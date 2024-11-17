@@ -10,6 +10,7 @@ import SwiftUI
 struct CircularProgressView: View {
     let progress: Double
     let timeString: String
+    let startTimeString: String
     let currentStage: TimeStage
     
     private var stageGradient: LinearGradient {
@@ -45,6 +46,7 @@ struct CircularProgressView: View {
     
     var body: some View {
         ZStack {
+            
             // Фоновый круг
             Circle()
                 .stroke(lineWidth: 12)
@@ -75,18 +77,16 @@ struct CircularProgressView: View {
                 Text(timeString)
                     .font(.system(size: 32, weight: .medium, design: .monospaced))
                 
-                Text("\(Int(progress * 24))h/24h")
-                    .font(.system(size: 14))
+//                Text("\(Int(progress * 24))h/24h")
+//                    .font(.system(size: 14))
+//                    .foregroundColor(.secondary)
+                
+                Text(startTimeString)
+                    .font(.system(size: 15))
                     .foregroundColor(.secondary)
             }
             
             // Текущая фаза (маленькая точка на круге)
-//            Circle()
-//                .frame(width: 15, height: 15)
-//                .foregroundColor(stageColor)
-//                .offset(y: -100)
-//                .rotationEffect(.degrees(progress * 360))
-//                .animation(.linear, value: progress)
             PulsingDot(color: stageColor)
                 .offset(y: -100)
                 .rotationEffect(.degrees(progress * 360))

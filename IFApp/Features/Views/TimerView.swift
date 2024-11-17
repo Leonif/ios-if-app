@@ -16,6 +16,7 @@ struct TimerView: View {
                     CircularProgressView(
                         progress: progress,
                         timeString: viewModel.elapsedTimeString,
+                        startTimeString: viewModel.startDateTimeString,
                         currentStage: TimeStage.determineStage(from: viewModel.elapsedTime)
                     )
                     Spacer()

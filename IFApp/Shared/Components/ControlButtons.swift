@@ -42,7 +42,7 @@ struct ControlButtons: View {
                         .font(.system(size: 20, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color.gray.opacity(0.3))
+                        .background(isRunning ? Color.red : Color.gray.opacity(0.3))
                         .foregroundColor(.white)
                         .cornerRadius(12)
                 }
