@@ -4,6 +4,7 @@ struct TimerView: View {
     @AppStorage("elapsed_time") private var savedElapsedTime: Double = 0
     @AppStorage("is_running") private var savedIsRunning: Bool = false
     @AppStorage("background_date") private var savedBackgroundDate: Double = 0
+    @AppStorage("start_date") private var savedStartDate: Double = 0
     
     @State private var elapsedTime: TimeInterval = 0
     @State private var timer: Timer?
@@ -11,49 +12,120 @@ struct TimerView: View {
     @State private var backgroundDate: Date?
     
     var body: some View {
-        VStack(spacing: 20) {
-            
-            Image(systemName: stageImage(from: elapsedTime))
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .foregroundColor(stageColor(from: elapsedTime))
-                .frame(width: 40, height: 40)
-            
-            Text(stageString(from: elapsedTime))
-                .font(.system(size: 30))
-                .monospacedDigit()
-            
-            Text(timeString(from: elapsedTime))
-                .font(.system(size: 50))
-                .monospacedDigit()
-            
-            Button(action: {
-                startTimer()
-            }) {
-                Text("Старт")
-                    .font(.title2)
-                    .frame(height: 50)
-                    .frame(maxWidth: .infinity)
-                    .background(isRunning ? Color.gray : Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding()
-            }
-            .disabled(isRunning)
-            
-            HStack(spacing: 16) {
-                Button(action: {
-                    stopTimer()
-                }) {
-                    Text("Стоп")
-                        .font(.title2)
-                        .frame(width: 100, height: 44)
-                        .background(!isRunning ? Color.gray : Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+        Spacer()
+        ScrollView {
+            Spacer()
+            VStack(spacing: 20) {
+                Spacer()
+                HStack {
+                    Button(action: {
+                        elapsedTime -= 10.minTimeInterval
+                    }) {
+                        Image(systemName: "arrow.left")
+                    }
+                    .buttonStyle(BorderedButtonStyle())
+                    
+                    VStack {
+                        Text(getStartDateAndTime())
+                        Text(elapsedTime.timeString)
+                            .font(.system(size: 50))
+                            .monospacedDigit()
+                    }
+                    
+                    
+                    
+                    Button(action: {
+                        elapsedTime += 10.minTimeInterval
+                    }) {
+                        Image(systemName: "arrow.right")
+                    }
+                    .buttonStyle(BorderedButtonStyle())
                 }
-                .disabled(!isRunning)
                 
+                HStack {
+                    Text(stageString(from: elapsedTime))
+                        .font(.system(size: 20))
+                        .monospacedDigit()
+                    
+                    Image(systemName: stageImage(from: elapsedTime))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundColor(stageColor(from: elapsedTime))
+                        .frame(width: 20, height: 20)
+                    
+                    if timeStage(from: elapsedTime).startHour != 0 {
+                        Text(timeStageString(from: elapsedTime))
+                            .font(.system(size: 20))
+                            .monospacedDigit()
+                    }
+                }
+                
+                buttonsView()
+                
+                Text(stageDescription(from: elapsedTime))
+                    .font(.callout)
+                    .padding()
+                    .background(Color.green.opacity(0.1))
+                    .cornerRadius(20)
+                    .padding()
+                
+                if let extraDescription = stageExtraDescription(from: elapsedTime) {
+                    HStack(spacing: 0) {
+                        Text("💡")
+                            .padding(.leading)
+                        
+                        Text(extraDescription)
+                            .font(.system(size: 16, weight: .bold))
+                            .padding()
+                        
+                    }
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(20)
+                    .padding()
+                }
+                
+            }
+        }
+        .onAppear {
+            setupNotifications()
+            restoreState()
+        }
+    }
+    
+    private func getStartDateAndTime() -> String {
+        // Получаем дату начала
+        let currentDate = Date()
+        let startDate = currentDate.addingTimeInterval(-elapsedTime)
+        
+        // Форматируем дату
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy HH:mm"
+        // Если нужна локализация для русского языка
+        dateFormatter.locale = Locale(identifier: "ru_RU")
+        
+        return dateFormatter.string(from: startDate)
+    }
+    
+    @ViewBuilder
+    private func buttonsView() -> some View {
+        Button(action: {
+            startTimer()
+        }) {
+            Text("Старт")
+                .font(.title2)
+                .frame(height: 50)
+                .frame(maxWidth: .infinity)
+                .background(isRunning ? Color.gray : Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .padding()
+        }
+        .disabled(isRunning)
+        
+        HStack(spacing: 8) {
+            Button(action: {
+                stopTimer()
+            }) {
                 Button(action: {
                     resetTimer()
                 }) {
@@ -65,36 +137,16 @@ struct TimerView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
+                
+                Text("Стоп")
+                    .font(.title2)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(!isRunning ? Color.gray : Color.red)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
             }
-            
-            Text(stageDescription(from: elapsedTime))
-                .font(.callout)
-                .padding()
-                .background(Color.green.opacity(0.1))
-                .cornerRadius(20)
-                .padding()
-            
-            if let extraDescription = stageExtraDescription(from: elapsedTime) {
-                HStack(spacing: 0) {
-                    Text("💡")
-                        .padding(.leading)
-                        
-                    Text(extraDescription)
-                        .font(.system(size: 16, weight: .bold))
-                        .padding()
-                        
-                }
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(20)
-                .padding()
-            }
-            
-        }
-        
-        .onAppear {
-            setupNotifications()
-            restoreState()
-        }
+        }.padding(.horizontal)
     }
     
     private func setupNotifications() {
@@ -111,6 +163,7 @@ struct TimerView: View {
             }
         }
         
+        // возвращение на экран
         NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification,
             object: nil,
@@ -143,6 +196,7 @@ struct TimerView: View {
     private func startTimer() {
         isRunning = true
         savedIsRunning = true
+        savedStartDate = Date().timeIntervalSince1970
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             elapsedTime += 1
             savedElapsedTime = elapsedTime
@@ -161,13 +215,6 @@ struct TimerView: View {
     private func resetTimer() {
         stopTimer()
         elapsedTime = 0
-    }
-    
-    private func timeString(from timeInterval: TimeInterval) -> String {
-        let hours = Int(timeInterval) / 3600
-        let minutes = Int(timeInterval) / 60 % 60
-        let seconds = Int(timeInterval) % 60
-        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
     
     private func stageString(from timeInterval: TimeInterval) -> String {
@@ -207,28 +254,33 @@ struct TimerView: View {
         switch timeStage(from: timeInterval) {
         case .anabolic:
             return """
-                - Период активного пищеварения и усвоения питательных веществ
-                - В крови повышен уровень глюкозы и инсулина
-                - Организм запасает энергию в мышцах и печени в виде гликогена
-                - Излишки углеводов преобразуются в жиры
-                - Активно идут процессы восстановления и роста тканей
-                - Это оптимальное время для тренировок на массу
+                🍽️ Период активного пищеварения и усвоения питательных веществ
+                🩸 В крови повышен уровень глюкозы и инсулина
+                ⚡ Организм запасает энергию в мышцах и печени в виде гликогена
+                🏋️ Излишки углеводов преобразуются в жиры
+                🔄 Активно идут процессы восстановления и роста тканей
+                💪 Это оптимальное время для тренировок на массу
                 """
         case .catabolic:
             return """
-                - Период разрушения тканей и уменьшения запасов энергии
-                - В крови повышается уровень гормонов стресса (кортизол, адреналин)
-                - Организм начинает расщеплять жиры и белки для получения энергии
-                - Уровень глюкозы в крови снижается
-                - Это оптимальное время для тренировок на снижение веса
+                📉 Уровень глюкозы и инсулина снижается
+                🔋 Организм начинает использовать запасы гликогена
+                ⚖️ Активизируются процессы расщепления
+                🧪 Начинается выработка глюкагона - гормона, способствующего расщеплению гликогена
+                🔄 Организм постепенно переходит на использование жировых запасов
+                🏃 В этой фазе хорошо проводить кардио тренировки
                 """
         default:
             return """
-                - Период активного сжигания жиров
-                - В крови повышается уровень гормона роста
-                - Организм использует жиры в качестве основного источника энергии
-                - Уровень глюкозы в крови снижается
-                - Это оптимальное время для кардио-тренировок
+                📪 Запасы гликогена истощаются
+                🔥 Организм переключается на использование жировых запасов как основного источника энергии
+                ⚗️ Активно вырабатываются кетоновые тела
+                📉 Снижается уровень инсулина до минимума
+                🧹 Активируются процессы аутофагии (очищение клеток)
+                📈 Увеличивается выработка гормона роста
+                ✨ Улучшается чувствительность к инсулину
+                🔥 Происходит активное жиросжигание
+                💪 Это оптимальное время для жиросжигающих тренировок
                 """
         }
     }
@@ -260,34 +312,34 @@ struct TimerView: View {
         let hours = Int(timeInterval) / 3600
         switch hours {
         case 0..<4:
-            return .anabolic
+            return .anabolic// hours
         case 4..<8:
-            return .catabolic
+            return .catabolic // timeInterval - 4 * 3600
         case 8..<12:
-            return .fatBurning8
+            return .fatBurning8  // hours - 8
         case 12..<16:
-            return .fatBurning12
+            return .fatBurning12  // hours - 12
         case 16..<24:
-            return .fatBurning16
+            return .fatBurning16  // hours - 16
         case 24..<36:
-            return .fatBurning24
+            return .fatBurning24  // hours - 24
         default:
-            return .fatBurning36
+            return .fatBurning36  // hours - 36
         }
+    }
+    
+    private func timeStageString(from timeInterval: TimeInterval) -> String {
+        let stage = timeStage(from: timeInterval)
+        let interval = timeInterval - TimeInterval(stage.startHour * 3600)
+        return interval.timeString
     }
 }
 
 
-enum TimeStage {
-    case anabolic
-    case catabolic
-    case fatBurning8
-    case fatBurning12
-    case fatBurning16
-    case fatBurning24
-    case fatBurning36
-}
 
-#Preview {
-    TimerView()
+
+extension Int {
+    var minTimeInterval: TimeInterval {
+        TimeInterval(self * 60)
+    }
 }
