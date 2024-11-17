@@ -2,16 +2,22 @@ import SwiftUI
 
 struct TimerView: View {
     @StateObject private var viewModel = TimerViewModel()
+    var progress: Double {
+        min(viewModel.elapsedTime / (24 * 3600), 1.0)
+    }
     
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                HStack(alignment: .bottom) {
+                HStack(alignment: .center) {
                     TimeControlButton(action: { viewModel.adjustTime(by: -10.minTimeInterval) },
                                       direction: "left")
                     Spacer()
-                    TimerDisplay(timeString: viewModel.elapsedTimeString,
-                                 dateString: viewModel.startDateTimeString)
+                    CircularProgressView(
+                        progress: progress,
+                        timeString: viewModel.elapsedTimeString,
+                        currentStage: TimeStage.determineStage(from: viewModel.elapsedTime)
+                    )
                     Spacer()
                     TimeControlButton(action: { viewModel.adjustTime(by: 10.minTimeInterval) },
                                       direction: "right")
@@ -39,3 +45,5 @@ struct TimerView: View {
         }
     }
 }
+
+
