@@ -6,37 +6,34 @@ struct TimerView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Таймер с контролами
-                HStack {
+                HStack(alignment: .bottom) {
                     TimeControlButton(action: { viewModel.adjustTime(by: -10.minTimeInterval) },
-                                   direction: "left")
-                    
+                                      direction: "left")
+                    Spacer()
                     TimerDisplay(timeString: viewModel.elapsedTimeString,
-                               dateString: viewModel.startDateTimeString)
-                    
+                                 dateString: viewModel.startDateTimeString)
+                    Spacer()
                     TimeControlButton(action: { viewModel.adjustTime(by: 10.minTimeInterval) },
-                                   direction: "right")
+                                      direction: "right")
                 }
-                .padding()
+                .padding(.horizontal)
                 
-                // Индикатор фазы
                 PhaseIndicator(phase: TimeStage.determineStage(from: viewModel.elapsedTime),
                              elapsedInPhase: viewModel.currentStageTimeString)
                 
-                // Кнопки управления
                 ControlButtons(isRunning: viewModel.isRunning,
                              onStart: viewModel.startTimer,
                              onStop: viewModel.stopTimer,
                              onReset: viewModel.resetTimer)
                 
-                // Описание фазы
                 let currentStage = TimeStage.determineStage(from: viewModel.elapsedTime)
-                PhaseDescription(description: currentStage.description,
-                               extraInfo: currentStage.extraDescription)
+                PhaseDescription(
+                    description: currentStage.description,
+                    extraInfo: currentStage.extraDescription
+                )
             }
-            .padding(.vertical)
         }
-        .background(Color.gray.opacity(0.05))
+        .background(Color.white)
         .onAppear {
             viewModel.setupNotifications()
         }

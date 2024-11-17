@@ -12,26 +12,18 @@ struct PhaseIndicator: View {
     let elapsedInPhase: String
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
             Text(phase.displayString)
-                .font(.title3.weight(.medium))
+                .font(.system(size: 20))
             
             Image(systemName: phase.systemImageName)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
+                .font(.system(size: 18))
                 .foregroundColor(phase.stageColor)
-                .frame(width: 24, height: 24)
             
-            if phase.startHour != 0 {
-                Text(elapsedInPhase)
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundColor(.secondary)
-            }
+            Text(elapsedInPhase)
+                .font(.system(size: 18, design: .monospaced))
+                .foregroundColor(.secondary)
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 16)
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: .gray.opacity(0.1), radius: 4, x: 0, y: 2)
+        .padding(.vertical, 12)
     }
 }

@@ -12,18 +12,16 @@ struct TimerDisplay: View {
     let dateString: String
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             Text(dateString)
-                .font(.system(size: 14))
+                .font(.system(size: 16))
                 .foregroundColor(.secondary)
             
             Text(timeString)
-                .font(.system(size: 54, weight: .light, design: .monospaced))
+                .font(.system(size: 38, weight: .regular, design: .monospaced))
                 .monospacedDigit()
                 .foregroundColor(.primary)
-                .padding(.vertical, 4)
+                .padding(.vertical, 8)
         }
-        .frame(maxWidth: .infinity)
-        .background(Color.white)
     }
 }

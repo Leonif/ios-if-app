@@ -13,12 +13,14 @@ struct TimeControlButton: View {
     
     var body: some View {
         Button(action: action) {
-            Image(systemName: "chevron.\(direction).circle.fill")
-                .font(.system(size: 32))
-                .foregroundColor(.blue)
-                .background(Color.white)
-                .clipShape(Circle())
-                .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
+            Circle()
+                .fill(Color.blue)
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Image(systemName: "chevron.\(direction)")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+                )
         }
     }
 }

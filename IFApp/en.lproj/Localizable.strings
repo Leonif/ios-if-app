@@ -1,0 +1,48 @@
+// Timer Controls
+"timer.button.start" = "Start";
+"timer.button.stop" = "Stop";
+"timer.button.reset" = "Reset";
+
+// Phase Names
+"phase.anabolic" = "Anabolic";
+"phase.catabolic" = "Catabolic";
+"phase.fatBurning" = "Fat Burning";
+
+// Anabolic Phase Description
+"phase.description.anabolic" = "
+🍽️ Active digestion and nutrient absorption period
+🩸 Elevated blood glucose and insulin levels
+⚡ Body stores energy in muscles and liver as glycogen
+🏋️ Excess carbohydrates are converted to fats
+🔄 Active tissue recovery and growth processes
+💪 Optimal time for mass training
+";
+
+// Catabolic Phase Description
+"phase.description.catabolic" = "
+📉 Glucose and insulin levels decrease
+🔋 Body starts using glycogen reserves
+⚖️ Breakdown processes activate
+🧪 Glucagon production begins - a hormone that promotes glycogen breakdown
+🔄 Body gradually transitions to using fat reserves
+🏃 Good time for cardio training
+";
+
+// Fat Burning Phase Description
+"phase.description.fatBurning" = "
+📪 Glycogen stores are depleted
+🔥 Body switches to using fat reserves as main energy source
+⚗️ Ketone bodies are actively produced
+📉 Insulin levels drop to minimum
+🧹 Autophagy processes activate (cell cleansing)
+📈 Growth hormone production increases
+✨ Insulin sensitivity improves
+🔥 Active fat burning occurs
+💪 Optimal time for fat burning workouts
+";
+
+// Extended Fasting Milestones
+"phase.extra.12hours" = "12 hours: complete glycogen depletion";
+"phase.extra.16hours" = "16-18 hours: maximum fat burning";
+"phase.extra.24hours" = "24 hours: significant increase in autophagy";
+"phase.extra.36hours" = "36-48 hours: immune system renewal";
