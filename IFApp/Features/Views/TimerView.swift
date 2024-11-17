@@ -5,134 +5,40 @@ struct TimerView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                Spacer()
-                timeDisplaySection
-                stageIndicatorSection
-                buttonsSection
-                descriptionSection
+            VStack(spacing: 24) {
+                // Таймер с контролами
+                HStack {
+                    TimeControlButton(action: { viewModel.adjustTime(by: -10.minTimeInterval) },
+                                   direction: "left")
+                    
+                    TimerDisplay(timeString: viewModel.elapsedTimeString,
+                               dateString: viewModel.startDateTimeString)
+                    
+                    TimeControlButton(action: { viewModel.adjustTime(by: 10.minTimeInterval) },
+                                   direction: "right")
+                }
+                .padding()
+                
+                // Индикатор фазы
+                PhaseIndicator(phase: TimeStage.determineStage(from: viewModel.elapsedTime),
+                             elapsedInPhase: viewModel.currentStageTimeString)
+                
+                // Кнопки управления
+                ControlButtons(isRunning: viewModel.isRunning,
+                             onStart: viewModel.startTimer,
+                             onStop: viewModel.stopTimer,
+                             onReset: viewModel.resetTimer)
+                
+                // Описание фазы
+                let currentStage = TimeStage.determineStage(from: viewModel.elapsedTime)
+                PhaseDescription(description: currentStage.description,
+                               extraInfo: currentStage.extraDescription)
             }
+            .padding(.vertical)
         }
+        .background(Color.gray.opacity(0.05))
         .onAppear {
             viewModel.setupNotifications()
-        }
-    }
-    
-    private var timeDisplaySection: some View {
-        HStack {
-            Button(action: {
-                viewModel.adjustTime(by: -10.minTimeInterval)
-            }) {
-                Image(systemName: "arrow.left")
-            }
-            .buttonStyle(BorderedButtonStyle())
-            
-            VStack {
-                Text(viewModel.startDateTimeString)
-                Text(viewModel.elapsedTimeString)
-                    .font(.system(size: 50))
-                    .monospacedDigit()
-            }
-            
-            Button(action: {
-                viewModel.adjustTime(by: 10.minTimeInterval)
-            }) {
-                Image(systemName: "arrow.right")
-            }
-            .buttonStyle(BorderedButtonStyle())
-        }
-    }
-    
-    private var stageIndicatorSection: some View {
-        let currentStage = TimeStage.determineStage(from: viewModel.elapsedTime)
-        
-        return HStack {
-            Text(currentStage.displayString)
-                .font(.system(size: 20))
-                .monospacedDigit()
-            
-            Image(systemName: currentStage.systemImageName)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .foregroundColor(currentStage.stageColor)
-                .frame(width: 20, height: 20)
-            
-            if currentStage.startHour != 0 {
-                Text(viewModel.currentStageTimeString)
-                    .font(.system(size: 20))
-                    .monospacedDigit()
-            }
-        }
-    }
-    
-    private var buttonsSection: some View {
-        VStack {
-            Button(action: {
-                viewModel.startTimer()
-            }) {
-                Text("Старт")
-                    .font(.title2)
-                    .frame(height: 50)
-                    .frame(maxWidth: .infinity)
-                    .background(viewModel.isRunning ? Color.gray : Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding()
-            }
-            .disabled(viewModel.isRunning)
-            
-            HStack(spacing: 8) {
-                Button(action: {
-                    viewModel.resetTimer()
-                }) {
-                    Text("Сброс")
-                        .padding()
-                        .font(.title2)
-                        .frame(width: 100, height: 44)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                
-                Button(action: {
-                    viewModel.stopTimer()
-                }) {
-                    Text("Стоп")
-                        .font(.title2)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .background(!viewModel.isRunning ? Color.gray : Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-            }.padding(.horizontal)
-        }
-    }
-    
-    private var descriptionSection: some View {
-        let currentStage = TimeStage.determineStage(from: viewModel.elapsedTime)
-        
-        return VStack {
-            Text(currentStage.description)
-                .font(.callout)
-                .padding()
-                .background(Color.green.opacity(0.1))
-                .cornerRadius(20)
-                .padding()
-            
-            if let extraDescription = currentStage.extraDescription {
-                HStack(spacing: 0) {
-                    Text("💡")
-                        .padding(.leading)
-                    
-                    Text(extraDescription)
-                        .font(.system(size: 16, weight: .bold))
-                        .padding()
-                }
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(20)
-                .padding()
-            }
         }
     }
 }
