@@ -81,12 +81,15 @@ struct CircularProgressView: View {
             }
             
             // Текущая фаза (маленькая точка на круге)
-            Circle()
-                .frame(width: 15, height: 15)
-                .foregroundColor(stageColor)
+//            Circle()
+//                .frame(width: 15, height: 15)
+//                .foregroundColor(stageColor)
+//                .offset(y: -100)
+//                .rotationEffect(.degrees(progress * 360))
+//                .animation(.linear, value: progress)
+            PulsingDot(color: stageColor)
                 .offset(y: -100)
                 .rotationEffect(.degrees(progress * 360))
-                .animation(.linear, value: progress)
 
             // Фазовые подписи (опционально)
             ForEach(0..<4) { i in
@@ -109,5 +112,33 @@ struct CircularProgressView: View {
         case 3: return "18h"
         default: return ""
         }
+    }
+}
+
+
+struct PulsingDot: View {
+    let color: Color
+    @State private var isPulsing = false
+    
+    var body: some View {
+        Circle()
+            .fill(color)
+            .frame(width: 15, height: 15)
+            .padding(2)
+            .background(
+//                RoundedRectangle(cornerRadius: 3)
+                Circle()
+                    .fill(Color.white)
+                    .shadow(radius: 1)
+            )
+            .scaleEffect(isPulsing ? 1.2 : 1.0)
+            .animation(
+                Animation.easeInOut(duration: 1)
+                    .repeatForever(autoreverses: true),
+                value: isPulsing
+            )
+            .onAppear {
+                isPulsing = true
+            }
     }
 }
