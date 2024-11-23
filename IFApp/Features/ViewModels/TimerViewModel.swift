@@ -9,24 +9,21 @@ import SwiftUI
 import Combine
 
 final class TimerViewModel: ObservableObject {
-    @AppStorage("elapsed_time") private var savedElapsedTime: Double = 0
+    // Сохраняем только самые необходимые значения
+    @AppStorage("start_timestamp") private var savedStartTimestamp: Double = 0
     @AppStorage("is_running") private var savedIsRunning: Bool = false
-    @AppStorage("background_date") private var savedBackgroundDate: Double = 0
-    @AppStorage("start_date") private var savedStartDate: Double = 0
     
     @Published var elapsedTime: TimeInterval = 0
     @Published var isRunning = false
     
     private var timer: Timer?
-    private var backgroundDate: Date?
     
     var elapsedTimeString: String {
         elapsedTime.timeString
     }
     
     var startDateTimeString: String {
-        let currentDate = Date()
-        let startDate = currentDate.addingTimeInterval(-elapsedTime)
+        let startDate = Date(timeIntervalSince1970: savedStartTimestamp)
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy HH:mm"
@@ -65,8 +62,6 @@ final class TimerViewModel: ObservableObject {
     
     private func handleBackgroundTransition() {
         if isRunning {
-            backgroundDate = Date()
-            savedBackgroundDate = backgroundDate?.timeIntervalSince1970 ?? 0
             timer?.invalidate()
             timer = nil
         }
@@ -74,33 +69,37 @@ final class TimerViewModel: ObservableObject {
     
     private func handleForegroundTransition() {
         if isRunning {
-            let savedDate = Date(timeIntervalSince1970: savedBackgroundDate)
-            let timeInterval = Date().timeIntervalSince(savedDate)
-            elapsedTime += timeInterval
-            savedElapsedTime = elapsedTime
+            updateElapsedTime()
             startTimer()
         }
     }
     
+    private func updateElapsedTime() {
+        if savedStartTimestamp > 0 {
+            elapsedTime = Date().timeIntervalSince1970 - savedStartTimestamp
+        }
+    }
+    
     private func restoreState() {
-        elapsedTime = savedElapsedTime
         isRunning = savedIsRunning
         
-        if isRunning, savedBackgroundDate > 0 {
-            let savedDate = Date(timeIntervalSince1970: savedBackgroundDate)
-            let timeInterval = Date().timeIntervalSince(savedDate)
-            elapsedTime += timeInterval
-            savedElapsedTime = elapsedTime
+        if isRunning {
+            updateElapsedTime()
+            startTimer()
         }
     }
     
     func startTimer() {
         isRunning = true
         savedIsRunning = true
-        savedStartDate = Date().timeIntervalSince1970
+        
+        // Если таймер не был запущен ранее, сохраняем время старта
+        if savedStartTimestamp == 0 {
+            savedStartTimestamp = Date().timeIntervalSince1970 - elapsedTime
+        }
+        
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.elapsedTime += 1
-            self?.savedElapsedTime = self?.elapsedTime ?? 0
+            self?.updateElapsedTime()
         }
     }
     
@@ -109,18 +108,19 @@ final class TimerViewModel: ObservableObject {
         savedIsRunning = false
         timer?.invalidate()
         timer = nil
-        backgroundDate = nil
-        savedBackgroundDate = 0
+        savedStartTimestamp = 0
     }
     
     func resetTimer() {
         stopTimer()
         elapsedTime = 0
-        savedElapsedTime = 0
     }
     
     func adjustTime(by interval: TimeInterval) {
         elapsedTime += interval
-        savedElapsedTime = elapsedTime
+        if isRunning {
+            // При корректировке времени обновляем сохраненное время старта
+            savedStartTimestamp = Date().timeIntervalSince1970 - elapsedTime
+        }
     }
 }
