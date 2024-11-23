@@ -22,10 +22,10 @@ enum TimeStage {
         case .anabolic: return 0
         case .catabolic: return 4
         case .fatBurning8: return 8
-        case .fatBurning12: return 12
-        case .fatBurning16: return 16
-        case .fatBurning24: return 24
-        case .fatBurning36: return 36
+        case .fatBurning12: return 8
+        case .fatBurning16: return 8
+        case .fatBurning24: return 8
+        case .fatBurning36: return 8
         }
     }
     
