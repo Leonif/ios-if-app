@@ -10,7 +10,7 @@ import SwiftUI
 struct CircularProgressView: View {
     let progress: Double
     let timeString: String
-    let startTimeString: String
+    let startTimeString: String?
     let currentStage: TimeStage
     
     private var stageGradient: LinearGradient {
@@ -76,14 +76,11 @@ struct CircularProgressView: View {
             VStack(spacing: 4) {
                 Text(timeString)
                     .font(.system(size: 32, weight: .medium, design: .monospaced))
-                
-//                Text("\(Int(progress * 24))h/24h")
-//                    .font(.system(size: 14))
-//                    .foregroundColor(.secondary)
-                
-                Text(startTimeString)
-                    .font(.system(size: 15))
-                    .foregroundColor(.secondary)
+                if let startTimeString {
+                    Text(startTimeString)
+                        .font(.system(size: 15))
+                        .foregroundColor(.secondary)
+                }
             }
             
             // Текущая фаза (маленькая точка на круге)

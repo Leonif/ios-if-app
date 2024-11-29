@@ -22,7 +22,8 @@ final class TimerViewModel: ObservableObject {
         elapsedTime.timeString
     }
     
-    var startDateTimeString: String {
+    var startDateTimeString: String? {
+        guard savedStartTimestamp > 0 else { return nil }
         let startDate = Date(timeIntervalSince1970: savedStartTimestamp)
         
         let dateFormatter = DateFormatter()
