@@ -46,3 +46,6 @@
 "phase.extra.16hours" = "16-18 hours: maximum fat burning";
 "phase.extra.24hours" = "24 hours: significant increase in autophagy";
 "phase.extra.36hours" = "36-48 hours: immune system renewal";
+
+
+"disclaimer" = "Disclaimer: This app does not provide medical advice. Please consult a doctor before making any health-related decisions.";

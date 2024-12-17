@@ -15,7 +15,7 @@ struct TimeControlButton: View {
         Button(action: action) {
             Circle()
                 .fill(Color.blue)
-                .frame(width: 40, height: 40)
+                .frame(width: 45, height: 45)
                 .overlay(
                     Image(systemName: "chevron.\(direction)")
                         .font(.system(size: 20, weight: .bold))

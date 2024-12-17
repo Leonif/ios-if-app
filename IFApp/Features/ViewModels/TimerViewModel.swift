@@ -15,6 +15,7 @@ final class TimerViewModel: ObservableObject {
     
     @Published var elapsedTime: TimeInterval = 0
     @Published var isRunning = false
+    var showSources: Bool = false
     
     private var timer: Timer?
     

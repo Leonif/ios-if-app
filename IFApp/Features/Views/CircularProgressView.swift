@@ -75,7 +75,7 @@ struct CircularProgressView: View {
             // Текст в центре
             VStack(spacing: 4) {
                 Text(timeString)
-                    .font(.system(size: 32, weight: .medium, design: .monospaced))
+                    .font(.system(size: 35, weight: .medium, design: .monospaced))
                 if let startTimeString {
                     Text(startTimeString)
                         .font(.system(size: 15))
