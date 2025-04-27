@@ -1,7 +1,10 @@
 import SwiftUI
 
 struct TimerView: View {
+    
     @StateObject private var viewModel = TimerViewModel()
+    @State var showSources: Bool = false
+    
     var progress: Double {
         min(viewModel.elapsedTime / (24 * 3600), 1.0)
     }
@@ -10,7 +13,7 @@ struct TimerView: View {
         HStack {
             Spacer()
             Button("Sources") {
-                viewModel.showSources = true
+                showSources = true
             }
         }.padding()
         ScrollView {
@@ -50,7 +53,7 @@ struct TimerView: View {
         .onAppear {
             viewModel.setupNotifications()
         }
-        .sheet(isPresented: $viewModel.showSources, content: { SourcesView() })
+        .sheet(isPresented: $showSources, content: { SourcesView() })
         
     }
 }
