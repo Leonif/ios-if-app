@@ -7,6 +7,8 @@
 
 import SwiftUI
 import Combine
+import StoreKit
+import UIKit
 
 final class TimerViewModel: ObservableObject {
     // Сохраняем только самые необходимые значения
@@ -111,11 +113,20 @@ final class TimerViewModel: ObservableObject {
         timer?.invalidate()
         timer = nil
         savedStartTimestamp = 0
+        
+        Task { @MainActor in
+            guard let scene = UIApplication.shared.connectedScenes.first(where: {
+                $0.activationState == .foregroundActive 
+            }) as? UIWindowScene else { 
+                return 
+            }
+            AppStore.requestReview(in: scene)
+        }
     }
     
     func resetTimer() {
         stopTimer()
-        elapsedTime = 0
+        elapsedTime = 0 
     }
     
     func adjustTime(by interval: TimeInterval) {
