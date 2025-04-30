@@ -99,4 +99,37 @@ enum L10n {
             value: "Відмова від відповідальності: Цей додаток не надає медичних консультацій. Будь ласка, проконсультуйтеся з лікарем, перш ніж приймати будь-які рішення, пов'язані зі здоров'ям.",
             comment: "Відмова від відповідальності: Цей додаток не надає медичних консультацій. Будь ласка, проконсультуйтеся з лікарем, перш ніж приймати будь-які рішення, пов'язані зі здоров'ям.")
     }
+    
+    enum Notification {
+        static let reminderTitle = NSLocalizedString("notification.reminder.title",
+            value: "⏰ Напоминание",
+            comment: "Title for daily notification")
+
+        static let reminderBody = NSLocalizedString("notification.reminder.body",
+            value: "Проверь свою фазу голодания!",
+            comment: "Body text for daily notification")
+
+        static let errorScheduling = NSLocalizedString("notification.error.scheduling",
+            value: "Ошибка добавления уведомления",
+            comment: "Error message when scheduling fails")
+
+        static let scheduledMessage = NSLocalizedString("notification.scheduled",
+            value: "Ежедневное уведомление запланировано на 12:00",
+            comment: "Success message for scheduled daily notification")
+
+        static let sentMessage = NSLocalizedString("notification.sent",
+            value: "Уведомление отправлено",
+            comment: "Message after sending immediate notification")
+
+        static let allCancelled = NSLocalizedString("notification.cancelled",
+            value: "Все уведомления отменены.",
+            comment: "Message after cancelling all notifications")
+        
+        static func phaseTitle(_ phaseName: String) -> String {
+            String(format: NSLocalizedString("notification.phase.title",
+                value: "Фаза: %@",
+                comment: "Notification title with current fasting phase"), phaseName)
+        }
+    }
+
 }
