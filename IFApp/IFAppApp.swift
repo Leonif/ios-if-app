@@ -12,6 +12,10 @@ struct IFAppApp: App {
     var body: some Scene {
         WindowGroup {
             TimerView()
+                .onAppear {
+                    NotificationManager.shared.requestAuthorization()
+                    NotificationManager.shared.scheduleDailyNoonNotification()
+                }
         }
     }
 }
