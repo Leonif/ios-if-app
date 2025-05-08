@@ -130,7 +130,7 @@ final class TimerViewModel: ObservableObject {
     }
     
     func adjustTime(by interval: TimeInterval) {
-        elapsedTime += interval
+        elapsedTime = max(0, elapsedTime + interval)
         if isRunning {
             // При корректировке времени обновляем сохраненное время старта
             savedStartTimestamp = Date().timeIntervalSince1970 - elapsedTime
