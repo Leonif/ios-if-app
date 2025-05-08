@@ -99,4 +99,66 @@ enum L10n {
             value: "Відмова від відповідальності: Цей додаток не надає медичних консультацій. Будь ласка, проконсультуйтеся з лікарем, перш ніж приймати будь-які рішення, пов'язані зі здоров'ям.",
             comment: "Відмова від відповідальності: Цей додаток не надає медичних консультацій. Будь ласка, проконсультуйтеся з лікарем, перш ніж приймати будь-які рішення, пов'язані зі здоров'ям.")
     }
+    
+    enum Notification {
+        static let reminderTitle = NSLocalizedString("notification.reminder.title",
+            value: "⏰ Напоминание",
+            comment: "Title for daily notification")
+
+        static let reminderBody = NSLocalizedString("notification.reminder.body",
+            value: "Проверь свою фазу голодания!",
+            comment: "Body text for daily notification")
+
+        static let errorScheduling = NSLocalizedString("notification.error.scheduling",
+            value: "Ошибка добавления уведомления",
+            comment: "Error message when scheduling fails")
+
+        static let scheduledMessage = NSLocalizedString("notification.scheduled",
+            value: "Ежедневное уведомление запланировано на 12:00",
+            comment: "Success message for scheduled daily notification")
+
+        static let sentMessage = NSLocalizedString("notification.sent",
+            value: "Уведомление отправлено",
+            comment: "Message after sending immediate notification")
+
+        static let allCancelled = NSLocalizedString("notification.cancelled",
+            value: "Все уведомления отменены.",
+            comment: "Message after cancelling all notifications")
+        
+        static func phaseTitle(_ phaseName: String) -> String {
+            String(format: NSLocalizedString("notification.phase.title",
+                value: "Фаза: %@",
+                comment: "Notification title with current fasting phase"), phaseName)
+        }
+    }
+    
+    enum Sources {
+        static let title = NSLocalizedString("sources.title",
+            value: "Scientific Sources",
+            comment: "Title for the sources screen")
+            
+        static let disclaimerTitle = NSLocalizedString("sources.disclaimer.title",
+            value: "Disclaimer",
+            comment: "Title for the disclaimer section")
+            
+        static let buttonViewStudy = NSLocalizedString("sources.button.viewStudy",
+            value: "View Study",
+            comment: "Button text to view the study")
+            
+        static let source1Title = NSLocalizedString("sources.source1.title",
+            value: "Glycogen and its metabolism: some new developments and old themes",
+            comment: "Title of the first scientific source")
+            
+        static let source2Title = NSLocalizedString("sources.source2.title",
+            value: "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial",
+            comment: "Title of the second scientific source")
+            
+        static let source3Title = NSLocalizedString("sources.source3.title",
+            value: "Fasting-induced FGF21 signaling activates hepatic autophagy and lipid degradation via JMJD3 histone demethylase",
+            comment: "Title of the third scientific source")
+            
+        static let source4Title = NSLocalizedString("sources.source4.title",
+            value: "Intermittent Fasting and Metabolic Health",
+            comment: "Title of the fourth scientific source")
+    }
 }

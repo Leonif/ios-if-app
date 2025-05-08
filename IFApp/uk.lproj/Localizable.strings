@@ -48,3 +48,23 @@
 "phase.extra.36hours" = "36-48 годин: оновлення імунної системи";
 
 "disclaimer" = "Відмова від відповідальності: Цей додаток не надає медичних консультацій. Будь ласка, проконсультуйтеся з лікарем, перш ніж приймати будь-які рішення, пов'язані зі здоров'ям.";
+
+
+/* Timer buttons */
+"timer.button.start" = "Старт";
+"timer.button.stop" = "Стоп";
+"timer.button.reset" = "Скидання";
+
+/* Phases */
+"phase.anabolic" = "Анаболічна";
+"phase.catabolic" = "Катаболічна";
+"phase.fatBurning" = "Жироспалення";
+
+/* Notification content */
+"notification.reminder.title" = "⏰ Нагадування";
+"notification.reminder.body" = "Перевір свою фазу голодування!";
+"notification.error.scheduling" = "Помилка додавання нагадування";
+"notification.scheduled" = "Щоденне нагадування заплановано на 12:00";
+"notification.sent" = "Нагадування надіслано";
+"notification.cancelled" = "Усі нагадування скасовано.";
+"notification.phase.title" = "Фаза: %@";

@@ -49,3 +49,31 @@
 
 
 "disclaimer" = "Disclaimer: This app does not provide medical advice. Please consult a doctor before making any health-related decisions.";
+
+/* Timer buttons */
+"timer.button.start" = "Start";
+"timer.button.stop" = "Stop";
+"timer.button.reset" = "Reset";
+
+/* Phases */
+"phase.anabolic" = "Anabolic";
+"phase.catabolic" = "Catabolic";
+"phase.fatBurning" = "Fat Burning";
+
+/* Notification content */
+"notification.reminder.title" = "⏰ Reminder";
+"notification.reminder.body" = "Check your fasting phase!";
+"notification.error.scheduling" = "Failed to schedule notification";
+"notification.scheduled" = "Daily notification scheduled for 12:00 PM";
+"notification.sent" = "Notification sent";
+"notification.cancelled" = "All notifications cancelled.";
+"notification.phase.title" = "Phase: %@";
+
+/* Sources View */
+"sources.title" = "Scientific Sources";
+"sources.disclaimer.title" = "Disclaimer";
+"sources.button.viewStudy" = "View Study";
+"sources.source1.title" = "Glycogen and its metabolism: some new developments and old themes";
+"sources.source2.title" = "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial";
+"sources.source3.title" = "Fasting-induced FGF21 signaling activates hepatic autophagy and lipid degradation via JMJD3 histone demethylase";
+"sources.source4.title" = "Intermittent Fasting and Metabolic Health";
