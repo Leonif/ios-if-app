@@ -14,9 +14,21 @@ struct SourcesView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                // Top bar with dismiss button
-                HStack {
-                    Spacer()
+                // Disclaimer section
+                ZStack(alignment: .topTrailing) {
+                    VStack(spacing: 12) {
+                        Text(L10n.Sources.disclaimerTitle)
+                            .font(.headline)
+                            .foregroundColor(.red)
+                        
+                        Text(L10n.Cautions.disclaimer)
+                            .font(.footnote)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    // Top bar with dismiss button
+                    
                     Button(action: {
                         dismiss()
                     }) {
@@ -24,20 +36,7 @@ struct SourcesView: View {
                             .font(.title2)
                             .foregroundColor(.gray)
                     }
-                }
-                .padding(.bottom, 8)
-                
-                // Disclaimer section
-                VStack(spacing: 12) {
-                    Text(L10n.Sources.disclaimerTitle)
-                        .font(.headline)
-                        .foregroundColor(.red)
                     
-                    Text(L10n.Cautions.disclaimer)
-                        .font(.footnote)
-                        .foregroundColor(.red)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
                 }
                 .padding()
                 .background(Color.red.opacity(0.1))

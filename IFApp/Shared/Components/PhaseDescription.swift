@@ -38,7 +38,7 @@ struct PhaseDescription: View {
                         Image(systemName: "chevron.down.circle.fill")
                             .font(.title2)
                             .foregroundColor(.green)
-                        Text("Показать описание")
+                        Text(L10n.Phases.Description.showDescription)
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.primary)
                     }

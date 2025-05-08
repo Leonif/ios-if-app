@@ -72,6 +72,10 @@ enum L10n {
                 💪 Это оптимальное время для жиросжигающих тренировок
                 """,
                 comment: "Fat burning phase description")
+                
+            static let showDescription = NSLocalizedString("phase.description.show",
+                value: "Показать описание",
+                comment: "Button text to show phase description")
         }
         
         enum Extra {

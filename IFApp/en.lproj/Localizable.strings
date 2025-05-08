@@ -77,3 +77,6 @@
 "sources.source2.title" = "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial";
 "sources.source3.title" = "Fasting-induced FGF21 signaling activates hepatic autophagy and lipid degradation via JMJD3 histone demethylase";
 "sources.source4.title" = "Intermittent Fasting and Metabolic Health";
+
+/* Phase Description */
+"phase.description.show" = "Show Description";
