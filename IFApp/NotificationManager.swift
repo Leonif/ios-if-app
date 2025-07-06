@@ -6,6 +6,7 @@
 //
 
 import UserNotifications
+import Foundation
 
 final class NotificationManager {
     static let shared = NotificationManager()
@@ -42,7 +43,6 @@ final class NotificationManager {
         }
     }
 
-
     func scheduleNotification(after seconds: TimeInterval, title: String, body: String) {
         let content = UNMutableNotificationContent()
         content.title = title
@@ -66,31 +66,59 @@ final class NotificationManager {
         }
     }
 
-    func scheduleDailyNoonNotification() {
+    // MARK: - Общий метод для планирования ежедневных уведомлений
+    private func scheduleDailyNotification(
+        hour: Int,
+        minute: Int = 0,
+        identifier: String,
+        title: String,
+        body: String,
+        successMessage: String
+    ) {
         var dateComponents = DateComponents()
-        dateComponents.hour = 12
-        dateComponents.minute = 0
+        dateComponents.hour = hour
+        dateComponents.minute = minute
 
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
 
         let content = UNMutableNotificationContent()
-        content.title = L10n.Notification.reminderTitle
-        content.body = L10n.Notification.reminderBody
+        content.title = title
+        content.body = body
         content.sound = .default
 
         let request = UNNotificationRequest(
-            identifier: "daily_noon_notification",
+            identifier: identifier,
             content: content,
             trigger: trigger
         )
 
         UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
+            if let error {
                 print("\(L10n.Notification.errorScheduling): \(error.localizedDescription)")
             } else {
-                print(L10n.Notification.scheduledMessage)
+                print(successMessage)
             }
         }
+    }
+
+    func scheduleDailyNoonNotification() {
+        scheduleDailyNotification(
+            hour: 12,
+            identifier: "daily_noon_notification",
+            title: L10n.Notification.reminderTitle,
+            body: L10n.Notification.reminderBody,
+            successMessage: L10n.Notification.scheduledMessage
+        )
+    }
+
+    func scheduleDailyEveningNotification() {
+        scheduleDailyNotification(
+            hour: 17,
+            identifier: "daily_evening_notification",
+            title: L10n.Notification.eveningTitle,
+            body: L10n.Notification.eveningBody,
+            successMessage: L10n.Notification.eveningScheduledMessage
+        )
     }
 
     func cancelAllNotifications() {

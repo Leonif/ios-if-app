@@ -15,6 +15,7 @@ struct IFAppApp: App {
                 .onAppear {
                     NotificationManager.shared.requestAuthorization()
                     NotificationManager.shared.scheduleDailyNoonNotification()
+                    NotificationManager.shared.scheduleDailyEveningNotification()
                 }
         }
     }
