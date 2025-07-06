@@ -72,6 +72,10 @@ enum L10n {
                 💪 Это оптимальное время для жиросжигающих тренировок
                 """,
                 comment: "Fat burning phase description")
+                
+            static let showDescription = NSLocalizedString("phase.description.show",
+                value: "Показать описание",
+                comment: "Button text to show phase description")
         }
         
         enum Extra {
@@ -131,5 +135,34 @@ enum L10n {
                 comment: "Notification title with current fasting phase"), phaseName)
         }
     }
-
+    
+    enum Sources {
+        static let title = NSLocalizedString("sources.title",
+            value: "Scientific Sources",
+            comment: "Title for the sources screen")
+            
+        static let disclaimerTitle = NSLocalizedString("sources.disclaimer.title",
+            value: "Disclaimer",
+            comment: "Title for the disclaimer section")
+            
+        static let buttonViewStudy = NSLocalizedString("sources.button.viewStudy",
+            value: "View Study",
+            comment: "Button text to view the study")
+            
+        static let source1Title = NSLocalizedString("sources.source1.title",
+            value: "Glycogen and its metabolism: some new developments and old themes",
+            comment: "Title of the first scientific source")
+            
+        static let source2Title = NSLocalizedString("sources.source2.title",
+            value: "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial",
+            comment: "Title of the second scientific source")
+            
+        static let source3Title = NSLocalizedString("sources.source3.title",
+            value: "Fasting-induced FGF21 signaling activates hepatic autophagy and lipid degradation via JMJD3 histone demethylase",
+            comment: "Title of the third scientific source")
+            
+        static let source4Title = NSLocalizedString("sources.source4.title",
+            value: "Intermittent Fasting and Metabolic Health",
+            comment: "Title of the fourth scientific source")
+    }
 }

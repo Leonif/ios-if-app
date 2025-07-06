@@ -1,0 +1,7 @@
+---
+description: как происходит локализация в проекте
+globs: 
+alwaysApply: false
+---
+1) теперь перенеси строки  и создай ключи для ни в @Localizable.strings 
+2) занеси необхдиміе константы этих ключей в @Strings.swift 
