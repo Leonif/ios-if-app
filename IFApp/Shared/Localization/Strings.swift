@@ -113,6 +113,14 @@ enum L10n {
             value: "Проверь свою фазу голодания!",
             comment: "Body text for daily notification")
 
+        static let eveningTitle = NSLocalizedString("notification.evening.title",
+            value: "🌅 Вечернее напоминание",
+            comment: "Title for evening notification")
+
+        static let eveningBody = NSLocalizedString("notification.evening.body",
+            value: "Время проверить прогресс голодания!",
+            comment: "Body text for evening notification")
+
         static let errorScheduling = NSLocalizedString("notification.error.scheduling",
             value: "Ошибка добавления уведомления",
             comment: "Error message when scheduling fails")
@@ -120,6 +128,10 @@ enum L10n {
         static let scheduledMessage = NSLocalizedString("notification.scheduled",
             value: "Ежедневное уведомление запланировано на 12:00",
             comment: "Success message for scheduled daily notification")
+
+        static let eveningScheduledMessage = NSLocalizedString("notification.evening.scheduled",
+            value: "Вечернее уведомление запланировано на 17:00",
+            comment: "Success message for scheduled evening notification")
 
         static let sentMessage = NSLocalizedString("notification.sent",
             value: "Уведомление отправлено",

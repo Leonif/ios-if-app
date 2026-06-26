@@ -63,8 +63,11 @@
 /* Notification content */
 "notification.reminder.title" = "⏰ Нагадування";
 "notification.reminder.body" = "Перевір свою фазу голодування!";
+"notification.evening.title" = "🌅 Вечірнє нагадування";
+"notification.evening.body" = "Час перевірити прогрес голодування!";
 "notification.error.scheduling" = "Помилка додавання нагадування";
 "notification.scheduled" = "Щоденне нагадування заплановано на 12:00";
+"notification.evening.scheduled" = "Вечірнє нагадування заплановано на 17:00";
 "notification.sent" = "Нагадування надіслано";
 "notification.cancelled" = "Усі нагадування скасовано.";
 "notification.phase.title" = "Фаза: %@";

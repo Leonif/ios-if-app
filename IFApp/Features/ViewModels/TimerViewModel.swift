@@ -14,11 +14,18 @@ final class TimerViewModel: ObservableObject {
     // Сохраняем только самые необходимые значения
     @AppStorage("start_timestamp") private var savedStartTimestamp: Double = 0
     @AppStorage("is_running") private var savedIsRunning: Bool = false
-    
+    // Сколько реальных сессий голодания человек довёл до конца - для запроса оценки
+    @AppStorage("completed_sessions_count") private var completedSessionsCount: Int = 0
+
     @Published var elapsedTime: TimeInterval = 0
     @Published var isRunning = false
-    
-    
+
+    // Засчитываем сессию как завершённую, только если дошли до жиросжигания (8 ч) -
+    // это отсекает случайные старт/стоп. Оценку просим после порога завершённых сессий.
+    private let minSessionDurationForReview: TimeInterval = 8 * 3600
+    private let completedSessionsThreshold = 2
+    private var didRequestReviewThisLaunch = false
+
     private var timer: Timer?
     
     var elapsedTimeString: String {
@@ -31,7 +38,7 @@ final class TimerViewModel: ObservableObject {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy HH:mm"
-        dateFormatter.locale = Locale(identifier: "ru_RU")
+        dateFormatter.locale = Locale.current
         
         return dateFormatter.string(from: startDate)
     }
@@ -108,25 +115,44 @@ final class TimerViewModel: ObservableObject {
     }
     
     func stopTimer() {
+        let finishedDuration = elapsedTime
+        clearRunningState()
+        maybeRequestReview(forCompletedSession: finishedDuration)
+    }
+
+    func resetTimer() {
+        // Сброс - это не завершение сессии, оценку тут не просим
+        clearRunningState()
+        elapsedTime = 0
+    }
+
+    private func clearRunningState() {
         isRunning = false
         savedIsRunning = false
         timer?.invalidate()
         timer = nil
         savedStartTimestamp = 0
-        
+    }
+
+    private func maybeRequestReview(forCompletedSession duration: TimeInterval) {
+        // Только реальная завершённая сессия, не случайный старт/стоп
+        guard duration >= minSessionDurationForReview else { return }
+        completedSessionsCount += 1
+
+        // Не на launch, не чаще раза за запуск приложения и только после порога.
+        // Частоту показов (лимит Apple) дальше регулирует сама система.
+        guard !didRequestReviewThisLaunch,
+              completedSessionsCount >= completedSessionsThreshold else { return }
+        didRequestReviewThisLaunch = true
+
         Task { @MainActor in
             guard let scene = UIApplication.shared.connectedScenes.first(where: {
-                $0.activationState == .foregroundActive 
-            }) as? UIWindowScene else { 
-                return 
+                $0.activationState == .foregroundActive
+            }) as? UIWindowScene else {
+                return
             }
             AppStore.requestReview(in: scene)
         }
-    }
-    
-    func resetTimer() {
-        stopTimer()
-        elapsedTime = 0 
     }
     
     func adjustTime(by interval: TimeInterval) {

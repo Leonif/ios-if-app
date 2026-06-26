@@ -46,14 +46,14 @@ enum TimeStage {
     }
     
     var displayString: String {
-            switch self {
-            case .anabolic: return L10n.Phases.anabolic
-            case .catabolic: return L10n.Phases.catabolic
-            default: return L10n.Phases.fatBurning
-            }
+        switch self {
+        case .anabolic: return L10n.Phases.anabolic
+        case .catabolic: return L10n.Phases.catabolic
+        default: return L10n.Phases.fatBurning
         }
+    }
         
-        var description: String {
+    var description: String {
             switch self {
             case .anabolic:
                 return L10n.Phases.Description.anabolic

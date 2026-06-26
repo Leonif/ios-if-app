@@ -63,8 +63,11 @@
 /* Notification content */
 "notification.reminder.title" = "⏰ Reminder";
 "notification.reminder.body" = "Check your fasting phase!";
+"notification.evening.title" = "🌅 Evening Reminder";
+"notification.evening.body" = "Time to check your fasting progress!";
 "notification.error.scheduling" = "Failed to schedule notification";
 "notification.scheduled" = "Daily notification scheduled for 12:00 PM";
+"notification.evening.scheduled" = "Evening notification scheduled for 5:00 PM";
 "notification.sent" = "Notification sent";
 "notification.cancelled" = "All notifications cancelled.";
 "notification.phase.title" = "Phase: %@";
