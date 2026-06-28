@@ -19,7 +19,8 @@ enum AppStoreFactory {
                 isRunning: loaded.isRunning,
                 stagedElapsed: 0,
                 completedSessionsCount: loaded.completedSessions
-            )
+            ),
+            planState: PlanState(planIdx: persistence.loadPlanIdx() ?? Plan.default.rawValue)
         )
 
         let core = ImprovedStoreV2(

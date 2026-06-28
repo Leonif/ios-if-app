@@ -2,129 +2,254 @@
 //  TimerFlowView.swift
 //  IFApp
 //
-//  Timer screen on Redux: reads a Props projection, dispatches thunks on user actions.
-//  Elapsed time is derived from the store's fastStartTimestamp + the current clock,
-//  refreshed once per second by TimelineView while a fast is running.
+//  The redesigned fasting screen on Redux. Reads a Props projection, derives the
+//  Verdant phase/fraction from elapsed vs the plan goal, and composes the ring,
+//  editorial, timeline, footer, and the plan/meal sheets. Elapsed is derived from
+//  fastStart + a TimelineView tick.
 //
 
 import SwiftUI
 import Redux
 
-struct TimerProps: Equatable {
+struct TimerScreenProps: Equatable {
     let isRunning: Bool
     let fastStartTimestamp: Double
     let stagedElapsed: TimeInterval
+    let planIdx: Int
+    let ateDay: Int
+    let ateMin: Int
+    let planEditorOpen: Bool
+    let mealPickerOpen: Bool
 
     init(state: AppState) {
         isRunning = state.timerState.isRunning
         fastStartTimestamp = state.timerState.fastStartTimestamp
         stagedElapsed = state.timerState.stagedElapsed
+        planIdx = state.planState.planIdx
+        ateDay = state.mealState.ateDay
+        ateMin = state.mealState.ateMin
+        planEditorOpen = state.uiState.planEditorOpen
+        mealPickerOpen = state.uiState.mealPickerOpen
     }
+
+    var plan: Plan { Plan(rawValue: planIdx) ?? .default }
+    var isMealFresh: Bool { ateMin < 0 }
 
     func elapsed(at now: Date) -> TimeInterval {
         isRunning ? max(0, now.timeIntervalSince1970 - fastStartTimestamp) : stagedElapsed
     }
 }
 
+private enum ScreenState { case idle, active, complete }
+
 struct TimerFlowView: View {
     private let store: Store<AppState>
-    @State private var props: TimerProps
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var props: TimerScreenProps
     @State private var showSources = false
 
     init(store: Store<AppState>) {
         self.store = store
-        _props = State(initialValue: TimerProps(state: store.getCurrentState()))
+        _props = State(initialValue: TimerScreenProps(state: store.getCurrentState()))
     }
 
     var body: some View {
-        ZStack(alignment: .top) {
-            ScrollView {
-                if props.isRunning {
-                    TimelineView(.periodic(from: .now, by: 1)) { context in
-                        content(elapsed: props.elapsed(at: context.date))
-                    }
-                } else {
-                    content(elapsed: props.stagedElapsed)
+        let theme = ThemeTokens.resolve(colorScheme)
+        ZStack {
+            backgroundLayer(theme: theme)
+
+            if props.isRunning {
+                TimelineView(.periodic(from: .now, by: 1)) { ctx in
+                    screen(theme: theme, now: ctx.date)
                 }
+            } else {
+                screen(theme: theme, now: Date())
             }
 
-            sourcesButton
+            overlays(theme: theme)
         }
-        .background(Color.backWhite)
         .sheet(isPresented: $showSources) { SourcesView() }
-        .connect(to: store, mapState: { TimerProps(state: $0) }, onPropsChange: { props = $0 })
+        .connect(to: store, mapState: { TimerScreenProps(state: $0) }, onPropsChange: { props = $0 })
     }
+
+    // MARK: Background (phase-reactive)
+
+    private func backgroundLayer(theme: ThemeTokens) -> some View {
+        let progress = PhaseProgress.compute(elapsed: props.elapsed(at: Date()), goalHours: props.plan.fastHours)
+        return theme.phaseBackground(progress.phase.color).ignoresSafeArea()
+    }
+
+    // MARK: Main screen
 
     @ViewBuilder
-    private func content(elapsed: TimeInterval) -> some View {
-        let stage = TimeStage.determineStage(from: elapsed)
-        VStack(spacing: 24) {
-            HStack(alignment: .center) {
-                TimeControlButton(action: { store.dispatch(AdjustTimeThunk(by: -10.minTimeInterval)) },
-                                  direction: "left")
-                Spacer()
-                CircularProgressView(
-                    progress: min(elapsed / (24 * 3600), 1.0),
-                    timeString: elapsed.timeString,
-                    startTimeString: startTimeString(),
-                    currentStage: stage
+    private func screen(theme: ThemeTokens, now: Date) -> some View {
+        let elapsed = props.elapsed(at: now)
+        let progress = PhaseProgress.compute(elapsed: elapsed, goalHours: props.plan.fastHours)
+        let state = screenState(progress: progress)
+        let nowMinute = Clock.minuteOfDay(now)
+
+        ScrollView {
+            VStack(spacing: 20) {
+                TimerHeader(
+                    plan: props.plan,
+                    theme: theme,
+                    onEditPlan: { store.dispatch(UIAction.planEditorOpened) },
+                    onSettings: { showSources = true }
                 )
-                Spacer()
-                TimeControlButton(action: { store.dispatch(AdjustTimeThunk(by: 10.minTimeInterval)) },
-                                  direction: "right")
-            }
-            .padding(.horizontal)
+                .padding(.bottom, 4)
 
-            PhaseIndicator(phase: stage, elapsedInPhase: stageElapsedString(elapsed: elapsed, stage: stage))
-
-            ControlButtons(
-                isRunning: props.isRunning,
-                onStart: { store.dispatch(StartFastThunk()) },
-                onStop: { store.dispatch(StopFastThunk()) },
-                onReset: { store.dispatch(ResetFastThunk()) }
-            )
-
-            PhaseDescription(description: stage.description, extraInfo: stage.extraDescription)
-        }
-        .padding(.top, 42)
-    }
-
-    private var sourcesButton: some View {
-        HStack {
-            Spacer()
-            Button(action: {
-                showSources = true
-                store.dispatch(AppLifecycleAction.sourcesOpened)
-            }) {
-                HStack(spacing: 8) {
-                    Image(systemName: "book.fill")
-                        .font(.system(size: 16))
-                    Text("Sources")
-                        .font(.system(size: 16, weight: .medium))
+                ZStack {
+                    PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
+                              isComplete: state == .complete, theme: theme)
+                    ringCenter(state: state, elapsed: elapsed, progress: progress, theme: theme)
                 }
-                .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.blue)
-                .cornerRadius(12)
+                .padding(.vertical, 6)
+
+                EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
+
+                if state == .active, let next = progress.nextPhase {
+                    NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
+                }
+
+                if state == .idle {
+                    LastMealPill(
+                        valueText: mealValue(nowMinute: nowMinute),
+                        subline: mealSubline(nowMinute: nowMinute),
+                        theme: theme,
+                        onTap: { store.dispatch(OpenMealPickerThunk()) }
+                    )
+                }
+
+                PhaseTimeline(currentPhase: progress.phase, isComplete: state == .complete, theme: theme)
+                    .padding(.top, 2)
+
+                footer(state: state, elapsed: elapsed, theme: theme)
+
+                Spacer(minLength: 0)
             }
+            .padding(.top, 74)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 22)
         }
-        .padding()
     }
 
-    /// Formatted start datetime, shown only while a fast is running (matches legacy behavior).
-    private func startTimeString() -> String? {
-        guard props.fastStartTimestamp > 0 else { return nil }
-        let date = Date(timeIntervalSince1970: props.fastStartTimestamp)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy HH:mm"
-        formatter.locale = .current
-        return formatter.string(from: date)
+    private func screenState(progress: PhaseProgress) -> ScreenState {
+        if !props.isRunning && props.stagedElapsed == 0 { return .idle }
+        if progress.isComplete || (!props.isRunning && props.stagedElapsed > 0) { return .complete }
+        return .active
     }
 
-    /// Elapsed time within the current stage (since the stage's start hour).
-    private func stageElapsedString(elapsed: TimeInterval, stage: TimeStage) -> String {
-        let interval = elapsed - TimeInterval(stage.startHour * 3600)
-        return interval.timeString
+    // MARK: Ring center
+
+    @ViewBuilder
+    private func ringCenter(state: ScreenState, elapsed: TimeInterval, progress: PhaseProgress, theme: ThemeTokens) -> some View {
+        switch state {
+        case .idle:
+            RingCenterIdle(theme: theme, onStart: { store.dispatch(StartFastThunk()) })
+        case .active:
+            RingCenterActive(elapsed: elapsed, phase: progress.phase, theme: theme)
+        case .complete:
+            RingCenterComplete(elapsed: elapsed, theme: theme)
+        }
+    }
+
+    // MARK: Footer
+
+    @ViewBuilder
+    private func footer(state: ScreenState, elapsed: TimeInterval, theme: ThemeTokens) -> some View {
+        switch state {
+        case .idle:
+            EmptyView()
+        case .active:
+            ActiveFooterCard(
+                startedAt: clockTime(props.fastStartTimestamp),
+                elapsed: hoursMinutes(elapsed),
+                goalLabel: "\(Int(props.plan.fastHours))h",
+                goalAt: clockTime(props.fastStartTimestamp + props.plan.fastHours * 3600),
+                theme: theme,
+                onEndFast: { store.dispatch(StopFastThunk()) }
+            )
+        case .complete:
+            CompleteFooterCard(
+                fasted: hoursMinutes(elapsed),
+                windowOpens: "Now",
+                theme: theme,
+                onReset: { store.dispatch(ResetFastThunk()) },
+                onStartEating: { store.dispatch(ResetFastThunk()) }
+            )
+        }
+    }
+
+    // MARK: Overlays (sheets)
+
+    @ViewBuilder
+    private func overlays(theme: ThemeTokens) -> some View {
+        if props.planEditorOpen {
+            PlanEditorSheet(
+                plan: props.plan,
+                theme: theme,
+                onSelect: { store.dispatch(PlanAction.selected($0)) },
+                onDone: { store.dispatch(UIAction.planEditorClosed) },
+                onClose: { store.dispatch(UIAction.planEditorClosed) }
+            )
+            .zIndex(1)
+        }
+        if props.mealPickerOpen {
+            let nowMinute = Clock.minuteOfDay()
+            LastMealPickerSheet(
+                dateLabel: MealMath.dateLabel(ateDay: props.ateDay),
+                timeLabel: MealMath.timeLabel(ateMin: props.ateMin),
+                previewText: mealPreview(nowMinute: nowMinute),
+                theme: theme,
+                onQuickChip: { store.dispatch(QuickMealChipThunk(minutesAgo: $0)) },
+                onDayStep: { store.dispatch(MealAction.dayStepped(by: $0)) },
+                onTimeStep: { store.dispatch(MealAction.timeStepped(by: $0)) },
+                onConfirm: { store.dispatch(ConfirmLastMealThunk()) },
+                onClose: { store.dispatch(UIAction.mealPickerClosed) }
+            )
+            .zIndex(1)
+        }
+    }
+
+    // MARK: Copy / formatting
+
+    private func editorial(state: ScreenState, progress: PhaseProgress) -> String {
+        switch state {
+        case .idle: return PhaseCopy.idle
+        case .complete: return PhaseCopy.complete
+        case .active: return PhaseCopy.editorial(for: progress.phase)
+        }
+    }
+
+    private func mealValue(nowMinute: Int) -> String {
+        props.isMealFresh ? "Just now" : MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
+    }
+
+    private func mealSubline(nowMinute: Int) -> String? {
+        guard !props.isMealFresh else { return nil }
+        let from = MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
+        let note = MealMath.note(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
+        return "Fast counts from \(from) · \(note)"
+    }
+
+    private func mealPreview(nowMinute: Int) -> String {
+        let from = MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
+        let note = MealMath.note(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
+        return "\(from) · \(note)"
+    }
+
+    /// "8:00 PM" from an epoch timestamp.
+    private func clockTime(_ timestamp: Double) -> String {
+        guard timestamp > 0 else { return "--" }
+        let f = DateFormatter()
+        f.dateFormat = "h:mm a"
+        f.locale = .current
+        return f.string(from: Date(timeIntervalSince1970: timestamp))
+    }
+
+    /// "13h 24m" from an elapsed interval.
+    private func hoursMinutes(_ elapsed: TimeInterval) -> String {
+        let total = max(0, Int(elapsed))
+        return String(format: "%dh %02dm", total / 3600, (total / 60) % 60)
     }
 }

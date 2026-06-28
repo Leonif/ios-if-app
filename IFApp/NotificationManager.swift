@@ -22,27 +22,6 @@ final class NotificationManager {
         }
     }
 
-    func sendNotification(for stage: TimeStage) {
-        let content = UNMutableNotificationContent()
-        content.title = L10n.Notification.phaseTitle(stage.displayString)
-        content.body = stage.description
-        content.sound = .default
-
-        let request = UNNotificationRequest(
-            identifier: UUID().uuidString,
-            content: content,
-            trigger: nil
-        )
-
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("\(L10n.Notification.errorScheduling): \(error.localizedDescription)")
-            } else {
-                print(L10n.Notification.sentMessage)
-            }
-        }
-    }
-
     func scheduleNotification(after seconds: TimeInterval, title: String, body: String) {
         let content = UNMutableNotificationContent()
         content.title = title

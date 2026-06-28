@@ -19,11 +19,12 @@ final class AnalyticsMiddleware: Middleware {
     func handle<State: Equatable>(thunk: Thunk, state: State) {}
 
     func handle<State: Equatable>(action: Action, state: State, dispatch: DispatchFunction) {
+        let app = state as? AppState
         switch action {
         case let lifecycle as AppLifecycleAction:
             handle(lifecycle)
         case let timer as TimerAction:
-            handle(timer)
+            handle(timer, goalHours: app?.planState.plan.fastHours ?? Plan.default.fastHours)
         default:
             break
         }
@@ -37,16 +38,16 @@ final class AnalyticsMiddleware: Middleware {
         }
     }
 
-    private func handle(_ action: TimerAction) {
+    private func handle(_ action: TimerAction, goalHours: Double) {
         switch action {
         case .started:
             repo.log(.fastStarted)
         case let .stopped(elapsed, qualifies):
-            let stage = TimeStage.determineStage(from: elapsed)
+            let phase = PhaseProgress.compute(elapsed: elapsed, goalHours: goalHours).phase
             repo.log(.fastStopped(
                 durationSeconds: Int(elapsed),
                 completed: qualifies,
-                stage: stage.displayString
+                stage: phase.label
             ))
         case .reset:
             repo.log(.fastReset)

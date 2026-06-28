@@ -7,4 +7,7 @@
 
 struct AppState: Equatable, Sendable {
     var timerState = TimerState()
+    var planState = PlanState()
+    var mealState = MealState()
+    var uiState = UIState()
 }

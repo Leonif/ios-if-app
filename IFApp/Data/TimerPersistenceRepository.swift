@@ -11,6 +11,8 @@ import Foundation
 protocol TimerPersistenceRepositoryProtocol {
     func load() -> (fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int)
     func save(fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int)
+    func loadPlanIdx() -> Int?
+    func savePlanIdx(_ idx: Int)
 }
 
 struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
@@ -18,6 +20,7 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         static let startTimestamp = "start_timestamp"
         static let isRunning = "is_running"
         static let completedSessions = "completed_sessions_count"
+        static let planIdx = "plan_idx"
     }
 
     private let defaults: UserDefaults
@@ -38,5 +41,13 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         defaults.set(fastStartTimestamp, forKey: Key.startTimestamp)
         defaults.set(isRunning, forKey: Key.isRunning)
         defaults.set(completedSessions, forKey: Key.completedSessions)
+    }
+
+    func loadPlanIdx() -> Int? {
+        defaults.object(forKey: Key.planIdx) as? Int
+    }
+
+    func savePlanIdx(_ idx: Int) {
+        defaults.set(idx, forKey: Key.planIdx)
     }
 }
