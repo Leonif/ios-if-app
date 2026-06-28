@@ -1,3 +1,7 @@
 IFApp.xcodeproj/project.xcworkspace/xcuserdata/*
 xcuserdata/
 *.xcbkptlist
+
+# Swift Package Manager build artifacts
+.build/
+Redux/.build/
