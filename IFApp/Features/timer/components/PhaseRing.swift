@@ -77,12 +77,31 @@ struct PhaseRing: View {
         let theta = progress * 2 * .pi
         let x = centerRadius * sin(theta)
         let y = -centerRadius * cos(theta)
-        return Circle()
-            .fill(theme.isDark ? Color(hex: "#0C0D10") : .white)
-            .frame(width: 18, height: 18)
-            .overlay(Circle().stroke(currentPhase.color, lineWidth: 3.5))
-            .shadow(color: theme.isDark ? currentPhase.color.opacity(0.6) : .clear, radius: 5)
+        // Position animates with progress on the wrapper; the breathing pulse lives
+        // on the inner view so the two animations don't fight.
+        return BreathingDot(color: currentPhase.color, isDark: theme.isDark)
             .offset(x: x, y: y)
             .animation(.easeOut(duration: 0.3), value: progress)
+    }
+}
+
+/// The ring's head dot, softly breathing to hint that progress is moving.
+private struct BreathingDot: View {
+    let color: Color
+    let isDark: Bool
+    @State private var grown = false
+
+    var body: some View {
+        Circle()
+            .fill(isDark ? Color(hex: "#0C0D10") : .white)
+            .frame(width: 18, height: 18)
+            .overlay(Circle().stroke(color, lineWidth: 3.5))
+            .shadow(color: isDark ? color.opacity(0.6) : .clear, radius: 5)
+            .scaleEffect(grown ? 1.22 : 1.0)
+            .onAppear {
+                withAnimation(.easeInOut(duration: 1.3).repeatForever(autoreverses: true)) {
+                    grown = true
+                }
+            }
     }
 }

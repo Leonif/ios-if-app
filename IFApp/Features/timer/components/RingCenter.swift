@@ -14,6 +14,30 @@ private func hourMinute(_ elapsed: TimeInterval) -> String {
     return String(format: "%d:%02d", total / 3600, (total / 60) % 60)
 }
 
+/// ":SS" seconds suffix for the live elapsed readout (e.g. ":07").
+private func secondsSuffix(_ elapsed: TimeInterval) -> String {
+    String(format: ":%02d", max(0, Int(elapsed)) % 60)
+}
+
+/// A small accent dot that softly pulses to signal a live, running fast.
+private struct LiveDot: View {
+    let color: Color
+    @State private var dimmed = false
+
+    var body: some View {
+        Circle()
+            .fill(color)
+            .frame(width: 6, height: 6)
+            .opacity(dimmed ? 0.32 : 1)
+            .scaleEffect(dimmed ? 0.78 : 1)
+            .onAppear {
+                withAnimation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true)) {
+                    dimmed = true
+                }
+            }
+    }
+}
+
 struct RingCenterIdle: View {
     let theme: ThemeTokens
     let onStart: () -> Void
@@ -42,15 +66,23 @@ struct RingCenterActive: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            Text("ELAPSED")
-                .font(.hanken(12, .semibold))
-                .tracking(1.9)               // ~.16em at 12pt
-                .foregroundColor(theme.mut)
+            HStack(spacing: 6) {
+                LiveDot(color: theme.accent)
+                Text("ELAPSED")
+                    .font(.hanken(12, .semibold))
+                    .tracking(1.9)           // ~.16em at 12pt
+                    .foregroundColor(theme.mut)
+            }
 
-            Text(hourMinute(elapsed))
-                .font(Typography.timerNumerals)
-                .monospacedDigit()
-                .foregroundColor(theme.ink)
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text(hourMinute(elapsed))
+                    .font(Typography.timerNumerals)
+                    .foregroundColor(theme.ink)
+                Text(secondsSuffix(elapsed))
+                    .font(Typography.timerSeconds)
+                    .foregroundColor(theme.mut)
+            }
+            .monospacedDigit()
 
             HStack(spacing: 7) {
                 Circle()

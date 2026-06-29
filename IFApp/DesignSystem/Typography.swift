@@ -23,6 +23,7 @@ extension Font {
 
 enum Typography {
     static let timerNumerals = Font.bricolage(66)       // tabular via .monospacedDigit()
+    static let timerSeconds = Font.bricolage(29)        // dimmed :SS suffix beside the elapsed H:MM
     static let completeNumerals = Font.bricolage(50)
     static let screenTitle = Font.bricolage(19)
     static let sheetTitle = Font.bricolage(20)
