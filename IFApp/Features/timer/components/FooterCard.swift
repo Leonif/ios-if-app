@@ -21,6 +21,7 @@ private struct Stat: View {
                 .tracking(1.4)
                 .foregroundColor(theme.mut)
                 .lineLimit(1)
+                .minimumScaleFactor(0.7)
             Text(value)
                 .font(.hanken(15, .bold))
                 .foregroundColor(valueColor)
