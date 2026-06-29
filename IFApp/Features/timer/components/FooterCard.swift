@@ -56,13 +56,13 @@ struct ActiveFooterCard: View {
     var body: some View {
         VStack(spacing: 14) {
             HStack(spacing: 0) {
-                Stat(overline: "Started", value: startedAt, valueColor: theme.ink, theme: theme)
+                Stat(overline: strings.Footer.started, value: startedAt, valueColor: theme.ink, theme: theme)
                 divider
-                Stat(overline: "Elapsed", value: elapsed, valueColor: theme.deep, theme: theme)
+                Stat(overline: strings.Footer.elapsed, value: elapsed, valueColor: theme.deep, theme: theme)
                 divider
-                Stat(overline: "Goal · \(goalLabel)", value: goalAt, valueColor: theme.ink, theme: theme)
+                Stat(overline: strings.Footer.goal(goalLabel), value: goalAt, valueColor: theme.ink, theme: theme)
             }
-            PrimaryButton(title: "End fast", theme: theme, action: onEndFast)
+            PrimaryButton(title: strings.Footer.endFast, theme: theme, action: onEndFast)
         }
         .modifier(CardBackground(theme: theme))
     }
@@ -82,14 +82,14 @@ struct CompleteFooterCard: View {
     var body: some View {
         VStack(spacing: 14) {
             HStack(spacing: 0) {
-                Stat(overline: "Fasted", value: fasted, valueColor: theme.deep, theme: theme)
+                Stat(overline: strings.Footer.fasted, value: fasted, valueColor: theme.deep, theme: theme)
                 Rectangle().fill(theme.surfaceLine).frame(width: 1, height: 30)
-                Stat(overline: "Window opens", value: windowOpens, valueColor: theme.ink, theme: theme)
+                Stat(overline: strings.Footer.windowOpens, value: windowOpens, valueColor: theme.ink, theme: theme)
             }
             HStack(spacing: 12) {
-                SecondaryButton(title: "Reset", theme: theme, action: onReset)
+                SecondaryButton(title: strings.Footer.reset, theme: theme, action: onReset)
                     .frame(width: 110)
-                PrimaryButton(title: "Start eating window", theme: theme, action: onStartEating)
+                PrimaryButton(title: strings.Footer.startEatingWindow, theme: theme, action: onStartEating)
             }
         }
         .modifier(CardBackground(theme: theme))

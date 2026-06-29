@@ -21,7 +21,7 @@ struct LastMealPill: View {
                     Image(systemName: "clock")
                         .font(.system(size: 15))
                         .foregroundColor(theme.iconStroke)
-                    Text("Last meal · ")
+                    Text(strings.Timer.lastMeal)
                         .font(.hanken(13.5, .semibold))
                         .foregroundColor(theme.ink)
                     + Text(valueText)

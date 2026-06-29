@@ -17,11 +17,11 @@ struct SourcesView: View {
                 // Disclaimer section
                 ZStack(alignment: .topTrailing) {
                     VStack(spacing: 12) {
-                        Text(L10n.Sources.disclaimerTitle)
+                        Text(strings.Sources.disclaimerTitle)
                             .font(.headline)
                             .foregroundColor(.red)
-                        
-                        Text(L10n.Cautions.disclaimer)
+
+                        Text(strings.Sources.disclaimerBody)
                             .font(.footnote)
                             .foregroundColor(.red)
                             .multilineTextAlignment(.center)
@@ -44,32 +44,32 @@ struct SourcesView: View {
                 
                 // Sources section
                 VStack(alignment: .leading, spacing: 20) {
-                    Text(L10n.Sources.title)
+                    Text(strings.Sources.title)
                         .font(.title)
                         .fontWeight(.bold)
                         .padding(.bottom, 8)
                     
                     SourceLinkView(
                         number: 1,
-                        title: L10n.Sources.source1Title,
+                        title: strings.Sources.source1,
                         url: "https://pubmed.ncbi.nlm.nih.gov/22248338/"
                     )
-                    
+
                     SourceLinkView(
                         number: 2,
-                        title: L10n.Sources.source2Title,
+                        title: strings.Sources.source2,
                         url: "https://pubmed.ncbi.nlm.nih.gov/28459931/"
                     )
-                    
+
                     SourceLinkView(
                         number: 3,
-                        title: L10n.Sources.source3Title,
+                        title: strings.Sources.source3,
                         url: "https://www.nature.com/articles/s41467-020-14384-z"
                     )
-                    
+
                     SourceLinkView(
                         number: 4,
-                        title: L10n.Sources.source4Title,
+                        title: strings.Sources.source4,
                         url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8839325/#:~:text=In%20summary%2C%20intermittent%20fasting%20has,levels%20of%20leptin%20and%20adiponectin."
                     )
                 }
@@ -107,7 +107,7 @@ struct SourceLinkView: View {
                     UIApplication.shared.open(url)
                 }
             }) {
-                Text(L10n.Sources.buttonViewStudy)
+                Text(strings.Sources.viewStudy)
                     .font(.footnote)
                     .foregroundColor(.blue)
                     .padding(.vertical, 4)

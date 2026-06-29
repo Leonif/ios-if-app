@@ -21,7 +21,7 @@ struct TimerHeader: View {
                         .font(.hanken(15, .bold))
                         .monospacedDigit()
                         .foregroundColor(theme.ink)
-                    Text("Daily fast")
+                    Text(strings.Timer.dailyFast)
                         .font(.hanken(13, .medium))
                         .foregroundColor(theme.mut)
                     Image(systemName: "pencil")

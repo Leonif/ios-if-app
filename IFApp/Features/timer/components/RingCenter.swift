@@ -47,7 +47,7 @@ struct RingCenterIdle: View {
             VStack(spacing: 4) {
                 Image(systemName: "play.fill")
                     .font(.system(size: 26))
-                Text("Start")
+                Text(strings.Timer.start)
                     .font(.hanken(17, .bold))
             }
             .foregroundColor(theme.primaryButtonText)
@@ -64,25 +64,34 @@ struct RingCenterActive: View {
     let phase: Phase
     let theme: ThemeTokens
 
+    /// Big H:MM with a small, dimmed :SS suffix in one baseline-aligned run, so the
+    /// whole readout scales as a unit (via minimumScaleFactor) and never touches the
+    /// ring on narrow devices or at two-digit hours.
+    private var elapsedNumerals: AttributedString {
+        var hm = AttributedString(hourMinute(elapsed))
+        hm.font = Typography.timerNumerals
+        hm.foregroundColor = theme.ink
+        var ss = AttributedString(secondsSuffix(elapsed))
+        ss.font = Typography.timerSeconds
+        ss.foregroundColor = theme.mut
+        return hm + ss
+    }
+
     var body: some View {
         VStack(spacing: 6) {
             HStack(spacing: 6) {
                 LiveDot(color: theme.accent)
-                Text("ELAPSED")
+                Text(strings.Timer.elapsedCaption)
                     .font(.hanken(12, .semibold))
                     .tracking(1.9)           // ~.16em at 12pt
                     .foregroundColor(theme.mut)
             }
 
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(hourMinute(elapsed))
-                    .font(Typography.timerNumerals)
-                    .foregroundColor(theme.ink)
-                Text(secondsSuffix(elapsed))
-                    .font(Typography.timerSeconds)
-                    .foregroundColor(theme.mut)
-            }
-            .monospacedDigit()
+            Text(elapsedNumerals)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .frame(maxWidth: 200)
 
             HStack(spacing: 7) {
                 Circle()
@@ -111,7 +120,7 @@ struct RingCenterComplete: View {
                         .foregroundColor(theme.primaryButtonText)
                 )
 
-            Text("FAST COMPLETE")
+            Text(strings.Timer.fastComplete)
                 .font(.hanken(12, .semibold))
                 .tracking(1.9)
                 .foregroundColor(theme.mut)

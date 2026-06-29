@@ -30,11 +30,11 @@ struct PlanEditorSheet: View {
     private var card: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Fasting plan")
+                Text(strings.Sheet.fastingPlan)
                     .font(.bricolage(19))
                     .foregroundColor(theme.ink)
                 Spacer()
-                Text("Tap to change")
+                Text(strings.Sheet.tapToChange)
                     .font(.hanken(12, .semibold))
                     .foregroundColor(theme.mut)
             }
@@ -47,7 +47,7 @@ struct PlanEditorSheet: View {
             )
 
             HStack {
-                Text("Eating window")
+                Text(strings.Sheet.eatingWindow)
                     .font(.hanken(13.5, .semibold))
                     .foregroundColor(theme.sec)
                 Spacer()
@@ -63,7 +63,7 @@ struct PlanEditorSheet: View {
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(theme.secLine, lineWidth: 1))
             )
 
-            PrimaryButton(title: "Done", theme: theme, action: onDone)
+            PrimaryButton(title: strings.Sheet.done, theme: theme, action: onDone)
         }
         .padding(18)
         .background(

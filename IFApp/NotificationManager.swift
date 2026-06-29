@@ -38,70 +38,52 @@ final class NotificationManager {
 
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("\(L10n.Notification.errorScheduling): \(error.localizedDescription)")
+                print("Notification scheduling error: \(error.localizedDescription)")
             } else {
                 print("Уведомление запланировано через \(seconds) секунд.")
             }
         }
     }
 
-    // MARK: - Общий метод для планирования ежедневных уведомлений
-    private func scheduleDailyNotification(
-        hour: Int,
-        minute: Int = 0,
-        identifier: String,
-        title: String,
-        body: String,
-        successMessage: String
-    ) {
-        var dateComponents = DateComponents()
-        dateComponents.hour = hour
-        dateComponents.minute = minute
+    // MARK: - Fast-goal notification (one local push at goal time)
 
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+    /// A single, replaceable local notification fired when the fast reaches its goal.
+    private let goalReachedID = "fast_goal_reached"
+
+    /// Schedules the goal-reached notification `seconds` from now, replacing any
+    /// previously scheduled one. Fires even if the app is backgrounded or killed.
+    func scheduleGoalNotification(after seconds: TimeInterval) {
+        cancelGoalNotification()
 
         let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = body
+        content.title = strings.Notification.goalTitle
+        content.body = strings.Notification.goalBody
         content.sound = .default
 
-        let request = UNNotificationRequest(
-            identifier: identifier,
-            content: content,
-            trigger: trigger
-        )
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, seconds), repeats: false)
+        let request = UNNotificationRequest(identifier: goalReachedID, content: content, trigger: trigger)
 
         UNUserNotificationCenter.current().add(request) { error in
             if let error {
-                print("\(L10n.Notification.errorScheduling): \(error.localizedDescription)")
-            } else {
-                print(successMessage)
+                print("Notification scheduling error: \(error.localizedDescription)")
             }
         }
     }
 
-    func scheduleDailyNoonNotification() {
-        scheduleDailyNotification(
-            hour: 12,
-            identifier: "daily_noon_notification",
-            title: L10n.Notification.reminderTitle,
-            body: L10n.Notification.reminderBody,
-            successMessage: L10n.Notification.scheduledMessage
-        )
+    func cancelGoalNotification() {
+        UNUserNotificationCenter.current()
+            .removePendingNotificationRequests(withIdentifiers: [goalReachedID])
     }
 
-    func scheduleDailyEveningNotification() {
-        scheduleDailyNotification(
-            hour: 17,
-            identifier: "daily_evening_notification",
-            title: L10n.Notification.eveningTitle,
-            body: L10n.Notification.eveningBody,
-            successMessage: L10n.Notification.eveningScheduledMessage
-        )
+    /// Removes the legacy fixed daily reminders (noon/evening) left scheduled on
+    /// existing installs after dropping that feature.
+    func cancelDailyReminders() {
+        UNUserNotificationCenter.current()
+            .removePendingNotificationRequests(withIdentifiers: ["daily_noon_notification", "daily_evening_notification"])
     }
 
     func cancelAllNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-        print(L10n.Notification.allCancelled)
+        print("All notifications cancelled")
     }
 }

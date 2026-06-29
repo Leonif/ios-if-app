@@ -30,10 +30,10 @@ enum Plan: Int, CaseIterable {
     /// Eating window text shown in the plan editor (handoff copy).
     var windowLabel: String {
         switch self {
-        case .p14_10: return "10:00 AM - 8:00 PM"
-        case .p16_8: return "12:00 - 8:00 PM"
-        case .p18_6: return "2:00 - 8:00 PM"
-        case .p20_4: return "4:00 - 8:00 PM"
+        case .p14_10: return strings.Window.p14_10
+        case .p16_8: return strings.Window.p16_8
+        case .p18_6: return strings.Window.p18_6
+        case .p20_4: return strings.Window.p20_4
         }
     }
 

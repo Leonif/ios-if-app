@@ -30,6 +30,7 @@ enum AppStoreFactory {
                 PersistenceMiddleware(),
                 ReviewMiddleware(),
                 AnalyticsMiddleware(),
+                NotificationMiddleware(),
             ]
         )
 

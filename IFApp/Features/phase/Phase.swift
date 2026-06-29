@@ -25,11 +25,11 @@ enum Phase: Int, CaseIterable {
 
     var label: String {
         switch self {
-        case .fed: return "Fed"
-        case .sugar: return "Sugar"
-        case .fat: return "Fat"
-        case .ketosis: return "Ketosis"
-        case .autophagy: return "Autophagy"
+        case .fed: return strings.Phase.fed
+        case .sugar: return strings.Phase.sugar
+        case .fat: return strings.Phase.fat
+        case .ketosis: return strings.Phase.ketosis
+        case .autophagy: return strings.Phase.autophagy
         }
     }
 

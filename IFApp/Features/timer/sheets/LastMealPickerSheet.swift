@@ -35,17 +35,17 @@ struct LastMealPickerSheet: View {
     private var card: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("When did you last eat?")
+                Text(strings.Sheet.whenDidYouEat)
                     .font(.bricolage(20))
                     .foregroundColor(theme.ink)
-                Text("We'll back-date your fast so the timer stays accurate.")
+                Text(strings.Sheet.backdateHint)
                     .font(.hanken(13, .medium))
                     .foregroundColor(theme.mut)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             SegmentedControl(
-                options: ["30 min", "1 hour", "2 hours"],
+                options: [strings.Sheet.chip30Min, strings.Sheet.chip1Hour, strings.Sheet.chip2Hours],
                 selectedIndex: -1,
                 theme: theme,
                 onSelect: { idx in onQuickChip([30, 60, 120][idx]) }
@@ -53,19 +53,19 @@ struct LastMealPickerSheet: View {
 
             dividerLabel
 
-            stepperRow(label: "Date",
+            stepperRow(label: strings.Sheet.date,
                        value: dateLabel,
                        onMinus: { onDayStep(1) },   // ◁ older
                        onPlus: { onDayStep(-1) })    // ▷ newer
             Rectangle().fill(theme.surfaceLine).frame(height: 1)
-            stepperRow(label: "Time",
+            stepperRow(label: strings.Sheet.time,
                        value: timeLabel,
                        onMinus: { onTimeStep(-15) },
                        onPlus: { onTimeStep(15) })
 
             preview
 
-            PrimaryButton(title: "Confirm", theme: theme, action: onConfirm)
+            PrimaryButton(title: strings.Sheet.confirm, theme: theme, action: onConfirm)
         }
         .padding(18)
         .background(
@@ -78,7 +78,7 @@ struct LastMealPickerSheet: View {
     private var dividerLabel: some View {
         HStack(spacing: 10) {
             Rectangle().fill(theme.surfaceLine).frame(height: 1)
-            Text("OR SET EXACT")
+            Text(strings.Sheet.orSetExact)
                 .font(.hanken(11, .semibold))
                 .tracking(1.3)
                 .foregroundColor(theme.faint)
@@ -123,7 +123,7 @@ struct LastMealPickerSheet: View {
     private var preview: some View {
         let c = theme.chip(for: theme.deep)
         return HStack {
-            Text("Fasting since")
+            Text(strings.Sheet.fastingSince)
                 .font(.hanken(13, .semibold))
                 .foregroundColor(theme.sec)
             Spacer()

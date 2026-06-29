@@ -108,7 +108,7 @@
 				};
 			};
 			buildConfigurationList = CEC5D0C02CD29D9300888D81 /* Build configuration list for PBXProject "IFApp" */;
-			developmentRegion = uk;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				uk,

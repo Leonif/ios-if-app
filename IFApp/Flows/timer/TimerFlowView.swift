@@ -164,7 +164,7 @@ struct TimerFlowView: View {
             ActiveFooterCard(
                 startedAt: clockTime(props.fastStartTimestamp),
                 elapsed: hoursMinutes(elapsed),
-                goalLabel: "\(Int(props.plan.fastHours))h",
+                goalLabel: strings.Duration.goalHours(Int(props.plan.fastHours)),
                 goalAt: clockTime(props.fastStartTimestamp + props.plan.fastHours * 3600),
                 theme: theme,
                 onEndFast: { store.dispatch(StopFastThunk()) }
@@ -222,14 +222,14 @@ struct TimerFlowView: View {
     }
 
     private func mealValue(nowMinute: Int) -> String {
-        props.isMealFresh ? "Just now" : MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
+        props.isMealFresh ? strings.Meal.justNow : MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
     }
 
     private func mealSubline(nowMinute: Int) -> String? {
         guard !props.isMealFresh else { return nil }
         let from = MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
         let note = MealMath.note(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
-        return "Fast counts from \(from) · \(note)"
+        return strings.Meal.fastCountsFrom(from, note)
     }
 
     private func mealPreview(nowMinute: Int) -> String {
@@ -242,14 +242,17 @@ struct TimerFlowView: View {
     private func clockTime(_ timestamp: Double) -> String {
         guard timestamp > 0 else { return "--" }
         let f = DateFormatter()
-        f.dateFormat = "h:mm a"
         f.locale = .current
+        // Locale-aware short time: English shows 12h "10:06 PM"; Cyrillic and other
+        // 24h locales show "22:06". Also honours the device's 24-Hour Time setting.
+        f.timeStyle = .short
+        f.dateStyle = .none
         return f.string(from: Date(timeIntervalSince1970: timestamp))
     }
 
     /// "13h 24m" from an elapsed interval.
     private func hoursMinutes(_ elapsed: TimeInterval) -> String {
         let total = max(0, Int(elapsed))
-        return String(format: "%dh %02dm", total / 3600, (total / 60) % 60)
+        return strings.Duration.hm(total / 3600, (total / 60) % 60)
     }
 }

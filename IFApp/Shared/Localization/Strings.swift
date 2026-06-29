@@ -1,180 +1,142 @@
 //
-//  Strings.swift
+//  strings.swift
 //  IFApp
 //
-//  Created by LEONID NIFANTIJEV on 17.11.2024.
+//  Type-safe access to the Localizable.xcstrings String Catalog. Keys are the
+//  English source text (the catalog's source language); each accessor resolves the
+//  current locale via String(localized:). Add a case here, then add the matching
+//  key + translations in Localizable.xcstrings.
 //
 
-// Shared/Localization/Strings.swift
 import Foundation
 
-enum L10n {
+enum strings {
+    enum Phase {
+        static var fed: String { String(localized: "Fed") }
+        static var sugar: String { String(localized: "Sugar") }
+        static var fat: String { String(localized: "Fat") }
+        static var ketosis: String { String(localized: "Ketosis") }
+        static var autophagy: String { String(localized: "Autophagy") }
+    }
+
+    enum Editorial {
+        static var idle: String { String(localized: "Start whenever you're ready, or log your last meal to pick up a fast already in progress.") }
+        static var complete: String { String(localized: "Fast complete. Your eating window is open. Refuel gently.") }
+        static var fed: String { String(localized: "Still digesting. Insulin is up and your body is storing the energy from your last meal.") }
+        static var sugar: String { String(localized: "Glucose is easing down. Your body is leaning on its glycogen stores for fuel.") }
+        static var fat: String { String(localized: "Glycogen is running low. Fat is becoming your main source of energy.") }
+        static var ketosis: String { String(localized: "Ketones are climbing. You're well into fat-burning now.") }
+        static var autophagy: String { String(localized: "Deep in the fast. Autophagy is recycling what your cells no longer need.") }
+
+        /// "Autophagy begins in 2h 36m"
+        static func beginsIn(_ phase: String, _ when: String) -> String {
+            String(format: String(localized: "%@ begins in %@"), phase, when)
+        }
+    }
+
     enum Timer {
-        static let start = NSLocalizedString("timer.button.start",
-            value: "Старт",
-            comment: "Start timer button")
-        
-        static let stop = NSLocalizedString("timer.button.stop",
-            value: "Стоп",
-            comment: "Stop timer button")
-        
-        static let reset = NSLocalizedString("timer.button.reset",
-            value: "Сброс",
-            comment: "Reset timer button")
+        static var elapsedCaption: String { String(localized: "ELAPSED") }
+        static var fastComplete: String { String(localized: "FAST COMPLETE") }
+        static var start: String { String(localized: "Start") }
+        static var dailyFast: String { String(localized: "Daily fast") }
+        static var lastMeal: String { String(localized: "Last meal · ") }
     }
-    
-    enum Phases {
-        static let anabolic = NSLocalizedString("phase.anabolic",
-            value: "Anabolic",
-            comment: "Anabolic phase name")
-            
-        static let catabolic = NSLocalizedString("phase.catabolic",
-            value: "Catabolic",
-            comment: "Catabolic phase name")
-            
-        static let fatBurning = NSLocalizedString("phase.fatBurning",
-            value: "Fat Burning",
-            comment: "Fat burning phase name")
-        
-        enum Description {
-            static let anabolic = NSLocalizedString("phase.description.anabolic",
-                value: """
-                🍽️ Период активного пищеварения и усвоения питательных веществ
-                🩸 В крови повышен уровень глюкозы и инсулина
-                ⚡ Организм запасает энергию в мышцах и печени в виде гликогена
-                🏋️ Излишки углеводов преобразуются в жиры
-                🔄 Активно идут процессы восстановления и роста тканей
-                💪 Это оптимальное время для тренировок на массу
-                """,
-                comment: "Anabolic phase description")
-                
-            static let catabolic = NSLocalizedString("phase.description.catabolic",
-                value: """
-                📉 Уровень глюкозы и инсулина снижается
-                🔋 Организм начинает использовать запасы гликогена
-                ⚖️ Активизируются процессы расщепления
-                🧪 Начинается выработка глюкагона - гормона, способствующего расщеплению гликогена
-                🔄 Организм постепенно переходит на использование жировых запасов
-                🏃 В этой фазе хорошо проводить кардио тренировки
-                """,
-                comment: "Catabolic phase description")
-                
-            static let fatBurning = NSLocalizedString("phase.description.fatBurning",
-                value: """
-                📪 Запасы гликогена истощаются
-                🔥 Организм переключается на использование жировых запасов как основного источника энергии
-                ⚗️ Активно вырабатываются кетоновые тела
-                📉 Снижается уровень инсулина до минимума
-                🧹 Активируются процессы аутофагии (очищение клеток)
-                📈 Увеличивается выработка гормона роста
-                ✨ Улучшается чувствительность к инсулину
-                🔥 Происходит активное жиросжигание
-                💪 Это оптимальное время для жиросжигающих тренировок
-                """,
-                comment: "Fat burning phase description")
-                
-            static let showDescription = NSLocalizedString("phase.description.show",
-                value: "Показать описание",
-                comment: "Button text to show phase description")
+
+    enum Footer {
+        static var started: String { String(localized: "Started") }
+        static var elapsed: String { String(localized: "Elapsed") }
+        static var endFast: String { String(localized: "End fast") }
+        static var fasted: String { String(localized: "Fasted") }
+        static var windowOpens: String { String(localized: "Window opens") }
+        static var reset: String { String(localized: "Reset") }
+        static var startEatingWindow: String { String(localized: "Start eating window") }
+
+        /// "Goal · 16h"
+        static func goal(_ hours: String) -> String {
+            String(localized: "Goal · \(hours)")
         }
-        
-        enum Extra {
-            static let hours12 = NSLocalizedString("phase.extra.12hours",
-                value: "12 часов: полное истощение запасов гликогена",
-                comment: "12 hours milestone description")
-                
-            static let hours16 = NSLocalizedString("phase.extra.16hours",
-                value: "16-18 часов: максимальное жиросжигание",
-                comment: "16-18 hours milestone description")
-                
-            static let hours24 = NSLocalizedString("phase.extra.24hours",
-                value: "24 часа: значительное усиление аутофагии",
-                comment: "24 hours milestone description")
-                
-            static let hours36 = NSLocalizedString("phase.extra.36hours",
-                value: "36-48 часов: обновление иммунной системы",
-                comment: "36-48 hours milestone description")
+    }
+
+    enum Sheet {
+        static var fastingPlan: String { String(localized: "Fasting plan") }
+        static var tapToChange: String { String(localized: "Tap to change") }
+        static var eatingWindow: String { String(localized: "Eating window") }
+        static var done: String { String(localized: "Done") }
+        static var whenDidYouEat: String { String(localized: "When did you last eat?") }
+        static var backdateHint: String { String(localized: "We'll back-date your fast so the timer stays accurate.") }
+        static var chip30Min: String { String(localized: "30 min") }
+        static var chip1Hour: String { String(localized: "1 hour") }
+        static var chip2Hours: String { String(localized: "2 hours") }
+        static var date: String { String(localized: "Date") }
+        static var time: String { String(localized: "Time") }
+        static var confirm: String { String(localized: "Confirm") }
+        static var orSetExact: String { String(localized: "OR SET EXACT") }
+        static var fastingSince: String { String(localized: "Fasting since") }
+    }
+
+    enum Window {
+        static var p14_10: String { String(localized: "10:00 AM - 8:00 PM") }
+        static var p16_8: String { String(localized: "12:00 - 8:00 PM") }
+        static var p18_6: String { String(localized: "2:00 - 8:00 PM") }
+        static var p20_4: String { String(localized: "4:00 - 8:00 PM") }
+    }
+
+    enum Meal {
+        static var today: String { String(localized: "Today") }
+        static var yesterday: String { String(localized: "Yesterday") }
+        static var now: String { String(localized: "Now") }
+        static var justNow: String { String(localized: "Just now") }
+        static var startingFresh: String { String(localized: "starting fresh") }
+
+        /// "2 days ago" (locale-aware plural)
+        static func daysAgo(_ n: Int) -> String { String(localized: "\(n) days ago") }
+
+        /// "Yesterday 7:00 PM"
+        static func yesterdayAt(_ time: String) -> String { String(localized: "Yesterday \(time)") }
+
+        /// "2h 43m in"
+        static func noteIn(_ h: Int, _ m: Int) -> String {
+            String(format: String(localized: "%dh %02dm in"), h, m)
         }
-        
-        
+
+        /// "Fast counts from 7:00 PM · 2h 40m in"
+        static func fastCountsFrom(_ from: String, _ note: String) -> String {
+            String(localized: "Fast counts from \(from) · \(note)")
+        }
     }
-    enum Cautions {
-        static let disclaimer = NSLocalizedString("disclaimer",
-            value: "Відмова від відповідальності: Цей додаток не надає медичних консультацій. Будь ласка, проконсультуйтеся з лікарем, перш ніж приймати будь-які рішення, пов'язані зі здоров'ям.",
-            comment: "Відмова від відповідальності: Цей додаток не надає медичних консультацій. Будь ласка, проконсультуйтеся з лікарем, перш ніж приймати будь-які рішення, пов'язані зі здоров'ям.")
+
+    enum Duration {
+        /// "13h 04m"
+        static func hm(_ h: Int, _ m: Int) -> String {
+            String(format: String(localized: "%dh %02dm"), h, m)
+        }
+        /// "2h 6m"
+        static func hmShort(_ h: Int, _ m: Int) -> String {
+            String(format: String(localized: "%dh %dm"), h, m)
+        }
+        /// "36m"
+        static func minutes(_ m: Int) -> String {
+            String(format: String(localized: "%dm"), m)
+        }
+        /// "16h"
+        static func goalHours(_ h: Int) -> String {
+            String(format: String(localized: "%dh"), h)
+        }
     }
-    
+
     enum Notification {
-        static let reminderTitle = NSLocalizedString("notification.reminder.title",
-            value: "⏰ Напоминание",
-            comment: "Title for daily notification")
-
-        static let reminderBody = NSLocalizedString("notification.reminder.body",
-            value: "Проверь свою фазу голодания!",
-            comment: "Body text for daily notification")
-
-        static let eveningTitle = NSLocalizedString("notification.evening.title",
-            value: "🌅 Вечернее напоминание",
-            comment: "Title for evening notification")
-
-        static let eveningBody = NSLocalizedString("notification.evening.body",
-            value: "Время проверить прогресс голодания!",
-            comment: "Body text for evening notification")
-
-        static let errorScheduling = NSLocalizedString("notification.error.scheduling",
-            value: "Ошибка добавления уведомления",
-            comment: "Error message when scheduling fails")
-
-        static let scheduledMessage = NSLocalizedString("notification.scheduled",
-            value: "Ежедневное уведомление запланировано на 12:00",
-            comment: "Success message for scheduled daily notification")
-
-        static let eveningScheduledMessage = NSLocalizedString("notification.evening.scheduled",
-            value: "Вечернее уведомление запланировано на 17:00",
-            comment: "Success message for scheduled evening notification")
-
-        static let sentMessage = NSLocalizedString("notification.sent",
-            value: "Уведомление отправлено",
-            comment: "Message after sending immediate notification")
-
-        static let allCancelled = NSLocalizedString("notification.cancelled",
-            value: "Все уведомления отменены.",
-            comment: "Message after cancelling all notifications")
-        
-        static func phaseTitle(_ phaseName: String) -> String {
-            String(format: NSLocalizedString("notification.phase.title",
-                value: "Фаза: %@",
-                comment: "Notification title with current fasting phase"), phaseName)
-        }
+        static var goalTitle: String { String(localized: "Fast complete") }
+        static var goalBody: String { String(localized: "You reached your goal. Your eating window is open.") }
     }
-    
+
     enum Sources {
-        static let title = NSLocalizedString("sources.title",
-            value: "Scientific Sources",
-            comment: "Title for the sources screen")
-            
-        static let disclaimerTitle = NSLocalizedString("sources.disclaimer.title",
-            value: "Disclaimer",
-            comment: "Title for the disclaimer section")
-            
-        static let buttonViewStudy = NSLocalizedString("sources.button.viewStudy",
-            value: "View Study",
-            comment: "Button text to view the study")
-            
-        static let source1Title = NSLocalizedString("sources.source1.title",
-            value: "Glycogen and its metabolism: some new developments and old themes",
-            comment: "Title of the first scientific source")
-            
-        static let source2Title = NSLocalizedString("sources.source2.title",
-            value: "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial",
-            comment: "Title of the second scientific source")
-            
-        static let source3Title = NSLocalizedString("sources.source3.title",
-            value: "Fasting-induced FGF21 signaling activates hepatic autophagy and lipid degradation via JMJD3 histone demethylase",
-            comment: "Title of the third scientific source")
-            
-        static let source4Title = NSLocalizedString("sources.source4.title",
-            value: "Intermittent Fasting and Metabolic Health",
-            comment: "Title of the fourth scientific source")
+        static var disclaimerTitle: String { String(localized: "Disclaimer") }
+        static var disclaimerBody: String { String(localized: "Disclaimer: This app does not provide medical advice. Please consult a doctor before making any health-related decisions.") }
+        static var title: String { String(localized: "Scientific Sources") }
+        static var viewStudy: String { String(localized: "View Study") }
+        static var source1: String { String(localized: "Glycogen and its metabolism: some new developments and old themes") }
+        static var source2: String { String(localized: "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial") }
+        static var source3: String { String(localized: "Fasting-induced FGF21 signaling activates hepatic autophagy and lipid degradation via JMJD3 histone demethylase") }
+        static var source4: String { String(localized: "Intermittent Fasting and Metabolic Health") }
     }
 }
