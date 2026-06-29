@@ -51,7 +51,6 @@ enum MealMath {
     static func note(ateDay: Int, ateMin: Int, nowMinuteOfDay: Int) -> String {
         let mins = minutesAgo(ateDay: ateDay, ateMin: ateMin, nowMinuteOfDay: nowMinuteOfDay)
         guard mins > 0 else { return "starting fresh" }
-        let h = mins / 60, m = mins % 60
-        return h > 0 ? "\(h)h \(m)m in" : "\(m)m in"
+        return String(format: "%dh %02dm in", mins / 60, mins % 60)
     }
 }

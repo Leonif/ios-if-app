@@ -18,7 +18,9 @@ struct PhaseRing: View {
     private let diameter: CGFloat = 280
     private let lineWidth: CGFloat = 10
 
-    private var centerRadius: CGFloat { (diameter - lineWidth) / 2 }
+    // The stroked Circle's path radius is diameter/2, so the head dot must ride at
+    // that radius to sit centered on the ring line (not inset by half the stroke).
+    private var centerRadius: CGFloat { diameter / 2 }
 
     var body: some View {
         ZStack {
@@ -32,9 +34,12 @@ struct PhaseRing: View {
                     .stroke(loopedGradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                     .rotationEffect(.degrees(-90))
             } else {
+                // Flat caps (like the design's conic arc): a round start cap would
+                // bleed the gradient's wrap colour (ketosis) onto the gold Fed start.
+                // The head dot covers the flat leading edge.
                 Circle()
                     .trim(from: 0, to: max(0.0001, progress))
-                    .stroke(progressGradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                    .stroke(progressGradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .butt))
                     .rotationEffect(.degrees(-90))
 
                 headDot

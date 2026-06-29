@@ -88,49 +88,49 @@ struct TimerFlowView: View {
         let state = screenState(progress: progress)
         let nowMinute = Clock.minuteOfDay(now)
 
-        ScrollView {
-            VStack(spacing: 20) {
-                TimerHeader(
-                    plan: props.plan,
-                    theme: theme,
-                    onEditPlan: { store.dispatch(UIAction.planEditorOpened) },
-                    onSettings: { showSources = true }
-                )
-                .padding(.bottom, 4)
+        VStack(spacing: 20) {
+            TimerHeader(
+                plan: props.plan,
+                theme: theme,
+                onEditPlan: { store.dispatch(UIAction.planEditorOpened) },
+                onSettings: { showSources = true }
+            )
+            .padding(.bottom, 4)
 
-                ZStack {
-                    PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
-                              isComplete: state == .complete, theme: theme)
-                    ringCenter(state: state, elapsed: elapsed, progress: progress, theme: theme)
-                }
-                .padding(.vertical, 6)
-
-                EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
-
-                if state == .active, let next = progress.nextPhase {
-                    NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
-                }
-
-                if state == .idle {
-                    LastMealPill(
-                        valueText: mealValue(nowMinute: nowMinute),
-                        subline: mealSubline(nowMinute: nowMinute),
-                        theme: theme,
-                        onTap: { store.dispatch(OpenMealPickerThunk()) }
-                    )
-                }
-
-                PhaseTimeline(currentPhase: progress.phase, isComplete: state == .complete, theme: theme)
-                    .padding(.top, 2)
-
-                footer(state: state, elapsed: elapsed, theme: theme)
-
-                Spacer(minLength: 0)
+            ZStack {
+                PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
+                          isComplete: state == .complete, theme: theme)
+                ringCenter(state: state, elapsed: elapsed, progress: progress, theme: theme)
             }
-            .padding(.top, 74)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 22)
+            .padding(.vertical, 6)
+
+            EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
+
+            if state == .active, let next = progress.nextPhase {
+                NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
+            }
+
+            if state == .idle {
+                LastMealPill(
+                    valueText: mealValue(nowMinute: nowMinute),
+                    subline: mealSubline(nowMinute: nowMinute),
+                    theme: theme,
+                    onTap: { store.dispatch(OpenMealPickerThunk()) }
+                )
+            }
+
+            PhaseTimeline(currentPhase: progress.phase, isComplete: state == .complete, theme: theme)
+                .padding(.top, 2)
+
+            // Push the footer to the bottom; everything above flows from the top.
+            Spacer(minLength: 12)
+
+            footer(state: state, elapsed: elapsed, theme: theme)
         }
+        .padding(.top, 14)
+        .padding(.horizontal, 24)
+        .padding(.bottom, 22)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private func screenState(progress: PhaseProgress) -> ScreenState {
