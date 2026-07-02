@@ -2821,43 +2821,43 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "بدء نافذة الأكل"
+            "value" : "ابدأ الأكل"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Essensfenster starten"
+            "value" : "Essen starten"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Iniciar ventana de comida"
+            "value" : "Empezar a comer"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouvrir la fenêtre alimentaire"
+            "value" : "Commencer à manger"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "食事の時間帯を開始"
+            "value" : "食事を始める"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "식사 시간 시작"
+            "value" : "식사 시작"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rozpocznij okno żywieniowe"
+            "value" : "Zacznij jeść"
           }
         },
         "uk" : {
@@ -2869,7 +2869,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "开始进食窗口"
+            "value" : "开始进食"
           }
         }
       }
