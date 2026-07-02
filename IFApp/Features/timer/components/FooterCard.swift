@@ -64,6 +64,7 @@ struct ActiveFooterCard: View {
                 Stat(overline: strings.Footer.goal(goalLabel), value: goalAt, valueColor: theme.ink, theme: theme)
             }
             PrimaryButton(title: strings.Footer.endFast, theme: theme, action: onEndFast)
+                .accessibilityIdentifier("timer.endFast")
         }
         .modifier(CardBackground(theme: theme))
     }
@@ -90,6 +91,7 @@ struct CompleteFooterCard: View {
             HStack(spacing: 12) {
                 SecondaryButton(title: strings.Footer.reset, theme: theme, action: onReset)
                     .frame(width: 110)
+                    .accessibilityIdentifier("timer.reset")
                 PrimaryButton(title: strings.Footer.startEatingWindow, theme: theme, action: onStartEating)
             }
         }

@@ -56,6 +56,7 @@ struct RingCenterIdle: View {
             .shadow(color: theme.buttonShadow, radius: 18, x: 0, y: 16)
         }
         .buttonStyle(.pressable)
+        .accessibilityIdentifier("timer.start")
     }
 }
 
