@@ -119,7 +119,10 @@ struct TimerFlowView: View {
                 )
             }
 
-            PhaseTimeline(currentPhase: progress.phase, isComplete: state == .complete, theme: theme)
+            PhaseTimeline(currentPhase: progress.phase,
+                          currentFill: progress.fraction * 4 - Double(progress.phase.rawValue),
+                          isComplete: state == .complete,
+                          theme: theme)
                 .padding(.top, 2)
 
             // Push the footer to the bottom; everything above flows from the top.
@@ -172,7 +175,7 @@ struct TimerFlowView: View {
         case .complete:
             CompleteFooterCard(
                 fasted: hoursMinutes(elapsed),
-                windowOpens: "Now",
+                windowOpens: strings.Meal.now,
                 theme: theme,
                 onReset: { store.dispatch(ResetFastThunk()) },
                 onStartEating: { store.dispatch(ResetFastThunk()) }

@@ -2,14 +2,16 @@
 //  PhaseTimeline.swift
 //  IFApp
 //
-//  Five equal columns: a bar over a track + a label. Current phase fills 42%,
-//  passed 100%, future 0%. Labels recolor by state.
+//  Five equal columns: a bar over a track + a label. Current phase fills by its
+//  real progress within the phase, passed 100%, future 0%. Labels recolor by state.
 //
 
 import SwiftUI
 
 struct PhaseTimeline: View {
     let currentPhase: Phase
+    /// Real progress through the current phase, 0...1.
+    let currentFill: Double
     let isComplete: Bool
     let theme: ThemeTokens
 
@@ -29,7 +31,7 @@ struct PhaseTimeline: View {
         let fill: Double = {
             if isComplete { return 1 }
             if idx < currentIndex { return 1 }
-            if idx == currentIndex { return 0.42 }
+            if idx == currentIndex { return min(1, max(0, currentFill)) }
             return 0
         }()
         let isCurrent = !isComplete && idx == currentIndex

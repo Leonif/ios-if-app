@@ -18,6 +18,8 @@ struct PrimaryButton: View {
             Text(title)
                 .font(.hanken(17, .bold))
                 .foregroundColor(theme.primaryButtonText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
                 .background(RoundedRectangle(cornerRadius: cornerRadius).fill(theme.primaryButtonBg))
@@ -38,6 +40,8 @@ struct SecondaryButton: View {
             Text(title)
                 .font(.hanken(17, .bold))
                 .foregroundColor(theme.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
                 .background(
