@@ -140,6 +140,7 @@ enum strings {
         static var disclaimerTitle: String { String(localized: "Disclaimer") }
         static var disclaimerBody: String { String(localized: "Disclaimer: This app does not provide medical advice. Please consult a doctor before making any health-related decisions.") }
         static var title: String { String(localized: "Scientific Sources") }
+        static var subtitle: String { String(localized: "The research behind each fasting phase.") }
         static var viewStudy: String { String(localized: "View Study") }
         static var source1: String { String(localized: "Glycogen and its metabolism: some new developments and old themes") }
         static var source2: String { String(localized: "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial") }

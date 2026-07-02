@@ -37,13 +37,14 @@ struct TimerHeader: View {
             Spacer()
 
             Button(action: onSettings) {
-                Image(systemName: "gearshape")
+                Image(systemName: "doc.text")
                     .font(.system(size: 16))
                     .foregroundColor(theme.iconStroke)
                     .frame(width: 34, height: 34)
                     .background(Circle().fill(theme.iconCircle))
             }
             .buttonStyle(.pressable)
+            .accessibilityIdentifier("timer.sources")
         }
     }
 }

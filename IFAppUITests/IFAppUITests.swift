@@ -67,6 +67,22 @@ final class IFAppUITests: XCTestCase {
                       "Rating pre-prompt should close after Not now")
     }
 
+    /// Opens the redesigned Scientific Sources screen and screenshots it.
+    func testSources() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-uitestReset"]
+        app.launch()
+
+        let sources = app.buttons["timer.sources"]
+        XCTAssertTrue(sources.waitForExistence(timeout: 15), "Sources button should exist")
+        sources.tap()
+
+        XCTAssertTrue(app.staticTexts["Scientific Sources"].waitForExistence(timeout: 5)
+                      || app.scrollViews.firstMatch.waitForExistence(timeout: 5),
+                      "Sources screen should open")
+        attach(app, "sources")
+    }
+
     private func attach(_ app: XCUIApplication, _ name: String) {
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = name

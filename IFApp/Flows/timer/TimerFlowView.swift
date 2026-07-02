@@ -57,9 +57,7 @@ struct TimerFlowView: View {
 
     var body: some View {
         let theme = ThemeTokens.resolve(colorScheme)
-        ZStack {
-            backgroundLayer(theme: theme)
-
+        Group {
             if props.isRunning {
                 TimelineView(.periodic(from: .now, by: 1)) { ctx in
                     screen(theme: theme, now: ctx.date)
@@ -67,9 +65,10 @@ struct TimerFlowView: View {
             } else {
                 screen(theme: theme, now: Date())
             }
-
-            overlays(theme: theme)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(backgroundLayer(theme: theme))
+        .overlay { overlays(theme: theme) }
         .sheet(isPresented: $showSources) { SourcesView() }
         .connect(to: store, mapState: { TimerScreenProps(state: $0) }, onPropsChange: { props = $0 })
     }
@@ -90,52 +89,59 @@ struct TimerFlowView: View {
         let state = screenState(progress: progress)
         let nowMinute = Clock.minuteOfDay(now)
 
-        VStack(spacing: 20) {
+        VStack(spacing: 0) {
             TimerHeader(
                 plan: props.plan,
                 theme: theme,
                 onEditPlan: { store.dispatch(UIAction.planEditorOpened) },
                 onSettings: { showSources = true }
             )
-            .padding(.bottom, 4)
+            // Fixed gap header -> ring so the ring stays anchored at the same
+            // vertical spot in every state (idle/active/complete). Only the block
+            // *below* the ring changes between states, so the ring never moves.
+            .padding(.bottom, 24)
 
-            ZStack {
-                PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
-                          isComplete: state == .complete, theme: theme)
-                ringCenter(state: state, elapsed: elapsed, progress: progress, theme: theme)
+            VStack(spacing: 20) {
+                ZStack {
+                    PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
+                              isComplete: state == .complete, theme: theme)
+                    ringCenter(state: state, elapsed: elapsed, progress: progress, theme: theme)
+                }
+                .padding(.vertical, 6)
+
+                EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
+
+                if state == .active, let next = progress.nextPhase {
+                    NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
+                }
+
+                if state == .idle {
+                    LastMealPill(
+                        valueText: mealValue(nowMinute: nowMinute),
+                        subline: mealSubline(nowMinute: nowMinute),
+                        theme: theme,
+                        onTap: { store.dispatch(OpenMealPickerThunk()) }
+                    )
+                }
+
+                PhaseTimeline(currentPhase: progress.phase,
+                              currentFill: progress.fraction * 4 - Double(progress.phase.rawValue),
+                              isComplete: state == .complete,
+                              theme: theme)
+                    .padding(.top, 2)
             }
-            .padding(.vertical, 6)
 
-            EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
-
-            if state == .active, let next = progress.nextPhase {
-                NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
-            }
-
-            if state == .idle {
-                LastMealPill(
-                    valueText: mealValue(nowMinute: nowMinute),
-                    subline: mealSubline(nowMinute: nowMinute),
-                    theme: theme,
-                    onTap: { store.dispatch(OpenMealPickerThunk()) }
-                )
-            }
-
-            PhaseTimeline(currentPhase: progress.phase,
-                          currentFill: progress.fraction * 4 - Double(progress.phase.rawValue),
-                          isComplete: state == .complete,
-                          theme: theme)
-                .padding(.top, 2)
-
-            // Push the footer to the bottom; everything above flows from the top.
             Spacer(minLength: 12)
 
+            // Footer sits flush at the bottom edge, dropping into the home-indicator
+            // safe area so only a hair of margin remains below it.
             footer(state: state, elapsed: elapsed, theme: theme)
+                .padding(.bottom, 12)
         }
         .padding(.top, 14)
         .padding(.horizontal, 24)
-        .padding(.bottom, 22)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 
     private func screenState(progress: PhaseProgress) -> ScreenState {

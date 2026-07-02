@@ -2,7 +2,8 @@
 //  SourcesView.swift
 //  IFApp
 //
-//  Created by LEONID NIFANTIJEV on 08.05.2025.
+//  Scientific sources behind the fasting phases. Redesigned into the Verdant
+//  system: a grouped "editorial list" card of studies + a soft medical note.
 //
 
 import SwiftUI
@@ -10,118 +11,109 @@ import UIKit
 
 struct SourcesView: View {
     @Environment(\.dismiss) private var dismiss
-    
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                // Disclaimer section
-                ZStack(alignment: .topTrailing) {
-                    VStack(spacing: 12) {
-                        Text(strings.Sources.disclaimerTitle)
-                            .font(.headline)
-                            .foregroundColor(.red)
+    @Environment(\.colorScheme) private var colorScheme
 
-                        Text(strings.Sources.disclaimerBody)
-                            .font(.footnote)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                    }
-                    // Top bar with dismiss button
-                    
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(.gray)
-                    }
-                    
-                }
-                .padding()
-                .background(Color.red.opacity(0.1))
-                .cornerRadius(12)
-                
-                // Sources section
-                VStack(alignment: .leading, spacing: 20) {
-                    Text(strings.Sources.title)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 8)
-                    
-                    SourceLinkView(
-                        number: 1,
-                        title: strings.Sources.source1,
-                        url: "https://pubmed.ncbi.nlm.nih.gov/22248338/"
-                    )
-
-                    SourceLinkView(
-                        number: 2,
-                        title: strings.Sources.source2,
-                        url: "https://pubmed.ncbi.nlm.nih.gov/28459931/"
-                    )
-
-                    SourceLinkView(
-                        number: 3,
-                        title: strings.Sources.source3,
-                        url: "https://www.nature.com/articles/s41467-020-14384-z"
-                    )
-
-                    SourceLinkView(
-                        number: 4,
-                        title: strings.Sources.source4,
-                        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8839325/#:~:text=In%20summary%2C%20intermittent%20fasting%20has,levels%20of%20leptin%20and%20adiponectin."
-                    )
-                }
-                .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(16)
-                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-            }
-            .padding()
-        }
-        .background(Color(.systemGroupedBackground))
+    private struct Source { let title: String; let url: String }
+    private var sources: [Source] {
+        [
+            Source(title: strings.Sources.source1, url: "https://pubmed.ncbi.nlm.nih.gov/22248338/"),
+            Source(title: strings.Sources.source2, url: "https://pubmed.ncbi.nlm.nih.gov/28459931/"),
+            Source(title: strings.Sources.source3, url: "https://www.nature.com/articles/s41467-020-14384-z"),
+            Source(title: strings.Sources.source4, url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8839325/"),
+        ]
     }
-}
 
-struct SourceLinkView: View {
-    let number: Int
-    let title: String
-    let url: String
-    
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top) {
-                Text("\(number).")
-                    .font(.headline)
-                    .foregroundColor(.blue)
-                
-                Text(title)
-                    .font(.subheadline)
-                    .foregroundColor(.primary)
-                Spacer()
-            }
-            
-            Button(action: {
-                if let url = URL(string: url) {
-                    UIApplication.shared.open(url)
+        let theme = ThemeTokens.resolve(colorScheme)
+        ZStack {
+            theme.backgroundBase.ignoresSafeArea()
+            VStack(alignment: .leading, spacing: 16) {
+                header(theme)
+                ScrollView {
+                    card(theme)
                 }
-            }) {
-                Text(strings.Sources.viewStudy)
-                    .font(.footnote)
-                    .foregroundColor(.blue)
-                    .padding(.vertical, 4)
-                    .padding(.horizontal, 12)
-                    .background(Color.blue.opacity(0.1))
-                    .cornerRadius(8)
+                disclaimer(theme)
+                    .padding(.bottom, 12)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea(.container, edges: .bottom)
+        }
+    }
+
+    private func header(_ theme: ThemeTokens) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(strings.Sources.title)
+                    .font(.bricolage(26))
+                    .foregroundColor(theme.ink)
+                Text(strings.Sources.subtitle)
+                    .font(.hanken(14, .medium))
+                    .foregroundColor(theme.mut)
+            }
+            Spacer()
+            Button(action: { dismiss() }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(theme.mut)
+                    .frame(width: 32, height: 32)
+                    .background(Circle().fill(theme.secBg))
             }
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
+        .padding(.top, 8)
     }
-}
 
-#Preview {
-    SourcesView()
+    private func card(_ theme: ThemeTokens) -> some View {
+        VStack(spacing: 0) {
+            ForEach(Array(sources.enumerated()), id: \.offset) { idx, source in
+                Button(action: { open(source.url) }) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "doc.text")
+                            .font(.system(size: 17))
+                            .foregroundColor(theme.accent)
+                            .frame(width: 34, height: 34)
+                            .background(Circle().fill(theme.iconCircle))
+                        Text(source.title)
+                            .font(.hanken(15, .semibold))
+                            .foregroundColor(theme.ink)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 8)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(theme.faint)
+                    }
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 16)
+                }
+                .buttonStyle(.plain)
+                if idx < sources.count - 1 {
+                    Rectangle().fill(theme.surfaceLine).frame(height: 1).padding(.leading, 62)
+                }
+            }
+        }
+        .background(RoundedRectangle(cornerRadius: 20).fill(theme.sheetBg))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(theme.surfaceLine, lineWidth: 1))
+    }
+
+    private func disclaimer(_ theme: ThemeTokens) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 15))
+                .foregroundColor(theme.mut)
+            Text(strings.Sources.disclaimerBody)
+                .font(.hanken(12.5, .regular))
+                .foregroundColor(theme.mut)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 16).fill(theme.surface))
+    }
+
+    private func open(_ string: String) {
+        guard let url = URL(string: string) else { return }
+        UIApplication.shared.open(url)
+    }
 }
