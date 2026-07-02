@@ -2652,7 +2652,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zurücksetzen"
+            "value" : "Reset"
           }
         },
         "es" : {
@@ -2664,7 +2664,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Réinitialiser"
+            "value" : "Réinit."
           }
         },
         "ja" : {
@@ -2863,7 +2863,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Почати харчування"
+            "value" : "Почати їсти"
           }
         },
         "zh-Hans" : {
@@ -3539,7 +3539,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouverture de la fenêtre"
+            "value" : "Ouverture"
           }
         },
         "ja" : {

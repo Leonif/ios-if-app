@@ -18,7 +18,7 @@ private struct Stat: View {
         VStack(spacing: 4) {
             Text(overline.uppercased())
                 .font(.hanken(10.5, .semibold))
-                .tracking(1.4)
+                .overlineTracking(1.4)
                 .foregroundColor(theme.mut)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)

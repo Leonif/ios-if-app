@@ -245,9 +245,12 @@ struct TimerFlowView: View {
     private func clockTime(_ timestamp: Double) -> String {
         guard timestamp > 0 else { return "--" }
         let f = DateFormatter()
-        f.locale = .current
-        // Locale-aware short time: English shows 12h "10:06 PM"; Cyrillic and other
-        // 24h locales show "22:06". Also honours the device's 24-Hour Time setting.
+        // Keep the region's 12/24h convention (and the device's 24-Hour Time setting)
+        // but force Western (Latin) digits, so the footer clock matches the manually
+        // built timer/chip numerals instead of showing Eastern-Arabic digits in ar.
+        var localeComponents = Locale.Components(locale: .current)
+        localeComponents.numberingSystem = Locale.NumberingSystem("latn")
+        f.locale = Locale(components: localeComponents)
         f.timeStyle = .short
         f.dateStyle = .none
         return f.string(from: Date(timeIntervalSince1970: timestamp))

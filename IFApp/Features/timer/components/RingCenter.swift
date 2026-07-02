@@ -84,7 +84,7 @@ struct RingCenterActive: View {
                 LiveDot(color: theme.accent)
                 Text(strings.Timer.elapsedCaption)
                     .font(.hanken(12, .semibold))
-                    .tracking(1.9)           // ~.16em at 12pt
+                    .overlineTracking(1.9)           // ~.16em at 12pt (LTR only)
                     .foregroundColor(theme.mut)
             }
 
@@ -123,7 +123,7 @@ struct RingCenterComplete: View {
 
             Text(strings.Timer.fastComplete)
                 .font(.hanken(12, .semibold))
-                .tracking(1.9)
+                .overlineTracking(1.9)
                 .foregroundColor(theme.mut)
 
             Text(hourMinute(elapsed))

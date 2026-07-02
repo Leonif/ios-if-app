@@ -80,7 +80,7 @@ struct LastMealPickerSheet: View {
             Rectangle().fill(theme.surfaceLine).frame(height: 1)
             Text(strings.Sheet.orSetExact)
                 .font(.hanken(11, .semibold))
-                .tracking(1.3)
+                .overlineTracking(1.3)
                 .foregroundColor(theme.faint)
                 .fixedSize()
             Rectangle().fill(theme.surfaceLine).frame(height: 1)

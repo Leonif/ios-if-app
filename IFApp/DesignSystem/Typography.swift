@@ -21,6 +21,23 @@ extension Font {
     }
 }
 
+/// Letter-spacing for the uppercase small-caps overline labels. Suppressed in
+/// right-to-left (Arabic) layouts, where positive tracking breaks the connected
+/// cursive script and makes words read as disjointed letters.
+private struct OverlineTracking: ViewModifier {
+    let value: CGFloat
+    @Environment(\.layoutDirection) private var layoutDirection
+    func body(content: Content) -> some View {
+        content.tracking(layoutDirection == .rightToLeft ? 0 : value)
+    }
+}
+
+extension View {
+    func overlineTracking(_ value: CGFloat) -> some View {
+        modifier(OverlineTracking(value: value))
+    }
+}
+
 enum Typography {
     static let timerNumerals = Font.bricolage(66)       // tabular via .monospacedDigit()
     static let timerSeconds = Font.bricolage(29)        // dimmed :SS suffix beside the elapsed H:MM
