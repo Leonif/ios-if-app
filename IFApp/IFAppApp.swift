@@ -23,6 +23,9 @@ struct IFAppApp: App {
         _store = StateObject(wrappedValue: store)
         store.dispatch(ScheduleNotificationsThunk())
         store.dispatch(AppLifecycleAction.appOpened)
+        if ProcessInfo.processInfo.arguments.contains("-showReviewPrompt") {
+            store.dispatch(UIAction.reviewPromptOpened)
+        }
     }
 
     /// Configures Firebase only when the SDK is linked AND GoogleService-Info.plist

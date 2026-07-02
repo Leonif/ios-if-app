@@ -49,6 +49,24 @@ final class IFAppUITests: XCTestCase {
         attach(app, "4-idle-again")
     }
 
+    /// Force-shows the "Enjoying IF24?" rating pre-prompt and checks its buttons.
+    func testReviewPrompt() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-uitestReset", "-showReviewPrompt"]
+        app.launch()
+
+        let positive = app.buttons["review.positive"]
+        XCTAssertTrue(positive.waitForExistence(timeout: 15),
+                      "Rating pre-prompt positive button should appear")
+        XCTAssertTrue(app.buttons["review.dismiss"].exists,
+                      "Rating pre-prompt dismiss button should appear")
+        attach(app, "review-prompt")
+
+        app.buttons["review.dismiss"].tap()
+        XCTAssertTrue(positive.waitForNonExistence(timeout: 3),
+                      "Rating pre-prompt should close after Not now")
+    }
+
     private func attach(_ app: XCUIApplication, _ name: String) {
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = name

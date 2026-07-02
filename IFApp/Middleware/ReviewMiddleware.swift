@@ -24,10 +24,12 @@ final class ReviewMiddleware: Middleware {
               let app = state as? AppState else { return }
 
         guard !didRequestReviewThisLaunch,
-              app.timerState.completedSessionsCount >= completedSessionsThreshold else { return }
+              app.timerState.completedSessionsCount >= completedSessionsThreshold,
+              repo.canPrompt() else { return }
 
         didRequestReviewThisLaunch = true
-        repo.requestReview()
+        repo.markPromptShown()
+        dispatch(UIAction.reviewPromptOpened)
         dispatch(AppLifecycleAction.reviewPrompted)
     }
 }

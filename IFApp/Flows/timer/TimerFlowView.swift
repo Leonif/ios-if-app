@@ -20,6 +20,7 @@ struct TimerScreenProps: Equatable {
     let ateMin: Int
     let planEditorOpen: Bool
     let mealPickerOpen: Bool
+    let reviewPromptOpen: Bool
 
     init(state: AppState) {
         isRunning = state.timerState.isRunning
@@ -30,6 +31,7 @@ struct TimerScreenProps: Equatable {
         ateMin = state.mealState.ateMin
         planEditorOpen = state.uiState.planEditorOpen
         mealPickerOpen = state.uiState.mealPickerOpen
+        reviewPromptOpen = state.uiState.reviewPromptOpen
     }
 
     var plan: Plan { Plan(rawValue: planIdx) ?? .default }
@@ -211,6 +213,14 @@ struct TimerFlowView: View {
                 onClose: { store.dispatch(UIAction.mealPickerClosed) }
             )
             .zIndex(1)
+        }
+        if props.reviewPromptOpen {
+            ReviewPromptSheet(
+                theme: theme,
+                onPositive: { store.dispatch(LeaveReviewThunk()) },
+                onDismiss: { store.dispatch(UIAction.reviewPromptClosed) }
+            )
+            .zIndex(2)
         }
     }
 

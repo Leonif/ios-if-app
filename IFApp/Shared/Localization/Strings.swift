@@ -124,6 +124,13 @@ enum strings {
         }
     }
 
+    enum Review {
+        static var title: String { String(localized: "Enjoying IF24?") }
+        static var subtitle: String { String(localized: "Your review helps us grow.") }
+        static var positive: String { String(localized: "Yes, love it") }
+        static var dismiss: String { String(localized: "Not now") }
+    }
+
     enum Notification {
         static var goalTitle: String { String(localized: "Fast complete") }
         static var goalBody: String { String(localized: "You reached your goal. Your eating window is open.") }
