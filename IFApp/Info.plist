@@ -4,5 +4,10 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>BricolageGrotesque.ttf</string>
+		<string>HankenGrotesk.ttf</string>
+	</array>
 </dict>
 </plist>
