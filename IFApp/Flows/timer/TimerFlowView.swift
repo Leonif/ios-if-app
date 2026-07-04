@@ -133,10 +133,10 @@ struct TimerFlowView: View {
 
             Spacer(minLength: 12)
 
-            // Footer sits flush at the bottom edge, dropping into the home-indicator
-            // safe area so only a hair of margin remains below it.
+            // Footer sits near the bottom edge, dropping into the home-indicator
+            // safe area but lifted a touch so it isn't jammed against the edge.
             footer(state: state, elapsed: elapsed, theme: theme)
-                .padding(.bottom, 12)
+                .padding(.bottom, 28)
         }
         .padding(.top, 14)
         .padding(.horizontal, 24)
