@@ -35,13 +35,16 @@ final class AnalyticsMiddleware: Middleware {
         case .appOpened: repo.log(.appOpened)
         case .sourcesOpened: repo.log(.sourcesOpened)
         case .reviewPrompted: repo.log(.reviewPrompted)
+        case .reviewCtaTapped: repo.log(.reviewCtaTapped)
+        case let .lastMealLogged(backdated, minutesAgo):
+            repo.log(.lastMealLogged(backdated: backdated, minutesAgo: minutesAgo))
         }
     }
 
     private func handle(_ action: TimerAction, goalHours: Double) {
         switch action {
         case .started:
-            repo.log(.fastStarted)
+            repo.log(.fastStarted(goalHours: goalHours))
         case let .stopped(elapsed, qualifies):
             let phase = PhaseProgress.compute(elapsed: elapsed, goalHours: goalHours).phase
             repo.log(.fastStopped(

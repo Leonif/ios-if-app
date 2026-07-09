@@ -12,18 +12,23 @@ import Foundation
 enum AnalyticsEvent {
     /// App launched / foregrounded into use.
     case appOpened
-    /// User started a fast.
-    case fastStarted
+    /// User started a fast. `goalHours` = the chosen plan's fasting window.
+    case fastStarted(goalHours: Double)
     /// User ended a fast. `completed` = reached the qualifying threshold (8h).
     case fastStopped(durationSeconds: Int, completed: Bool, stage: String)
     /// User reset the timer (a drop-off signal — gave up before finishing).
     case fastReset
     /// User nudged the elapsed time (manual ± correction).
     case timeAdjusted
+    /// User confirmed the Last-meal picker. `backdated` = started in the past
+    /// (logged a real meal time) vs fresh "now"; `minutesAgo` = how far back.
+    case lastMealLogged(backdated: Bool, minutesAgo: Int)
     /// User opened the scientific Sources screen.
     case sourcesOpened
     /// The in-app review prompt was shown.
     case reviewPrompted
+    /// User tapped the positive CTA on the review prompt (went to write-review).
+    case reviewCtaTapped
 
     var name: String {
         switch self {
@@ -32,13 +37,17 @@ enum AnalyticsEvent {
         case .fastStopped: return "fast_stopped"
         case .fastReset: return "fast_reset"
         case .timeAdjusted: return "time_adjusted"
+        case .lastMealLogged: return "last_meal_logged"
         case .sourcesOpened: return "sources_opened"
         case .reviewPrompted: return "review_prompted"
+        case .reviewCtaTapped: return "review_cta_tapped"
         }
     }
 
     var parameters: [String: Any] {
         switch self {
+        case let .fastStarted(goalHours):
+            return ["goal_hours": goalHours]
         case let .fastStopped(durationSeconds, completed, stage):
             return [
                 "duration_seconds": durationSeconds,
@@ -46,7 +55,12 @@ enum AnalyticsEvent {
                 "completed": completed,
                 "stage": stage,
             ]
-        case .appOpened, .fastStarted, .fastReset, .timeAdjusted, .sourcesOpened, .reviewPrompted:
+        case let .lastMealLogged(backdated, minutesAgo):
+            return [
+                "backdated": backdated,
+                "minutes_ago": minutesAgo,
+            ]
+        case .appOpened, .fastReset, .timeAdjusted, .sourcesOpened, .reviewPrompted, .reviewCtaTapped:
             return [:]
         }
     }

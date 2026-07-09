@@ -12,4 +12,6 @@ enum AppLifecycleAction: Action {
     case appOpened
     case sourcesOpened
     case reviewPrompted
+    case reviewCtaTapped
+    case lastMealLogged(backdated: Bool, minutesAgo: Int)
 }

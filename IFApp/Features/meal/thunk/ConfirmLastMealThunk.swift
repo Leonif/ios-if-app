@@ -21,6 +21,7 @@ struct ConfirmLastMealThunk: Thunk {
         )
         let fastStart = Clock.now().timeIntervalSince1970 - Double(minutesAgo) * 60
 
+        dispatch(AppLifecycleAction.lastMealLogged(backdated: !meal.isFresh, minutesAgo: minutesAgo))
         dispatch(TimerAction.started(startTimestamp: fastStart))
         dispatch(UIAction.mealPickerClosed)
     }
