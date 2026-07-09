@@ -12,6 +12,10 @@ import Redux
 import FirebaseCore
 #endif
 
+#if canImport(FirebaseAnalytics)
+import FirebaseAnalytics
+#endif
+
 @main
 struct IFAppApp: App {
     @StateObject private var store: Store<AppState>
@@ -37,6 +41,29 @@ struct IFAppApp: App {
             return
         }
         FirebaseApp.configure()
+        tagInternalTraffic()
+        #endif
+    }
+
+    /// Stamps every event from non-App-Store builds (Xcode DEBUG, simulator,
+    /// TestFlight) with `traffic_type = internal`, so GA4's built-in Internal
+    /// Traffic filter can exclude our own testing from the real-user reports.
+    /// App Store production builds are left untagged.
+    private static func tagInternalTraffic() {
+        #if canImport(FirebaseAnalytics)
+        guard isInternalBuild else { return }
+        Analytics.setDefaultEventParameters(["traffic_type": "internal"])
+        #endif
+    }
+
+    private static var isInternalBuild: Bool {
+        #if DEBUG
+        return true
+        #else
+        // TestFlight and sandbox builds carry a "sandboxReceipt"; App Store
+        // production builds carry "receipt".
+        guard let receiptURL = Bundle.main.appStoreReceiptURL else { return false }
+        return receiptURL.lastPathComponent == "sandboxReceipt"
         #endif
     }
 
