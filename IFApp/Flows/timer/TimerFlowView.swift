@@ -71,6 +71,10 @@ struct TimerFlowView: View {
         .overlay { overlays(theme: theme) }
         .sheet(isPresented: $showSources) { SourcesView() }
         .connect(to: store, mapState: { TimerScreenProps(state: $0) }, onPropsChange: { props = $0 })
+        .onAppear { store.dispatch(AppLifecycleAction.themeActive(dark: colorScheme == .dark)) }
+        .onChange(of: colorScheme) { _, new in
+            store.dispatch(AppLifecycleAction.themeActive(dark: new == .dark))
+        }
     }
 
     // MARK: Background (phase-reactive)

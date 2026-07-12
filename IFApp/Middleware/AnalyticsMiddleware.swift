@@ -38,6 +38,8 @@ final class AnalyticsMiddleware: Middleware {
         case .reviewCtaTapped: repo.log(.reviewCtaTapped)
         case let .lastMealLogged(backdated, minutesAgo):
             repo.log(.lastMealLogged(backdated: backdated, minutesAgo: minutesAgo))
+        case let .themeActive(dark):
+            repo.log(.themeActive(dark: dark))
         }
     }
 

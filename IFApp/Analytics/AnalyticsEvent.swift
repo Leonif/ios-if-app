@@ -29,6 +29,10 @@ enum AnalyticsEvent {
     case reviewPrompted
     /// User tapped the positive CTA on the review prompt (went to write-review).
     case reviewCtaTapped
+    /// The appearance the app is being used in. `dark` = system dark mode.
+    /// Fires on screen appear and on live theme switches — count *users* per
+    /// `theme` value to see which appearance the audience actually uses.
+    case themeActive(dark: Bool)
 
     var name: String {
         switch self {
@@ -41,6 +45,7 @@ enum AnalyticsEvent {
         case .sourcesOpened: return "sources_opened"
         case .reviewPrompted: return "review_prompted"
         case .reviewCtaTapped: return "review_cta_tapped"
+        case .themeActive: return "theme_active"
         }
     }
 
@@ -60,6 +65,8 @@ enum AnalyticsEvent {
                 "backdated": backdated,
                 "minutes_ago": minutesAgo,
             ]
+        case let .themeActive(dark):
+            return ["theme": dark ? "dark" : "light"]
         case .appOpened, .fastReset, .timeAdjusted, .sourcesOpened, .reviewPrompted, .reviewCtaTapped:
             return [:]
         }
