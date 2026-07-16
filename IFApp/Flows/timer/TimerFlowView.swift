@@ -51,6 +51,7 @@ struct TimerFlowView: View {
     private let store: Store<AppState>
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
     @State private var props: TimerScreenProps
     @State private var showSources = false
     @State private var showResetConfirm = false
@@ -97,6 +98,12 @@ struct TimerFlowView: View {
         }
         .onChange(of: colorScheme) { _, new in
             store.dispatch(AppLifecycleAction.themeActive(dark: new == .dark))
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // The goal can be crossed while we're backgrounded; the moment waits
+            // here until the user is actually looking at the screen.
+            guard phase == .active else { return }
+            syncGoalMoment(to: currentScreenState())
         }
     }
 
@@ -315,6 +322,11 @@ struct TimerFlowView: View {
     /// mid-overtime (`hasCelebrated` already set) restores the settled end-state.
     private func syncGoalMoment(to state: ScreenState) {
         guard state == .goalReached else { return }
+        // iOS renders backgrounded apps (app-switcher snapshots), so a plain state
+        // check would burn the one-shot moment — haptic and all — with nobody
+        // watching, leaving a settled seal for whoever taps the push later.
+        // onChange(scenePhase) above replays this the moment we're visible again.
+        guard scenePhase == .active else { return }
         let haloTarget = colorScheme == .dark ? 0.95 : 0.6
 
         if props.hasCelebrated {
