@@ -24,7 +24,8 @@ final class PersistenceMiddleware: Middleware {
             repo.save(
                 fastStartTimestamp: timer.fastStartTimestamp,
                 isRunning: timer.isRunning,
-                completedSessions: timer.completedSessionsCount
+                completedSessions: timer.completedSessionsCount,
+                hasCelebrated: timer.hasCelebrated
             )
         case is PlanAction:
             repo.savePlanIdx(app.planState.planIdx)

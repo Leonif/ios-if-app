@@ -16,6 +16,8 @@ enum AnalyticsEvent {
     case fastStarted(goalHours: Double)
     /// User ended a fast. `completed` = reached the qualifying threshold (8h).
     case fastStopped(durationSeconds: Int, completed: Bool, stage: String)
+    /// The fast reached its goal (the goal-reached moment fired). `goalHours` = plan window.
+    case goalReached(goalHours: Double)
     /// User reset the timer (a drop-off signal — gave up before finishing).
     case fastReset
     /// User nudged the elapsed time (manual ± correction).
@@ -39,6 +41,7 @@ enum AnalyticsEvent {
         case .appOpened: return "app_opened"
         case .fastStarted: return "fast_started"
         case .fastStopped: return "fast_stopped"
+        case .goalReached: return "goal_reached"
         case .fastReset: return "fast_reset"
         case .timeAdjusted: return "time_adjusted"
         case .lastMealLogged: return "last_meal_logged"
@@ -52,6 +55,8 @@ enum AnalyticsEvent {
     var parameters: [String: Any] {
         switch self {
         case let .fastStarted(goalHours):
+            return ["goal_hours": goalHours]
+        case let .goalReached(goalHours):
             return ["goal_hours": goalHours]
         case let .fastStopped(durationSeconds, completed, stage):
             return [

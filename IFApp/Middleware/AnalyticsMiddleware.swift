@@ -58,6 +58,8 @@ final class AnalyticsMiddleware: Middleware {
             repo.log(.fastReset)
         case .timeAdjusted:
             repo.log(.timeAdjusted)
+        case .goalCelebrated:
+            repo.log(.goalReached(goalHours: goalHours))
         }
     }
 }

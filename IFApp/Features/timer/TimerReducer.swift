@@ -14,6 +14,7 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
     case let .started(startTimestamp):
         newState.fastStartTimestamp = startTimestamp
         newState.isRunning = true
+        newState.hasCelebrated = false
 
     case let .stopped(elapsed, qualifies):
         newState.isRunning = false
@@ -27,12 +28,16 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.isRunning = false
         newState.fastStartTimestamp = 0
         newState.stagedElapsed = 0
+        newState.hasCelebrated = false
 
     case let .timeAdjusted(newElapsed, runningStartTimestamp):
         newState.stagedElapsed = newElapsed
         if let runningStartTimestamp {
             newState.fastStartTimestamp = runningStartTimestamp
         }
+
+    case .goalCelebrated:
+        newState.hasCelebrated = true
 
     case .none:
         break

@@ -9,12 +9,14 @@
 //
 
 import SwiftUI
+import UIKit
 import Redux
 
 struct TimerScreenProps: Equatable {
     let isRunning: Bool
     let fastStartTimestamp: Double
     let stagedElapsed: TimeInterval
+    let hasCelebrated: Bool
     let planIdx: Int
     let ateDay: Int
     let ateMin: Int
@@ -26,6 +28,7 @@ struct TimerScreenProps: Equatable {
         isRunning = state.timerState.isRunning
         fastStartTimestamp = state.timerState.fastStartTimestamp
         stagedElapsed = state.timerState.stagedElapsed
+        hasCelebrated = state.timerState.hasCelebrated
         planIdx = state.planState.planIdx
         ateDay = state.mealState.ateDay
         ateMin = state.mealState.ateMin
@@ -42,13 +45,22 @@ struct TimerScreenProps: Equatable {
     }
 }
 
-private enum ScreenState { case idle, active, complete }
+private enum ScreenState { case idle, active, goalReached, complete }
 
 struct TimerFlowView: View {
     private let store: Store<AppState>
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var props: TimerScreenProps
     @State private var showSources = false
+    @State private var showResetConfirm = false
+
+    // Goal-reached moment / overtime glow — driven here so the one-shot plays only
+    // on a genuine live crossing and is not replayed when relaunching mid-overtime.
+    @State private var goalSealScale: CGFloat = 0
+    @State private var goalHaloOpacity: Double = 0
+    @State private var goalSweepAngle: Double = 0
+    @State private var goalSweepOpacity: Double = 0
 
     init(store: Store<AppState>) {
         self.store = store
@@ -70,8 +82,19 @@ struct TimerFlowView: View {
         .background(backgroundLayer(theme: theme))
         .overlay { overlays(theme: theme) }
         .sheet(isPresented: $showSources) { SourcesView() }
+        .confirmationDialog(strings.Reset.confirmTitle, isPresented: $showResetConfirm, titleVisibility: .visible) {
+            Button(strings.Reset.confirmAction, role: .destructive) { store.dispatch(ResetFastThunk()) }
+            Button(strings.Reset.cancel, role: .cancel) {}
+        } message: {
+            Text(strings.Reset.confirmMessage)
+        }
         .connect(to: store, mapState: { TimerScreenProps(state: $0) }, onPropsChange: { props = $0 })
-        .onAppear { store.dispatch(AppLifecycleAction.themeActive(dark: colorScheme == .dark)) }
+        .onAppear {
+            store.dispatch(AppLifecycleAction.themeActive(dark: colorScheme == .dark))
+            // Restore the settled overtime end-state on a relaunch mid-overtime
+            // (onChange below won't fire for the initial state).
+            syncGoalMoment(to: currentScreenState())
+        }
         .onChange(of: colorScheme) { _, new in
             store.dispatch(AppLifecycleAction.themeActive(dark: new == .dark))
         }
@@ -108,7 +131,12 @@ struct TimerFlowView: View {
             VStack(spacing: 20) {
                 ZStack {
                     PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
-                              isComplete: state == .complete, theme: theme)
+                              isComplete: state == .complete || state == .goalReached, theme: theme)
+                    if state == .goalReached {
+                        GoalMomentView(sealScale: goalSealScale, haloOpacity: goalHaloOpacity,
+                                       sweepAngle: goalSweepAngle, sweepOpacity: goalSweepOpacity,
+                                       theme: theme)
+                    }
                     ringCenter(state: state, elapsed: elapsed, progress: progress, theme: theme)
                 }
                 .padding(.vertical, 6)
@@ -117,6 +145,10 @@ struct TimerFlowView: View {
 
                 if state == .active, let next = progress.nextPhase {
                     NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
+                }
+
+                if state == .goalReached {
+                    StaticPhaseChip(phase: .autophagy, text: strings.Timer.deepAutophagy, theme: theme)
                 }
 
                 if state == .idle {
@@ -130,7 +162,7 @@ struct TimerFlowView: View {
 
                 PhaseTimeline(currentPhase: progress.phase,
                               currentFill: progress.fraction * 4 - Double(progress.phase.rawValue),
-                              isComplete: state == .complete,
+                              isComplete: state == .complete || state == .goalReached,
                               theme: theme)
                     .padding(.top, 2)
             }
@@ -146,12 +178,15 @@ struct TimerFlowView: View {
         .padding(.horizontal, 24)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .ignoresSafeArea(.container, edges: .bottom)
+        // Detect the goal crossing here (inside the per-second tick) — it is
+        // time-driven, so the outer body wouldn't re-evaluate to catch it.
+        .onChange(of: state) { _, newState in syncGoalMoment(to: newState) }
     }
 
     private func screenState(progress: PhaseProgress) -> ScreenState {
-        if !props.isRunning && props.stagedElapsed == 0 { return .idle }
-        if progress.isComplete || (!props.isRunning && props.stagedElapsed > 0) { return .complete }
-        return .active
+        if !props.isRunning { return props.stagedElapsed > 0 ? .complete : .idle }
+        // Running: past the goal is the overtime "goal reached" state, else active.
+        return progress.isComplete ? .goalReached : .active
     }
 
     // MARK: Ring center
@@ -163,6 +198,8 @@ struct TimerFlowView: View {
             RingCenterIdle(theme: theme, onStart: { store.dispatch(StartFastThunk()) })
         case .active:
             RingCenterActive(elapsed: elapsed, phase: progress.phase, theme: theme)
+        case .goalReached:
+            RingCenterGoalReached(elapsed: elapsed, goalSeconds: props.plan.fastHours * 3600, theme: theme)
         case .complete:
             RingCenterComplete(elapsed: elapsed, theme: theme)
         }
@@ -182,6 +219,15 @@ struct TimerFlowView: View {
                 goalLabel: strings.Duration.goalHours(Int(props.plan.fastHours)),
                 goalAt: clockTime(props.fastStartTimestamp + props.plan.fastHours * 3600),
                 theme: theme,
+                onEndFast: { store.dispatch(StopFastThunk()) }
+            )
+        case .goalReached:
+            GoalReachedFooterCard(
+                fasted: hoursMinutes(elapsed),
+                goal: hoursMinutes(props.plan.fastHours * 3600),
+                over: "+" + overtimeShort(elapsed - props.plan.fastHours * 3600),
+                theme: theme,
+                onReset: { showResetConfirm = true },
                 onEndFast: { store.dispatch(StopFastThunk()) }
             )
         case .complete:
@@ -241,7 +287,60 @@ struct TimerFlowView: View {
         case .idle: return PhaseCopy.idle
         case .complete: return PhaseCopy.complete
         case .active: return PhaseCopy.editorial(for: progress.phase)
+        case .goalReached: return strings.Editorial.goalReached(Int(props.plan.fastHours))
         }
+    }
+
+    // MARK: Goal-reached moment
+
+    /// The screen state derived from the current clock (used off the TimelineView tick).
+    private func currentScreenState() -> ScreenState {
+        screenState(progress: PhaseProgress.compute(elapsed: props.elapsed(at: Date()),
+                                                     goalHours: props.plan.fastHours))
+    }
+
+    /// "0:24" under an hour (M:SS), "2:14" past one (H:MM) — the footer's OVER value.
+    private func overtimeShort(_ over: TimeInterval) -> String {
+        let total = max(0, Int(over))
+        return total < 3600
+            ? String(format: "%d:%02d", total / 60, total % 60)
+            : String(format: "%d:%02d", total / 3600, (total / 60) % 60)
+    }
+
+    /// Drives the seal/halo/sweep for the goal-reached state. Plays the one-shot
+    /// moment (+ haptic + analytics) only on a genuine first crossing; a relaunch
+    /// mid-overtime (`hasCelebrated` already set) restores the settled end-state.
+    private func syncGoalMoment(to state: ScreenState) {
+        guard state == .goalReached else { return }
+        let haloTarget = colorScheme == .dark ? 0.95 : 0.6
+
+        if props.hasCelebrated {
+            goalSealScale = 1
+            goalHaloOpacity = haloTarget
+            goalSweepOpacity = 0
+            goalSweepAngle = 0
+            return
+        }
+
+        // Genuine first crossing.
+        store.dispatch(TimerAction.goalCelebrated)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+        guard !reduceMotion else {
+            goalSealScale = 1
+            goalHaloOpacity = haloTarget
+            goalSweepOpacity = 0
+            return
+        }
+
+        goalSweepAngle = 0
+        goalSweepOpacity = 1
+        goalSealScale = 0.2
+        withAnimation(.easeInOut(duration: 1.15)) { goalSweepAngle = 360 }
+        withAnimation(.easeOut(duration: 0.35).delay(1.05)) { goalSweepOpacity = 0 }
+        withAnimation(.easeOut(duration: 0.7).delay(0.35)) { goalSealScale = 1 }
+        withAnimation(.easeOut(duration: 0.9)) { goalHaloOpacity = haloTarget }
+
     }
 
     private func mealValue(nowMinute: Int) -> String {

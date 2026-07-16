@@ -17,4 +17,6 @@ enum TimerAction: Action {
     case reset
     /// Manual ± adjustment. `runningStartTimestamp` is non-nil only when the fast is running.
     case timeAdjusted(newElapsed: TimeInterval, runningStartTimestamp: Double?)
+    /// The goal-reached moment fired for the current fast (marks it so it plays once).
+    case goalCelebrated
 }

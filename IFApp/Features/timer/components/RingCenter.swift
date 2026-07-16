@@ -106,6 +106,64 @@ struct RingCenterActive: View {
     }
 }
 
+/// "16:00" from a goal length in hours (H:MM).
+private func goalHourMinute(_ goalSeconds: TimeInterval) -> String {
+    let total = max(0, Int(goalSeconds))
+    return String(format: "%d:%02d", total / 3600, (total / 60) % 60)
+}
+
+/// Overtime past the goal: "0:24" under an hour (M:SS), "2:14" past one (H:MM).
+private func overtimeLabel(_ over: TimeInterval) -> String {
+    let total = max(0, Int(over))
+    return total < 3600
+        ? String(format: "%d:%02d", total / 60, total % 60)
+        : String(format: "%d:%02d", total / 3600, (total / 60) % 60)
+}
+
+/// The goal-reached / overtime center: the fast keeps ticking past the goal, so the
+/// numerals stay live while a pill shows how far past the goal the user now is.
+struct RingCenterGoalReached: View {
+    let elapsed: TimeInterval
+    let goalSeconds: TimeInterval
+    let theme: ThemeTokens
+
+    private var elapsedNumerals: AttributedString {
+        var hm = AttributedString(hourMinute(elapsed))
+        hm.font = Typography.timerNumerals
+        hm.foregroundColor = theme.ink
+        var ss = AttributedString(secondsSuffix(elapsed))
+        ss.font = Typography.timerSeconds
+        ss.foregroundColor = theme.mut
+        return hm + ss
+    }
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Text(strings.Timer.goalReached)
+                .font(.hanken(12, .semibold))
+                .overlineTracking(1.9)
+                .foregroundColor(theme.deep)
+
+            Text(elapsedNumerals)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .frame(maxWidth: 200)
+
+            Text(strings.Timer.goalOvertime(goalHourMinute(goalSeconds), overtimeLabel(max(0, elapsed - goalSeconds))))
+                .font(.hanken(12.5, .bold))
+                .monospacedDigit()
+                .foregroundColor(theme.deep)
+                .padding(.vertical, 5)
+                .padding(.horizontal, 12)
+                .background(
+                    Capsule().fill(theme.accent.opacity(0.16))
+                        .overlay(Capsule().stroke(theme.accent.opacity(0.34), lineWidth: 1))
+                )
+        }
+    }
+}
+
 struct RingCenterComplete: View {
     let elapsed: TimeInterval
     let theme: ThemeTokens

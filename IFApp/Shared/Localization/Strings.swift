@@ -28,6 +28,11 @@ enum strings {
         static var ketosis: String { String(localized: "Ketones are climbing. You're well into fat-burning now.") }
         static var autophagy: String { String(localized: "Deep in the fast. Autophagy is recycling what your cells no longer need.") }
 
+        /// Editorial shown once the goal is reached (overtime). `hours` = plan goal in hours.
+        static func goalReached(_ hours: Int) -> String {
+            String(format: String(localized: "You've reached your %d-hour goal. Every minute now is deeper autophagy."), hours)
+        }
+
         /// "Autophagy begins in 2h 36m"
         static func beginsIn(_ phase: String, _ when: String) -> String {
             String(format: String(localized: "%@ begins in %@"), phase, when)
@@ -37,9 +42,18 @@ enum strings {
     enum Timer {
         static var elapsedCaption: String { String(localized: "ELAPSED") }
         static var fastComplete: String { String(localized: "FAST COMPLETE") }
+        static var goalReached: String { String(localized: "GOAL REACHED") }
         static var start: String { String(localized: "Start") }
         static var dailyFast: String { String(localized: "Daily fast") }
         static var lastMeal: String { String(localized: "Last meal · ") }
+
+        /// Overtime pill in the center, e.g. "Goal 16:00 · +0:24".
+        static func goalOvertime(_ goal: String, _ over: String) -> String {
+            String(localized: "Goal \(goal) · +\(over)")
+        }
+
+        /// Static phase chip shown in the overtime state.
+        static var deepAutophagy: String { String(localized: "Deep autophagy - cellular repair") }
     }
 
     enum Footer {
@@ -50,11 +64,20 @@ enum strings {
         static var windowOpens: String { String(localized: "Window opens") }
         static var reset: String { String(localized: "Reset") }
         static var startEatingWindow: String { String(localized: "Start eating window") }
+        static var goalStat: String { String(localized: "Goal") }
+        static var over: String { String(localized: "Over") }
 
         /// "Goal · 16h"
         static func goal(_ hours: String) -> String {
             String(localized: "Goal · \(hours)")
         }
+    }
+
+    enum Reset {
+        static var confirmTitle: String { String(localized: "Reset this fast?") }
+        static var confirmMessage: String { String(localized: "This discards the current fast and returns to the start.") }
+        static var confirmAction: String { String(localized: "Reset fast") }
+        static var cancel: String { String(localized: "Cancel") }
     }
 
     enum Sheet {

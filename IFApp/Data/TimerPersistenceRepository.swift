@@ -9,8 +9,8 @@
 import Foundation
 
 protocol TimerPersistenceRepositoryProtocol {
-    func load() -> (fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int)
-    func save(fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int)
+    func load() -> (fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool)
+    func save(fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool)
     func loadPlanIdx() -> Int?
     func savePlanIdx(_ idx: Int)
 }
@@ -20,6 +20,7 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         static let startTimestamp = "start_timestamp"
         static let isRunning = "is_running"
         static let completedSessions = "completed_sessions_count"
+        static let hasCelebrated = "has_celebrated"
         static let planIdx = "plan_idx"
     }
 
@@ -29,18 +30,20 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         self.defaults = defaults
     }
 
-    func load() -> (fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int) {
+    func load() -> (fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool) {
         (
             fastStartTimestamp: defaults.double(forKey: Key.startTimestamp),
             isRunning: defaults.bool(forKey: Key.isRunning),
-            completedSessions: defaults.integer(forKey: Key.completedSessions)
+            completedSessions: defaults.integer(forKey: Key.completedSessions),
+            hasCelebrated: defaults.bool(forKey: Key.hasCelebrated)
         )
     }
 
-    func save(fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int) {
+    func save(fastStartTimestamp: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool) {
         defaults.set(fastStartTimestamp, forKey: Key.startTimestamp)
         defaults.set(isRunning, forKey: Key.isRunning)
         defaults.set(completedSessions, forKey: Key.completedSessions)
+        defaults.set(hasCelebrated, forKey: Key.hasCelebrated)
     }
 
     func loadPlanIdx() -> Int? {

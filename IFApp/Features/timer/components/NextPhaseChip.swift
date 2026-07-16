@@ -13,12 +13,38 @@ struct NextPhaseChip: View {
     let theme: ThemeTokens
 
     var body: some View {
-        let c = theme.chip(for: next.color)
+        PhaseChipShape(
+            color: next.color,
+            text: PhaseCopy.nextPhaseChip(next: next, secondsToNext: secondsToNext),
+            theme: theme
+        )
+    }
+}
+
+/// A static phase chip (no countdown) — used in the overtime state for autophagy.
+struct StaticPhaseChip: View {
+    let phase: Phase
+    let text: String
+    let theme: ThemeTokens
+
+    var body: some View {
+        PhaseChipShape(color: phase.color, text: text, theme: theme)
+    }
+}
+
+/// Shared pill shape colored by a phase color.
+private struct PhaseChipShape: View {
+    let color: Color
+    let text: String
+    let theme: ThemeTokens
+
+    var body: some View {
+        let c = theme.chip(for: color)
         HStack(spacing: 7) {
             Circle()
                 .fill(c.dot)
                 .frame(width: 7, height: 7)
-            Text(PhaseCopy.nextPhaseChip(next: next, secondsToNext: secondsToNext))
+            Text(text)
                 .font(.hanken(13, .semibold))
                 .foregroundColor(c.text)
         }

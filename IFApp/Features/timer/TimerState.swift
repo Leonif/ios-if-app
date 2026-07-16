@@ -16,4 +16,7 @@ struct TimerState: Equatable, Sendable {
     var stagedElapsed: TimeInterval = 0
     /// Count of fasts that reached the "completed" threshold — gates the review prompt.
     var completedSessionsCount: Int = 0
+    /// Whether the goal-reached moment already fired for the current fast. Persisted so
+    /// relaunching mid-overtime restores the steady end-state without replaying it.
+    var hasCelebrated: Bool = false
 }

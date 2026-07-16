@@ -74,6 +74,41 @@ struct ActiveFooterCard: View {
     }
 }
 
+/// Overtime footer: fasted / goal / over stats + Reset (secondary) and End fast (primary).
+/// The fast is still running here — "End fast" ends it, "Reset" discards it (with a confirm).
+struct GoalReachedFooterCard: View {
+    let fasted: String          // "16h 24m"
+    let goal: String            // "16h 00m"
+    let over: String            // "+0:24"
+    let theme: ThemeTokens
+    let onReset: () -> Void
+    let onEndFast: () -> Void
+
+    var body: some View {
+        VStack(spacing: 14) {
+            HStack(spacing: 0) {
+                Stat(overline: strings.Footer.fasted, value: fasted, valueColor: theme.ink, theme: theme)
+                divider
+                Stat(overline: strings.Footer.goalStat, value: goal, valueColor: theme.ink, theme: theme)
+                divider
+                Stat(overline: strings.Footer.over, value: over, valueColor: theme.deep, theme: theme)
+            }
+            HStack(spacing: 12) {
+                SecondaryButton(title: strings.Footer.reset, theme: theme, action: onReset)
+                    .frame(width: 110)
+                    .accessibilityIdentifier("timer.reset")
+                PrimaryButton(title: strings.Footer.endFast, theme: theme, action: onEndFast)
+                    .accessibilityIdentifier("timer.endFast")
+            }
+        }
+        .modifier(CardBackground(theme: theme))
+    }
+
+    private var divider: some View {
+        Rectangle().fill(theme.surfaceLine).frame(width: 1, height: 30)
+    }
+}
+
 struct CompleteFooterCard: View {
     let fasted: String          // "16h 02m"
     let windowOpens: String     // "Now"
