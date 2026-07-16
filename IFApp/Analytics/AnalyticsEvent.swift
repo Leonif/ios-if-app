@@ -14,7 +14,7 @@ enum AnalyticsEvent {
     case appOpened
     /// User started a fast. `goalHours` = the chosen plan's fasting window.
     case fastStarted(goalHours: Double)
-    /// User ended a fast. `completed` = reached the qualifying threshold (8h).
+    /// User ended a fast. `completed` = the fast had reached its goal.
     case fastStopped(durationSeconds: Int, completed: Bool, stage: String)
     /// The fast reached its goal (the goal-reached moment fired). `goalHours` = plan window.
     case goalReached(goalHours: Double)
@@ -31,6 +31,8 @@ enum AnalyticsEvent {
     case reviewPrompted
     /// User tapped the positive CTA on the review prompt (went to write-review).
     case reviewCtaTapped
+    /// User dismissed the review prompt without tapping the positive CTA.
+    case reviewPromptDismissed
     /// The appearance the app is being used in. `dark` = system dark mode.
     /// Fires on screen appear and on live theme switches — count *users* per
     /// `theme` value to see which appearance the audience actually uses.
@@ -48,6 +50,7 @@ enum AnalyticsEvent {
         case .sourcesOpened: return "sources_opened"
         case .reviewPrompted: return "review_prompted"
         case .reviewCtaTapped: return "review_cta_tapped"
+        case .reviewPromptDismissed: return "review_prompt_dismissed"
         case .themeActive: return "theme_active"
         }
     }
@@ -72,7 +75,8 @@ enum AnalyticsEvent {
             ]
         case let .themeActive(dark):
             return ["theme": dark ? "dark" : "light"]
-        case .appOpened, .fastReset, .timeAdjusted, .sourcesOpened, .reviewPrompted, .reviewCtaTapped:
+        case .appOpened, .fastReset, .timeAdjusted, .sourcesOpened, .reviewPrompted, .reviewCtaTapped,
+             .reviewPromptDismissed:
             return [:]
         }
     }

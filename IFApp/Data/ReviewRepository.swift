@@ -10,9 +10,10 @@
 import UIKit
 
 protocol ReviewRepositoryProtocol {
-    /// True if the pre-prompt may show: not already reviewed, and not shown today.
+    /// True if the pre-prompt may show: not already reviewed, not shown today,
+    /// and under the lifetime show cap.
     func canPrompt() -> Bool
-    /// Records that the pre-prompt was shown (limits it to once per day).
+    /// Records that the pre-prompt was shown (once per day, and counts toward the cap).
     func markPromptShown()
     /// Opens the App Store write-review form and marks the user as reviewed.
     func openWriteReview()
@@ -23,7 +24,10 @@ struct ReviewRepository: ReviewRepositoryProtocol {
     private enum Key {
         static let lastShown = "review_last_shown"
         static let left = "review_left"
+        static let promptCount = "review_prompt_count"
     }
+    /// Lifetime cap on our own sheet — it isn't covered by Apple's native limit.
+    private let maxPrompts = 3
     // ?action=write-review opens the review composer directly, not the product page.
     private let writeReviewURL = "https://apps.apple.com/app/id6738324344?action=write-review"
 
@@ -31,6 +35,7 @@ struct ReviewRepository: ReviewRepositoryProtocol {
 
     func canPrompt() -> Bool {
         if defaults.bool(forKey: Key.left) { return false }
+        if defaults.integer(forKey: Key.promptCount) >= maxPrompts { return false }
         if let last = defaults.object(forKey: Key.lastShown) as? Date,
            Calendar.current.isDateInToday(last) { return false }
         return true
@@ -38,6 +43,7 @@ struct ReviewRepository: ReviewRepositoryProtocol {
 
     func markPromptShown() {
         defaults.set(Date(), forKey: Key.lastShown)
+        defaults.set(defaults.integer(forKey: Key.promptCount) + 1, forKey: Key.promptCount)
     }
 
     func openWriteReview() {

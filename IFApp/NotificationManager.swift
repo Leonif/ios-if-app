@@ -22,6 +22,11 @@ final class NotificationManager {
         }
     }
 
+    /// The current notification authorization status (user may change it in Settings).
+    func authorizationStatus() async -> UNAuthorizationStatus {
+        await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+    }
+
     func scheduleNotification(after seconds: TimeInterval, title: String, body: String) {
         let content = UNMutableNotificationContent()
         content.title = title

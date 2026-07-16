@@ -274,7 +274,10 @@ struct TimerFlowView: View {
             ReviewPromptSheet(
                 theme: theme,
                 onPositive: { store.dispatch(LeaveReviewThunk()) },
-                onDismiss: { store.dispatch(UIAction.reviewPromptClosed) }
+                onDismiss: {
+                    store.dispatch(UIAction.reviewPromptClosed)
+                    store.dispatch(AppLifecycleAction.reviewPromptDismissed)
+                }
             )
             .zIndex(2)
         }
@@ -319,6 +322,8 @@ struct TimerFlowView: View {
             goalHaloOpacity = haloTarget
             goalSweepOpacity = 0
             goalSweepAngle = 0
+            // Relaunch mid-overtime: no moment to wait for, the screen is already settled.
+            store.dispatch(AppLifecycleAction.goalScreenSettled)
             return
         }
 
@@ -330,6 +335,7 @@ struct TimerFlowView: View {
             goalSealScale = 1
             goalHaloOpacity = haloTarget
             goalSweepOpacity = 0
+            store.dispatch(AppLifecycleAction.goalScreenSettled)
             return
         }
 
@@ -341,6 +347,12 @@ struct TimerFlowView: View {
         withAnimation(.easeOut(duration: 0.7).delay(0.35)) { goalSealScale = 1 }
         withAnimation(.easeOut(duration: 0.9)) { goalHaloOpacity = haloTarget }
 
+        // Let the seal/sweep finish before anything (the review sheet) can cover it.
+        // Re-check the state on arrival — the fast may have been ended meanwhile.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+            guard currentScreenState() == .goalReached else { return }
+            store.dispatch(AppLifecycleAction.goalScreenSettled)
+        }
     }
 
     private func mealValue(nowMinute: Int) -> String {

@@ -14,6 +14,8 @@ import FirebaseAnalytics
 
 protocol AnalyticsClient {
     func log(name: String, parameters: [String: Any])
+    /// Sets a persistent user property for segmentation (nil clears it).
+    func setUserProperty(_ value: String?, forName name: String)
 }
 
 struct DefaultAnalyticsClient: AnalyticsClient {
@@ -26,6 +28,14 @@ struct DefaultAnalyticsClient: AnalyticsClient {
         } else {
             print("[Analytics] \(name) \(parameters)")
         }
+        #endif
+    }
+
+    func setUserProperty(_ value: String?, forName name: String) {
+        #if canImport(FirebaseAnalytics)
+        Analytics.setUserProperty(value, forName: name)
+        #else
+        print("[Analytics] user_property \(name) = \(value ?? "nil")")
         #endif
     }
 }

@@ -26,6 +26,7 @@ struct IFAppApp: App {
         let store = AppStoreFactory.make()
         _store = StateObject(wrappedValue: store)
         store.dispatch(ScheduleNotificationsThunk())
+        store.dispatch(SyncPushStatusThunk())
         store.dispatch(AppLifecycleAction.appOpened)
         if ProcessInfo.processInfo.arguments.contains("-showReviewPrompt") {
             store.dispatch(UIAction.reviewPromptOpened)

@@ -8,6 +8,8 @@
 
 protocol AnalyticsRepositoryProtocol {
     func log(_ event: AnalyticsEvent)
+    /// Sets a persistent user property for segmentation (nil clears it).
+    func setUserProperty(_ value: String?, forName name: String)
 }
 
 struct AnalyticsRepository: AnalyticsRepositoryProtocol {
@@ -19,5 +21,9 @@ struct AnalyticsRepository: AnalyticsRepositoryProtocol {
 
     func log(_ event: AnalyticsEvent) {
         client.log(name: event.name, parameters: event.parameters)
+    }
+
+    func setUserProperty(_ value: String?, forName name: String) {
+        client.setUserProperty(value, forName: name)
     }
 }

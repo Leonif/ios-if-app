@@ -6,9 +6,12 @@
 //
 
 import Foundation
+import UserNotifications
 
 protocol NotificationRepositoryProtocol {
     func requestAuthorization()
+    /// The current notification authorization status.
+    func authorizationStatus() async -> UNAuthorizationStatus
     /// One-time cleanup of the legacy fixed daily reminders on existing installs.
     func removeLegacyDailyReminders()
     /// Schedule (replacing any existing) the goal-reached push `seconds` from now.
@@ -19,6 +22,10 @@ protocol NotificationRepositoryProtocol {
 struct NotificationRepository: NotificationRepositoryProtocol {
     func requestAuthorization() {
         NotificationManager.shared.requestAuthorization()
+    }
+
+    func authorizationStatus() async -> UNAuthorizationStatus {
+        await NotificationManager.shared.authorizationStatus()
     }
 
     func removeLegacyDailyReminders() {

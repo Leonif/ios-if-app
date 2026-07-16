@@ -16,13 +16,10 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.isRunning = true
         newState.hasCelebrated = false
 
-    case let .stopped(elapsed, qualifies):
+    case let .stopped(elapsed, _):
         newState.isRunning = false
         newState.fastStartTimestamp = 0
         newState.stagedElapsed = elapsed
-        if qualifies {
-            newState.completedSessionsCount += 1
-        }
 
     case .reset:
         newState.isRunning = false
@@ -37,7 +34,13 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         }
 
     case .goalCelebrated:
-        newState.hasCelebrated = true
+        // Idempotent by design: syncGoalMoment is called from two places and props
+        // update asynchronously, so the guard lives here rather than in the view.
+        // Reaching the goal — not tapping "End fast" — is what completes a fast.
+        if !newState.hasCelebrated {
+            newState.hasCelebrated = true
+            newState.completedSessionsCount += 1
+        }
 
     case .none:
         break

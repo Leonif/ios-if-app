@@ -36,6 +36,8 @@ final class AnalyticsMiddleware: Middleware {
         case .sourcesOpened: repo.log(.sourcesOpened)
         case .reviewPrompted: repo.log(.reviewPrompted)
         case .reviewCtaTapped: repo.log(.reviewCtaTapped)
+        case .reviewPromptDismissed: repo.log(.reviewPromptDismissed)
+        case .goalScreenSettled: break   // internal gate signal, not a funnel event
         case let .lastMealLogged(backdated, minutesAgo):
             repo.log(.lastMealLogged(backdated: backdated, minutesAgo: minutesAgo))
         case let .themeActive(dark):

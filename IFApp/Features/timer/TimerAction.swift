@@ -11,7 +11,8 @@ import Redux
 enum TimerAction: Action {
     /// Begin a fast. `startTimestamp` already accounts for any staged elapsed time.
     case started(startTimestamp: Double)
-    /// End a fast. `qualifiesAsCompleted` = session was long enough to count toward the review gate.
+    /// End a fast. `qualifiesAsCompleted` = the fast reached its goal. Analytics-only:
+    /// completed fasts are counted on `goalCelebrated`, not here.
     case stopped(elapsed: TimeInterval, qualifiesAsCompleted: Bool)
     /// Clear everything back to zero.
     case reset
