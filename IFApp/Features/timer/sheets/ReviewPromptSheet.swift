@@ -10,6 +10,7 @@
 import SwiftUI
 
 struct ReviewPromptSheet: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let theme: ThemeTokens
     let onPositive: () -> Void
     let onDismiss: () -> Void
@@ -21,9 +22,10 @@ struct ReviewPromptSheet: View {
             Color.black.opacity(theme.isDark ? 0.5 : 0.35)
                 .ignoresSafeArea()
                 .onTapGesture(perform: onDismiss)
+                .transition(.opacity)
             sheet
+                .transition(reduceMotion ? .opacity : .move(edge: .bottom))
         }
-        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     private var sheet: some View {

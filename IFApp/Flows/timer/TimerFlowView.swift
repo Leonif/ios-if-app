@@ -81,7 +81,14 @@ struct TimerFlowView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(backgroundLayer(theme: theme))
-        .overlay { overlays(theme: theme) }
+        .overlay {
+            // The sheets ship transitions, but props land from the store as a plain
+            // assignment — without an animation bound to the flag the transition
+            // never runs and the sheet just pops in. Scoped to this one flag so the
+            // per-second timer ticks stay unanimated.
+            overlays(theme: theme)
+                .animation(.easeOut(duration: 0.3), value: props.reviewPromptOpen)
+        }
         .sheet(isPresented: $showSources) { SourcesView() }
         .confirmationDialog(strings.Reset.confirmTitle, isPresented: $showResetConfirm, titleVisibility: .visible) {
             Button(strings.Reset.confirmAction, role: .destructive) { store.dispatch(ResetFastThunk()) }
