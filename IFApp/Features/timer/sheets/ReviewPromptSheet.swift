@@ -11,20 +11,32 @@ import SwiftUI
 
 struct ReviewPromptSheet: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let isOpen: Bool
     let theme: ThemeTokens
     let onPositive: () -> Void
     let onDismiss: () -> Void
 
     private let gold = Color(hex: "#E7C36A")
 
+    // The stack itself always exists and only its children come and go: inserting
+    // the stack would hand SwiftUI's default opacity transition to everything
+    // inside, and the fade would swallow the sheet's travel. Separate `if`s so the
+    // scrim and the sheet are inserted independently, each on its own transition.
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.black.opacity(theme.isDark ? 0.5 : 0.35)
-                .ignoresSafeArea()
-                .onTapGesture(perform: onDismiss)
-                .transition(.opacity)
-            sheet
-                .transition(reduceMotion ? .opacity : .move(edge: .bottom))
+            if isOpen {
+                Color.black.opacity(theme.isDark ? 0.5 : 0.35)
+                    .ignoresSafeArea()
+                    .onTapGesture(perform: onDismiss)
+                    .transition(.opacity)
+            }
+            if isOpen {
+                // Full opacity the whole way up — it should read as a solid thing
+                // that was always waiting below the edge, not one materialising
+                // mid-flight.
+                sheet
+                    .transition(reduceMotion ? .opacity : .move(edge: .bottom))
+            }
         }
     }
 

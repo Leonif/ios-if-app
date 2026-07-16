@@ -284,17 +284,16 @@ struct TimerFlowView: View {
             )
             .zIndex(1)
         }
-        if props.reviewPromptOpen {
-            ReviewPromptSheet(
-                theme: theme,
-                onPositive: { store.dispatch(LeaveReviewThunk()) },
-                onDismiss: {
-                    store.dispatch(UIAction.reviewPromptClosed)
-                    store.dispatch(AppLifecycleAction.reviewPromptDismissed)
-                }
-            )
-            .zIndex(2)
-        }
+        ReviewPromptSheet(
+            isOpen: props.reviewPromptOpen,
+            theme: theme,
+            onPositive: { store.dispatch(LeaveReviewThunk()) },
+            onDismiss: {
+                store.dispatch(UIAction.reviewPromptClosed)
+                store.dispatch(AppLifecycleAction.reviewPromptDismissed)
+            }
+        )
+        .zIndex(2)
     }
 
     // MARK: Copy / formatting
