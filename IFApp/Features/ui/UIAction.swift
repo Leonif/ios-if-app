@@ -12,4 +12,6 @@ enum UIAction: Action {
     case mealPickerClosed
     case reviewPromptOpened
     case reviewPromptClosed
+    case resetConfirmOpened
+    case resetConfirmClosed
 }

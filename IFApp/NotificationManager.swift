@@ -80,6 +80,36 @@ final class NotificationManager {
             .removePendingNotificationRequests(withIdentifiers: [goalReachedID])
     }
 
+    // MARK: - Eating-window notification (one local push when the window closes)
+
+    /// A single, replaceable local notification fired when the eating window closes.
+    private let eatingEndID = "eating_window_ended"
+
+    /// Schedules the eating-window-closed notification `seconds` from now, replacing
+    /// any previously scheduled one. Fires even if the app is backgrounded or killed.
+    func scheduleEatingEndNotification(after seconds: TimeInterval) {
+        cancelEatingEndNotification()
+
+        let content = UNMutableNotificationContent()
+        content.title = strings.Notification.eatingEndTitle
+        content.body = strings.Notification.eatingEndBody
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, seconds), repeats: false)
+        let request = UNNotificationRequest(identifier: eatingEndID, content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error {
+                print("Notification scheduling error: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func cancelEatingEndNotification() {
+        UNUserNotificationCenter.current()
+            .removePendingNotificationRequests(withIdentifiers: [eatingEndID])
+    }
+
     /// Removes the legacy fixed daily reminders (noon/evening) left scheduled on
     /// existing installs after dropping that feature.
     func cancelDailyReminders() {

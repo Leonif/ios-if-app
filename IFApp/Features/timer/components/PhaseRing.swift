@@ -14,8 +14,8 @@ struct PhaseRing: View {
     let currentPhase: Phase
     let isComplete: Bool
     let theme: ThemeTokens
+    var diameter: CGFloat = 280
 
-    private let diameter: CGFloat = 280
     private let lineWidth: CGFloat = 10
 
     // The stroked Circle's path radius is diameter/2, so the head dot must ride at

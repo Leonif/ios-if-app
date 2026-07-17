@@ -15,6 +15,8 @@ func uiReducer(state: UIState, action: Action) -> UIState {
     case .mealPickerClosed: newState.mealPickerOpen = false
     case .reviewPromptOpened: newState.reviewPromptOpen = true
     case .reviewPromptClosed: newState.reviewPromptOpen = false
+    case .resetConfirmOpened: newState.resetConfirmOpen = true
+    case .resetConfirmClosed: newState.resetConfirmOpen = false
     case .none: break
     }
 

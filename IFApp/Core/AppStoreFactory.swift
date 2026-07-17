@@ -14,8 +14,12 @@ enum AppStoreFactory {
         let persistence: TimerPersistenceRepositoryProtocol = container.inject()
         // UI tests launch with "-uitestReset" to start from a clean idle state.
         if ProcessInfo.processInfo.arguments.contains("-uitestReset") {
-            persistence.save(fastStartTimestamp: 0, isRunning: false, completedSessions: 0, hasCelebrated: false)
+            persistence.save(fastStartTimestamp: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false)
         }
+        // UI tests also seed timer/review state via "-seed…" args (see UITestSeed).
+        #if DEBUG
+        UITestSeed.applyIfNeeded()
+        #endif
         let loaded = persistence.load()
 
         let initialState = AppState(
@@ -24,7 +28,9 @@ enum AppStoreFactory {
                 isRunning: loaded.isRunning,
                 stagedElapsed: 0,
                 completedSessionsCount: loaded.completedSessions,
-                hasCelebrated: loaded.hasCelebrated
+                hasCelebrated: loaded.hasCelebrated,
+                eatingStartTimestamp: loaded.eatingStartTimestamp,
+                isEating: loaded.isEating
             ),
             planState: PlanState(planIdx: persistence.loadPlanIdx() ?? Plan.default.rawValue)
         )

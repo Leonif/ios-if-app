@@ -15,6 +15,9 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.fastStartTimestamp = startTimestamp
         newState.isRunning = true
         newState.hasCelebrated = false
+        // Starting a fast closes any open eating window.
+        newState.isEating = false
+        newState.eatingStartTimestamp = 0
 
     case let .stopped(elapsed, _):
         newState.isRunning = false
@@ -26,6 +29,8 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.fastStartTimestamp = 0
         newState.stagedElapsed = 0
         newState.hasCelebrated = false
+        newState.isEating = false
+        newState.eatingStartTimestamp = 0
 
     case let .timeAdjusted(newElapsed, runningStartTimestamp):
         newState.stagedElapsed = newElapsed
@@ -41,6 +46,19 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
             newState.hasCelebrated = true
             newState.completedSessionsCount += 1
         }
+
+    case let .eatingStarted(startTimestamp):
+        // Opening the window clears the finished fast (like reset, but into eating).
+        newState.isRunning = false
+        newState.fastStartTimestamp = 0
+        newState.stagedElapsed = 0
+        newState.hasCelebrated = false
+        newState.isEating = true
+        newState.eatingStartTimestamp = startTimestamp
+
+    case .eatingEnded:
+        newState.isEating = false
+        newState.eatingStartTimestamp = 0
 
     case .none:
         break

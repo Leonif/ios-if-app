@@ -43,6 +43,8 @@ enum strings {
         static var elapsedCaption: String { String(localized: "ELAPSED") }
         static var fastComplete: String { String(localized: "FAST COMPLETE") }
         static var goalReached: String { String(localized: "GOAL REACHED") }
+        static var eatingWindow: String { String(localized: "EATING WINDOW") }
+        static var fastStartsIn: String { String(localized: "Fast starts in") }
         static var start: String { String(localized: "Start") }
         static var dailyFast: String { String(localized: "Daily fast") }
         static var lastMeal: String { String(localized: "Last meal · ") }
@@ -64,6 +66,8 @@ enum strings {
         static var windowOpens: String { String(localized: "Window opens") }
         static var reset: String { String(localized: "Reset") }
         static var startEatingWindow: String { String(localized: "Start eating window") }
+        static var startFast: String { String(localized: "Start fast") }
+        static var skip: String { String(localized: "Skip") }
         static var goalStat: String { String(localized: "Goal") }
         static var over: String { String(localized: "Over") }
 
@@ -77,6 +81,7 @@ enum strings {
         static var confirmTitle: String { String(localized: "Reset this fast?") }
         static var confirmMessage: String { String(localized: "This discards the current fast and returns to the start.") }
         static var confirmAction: String { String(localized: "Reset fast") }
+        static var keepFasting: String { String(localized: "Keep fasting") }
         static var cancel: String { String(localized: "Cancel") }
     }
 
@@ -157,6 +162,8 @@ enum strings {
     enum Notification {
         static var goalTitle: String { String(localized: "Fast complete") }
         static var goalBody: String { String(localized: "You reached your goal. Your eating window is open.") }
+        static var eatingEndTitle: String { String(localized: "Eating window closed") }
+        static var eatingEndBody: String { String(localized: "Time to fast. Start whenever you're ready.") }
     }
 
     enum Sources {

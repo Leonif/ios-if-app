@@ -109,6 +109,25 @@ struct GoalReachedFooterCard: View {
     }
 }
 
+/// Eating-window footer: Skip (secondary, back to idle) + Start fast (primary, begins a
+/// new fast early). No stats — the countdown is the hero above.
+struct EatingFooterCard: View {
+    let theme: ThemeTokens
+    let onSkip: () -> Void
+    let onStartFast: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            SecondaryButton(title: strings.Footer.skip, theme: theme, action: onSkip)
+                .frame(width: 110)
+                .accessibilityIdentifier("eating.skip")
+            PrimaryButton(title: strings.Footer.startFast, theme: theme, action: onStartFast)
+                .accessibilityIdentifier("eating.startFast")
+        }
+        .modifier(CardBackground(theme: theme))
+    }
+}
+
 struct CompleteFooterCard: View {
     let fasted: String          // "16h 02m"
     let windowOpens: String     // "Now"

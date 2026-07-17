@@ -16,8 +16,8 @@ struct GoalMomentView: View {
     let sweepAngle: Double      // degrees, 0...360 during the sweep
     let sweepOpacity: Double
     let theme: ThemeTokens
+    var diameter: CGFloat = 280
 
-    private let diameter: CGFloat = 280
     private let lineWidth: CGFloat = 10
     private let sealDiameter: CGFloat = 44
 

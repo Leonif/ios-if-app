@@ -20,4 +20,8 @@ enum TimerAction: Action {
     case timeAdjusted(newElapsed: TimeInterval, runningStartTimestamp: Double?)
     /// The goal-reached moment fired for the current fast (marks it so it plays once).
     case goalCelebrated
+    /// Open the eating window. `startTimestamp` = when it opened (usually now).
+    case eatingStarted(startTimestamp: Double)
+    /// Close the eating window back to idle (window elapsed, or skipped).
+    case eatingEnded
 }

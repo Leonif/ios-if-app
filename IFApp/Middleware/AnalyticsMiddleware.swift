@@ -58,6 +58,10 @@ final class AnalyticsMiddleware: Middleware {
             ))
         case .reset:
             repo.log(.fastReset)
+        case .eatingStarted:
+            repo.log(.eatingWindowStarted)
+        case .eatingEnded:
+            break
         case .timeAdjusted:
             repo.log(.timeAdjusted)
         case .goalCelebrated:

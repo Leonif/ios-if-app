@@ -17,6 +17,9 @@ protocol NotificationRepositoryProtocol {
     /// Schedule (replacing any existing) the goal-reached push `seconds` from now.
     func scheduleGoalNotification(after seconds: TimeInterval)
     func cancelGoalNotification()
+    /// Schedule (replacing any existing) the eating-window-closed push `seconds` from now.
+    func scheduleEatingEndNotification(after seconds: TimeInterval)
+    func cancelEatingEndNotification()
 }
 
 struct NotificationRepository: NotificationRepositoryProtocol {
@@ -38,5 +41,13 @@ struct NotificationRepository: NotificationRepositoryProtocol {
 
     func cancelGoalNotification() {
         NotificationManager.shared.cancelGoalNotification()
+    }
+
+    func scheduleEatingEndNotification(after seconds: TimeInterval) {
+        NotificationManager.shared.scheduleEatingEndNotification(after: seconds)
+    }
+
+    func cancelEatingEndNotification() {
+        NotificationManager.shared.cancelEatingEndNotification()
     }
 }

@@ -29,23 +29,37 @@ final class NotificationMiddleware: Middleware {
         }
     }
 
-    /// Schedules the goal push when a fast is running and the goal is still ahead;
-    /// otherwise cancels it. Idempotent, so it's safe to call on every relevant action.
+    /// Keeps the goal push (running fast) and the eating-window push (open window) in
+    /// sync with the timer. Each is scheduled while its deadline is still ahead and
+    /// cancelled otherwise. Idempotent, so it's safe to call on every relevant action.
     private func sync(_ app: AppState) {
         let timer = app.timerState
-        guard timer.isRunning else {
-            repo.cancelGoalNotification()
-            return
-        }
+        let plan = Plan(rawValue: app.planState.planIdx) ?? .default
+        let now = Clock.now().timeIntervalSince1970
 
-        let goalHours = (Plan(rawValue: app.planState.planIdx) ?? .default).fastHours
-        let goalTimestamp = timer.fastStartTimestamp + goalHours * 3600
-        let secondsUntilGoal = goalTimestamp - Clock.now().timeIntervalSince1970
-
-        if secondsUntilGoal > 0 {
-            repo.scheduleGoalNotification(after: secondsUntilGoal)
+        // Goal push while a fast is running.
+        if timer.isRunning {
+            let secondsUntilGoal = timer.fastStartTimestamp + plan.fastHours * 3600 - now
+            if secondsUntilGoal > 0 {
+                repo.scheduleGoalNotification(after: secondsUntilGoal)
+            } else {
+                repo.cancelGoalNotification()
+            }
         } else {
             repo.cancelGoalNotification()
+        }
+
+        // Eating-window-closed push while a window is open.
+        if timer.isEating {
+            let eatingHours = 24 - plan.fastHours
+            let secondsUntilClose = timer.eatingStartTimestamp + eatingHours * 3600 - now
+            if secondsUntilClose > 0 {
+                repo.scheduleEatingEndNotification(after: secondsUntilClose)
+            } else {
+                repo.cancelEatingEndNotification()
+            }
+        } else {
+            repo.cancelEatingEndNotification()
         }
     }
 }

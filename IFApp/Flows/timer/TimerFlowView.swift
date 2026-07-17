@@ -17,35 +17,49 @@ struct TimerScreenProps: Equatable {
     let fastStartTimestamp: Double
     let stagedElapsed: TimeInterval
     let hasCelebrated: Bool
+    let isEating: Bool
+    let eatingStartTimestamp: Double
     let planIdx: Int
     let ateDay: Int
     let ateMin: Int
     let planEditorOpen: Bool
     let mealPickerOpen: Bool
     let reviewPromptOpen: Bool
+    let resetConfirmOpen: Bool
 
     init(state: AppState) {
         isRunning = state.timerState.isRunning
         fastStartTimestamp = state.timerState.fastStartTimestamp
         stagedElapsed = state.timerState.stagedElapsed
         hasCelebrated = state.timerState.hasCelebrated
+        isEating = state.timerState.isEating
+        eatingStartTimestamp = state.timerState.eatingStartTimestamp
         planIdx = state.planState.planIdx
         ateDay = state.mealState.ateDay
         ateMin = state.mealState.ateMin
         planEditorOpen = state.uiState.planEditorOpen
         mealPickerOpen = state.uiState.mealPickerOpen
         reviewPromptOpen = state.uiState.reviewPromptOpen
+        resetConfirmOpen = state.uiState.resetConfirmOpen
     }
 
     var plan: Plan { Plan(rawValue: planIdx) ?? .default }
     var isMealFresh: Bool { ateMin < 0 }
 
+    /// Eating-window length in hours: the remainder of the 24h day after the fast.
+    var eatingHours: Double { 24 - plan.fastHours }
+
     func elapsed(at now: Date) -> TimeInterval {
         isRunning ? max(0, now.timeIntervalSince1970 - fastStartTimestamp) : stagedElapsed
     }
+
+    /// Seconds left in the eating window (until the next fast should start).
+    func eatingRemaining(at now: Date) -> TimeInterval {
+        max(0, eatingStartTimestamp + eatingHours * 3600 - now.timeIntervalSince1970)
+    }
 }
 
-private enum ScreenState { case idle, active, goalReached, complete }
+private enum ScreenState { case idle, active, goalReached, complete, eating }
 
 struct TimerFlowView: View {
     private let store: Store<AppState>
@@ -54,7 +68,6 @@ struct TimerFlowView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var props: TimerScreenProps
     @State private var showSources = false
-    @State private var showResetConfirm = false
 
     // Goal-reached moment / overtime glow — driven here so the one-shot plays only
     // on a genuine live crossing and is not replayed when relaunching mid-overtime.
@@ -71,7 +84,8 @@ struct TimerFlowView: View {
     var body: some View {
         let theme = ThemeTokens.resolve(colorScheme)
         Group {
-            if props.isRunning {
+            // Tick every second while a fast runs or an eating window counts down.
+            if props.isRunning || props.isEating {
                 TimelineView(.periodic(from: .now, by: 1)) { ctx in
                     screen(theme: theme, now: ctx.date)
                 }
@@ -88,20 +102,17 @@ struct TimerFlowView: View {
             // per-second timer ticks stay unanimated.
             overlays(theme: theme)
                 .animation(.easeOut(duration: 0.3), value: props.reviewPromptOpen)
+                .animation(.easeOut(duration: 0.3), value: props.resetConfirmOpen)
         }
         .sheet(isPresented: $showSources) { SourcesView() }
-        .confirmationDialog(strings.Reset.confirmTitle, isPresented: $showResetConfirm, titleVisibility: .visible) {
-            Button(strings.Reset.confirmAction, role: .destructive) { store.dispatch(ResetFastThunk()) }
-            Button(strings.Reset.cancel, role: .cancel) {}
-        } message: {
-            Text(strings.Reset.confirmMessage)
-        }
         .connect(to: store, mapState: { TimerScreenProps(state: $0) }, onPropsChange: { props = $0 })
         .onAppear {
             store.dispatch(AppLifecycleAction.themeActive(dark: colorScheme == .dark))
             // Restore the settled overtime end-state on a relaunch mid-overtime
             // (onChange below won't fire for the initial state).
             syncGoalMoment(to: currentScreenState())
+            // An eating window may have elapsed while the app was closed.
+            reconcileEating(currentScreenState())
         }
         .onChange(of: colorScheme) { _, new in
             store.dispatch(AppLifecycleAction.themeActive(dark: new == .dark))
@@ -111,6 +122,7 @@ struct TimerFlowView: View {
             // here until the user is actually looking at the screen.
             guard phase == .active else { return }
             syncGoalMoment(to: currentScreenState())
+            reconcileEating(currentScreenState())
         }
     }
 
@@ -127,77 +139,132 @@ struct TimerFlowView: View {
     private func screen(theme: ThemeTokens, now: Date) -> some View {
         let elapsed = props.elapsed(at: now)
         let progress = PhaseProgress.compute(elapsed: elapsed, goalHours: props.plan.fastHours)
-        let state = screenState(progress: progress)
+        let state = screenState(progress: progress, now: now)
         let nowMinute = Clock.minuteOfDay(now)
 
-        VStack(spacing: 0) {
-            TimerHeader(
-                plan: props.plan,
-                theme: theme,
-                onEditPlan: { store.dispatch(UIAction.planEditorOpened) },
-                onSettings: { showSources = true }
-            )
-            // Fixed gap header -> ring so the ring stays anchored at the same
-            // vertical spot in every state (idle/active/complete). Only the block
-            // *below* the ring changes between states, so the ring never moves.
-            .padding(.bottom, 24)
+        // Read the real safe-area insets so the top/bottom gaps adapt to the device.
+        // The header is a transparent floating overlay above a full-height ScrollView:
+        // it sits just below the status bar with no backdrop, so when the ring scrolls
+        // up it slides *under* the floating plan pill / notes icon and stays visible
+        // around them. The footer stays pinned above the home indicator. The middle
+        // (ring/editorial/timeline) scrolls between them so a short screen (SE) can
+        // reach the timeline while the full 280pt ring holds its resting spot.
+        GeometryReader { proxy in
+            let insets = proxy.safeAreaInsets
+            // Header geometry. `headerTop` matches the old .padding(.top, 14); the
+            // controls are ~34pt tall; `headerGap` is the old 24pt header->ring gap.
+            // The scroll content reserves (top + height + gap) at the top so the ring
+            // rests below the header exactly where it did before, yet can scroll under it.
+            let headerTop: CGFloat = 14
+            let headerHeight: CGFloat = 34
+            let headerGap: CGFloat = 24
 
-            VStack(spacing: 20) {
-                ZStack {
-                    PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
-                              isComplete: state == .complete || state == .goalReached, theme: theme)
-                    if state == .goalReached {
-                        GoalMomentView(sealScale: goalSealScale, haloOpacity: goalHaloOpacity,
-                                       sweepAngle: goalSweepAngle, sweepOpacity: goalSweepOpacity,
-                                       theme: theme)
+            ScrollView(.vertical, showsIndicators: false) {
+                Group {
+                    if state == .eating {
+                        // Eating window: a calm countdown to the next fast — no ring, no phases.
+                        VStack(spacing: 20) {
+                            EatingWindowCard(remaining: props.eatingRemaining(at: now), theme: theme)
+                                .padding(.vertical, 6)
+
+                            EditorialSentence(text: PhaseCopy.complete, theme: theme)
+                        }
+                    } else {
+                        VStack(spacing: 20) {
+                            ZStack {
+                                PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
+                                          isComplete: state == .complete || state == .goalReached, theme: theme,
+                                          diameter: 280)
+                                if state == .goalReached {
+                                    GoalMomentView(sealScale: goalSealScale, haloOpacity: goalHaloOpacity,
+                                                   sweepAngle: goalSweepAngle, sweepOpacity: goalSweepOpacity,
+                                                   theme: theme, diameter: 280)
+                                }
+                                ringCenter(state: state, elapsed: elapsed, progress: progress, theme: theme)
+                            }
+                            .padding(.vertical, 6)
+
+                            EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
+
+                            if state == .active, let next = progress.nextPhase {
+                                NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
+                            }
+
+                            if state == .goalReached {
+                                StaticPhaseChip(phase: .autophagy, text: strings.Timer.deepAutophagy, theme: theme)
+                            }
+
+                            if state == .idle {
+                                LastMealPill(
+                                    valueText: mealValue(nowMinute: nowMinute),
+                                    subline: mealSubline(nowMinute: nowMinute),
+                                    theme: theme,
+                                    onTap: { store.dispatch(OpenMealPickerThunk()) }
+                                )
+                            }
+
+                            PhaseTimeline(currentPhase: progress.phase,
+                                          currentFill: progress.fraction * 4 - Double(progress.phase.rawValue),
+                                          isComplete: state == .complete || state == .goalReached,
+                                          theme: theme)
+                                .padding(.top, 2)
+                        }
                     }
-                    ringCenter(state: state, elapsed: elapsed, progress: progress, theme: theme)
                 }
-                .padding(.vertical, 6)
-
-                EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
-
-                if state == .active, let next = progress.nextPhase {
-                    NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
-                }
-
-                if state == .goalReached {
-                    StaticPhaseChip(phase: .autophagy, text: strings.Timer.deepAutophagy, theme: theme)
-                }
-
-                if state == .idle {
-                    LastMealPill(
-                        valueText: mealValue(nowMinute: nowMinute),
-                        subline: mealSubline(nowMinute: nowMinute),
-                        theme: theme,
-                        onTap: { store.dispatch(OpenMealPickerThunk()) }
-                    )
-                }
-
-                PhaseTimeline(currentPhase: progress.phase,
-                              currentFill: progress.fraction * 4 - Double(progress.phase.rawValue),
-                              isComplete: state == .complete || state == .goalReached,
-                              theme: theme)
-                    .padding(.top, 2)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 24)
+                // Reserve room for the floating header so the ring rests below it, yet
+                // scrolls up under the transparent plaques when the user drags.
+                .padding(.top, headerTop + headerHeight + headerGap)
+                // Breathing room so the timeline doesn't butt against the pinned
+                // footer when the middle scrolls on a short screen.
+                .padding(.bottom, 12)
             }
-
-            Spacer(minLength: 12)
-
-            // Footer sits near the bottom edge, dropping into the home-indicator
-            // safe area but lifted a touch so it isn't jammed against the edge.
-            footer(state: state, elapsed: elapsed, theme: theme)
-                .padding(.bottom, 28)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            // Transparent floating header: no backdrop, just the plan pill and notes
+            // icon (each keeps its own iconCircle). It floats above the scroll so the
+            // ring shows through/around it while scrolling.
+            .overlay(alignment: .top) {
+                TimerHeader(
+                    plan: props.plan,
+                    theme: theme,
+                    onEditPlan: { store.dispatch(UIAction.planEditorOpened) },
+                    onSettings: { showSources = true }
+                )
+                .padding(.top, headerTop)
+                .padding(.horizontal, 24)
+            }
+            // Footer pinned above the scroll: it lifts off the bottom edge by the
+            // home-indicator inset, or a fixed minimum on home-button devices (inset 0)
+            // so it isn't jammed against the edge. The primary action stays visible; the
+            // scroll content reserves room for it. The colored background fills under it.
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                footer(state: state, elapsed: elapsed, theme: theme)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, max(insets.bottom, 32))
+                    .frame(maxWidth: .infinity)
+                    // Opaque backdrop so the translucent footer card doesn't let the
+                    // scrolling middle (chip/timeline) show through on a short screen.
+                    // The phase background is a radial gradient centered near the top; by
+                    // the footer it has fully resolved to backgroundBase, so this matches
+                    // seamlessly and fills into the bottom safe area to the screen edge.
+                    .background(theme.backgroundBase)
+            }
+            .ignoresSafeArea(.container, edges: .bottom)
         }
-        .padding(.top, 14)
-        .padding(.horizontal, 24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .ignoresSafeArea(.container, edges: .bottom)
         // Detect the goal crossing here (inside the per-second tick) — it is
         // time-driven, so the outer body wouldn't re-evaluate to catch it.
-        .onChange(of: state) { _, newState in syncGoalMoment(to: newState) }
+        .onChange(of: state) { _, newState in
+            syncGoalMoment(to: newState)
+            reconcileEating(newState)
+        }
     }
 
-    private func screenState(progress: PhaseProgress) -> ScreenState {
+    private func screenState(progress: PhaseProgress, now: Date) -> ScreenState {
+        // An open eating window shows the countdown until it closes, then falls to idle.
+        if props.isEating {
+            return props.eatingRemaining(at: now) > 0 ? .eating : .idle
+        }
         if !props.isRunning { return props.stagedElapsed > 0 ? .complete : .idle }
         // Running: past the goal is the overtime "goal reached" state, else active.
         return progress.isComplete ? .goalReached : .active
@@ -216,6 +283,9 @@ struct TimerFlowView: View {
             RingCenterGoalReached(elapsed: elapsed, goalSeconds: props.plan.fastHours * 3600, theme: theme)
         case .complete:
             RingCenterComplete(elapsed: elapsed, theme: theme)
+        case .eating:
+            // The eating window renders its own ring-free card (see screen()).
+            EmptyView()
         }
     }
 
@@ -241,7 +311,7 @@ struct TimerFlowView: View {
                 goal: hoursMinutes(props.plan.fastHours * 3600),
                 over: "+" + overtimeShort(elapsed - props.plan.fastHours * 3600),
                 theme: theme,
-                onReset: { showResetConfirm = true },
+                onReset: { store.dispatch(UIAction.resetConfirmOpened) },
                 onEndFast: { store.dispatch(StopFastThunk()) }
             )
         case .complete:
@@ -250,7 +320,13 @@ struct TimerFlowView: View {
                 windowOpens: strings.Meal.now,
                 theme: theme,
                 onReset: { store.dispatch(ResetFastThunk()) },
-                onStartEating: { store.dispatch(ResetFastThunk()) }
+                onStartEating: { store.dispatch(StartEatingThunk()) }
+            )
+        case .eating:
+            EatingFooterCard(
+                theme: theme,
+                onSkip: { store.dispatch(TimerAction.eatingEnded) },
+                onStartFast: { store.dispatch(StartFastThunk()) }
             )
         }
     }
@@ -294,6 +370,16 @@ struct TimerFlowView: View {
             }
         )
         .zIndex(2)
+        ResetConfirmSheet(
+            isOpen: props.resetConfirmOpen,
+            theme: theme,
+            onConfirm: {
+                store.dispatch(ResetFastThunk())
+                store.dispatch(UIAction.resetConfirmClosed)
+            },
+            onDismiss: { store.dispatch(UIAction.resetConfirmClosed) }
+        )
+        .zIndex(3)
     }
 
     // MARK: Copy / formatting
@@ -304,6 +390,7 @@ struct TimerFlowView: View {
         case .complete: return PhaseCopy.complete
         case .active: return PhaseCopy.editorial(for: progress.phase)
         case .goalReached: return strings.Editorial.goalReached(Int(props.plan.fastHours))
+        case .eating: return PhaseCopy.complete   // eating renders its own editorial in screen()
         }
     }
 
@@ -311,8 +398,18 @@ struct TimerFlowView: View {
 
     /// The screen state derived from the current clock (used off the TimelineView tick).
     private func currentScreenState() -> ScreenState {
-        screenState(progress: PhaseProgress.compute(elapsed: props.elapsed(at: Date()),
-                                                     goalHours: props.plan.fastHours))
+        let now = Date()
+        return screenState(progress: PhaseProgress.compute(elapsed: props.elapsed(at: now),
+                                                           goalHours: props.plan.fastHours),
+                           now: now)
+    }
+
+    /// Closes the eating window once it has elapsed: the state has already dropped to
+    /// idle (see screenState), so we clear the persisted `isEating` flag to match.
+    private func reconcileEating(_ state: ScreenState) {
+        if props.isEating && state != .eating {
+            store.dispatch(TimerAction.eatingEnded)
+        }
     }
 
     /// "0:24" under an hour (M:SS), "2:14" past one (H:MM) — the footer's OVER value.

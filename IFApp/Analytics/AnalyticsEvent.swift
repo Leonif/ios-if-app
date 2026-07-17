@@ -20,6 +20,8 @@ enum AnalyticsEvent {
     case goalReached(goalHours: Double)
     /// User reset the timer (a drop-off signal — gave up before finishing).
     case fastReset
+    /// User opened the eating window from the complete screen.
+    case eatingWindowStarted
     /// User nudged the elapsed time (manual ± correction).
     case timeAdjusted
     /// User confirmed the Last-meal picker. `backdated` = started in the past
@@ -45,6 +47,7 @@ enum AnalyticsEvent {
         case .fastStopped: return "fast_stopped"
         case .goalReached: return "goal_reached"
         case .fastReset: return "fast_reset"
+        case .eatingWindowStarted: return "eating_window_started"
         case .timeAdjusted: return "time_adjusted"
         case .lastMealLogged: return "last_meal_logged"
         case .sourcesOpened: return "sources_opened"
@@ -75,8 +78,8 @@ enum AnalyticsEvent {
             ]
         case let .themeActive(dark):
             return ["theme": dark ? "dark" : "light"]
-        case .appOpened, .fastReset, .timeAdjusted, .sourcesOpened, .reviewPrompted, .reviewCtaTapped,
-             .reviewPromptDismissed:
+        case .appOpened, .fastReset, .eatingWindowStarted, .timeAdjusted, .sourcesOpened, .reviewPrompted,
+             .reviewCtaTapped, .reviewPromptDismissed:
             return [:]
         }
     }

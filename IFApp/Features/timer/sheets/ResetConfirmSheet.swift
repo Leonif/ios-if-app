@@ -1,22 +1,21 @@
 //
-//  ReviewPromptSheet.swift
+//  ResetConfirmSheet.swift
 //  IFApp
 //
-//  "Enjoying IF24?" rating pre-prompt (bottom sheet). Shown after a qualifying
-//  completed fast; the positive tap opens the App Store write-review form.
-//  Filters happy users before any App Store review request.
+//  Reset confirmation (bottom sheet). Replaces the system `.confirmationDialog`,
+//  which on iOS 26 renders as a popover that hides the `.cancel` button, leaving
+//  only the destructive action visible. Two explicit actions instead: confirm the
+//  reset, or keep fasting.
 //
 
 import SwiftUI
 
-struct ReviewPromptSheet: View {
+struct ResetConfirmSheet: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let isOpen: Bool
     let theme: ThemeTokens
-    let onPositive: () -> Void
+    let onConfirm: () -> Void
     let onDismiss: () -> Void
-
-    private let gold = Color(hex: "#E7C36A")
 
     // The stack itself always exists and only its children come and go: inserting
     // the stack would hand SwiftUI's default opacity transition to everything
@@ -51,27 +50,18 @@ struct ReviewPromptSheet: View {
 
     private func sheet(bottomInset: CGFloat) -> some View {
         VStack(spacing: 14) {
-            ringMark
-            starRow
-                .padding(.top, 2)
-            Text(strings.Review.title)
+            Text(strings.Reset.confirmTitle)
                 .font(.bricolage(23))
                 .foregroundColor(theme.ink)
-            Text(strings.Review.subtitle)
+            Text(strings.Reset.confirmMessage)
                 .font(.hanken(14, .medium))
                 .foregroundColor(theme.mut)
                 .multilineTextAlignment(.center)
-            PrimaryButton(title: strings.Review.positive, theme: theme, action: onPositive)
+            PrimaryButton(title: strings.Reset.confirmAction, theme: theme, action: onConfirm)
                 .padding(.top, 6)
-                .accessibilityIdentifier("review.positive")
-            Button(action: onDismiss) {
-                Text(strings.Review.dismiss)
-                    .font(.hanken(15, .semibold))
-                    .foregroundColor(theme.mut)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 30)
-            }
-            .accessibilityIdentifier("review.dismiss")
+                .accessibilityIdentifier("reset.confirm")
+            SecondaryButton(title: strings.Reset.keepFasting, theme: theme, action: onDismiss)
+                .accessibilityIdentifier("reset.cancel")
         }
         .padding(.horizontal, 24)
         .padding(.top, 26)
@@ -85,26 +75,5 @@ struct ReviewPromptSheet: View {
                 .shadow(color: theme.cardShadow, radius: 24, x: 0, y: -6)
                 .ignoresSafeArea(edges: .bottom)
         )
-    }
-
-    private var ringMark: some View {
-        Circle()
-            .trim(from: 0, to: 0.72)
-            .stroke(
-                AngularGradient(colors: [gold, theme.accent, theme.deep], center: .center),
-                style: StrokeStyle(lineWidth: 5, lineCap: .round)
-            )
-            .rotationEffect(.degrees(-90))
-            .frame(width: 46, height: 46)
-    }
-
-    private var starRow: some View {
-        HStack(spacing: 7) {
-            ForEach(0..<5, id: \.self) { _ in
-                Image(systemName: "star.fill")
-                    .font(.system(size: 18))
-                    .foregroundColor(gold)
-            }
-        }
     }
 }
