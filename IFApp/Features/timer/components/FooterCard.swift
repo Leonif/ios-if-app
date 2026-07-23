@@ -128,6 +128,25 @@ struct EatingFooterCard: View {
     }
 }
 
+/// Window-closed footer: Skip (secondary, back to idle) + Continue fasting (primary,
+/// chains the next fast from the Last-meal time). No stats — the count-up is the hero.
+struct EatingOverFooterCard: View {
+    let theme: ThemeTokens
+    let onSkip: () -> Void
+    let onContinue: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            SecondaryButton(title: strings.Footer.skip, theme: theme, action: onSkip)
+                .frame(width: 110)
+                .accessibilityIdentifier("eatingOver.skip")
+            PrimaryButton(title: strings.Footer.continueFasting, theme: theme, action: onContinue)
+                .accessibilityIdentifier("eatingOver.continueFasting")
+        }
+        .modifier(CardBackground(theme: theme))
+    }
+}
+
 struct CompleteFooterCard: View {
     let fasted: String          // "16h 02m"
     let windowOpens: String     // "Now"

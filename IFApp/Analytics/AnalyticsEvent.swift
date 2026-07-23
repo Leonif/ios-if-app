@@ -22,6 +22,9 @@ enum AnalyticsEvent {
     case fastReset
     /// User opened the eating window from the complete screen.
     case eatingWindowStarted
+    /// User started the next fast from the window-closed screen (the chain held).
+    /// Accompanies `fast_started`.
+    case fastChained
     /// User nudged the elapsed time (manual ± correction).
     case timeAdjusted
     /// User confirmed the Last-meal picker. `backdated` = started in the past
@@ -47,6 +50,7 @@ enum AnalyticsEvent {
         case .goalReached: return "goal_reached"
         case .fastReset: return "fast_reset"
         case .eatingWindowStarted: return "eating_window_started"
+        case .fastChained: return "fast_chained"
         case .timeAdjusted: return "time_adjusted"
         case .lastMealLogged: return "last_meal_logged"
         case .sourcesOpened: return "sources_opened"
@@ -80,7 +84,7 @@ enum AnalyticsEvent {
             return ["trigger": trigger]
         case let .streakMilestone(days):
             return ["days": days]
-        case .appOpened, .fastReset, .eatingWindowStarted, .timeAdjusted, .sourcesOpened:
+        case .appOpened, .fastReset, .eatingWindowStarted, .fastChained, .timeAdjusted, .sourcesOpened:
             return [:]
         }
     }

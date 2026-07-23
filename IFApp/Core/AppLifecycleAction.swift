@@ -30,6 +30,8 @@ enum AppLifecycleAction: Action {
     /// Only ever sent from the `goalReached` state — the milestone card hangs off it.
     case goalScreenSettled
     case lastMealLogged(backdated: Bool, minutesAgo: Int)
+    /// A fast was started from the window-closed screen — the chain held.
+    case fastChained
     /// The app is being viewed in a given appearance. `dark` = system dark mode
     /// (the app follows the system scheme, it has no in-app theme toggle).
     case themeActive(dark: Bool)

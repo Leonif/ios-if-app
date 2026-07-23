@@ -49,6 +49,56 @@ final class IFAppUITests: XCTestCase {
         attach(app, "4-idle-again")
     }
 
+    /// An elapsed eating window (16:8 → 8h window, seeded 8h+2min ago) lands on the
+    /// window-closed screen; Continue fasting chains a new fast backdated to the close.
+    func testEatingOverContinue() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-seedEatingElapsed", "28920"]
+        app.launch()
+
+        let cont = app.buttons["eatingOver.continueFasting"]
+        XCTAssertTrue(cont.waitForExistence(timeout: 15),
+                      "Continue fasting button should exist on the window-closed screen")
+        attach(app, "eating-over")
+
+        cont.tap()
+
+        let endFast = app.buttons["timer.endFast"]
+        XCTAssertTrue(endFast.waitForExistence(timeout: 5),
+                      "Continue fasting should start a fast (active screen)")
+        attach(app, "eating-over-continued")
+    }
+
+    /// Skip on the window-closed screen drops back to idle.
+    func testEatingOverSkip() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-seedEatingElapsed", "28920"]
+        app.launch()
+
+        let skip = app.buttons["eatingOver.skip"]
+        XCTAssertTrue(skip.waitForExistence(timeout: 15),
+                      "Skip button should exist on the window-closed screen")
+        skip.tap()
+
+        XCTAssertTrue(app.buttons["timer.start"].waitForExistence(timeout: 5),
+                      "Skip should return to the idle screen")
+        attach(app, "eating-over-skipped")
+    }
+
+    /// A window that closed ≥24h ago times out to plain idle, not the chain screen.
+    func testEatingOverTimeout() throws {
+        let app = XCUIApplication()
+        // 8h window + 25h past the close.
+        app.launchArguments += ["-seedEatingElapsed", String(28800 + 25 * 3600)]
+        app.launch()
+
+        XCTAssertTrue(app.buttons["timer.start"].waitForExistence(timeout: 15),
+                      "A long-elapsed window should land on idle")
+        XCTAssertFalse(app.buttons["eatingOver.continueFasting"].exists,
+                       "The window-closed screen should not appear after the 24h timeout")
+        attach(app, "eating-over-timeout-idle")
+    }
+
     /// Force-shows the streak milestone card (with a seeded 3-day streak) and closes it.
     func testStreakMilestone() throws {
         let app = XCUIApplication()

@@ -14,6 +14,16 @@ enum MealMath {
         return nowMinuteOfDay - ateMin + ateDay * 1440
     }
 
+    /// (ateDay, ateMin) of a past moment relative to `now` — seeds the picker to a
+    /// concrete time (the eating-window close). Days clamp to the stepper's 0...6.
+    static func dayAndMinute(of date: Date, now: Date = Date()) -> (ateDay: Int, ateMin: Int) {
+        let cal = Calendar.current
+        let c = cal.dateComponents([.hour, .minute], from: date)
+        let minute = (c.hour ?? 0) * 60 + (c.minute ?? 0)
+        let days = cal.dateComponents([.day], from: cal.startOfDay(for: date), to: cal.startOfDay(for: now)).day ?? 0
+        return (min(6, max(0, days)), minute)
+    }
+
     /// Date stepper label: 0 → Today, 1 → Yesterday, n → "n days ago".
     static func dateLabel(ateDay: Int) -> String {
         switch ateDay {

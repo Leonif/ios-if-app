@@ -62,6 +62,14 @@ struct TimerScreenProps: Equatable {
         max(0, eatingStartTimestamp + eatingHours * 3600 - now.timeIntervalSince1970)
     }
 
+    /// Epoch seconds when the eating window closes (start + derived length).
+    var eatingEndTimestamp: Double { eatingStartTimestamp + eatingHours * 3600 }
+
+    /// Seconds since the eating window closed (the window-closed count-up).
+    func eatingOverElapsed(at now: Date) -> TimeInterval {
+        max(0, now.timeIntervalSince1970 - eatingEndTimestamp)
+    }
+
     /// The streak to display: 0 once a day was missed (last goal before yesterday).
     /// The persisted counter itself is only rewritten on the next goal.
     func displayedStreak(at now: Date) -> Int {
@@ -71,7 +79,7 @@ struct TimerScreenProps: Equatable {
     }
 }
 
-private enum ScreenState { case idle, active, goalReached, complete, eating }
+private enum ScreenState { case idle, active, goalReached, complete, eating, eatingOver }
 
 struct TimerFlowView: View {
     private let store: Store<AppState>
@@ -186,6 +194,23 @@ struct TimerFlowView: View {
 
                             EditorialSentence(text: PhaseCopy.complete, theme: theme)
                         }
+                    } else if state == .eatingOver {
+                        // Window closed: the count-up is already the next fast in waiting.
+                        // The Last-meal control (seeded to the close moment) sets where
+                        // "Continue fasting" backdates to.
+                        VStack(spacing: 20) {
+                            EatingOverCard(sinceClose: props.eatingOverElapsed(at: now), theme: theme)
+                                .padding(.vertical, 6)
+
+                            EditorialSentence(text: strings.Editorial.windowClosed, theme: theme)
+
+                            LastMealPill(
+                                valueText: mealValue(nowMinute: nowMinute),
+                                subline: mealSubline(nowMinute: nowMinute),
+                                theme: theme,
+                                onTap: { store.dispatch(OpenMealPickerThunk()) }
+                            )
+                        }
                     } else {
                         VStack(spacing: 20) {
                             ZStack {
@@ -287,9 +312,11 @@ struct TimerFlowView: View {
     }
 
     private func screenState(progress: PhaseProgress, now: Date) -> ScreenState {
-        // An open eating window shows the countdown until it closes, then falls to idle.
+        // An open eating window shows the countdown until it closes. Once closed, the
+        // chain screen (count-up + Continue fasting) holds for 24h, then falls to idle.
         if props.isEating {
-            return props.eatingRemaining(at: now) > 0 ? .eating : .idle
+            if props.eatingRemaining(at: now) > 0 { return .eating }
+            return props.eatingOverElapsed(at: now) < 24 * 3600 ? .eatingOver : .idle
         }
         if !props.isRunning { return props.stagedElapsed > 0 ? .complete : .idle }
         // Running: past the goal is the overtime "goal reached" state, else active.
@@ -309,8 +336,9 @@ struct TimerFlowView: View {
             RingCenterGoalReached(elapsed: elapsed, goalSeconds: props.plan.fastHours * 3600, theme: theme)
         case .complete:
             RingCenterComplete(elapsed: elapsed, theme: theme)
-        case .eating:
-            // The eating window renders its own ring-free card (see screen()).
+        case .eating, .eatingOver:
+            // The eating window / window-closed states render their own ring-free
+            // cards (see screen()).
             EmptyView()
         }
     }
@@ -353,6 +381,16 @@ struct TimerFlowView: View {
                 theme: theme,
                 onSkip: { store.dispatch(TimerAction.eatingEnded) },
                 onStartFast: { store.dispatch(StartFastThunk()) }
+            )
+        case .eatingOver:
+            EatingOverFooterCard(
+                theme: theme,
+                onSkip: {
+                    store.dispatch(TimerAction.eatingEnded)
+                    // Drop the seeded window-close time so idle starts fresh.
+                    store.dispatch(MealAction.cleared)
+                },
+                onContinue: { store.dispatch(ContinueFastingThunk()) }
             )
         }
     }
@@ -416,6 +454,7 @@ struct TimerFlowView: View {
         case .active: return PhaseCopy.editorial(for: progress.phase)
         case .goalReached: return strings.Editorial.goalReached(Int(props.plan.fastHours))
         case .eating: return PhaseCopy.complete   // eating renders its own editorial in screen()
+        case .eatingOver: return strings.Editorial.windowClosed
         }
     }
 
@@ -429,11 +468,21 @@ struct TimerFlowView: View {
                            now: now)
     }
 
-    /// Closes the eating window once it has elapsed: the state has already dropped to
-    /// idle (see screenState), so we clear the persisted `isEating` flag to match.
+    /// Keeps the persisted eating flag and the Last-meal control in step with the
+    /// derived state. An elapsed window holds `isEating` through `.eatingOver` (the
+    /// chain screen is computed from the same timestamps); only the 24h timeout
+    /// drops to idle, clearing the flag and the seeded meal time. Entering
+    /// `.eatingOver` seeds the Last-meal control to the window close moment, so
+    /// "Continue fasting" backdates from there by default.
     private func reconcileEating(_ state: ScreenState) {
-        if props.isEating && state != .eating {
+        if props.isEating && state != .eating && state != .eatingOver {
             store.dispatch(TimerAction.eatingEnded)
+            store.dispatch(MealAction.cleared)
+        }
+        if state == .eatingOver && props.isMealFresh {
+            let close = Date(timeIntervalSince1970: props.eatingEndTimestamp)
+            let (day, minute) = MealMath.dayAndMinute(of: close)
+            store.dispatch(MealAction.initialized(ateDay: day, ateMin: minute))
         }
     }
 

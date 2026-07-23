@@ -46,7 +46,9 @@ enum UITestSeed {
             defaults.set(true, forKey: "is_running")
         }
         if let sec = intArg("-seedEatingElapsed") {
-            // Eating window opened N seconds ago (fast not running).
+            // Eating window opened N seconds ago (fast not running). N past the window
+            // length lands on the window-closed (eatingOver) screen; N past the window
+            // length + 24h falls through to idle — all derived from this one timestamp.
             defaults.set(Date().timeIntervalSince1970 - Double(sec), forKey: "eating_start_timestamp")
             defaults.set(true, forKey: "is_eating")
             defaults.set(false, forKey: "is_running")

@@ -4,6 +4,7 @@
 //
 //  The eating-window center: a light countdown to when the next fast starts. No ring,
 //  no phases — the window is a calm pause between fasts. Overline + H:MM:SS + caption.
+//  EatingOverCard reuses the same card for the window-closed count-up.
 //
 
 import SwiftUI
@@ -17,23 +18,52 @@ private func hourMinuteSecond(_ remaining: TimeInterval) -> String {
 struct EatingWindowCard: View {
     let remaining: TimeInterval     // seconds until the window closes / fast starts
     let theme: ThemeTokens
+
+    var body: some View {
+        WindowCard(overline: strings.Timer.eatingWindow,
+                   value: hourMinuteSecond(remaining),
+                   caption: strings.Timer.fastStartsIn,
+                   theme: theme)
+    }
+}
+
+/// The window-closed center: the same calm card, but counting UP since the window
+/// closed — that time already belongs to the next fast once the user continues.
+struct EatingOverCard: View {
+    let sinceClose: TimeInterval    // seconds since the window closed
+    let theme: ThemeTokens
+
+    var body: some View {
+        WindowCard(overline: strings.Timer.windowClosed,
+                   value: hourMinuteSecond(sinceClose),
+                   caption: strings.Timer.fastingSoFar,
+                   theme: theme)
+    }
+}
+
+/// Shared circular card: overline + H:MM:SS + caption over the pulsing halo.
+private struct WindowCard: View {
+    let overline: String
+    let value: String
+    let caption: String
+    let theme: ThemeTokens
     @State private var haloDimmed = false
 
     var body: some View {
         VStack(spacing: 10) {
-            Text(strings.Timer.eatingWindow)
+            Text(overline)
                 .font(.hanken(12, .semibold))
                 .overlineTracking(1.9)
                 .foregroundColor(theme.deep)
 
-            Text(hourMinuteSecond(remaining))
+            Text(value)
                 .font(.bricolage(42))
                 .monospacedDigit()
                 .foregroundColor(theme.ink)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
 
-            Text(strings.Timer.fastStartsIn)
+            Text(caption)
                 .font(.hanken(14, .regular))
                 .foregroundColor(theme.mut)
         }

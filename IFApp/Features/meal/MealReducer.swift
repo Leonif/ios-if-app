@@ -15,6 +15,12 @@ func mealReducer(state: MealState, action: Action) -> MealState {
             newState.ateDay = 0
         }
 
+    case let .initialized(ateDay, ateMin):
+        if newState.ateMin < 0 {
+            newState.ateDay = ateDay
+            newState.ateMin = ateMin
+        }
+
     case let .quickChip(minutesAgo, nowMinute):
         let total = nowMinute - minutesAgo
         if total < 0 {

@@ -27,6 +27,7 @@ enum strings {
         static var fat: String { String(localized: "Glycogen is running low. Fat is becoming your main source of energy.") }
         static var ketosis: String { String(localized: "Ketones are climbing. You're well into fat-burning now.") }
         static var autophagy: String { String(localized: "Deep in the fast. Autophagy is recycling what your cells no longer need.") }
+        static var windowClosed: String { String(localized: "Your eating window has closed. Every minute since already counts - continue your fast whenever you're ready.") }
 
         /// Editorial shown once the goal is reached (overtime). `hours` = plan goal in hours.
         static func goalReached(_ hours: Int) -> String {
@@ -45,6 +46,8 @@ enum strings {
         static var goalReached: String { String(localized: "GOAL REACHED") }
         static var eatingWindow: String { String(localized: "EATING WINDOW") }
         static var fastStartsIn: String { String(localized: "Fast starts in") }
+        static var windowClosed: String { String(localized: "WINDOW CLOSED") }
+        static var fastingSoFar: String { String(localized: "Fasting so far") }
         static var start: String { String(localized: "Start") }
         static var dailyFast: String { String(localized: "Daily fast") }
         static var lastMeal: String { String(localized: "Last meal · ") }
@@ -67,6 +70,7 @@ enum strings {
         static var reset: String { String(localized: "Reset") }
         static var startEatingWindow: String { String(localized: "Start eating window") }
         static var startFast: String { String(localized: "Start fast") }
+        static var continueFasting: String { String(localized: "Continue fasting") }
         static var skip: String { String(localized: "Skip") }
         static var goalStat: String { String(localized: "Goal") }
         static var over: String { String(localized: "Over") }
