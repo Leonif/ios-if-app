@@ -49,22 +49,34 @@ final class IFAppUITests: XCTestCase {
         attach(app, "4-idle-again")
     }
 
-    /// Force-shows the "Enjoying IF24?" rating pre-prompt and checks its buttons.
-    func testReviewPrompt() throws {
+    /// Force-shows the streak milestone card (with a seeded 3-day streak) and closes it.
+    func testStreakMilestone() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-uitestReset", "-showReviewPrompt"]
+        app.launchArguments += ["-seedStreak", "3", "-showStreakMilestone"]
         app.launch()
 
-        let positive = app.buttons["review.positive"]
-        XCTAssertTrue(positive.waitForExistence(timeout: 15),
-                      "Rating pre-prompt positive button should appear")
-        XCTAssertTrue(app.buttons["review.dismiss"].exists,
-                      "Rating pre-prompt dismiss button should appear")
-        attach(app, "review-prompt")
+        let close = app.buttons["streak.milestone.close"]
+        XCTAssertTrue(close.waitForExistence(timeout: 15),
+                      "Milestone card close button should appear")
+        XCTAssertTrue(app.staticTexts["streak.milestone.title"].exists,
+                      "Milestone card title should appear")
+        attach(app, "streak-milestone")
 
-        app.buttons["review.dismiss"].tap()
-        XCTAssertTrue(positive.waitForNonExistence(timeout: 3),
-                      "Rating pre-prompt should close after Not now")
+        close.tap()
+        XCTAssertTrue(close.waitForNonExistence(timeout: 3),
+                      "Milestone card should close after Keep going")
+    }
+
+    /// A seeded 3-day streak renders the flame badge on the idle screen.
+    func testStreakBadge() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-seedStreak", "3"]
+        app.launch()
+
+        XCTAssertTrue(app.otherElements["streak.badge"].waitForExistence(timeout: 15)
+                      || app.staticTexts["streak.badge"].waitForExistence(timeout: 3),
+                      "Streak badge should render with a seeded streak")
+        attach(app, "streak-badge")
     }
 
     /// Opens the redesigned Scientific Sources screen and screenshots it.

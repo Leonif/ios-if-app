@@ -19,7 +19,10 @@ enum TimerAction: Action {
     /// Manual ± adjustment. `runningStartTimestamp` is non-nil only when the fast is running.
     case timeAdjusted(newElapsed: TimeInterval, runningStartTimestamp: Double?)
     /// The goal-reached moment fired for the current fast (marks it so it plays once).
-    case goalCelebrated
+    /// `dayKey` = the local day the goal counts toward (see Clock.dayKey) — injected
+    /// at dispatch so the reducer stays pure; a fast crossing midnight credits the
+    /// day the goal was actually reached.
+    case goalCelebrated(dayKey: String)
     /// Open the eating window. `startTimestamp` = when it opened (usually now).
     case eatingStarted(startTimestamp: Double)
     /// Close the eating window back to idle (window elapsed, or skipped).

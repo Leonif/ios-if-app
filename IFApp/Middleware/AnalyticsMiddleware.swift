@@ -34,9 +34,9 @@ final class AnalyticsMiddleware: Middleware {
         switch action {
         case .appOpened: repo.log(.appOpened)
         case .sourcesOpened: repo.log(.sourcesOpened)
-        case .reviewPrompted: repo.log(.reviewPrompted)
-        case .reviewCtaTapped: repo.log(.reviewCtaTapped)
-        case .reviewPromptDismissed: repo.log(.reviewPromptDismissed)
+        case let .reviewPrompted(trigger): repo.log(.reviewPrompted(trigger: trigger.rawValue))
+        case let .streakMilestone(days): repo.log(.streakMilestone(days: days))
+        case .appBecameActive: break     // internal gate signal, not a funnel event
         case .goalScreenSettled: break   // internal gate signal, not a funnel event
         case let .lastMealLogged(backdated, minutesAgo):
             repo.log(.lastMealLogged(backdated: backdated, minutesAgo: minutesAgo))

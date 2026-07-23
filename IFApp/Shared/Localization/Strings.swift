@@ -152,11 +152,17 @@ enum strings {
         }
     }
 
-    enum Review {
-        static var title: String { String(localized: "Enjoying IF24?") }
-        static var subtitle: String { String(localized: "Your review helps us grow.") }
-        static var positive: String { String(localized: "Yes, love it") }
-        static var dismiss: String { String(localized: "Not now") }
+    enum Streak {
+        /// "3-day streak" — the flame pill on the main screen.
+        static func badge(_ days: Int) -> String {
+            String(localized: "\(days)-day streak")
+        }
+        /// Milestone card title, e.g. "7 days in a row".
+        static func milestoneTitle(_ days: Int) -> String {
+            String(localized: "\(days) days in a row")
+        }
+        static var milestoneSubtitle: String { String(localized: "You've hit your fasting goal every day. Keep the rhythm going.") }
+        static var milestoneClose: String { String(localized: "Keep going") }
     }
 
     enum Notification {

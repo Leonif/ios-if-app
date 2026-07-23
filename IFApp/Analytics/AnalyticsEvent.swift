@@ -29,12 +29,11 @@ enum AnalyticsEvent {
     case lastMealLogged(backdated: Bool, minutesAgo: Int)
     /// User opened the scientific Sources screen.
     case sourcesOpened
-    /// The in-app review prompt was shown.
-    case reviewPrompted
-    /// User tapped the positive CTA on the review prompt (went to write-review).
-    case reviewCtaTapped
-    /// User dismissed the review prompt without tapping the positive CTA.
-    case reviewPromptDismissed
+    /// The native `requestReview` was called. `trigger` = what caused it
+    /// ("streak_milestone" / "next_open"). Apple may or may not show the panel.
+    case reviewPrompted(trigger: String)
+    /// A streak milestone card was shown. `days` = the threshold (3/7/14/30).
+    case streakMilestone(days: Int)
     /// The appearance the app is being used in. `dark` = system dark mode.
     /// Fires on screen appear and on live theme switches — count *users* per
     /// `theme` value to see which appearance the audience actually uses.
@@ -52,8 +51,7 @@ enum AnalyticsEvent {
         case .lastMealLogged: return "last_meal_logged"
         case .sourcesOpened: return "sources_opened"
         case .reviewPrompted: return "review_prompted"
-        case .reviewCtaTapped: return "review_cta_tapped"
-        case .reviewPromptDismissed: return "review_prompt_dismissed"
+        case .streakMilestone: return "streak_milestone"
         case .themeActive: return "theme_active"
         }
     }
@@ -78,8 +76,11 @@ enum AnalyticsEvent {
             ]
         case let .themeActive(dark):
             return ["theme": dark ? "dark" : "light"]
-        case .appOpened, .fastReset, .eatingWindowStarted, .timeAdjusted, .sourcesOpened, .reviewPrompted,
-             .reviewCtaTapped, .reviewPromptDismissed:
+        case let .reviewPrompted(trigger):
+            return ["trigger": trigger]
+        case let .streakMilestone(days):
+            return ["days": days]
+        case .appOpened, .fastReset, .eatingWindowStarted, .timeAdjusted, .sourcesOpened:
             return [:]
         }
     }

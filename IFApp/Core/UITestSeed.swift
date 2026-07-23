@@ -28,10 +28,13 @@ enum UITestSeed {
         defaults.set(false, forKey: "has_celebrated")
         defaults.set(0.0, forKey: "eating_start_timestamp")
         defaults.set(false, forKey: "is_eating")
+        defaults.set(0, forKey: "streak_count")
+        defaults.removeObject(forKey: "streak_last_goal_date")
+        defaults.set(0, forKey: "streak_last_milestone_shown")
         defaults.removeObject(forKey: "plan_idx")          // fall back to Plan.default
         defaults.removeObject(forKey: "review_last_shown")
-        defaults.set(false, forKey: "review_left")
         defaults.set(0, forKey: "review_prompt_count")
+        defaults.removeObject(forKey: "review_pending_goal_at")
 
         func intArg(_ name: String) -> Int? {
             guard let i = args.firstIndex(of: name), i + 1 < args.count else { return nil }
@@ -52,6 +55,15 @@ enum UITestSeed {
         if let cel = intArg("-seedCelebrated") { defaults.set(cel == 1, forKey: "has_celebrated") }
         if let p = intArg("-seedPlan") { defaults.set(p, forKey: "plan_idx") }
         if let pc = intArg("-seedPromptCount") { defaults.set(pc, forKey: "review_prompt_count") }
+        // Streak: "-seedStreak N" sets the counter; the last-goal day defaults to
+        // today so the badge renders, "-seedLastGoalDate D" moves it D days back
+        // (D=1 → yesterday, so crossing a goal extends the streak to N+1).
+        if let s = intArg("-seedStreak") { defaults.set(s, forKey: "streak_count") }
+        if intArg("-seedStreak") != nil || intArg("-seedLastGoalDate") != nil {
+            let daysAgo = intArg("-seedLastGoalDate") ?? 0
+            let day = Calendar.current.date(byAdding: .day, value: -daysAgo, to: Date()) ?? Date()
+            defaults.set(Clock.dayKey(day), forKey: "streak_last_goal_date")
+        }
     }
 }
 #endif

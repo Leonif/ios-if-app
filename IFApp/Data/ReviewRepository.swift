@@ -2,39 +2,41 @@
 //  ReviewRepository.swift
 //  IFApp
 //
-//  Rating pre-prompt persistence + the App Store review deep link. The custom
-//  "Enjoying IF24?" sheet is shown before any review request (ReviewMiddleware
-//  gates it); tapping the positive CTA opens the App Store write-review form.
+//  Native review-request persistence + the StoreKit call itself. ReviewMiddleware
+//  gates every call (lifetime cap, 1/day, 1/launch) and owns the triggers; this
+//  repo just remembers the gate state and the pending "next open" fallback.
 //
 
+import StoreKit
 import UIKit
 
 protocol ReviewRepositoryProtocol {
-    /// True if the pre-prompt may show: not already reviewed, not shown today,
-    /// and under the lifetime show cap.
+    /// True if requestReview may be called: not shown today and under the lifetime cap.
     func canPrompt() -> Bool
-    /// Records that the pre-prompt was shown (once per day, and counts toward the cap).
+    /// Records a requestReview call (once per day, and counts toward the cap).
     func markPromptShown()
-    /// Opens the App Store write-review form and marks the user as reviewed.
-    func openWriteReview()
+    /// Calls the native StoreKit review request. Apple decides whether to show it.
+    func requestReview()
+    /// The moment of the 3rd completed goal, when the "next open" fallback is armed.
+    func pendingGoalDate() -> Date?
+    func setPendingGoal(_ date: Date)
+    func clearPendingGoal()
 }
 
 struct ReviewRepository: ReviewRepositoryProtocol {
     private let defaults: UserDefaults
     private enum Key {
         static let lastShown = "review_last_shown"
-        static let left = "review_left"
         static let promptCount = "review_prompt_count"
+        static let pendingGoalAt = "review_pending_goal_at"
     }
-    /// Lifetime cap on our own sheet — it isn't covered by Apple's native limit.
+    /// Lifetime cap on requestReview calls — Apple's own 3/365 limit is opaque, so
+    /// we stop asking ourselves after this many attempts.
     private let maxPrompts = 3
-    // ?action=write-review opens the review composer directly, not the product page.
-    private let writeReviewURL = "https://apps.apple.com/app/id6738324344?action=write-review"
 
     init(defaults: UserDefaults = .standard) { self.defaults = defaults }
 
     func canPrompt() -> Bool {
-        if defaults.bool(forKey: Key.left) { return false }
         if defaults.integer(forKey: Key.promptCount) >= maxPrompts { return false }
         if let last = defaults.object(forKey: Key.lastShown) as? Date,
            Calendar.current.isDateInToday(last) { return false }
@@ -46,9 +48,25 @@ struct ReviewRepository: ReviewRepositoryProtocol {
         defaults.set(defaults.integer(forKey: Key.promptCount) + 1, forKey: Key.promptCount)
     }
 
-    func openWriteReview() {
-        defaults.set(true, forKey: Key.left)   // positive tap only — never prompt again
-        guard let url = URL(string: writeReviewURL) else { return }
-        Task { @MainActor in UIApplication.shared.open(url) }
+    func requestReview() {
+        Task { @MainActor in
+            let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+            // Prefer the active scene; fall back to any (launch may still be settling).
+            guard let scene = scenes.first(where: { $0.activationState == .foregroundActive }) ?? scenes.first
+            else { return }
+            AppStore.requestReview(in: scene)
+        }
+    }
+
+    func pendingGoalDate() -> Date? {
+        defaults.object(forKey: Key.pendingGoalAt) as? Date
+    }
+
+    func setPendingGoal(_ date: Date) {
+        defaults.set(date, forKey: Key.pendingGoalAt)
+    }
+
+    func clearPendingGoal() {
+        defaults.removeObject(forKey: Key.pendingGoalAt)
     }
 }

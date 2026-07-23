@@ -22,9 +22,11 @@ struct TimerScreenProps: Equatable {
     let planIdx: Int
     let ateDay: Int
     let ateMin: Int
+    let streakCount: Int
+    let lastGoalDate: String?
     let planEditorOpen: Bool
     let mealPickerOpen: Bool
-    let reviewPromptOpen: Bool
+    let streakMilestoneOpen: Bool
     let resetConfirmOpen: Bool
 
     init(state: AppState) {
@@ -34,12 +36,14 @@ struct TimerScreenProps: Equatable {
         hasCelebrated = state.timerState.hasCelebrated
         isEating = state.timerState.isEating
         eatingStartTimestamp = state.timerState.eatingStartTimestamp
+        streakCount = state.timerState.streakCount
+        lastGoalDate = state.timerState.lastGoalDate
         planIdx = state.planState.planIdx
         ateDay = state.mealState.ateDay
         ateMin = state.mealState.ateMin
         planEditorOpen = state.uiState.planEditorOpen
         mealPickerOpen = state.uiState.mealPickerOpen
-        reviewPromptOpen = state.uiState.reviewPromptOpen
+        streakMilestoneOpen = state.uiState.streakMilestoneOpen
         resetConfirmOpen = state.uiState.resetConfirmOpen
     }
 
@@ -56,6 +60,14 @@ struct TimerScreenProps: Equatable {
     /// Seconds left in the eating window (until the next fast should start).
     func eatingRemaining(at now: Date) -> TimeInterval {
         max(0, eatingStartTimestamp + eatingHours * 3600 - now.timeIntervalSince1970)
+    }
+
+    /// The streak to display: 0 once a day was missed (last goal before yesterday).
+    /// The persisted counter itself is only rewritten on the next goal.
+    func displayedStreak(at now: Date) -> Int {
+        guard let lastGoalDate else { return 0 }
+        let today = Clock.dayKey(now)
+        return (lastGoalDate == today || Clock.isDayBefore(lastGoalDate, today)) ? streakCount : 0
     }
 }
 
@@ -101,13 +113,14 @@ struct TimerFlowView: View {
             // never runs and the sheet just pops in. Scoped to this one flag so the
             // per-second timer ticks stay unanimated.
             overlays(theme: theme)
-                .animation(.easeOut(duration: 0.3), value: props.reviewPromptOpen)
+                .animation(.easeOut(duration: 0.3), value: props.streakMilestoneOpen)
                 .animation(.easeOut(duration: 0.3), value: props.resetConfirmOpen)
         }
         .sheet(isPresented: $showSources) { SourcesView() }
         .connect(to: store, mapState: { TimerScreenProps(state: $0) }, onPropsChange: { props = $0 })
         .onAppear {
             store.dispatch(AppLifecycleAction.themeActive(dark: colorScheme == .dark))
+            store.dispatch(AppLifecycleAction.appBecameActive)
             // Restore the settled overtime end-state on a relaunch mid-overtime
             // (onChange below won't fire for the initial state).
             syncGoalMoment(to: currentScreenState())
@@ -121,6 +134,10 @@ struct TimerFlowView: View {
             // The goal can be crossed while we're backgrounded; the moment waits
             // here until the user is actually looking at the screen.
             guard phase == .active else { return }
+            // Every foreground counts as an "open" for the review fallback (the
+            // cold start is covered by onAppear below — the initial scenePhase
+            // may already be .active, so this onChange alone can miss it).
+            store.dispatch(AppLifecycleAction.appBecameActive)
             syncGoalMoment(to: currentScreenState())
             reconcileEating(currentScreenState())
         }
@@ -185,6 +202,15 @@ struct TimerFlowView: View {
                             .padding(.vertical, 6)
 
                             EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
+
+                            // Streak badge on the resting states only — the goal /
+                            // complete screens keep their own celebratory copy clean.
+                            if state == .idle || state == .active {
+                                let streak = props.displayedStreak(at: now)
+                                if streak >= 2 {
+                                    StreakBadge(days: streak, theme: theme)
+                                }
+                            }
 
                             if state == .active, let next = progress.nextPhase {
                                 NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
@@ -360,14 +386,13 @@ struct TimerFlowView: View {
             )
             .zIndex(1)
         }
-        ReviewPromptSheet(
-            isOpen: props.reviewPromptOpen,
+        StreakMilestoneSheet(
+            isOpen: props.streakMilestoneOpen,
+            days: props.streakCount,
             theme: theme,
-            onPositive: { store.dispatch(LeaveReviewThunk()) },
-            onDismiss: {
-                store.dispatch(UIAction.reviewPromptClosed)
-                store.dispatch(AppLifecycleAction.reviewPromptDismissed)
-            }
+            // ReviewMiddleware listens for this close — the native review request
+            // may follow once the milestone moment is fully over.
+            onDismiss: { store.dispatch(UIAction.streakMilestoneClosed) }
         )
         .zIndex(2)
         ResetConfirmSheet(
@@ -442,8 +467,9 @@ struct TimerFlowView: View {
             return
         }
 
-        // Genuine first crossing.
-        store.dispatch(TimerAction.goalCelebrated)
+        // Genuine first crossing. The day key is stamped here (not in the reducer)
+        // so a fast crossing midnight credits the day the goal was reached.
+        store.dispatch(TimerAction.goalCelebrated(dayKey: Clock.dayKey()))
         UINotificationFeedbackGenerator().notificationOccurred(.success)
 
         guard !reduceMotion else {

@@ -28,8 +28,10 @@ struct IFAppApp: App {
         store.dispatch(ScheduleNotificationsThunk())
         store.dispatch(SyncPushStatusThunk())
         store.dispatch(AppLifecycleAction.appOpened)
-        if ProcessInfo.processInfo.arguments.contains("-showReviewPrompt") {
-            store.dispatch(UIAction.reviewPromptOpened)
+        // UI tests force the streak milestone card open (pair with "-seedStreak N"
+        // so the title shows a real day count).
+        if ProcessInfo.processInfo.arguments.contains("-showStreakMilestone") {
+            store.dispatch(UIAction.streakMilestoneOpened)
         }
     }
 

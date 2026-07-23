@@ -10,8 +10,8 @@ enum UIAction: Action {
     case planEditorClosed
     case mealPickerOpened
     case mealPickerClosed
-    case reviewPromptOpened
-    case reviewPromptClosed
+    case streakMilestoneOpened
+    case streakMilestoneClosed
     case resetConfirmOpened
     case resetConfirmClosed
 }

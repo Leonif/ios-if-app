@@ -1,22 +1,20 @@
 //
-//  ReviewPromptSheet.swift
+//  StreakMilestoneSheet.swift
 //  IFApp
 //
-//  "Enjoying IF24?" rating pre-prompt (bottom sheet). Shown after a qualifying
-//  completed fast; the positive tap opens the App Store write-review form.
-//  Filters happy users before any App Store review request.
+//  Streak milestone card (bottom sheet): "N days in a row" at 3/7/14/30 days,
+//  shown once per threshold after the goal moment settles. Calm editorial, one
+//  close button — the native review request may follow its dismissal.
 //
 
 import SwiftUI
 
-struct ReviewPromptSheet: View {
+struct StreakMilestoneSheet: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let isOpen: Bool
+    let days: Int
     let theme: ThemeTokens
-    let onPositive: () -> Void
     let onDismiss: () -> Void
-
-    private let gold = Color(hex: "#E7C36A")
 
     // The stack itself always exists and only its children come and go: inserting
     // the stack would hand SwiftUI's default opacity transition to everything
@@ -51,27 +49,18 @@ struct ReviewPromptSheet: View {
 
     private func sheet(bottomInset: CGFloat) -> some View {
         VStack(spacing: 14) {
-            ringMark
-            starRow
-                .padding(.top, 2)
-            Text(strings.Review.title)
+            flameMark
+            Text(strings.Streak.milestoneTitle(days))
                 .font(.bricolage(23))
                 .foregroundColor(theme.ink)
-            Text(strings.Review.subtitle)
+                .accessibilityIdentifier("streak.milestone.title")
+            Text(strings.Streak.milestoneSubtitle)
                 .font(.hanken(14, .medium))
                 .foregroundColor(theme.mut)
                 .multilineTextAlignment(.center)
-            PrimaryButton(title: strings.Review.positive, theme: theme, action: onPositive)
+            PrimaryButton(title: strings.Streak.milestoneClose, theme: theme, action: onDismiss)
                 .padding(.top, 6)
-                .accessibilityIdentifier("review.positive")
-            Button(action: onDismiss) {
-                Text(strings.Review.dismiss)
-                    .font(.hanken(15, .semibold))
-                    .foregroundColor(theme.mut)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 30)
-            }
-            .accessibilityIdentifier("review.dismiss")
+                .accessibilityIdentifier("streak.milestone.close")
         }
         .padding(.horizontal, 24)
         .padding(.top, 26)
@@ -87,24 +76,13 @@ struct ReviewPromptSheet: View {
         )
     }
 
-    private var ringMark: some View {
-        Circle()
-            .trim(from: 0, to: 0.72)
-            .stroke(
-                AngularGradient(colors: [gold, theme.accent, theme.deep], center: .center),
-                style: StrokeStyle(lineWidth: 5, lineCap: .round)
-            )
-            .rotationEffect(.degrees(-90))
+    private var flameMark: some View {
+        Image(systemName: "flame.fill")
+            .font(.system(size: 26, weight: .semibold))
+            .foregroundColor(theme.accent)
             .frame(width: 46, height: 46)
-    }
-
-    private var starRow: some View {
-        HStack(spacing: 7) {
-            ForEach(0..<5, id: \.self) { _ in
-                Image(systemName: "star.fill")
-                    .font(.system(size: 18))
-                    .foregroundColor(gold)
-            }
-        }
+            .background(
+                Circle().fill(theme.iconCircle)
+            )
     }
 }

@@ -24,4 +24,10 @@ struct TimerState: Equatable, Sendable {
     var eatingStartTimestamp: Double = 0
     /// Whether an eating window is currently open. Persisted so the window survives relaunch.
     var isEating: Bool = false
+    /// Consecutive local-calendar days with the goal reached. Advanced on `goalCelebrated`;
+    /// a missed day hard-resets it to 1 on the next goal. Display treats a stale
+    /// `lastGoalDate` (before yesterday) as 0 without touching this counter.
+    var streakCount: Int = 0
+    /// Local day key ("yyyy-MM-dd") of the last goal. nil = no goal ever reached.
+    var lastGoalDate: String? = nil
 }

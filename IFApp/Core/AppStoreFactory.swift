@@ -14,7 +14,7 @@ enum AppStoreFactory {
         let persistence: TimerPersistenceRepositoryProtocol = container.inject()
         // UI tests launch with "-uitestReset" to start from a clean idle state.
         if ProcessInfo.processInfo.arguments.contains("-uitestReset") {
-            persistence.save(fastStartTimestamp: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false)
+            persistence.save(fastStartTimestamp: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false, streakCount: 0, lastGoalDate: nil)
         }
         // UI tests also seed timer/review state via "-seed…" args (see UITestSeed).
         #if DEBUG
@@ -30,7 +30,9 @@ enum AppStoreFactory {
                 completedSessionsCount: loaded.completedSessions,
                 hasCelebrated: loaded.hasCelebrated,
                 eatingStartTimestamp: loaded.eatingStartTimestamp,
-                isEating: loaded.isEating
+                isEating: loaded.isEating,
+                streakCount: loaded.streakCount,
+                lastGoalDate: loaded.lastGoalDate
             ),
             planState: PlanState(planIdx: persistence.loadPlanIdx() ?? Plan.default.rawValue)
         )
@@ -40,6 +42,7 @@ enum AppStoreFactory {
             reducer: rootReducer,
             middlewares: [
                 PersistenceMiddleware(),
+                StreakMiddleware(),
                 ReviewMiddleware(),
                 AnalyticsMiddleware(),
                 NotificationMiddleware(),
