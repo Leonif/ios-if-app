@@ -17,6 +17,7 @@ private func hourMinuteSecond(_ remaining: TimeInterval) -> String {
 struct EatingWindowCard: View {
     let remaining: TimeInterval     // seconds until the window closes / fast starts
     let theme: ThemeTokens
+    @State private var haloDimmed = false
 
     var body: some View {
         VStack(spacing: 10) {
@@ -26,7 +27,7 @@ struct EatingWindowCard: View {
                 .foregroundColor(theme.deep)
 
             Text(hourMinuteSecond(remaining))
-                .font(Typography.completeNumerals)
+                .font(.bricolage(42))
                 .monospacedDigit()
                 .foregroundColor(theme.ink)
                 .lineLimit(1)
@@ -38,10 +39,25 @@ struct EatingWindowCard: View {
         }
         .frame(width: 232, height: 232)
         .background(
-            Circle()
-                .fill(theme.surface)
-                .overlay(Circle().stroke(theme.surfaceLine, lineWidth: 1))
-                .shadow(color: theme.cardShadow, radius: 24, x: 0, y: 10)
+            ZStack {
+                // Soft accent halo around the card, wider and dimmer than the drop shadow.
+                // Pulses slowly like a heartbeat while the window is open.
+                Circle()
+                    .fill(theme.accent.opacity(theme.isDark ? 0.30 : 0.22))
+                    .padding(-6)
+                    .blur(radius: 26)
+                    .scaleEffect(haloDimmed ? 0.96 : 1.07)
+                    .opacity(haloDimmed ? 0.55 : 1)
+                Circle()
+                    .fill(theme.surface)
+                    .overlay(Circle().stroke(theme.surfaceLine, lineWidth: 1))
+                    .shadow(color: theme.cardShadow, radius: 24, x: 0, y: 10)
+            }
         )
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
+                haloDimmed = true
+            }
+        }
     }
 }
