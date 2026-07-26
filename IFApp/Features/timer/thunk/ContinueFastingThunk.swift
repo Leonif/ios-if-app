@@ -18,8 +18,7 @@ struct ContinueFastingThunk: Thunk {
         let fastStart: Double
         if meal.isFresh {
             // The seed hasn't landed yet — fall back to the window close moment.
-            let timer = app.timerState
-            fastStart = timer.eatingStartTimestamp + (24 - app.planState.plan.fastHours) * 3600
+            fastStart = app.timerState.eatingEndTimestamp(fastHours: app.planState.plan.fastHours)
         } else {
             let minutesAgo = MealMath.minutesAgo(
                 ateDay: meal.ateDay,

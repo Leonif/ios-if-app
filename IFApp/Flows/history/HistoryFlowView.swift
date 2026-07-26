@@ -16,11 +16,11 @@ import Redux
 
 struct HistoryProps: Equatable {
     let records: [FastRecord]
-    let streak: Int
+    let streak: StreakStatus
 
     init(state: AppState) {
         records = state.historyState.records
-        streak = state.timerState.streakCount
+        streak = state.timerState.streak
     }
 }
 
@@ -45,13 +45,6 @@ struct HistoryFlowView: View {
         self.source = source
         self.onStartFast = onStartFast
         _props = State(initialValue: HistoryProps(state: store.getCurrentState()))
-    }
-
-    /// The streak the card shows: 0 once a day was missed, matching the main screen.
-    private var displayedStreak: Int {
-        let stats = HistoryStats.compute(records: props.records)
-        guard stats.fastsCount > 0 else { return props.streak }
-        return props.streak
     }
 
     var body: some View {
@@ -138,7 +131,8 @@ struct HistoryFlowView: View {
     private func content(stats: HistoryStats, theme: ThemeTokens) -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack(alignment: .leading, spacing: 20) {
-                HistorySummaryCard(streak: displayedStreak, stats: stats, theme: theme)
+                // Same projection the main screen shows — one rule, one number.
+                HistorySummaryCard(streak: props.streak.displayed(at: Clock.now()), stats: stats, theme: theme)
                     .padding(.bottom, 2)
 
                 // Charts land here in a later release — between the totals and the

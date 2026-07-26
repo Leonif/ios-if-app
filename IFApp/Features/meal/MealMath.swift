@@ -40,7 +40,9 @@ enum MealMath {
         let base = cal.startOfDay(for: Date())
         let date = cal.date(byAdding: .minute, value: minute, to: base) ?? base
         let f = DateFormatter()
-        f.locale = .current
+        // Latin digits (and the Gregorian calendar) so this clock reads the same as
+        // the manually built numerals it sits beside — see Locale.latinDigits.
+        f.locale = .latinDigits
         f.timeStyle = .short
         f.dateStyle = .none
         return f.string(from: date)

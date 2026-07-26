@@ -51,8 +51,7 @@ final class NotificationMiddleware: Middleware {
 
         // Eating-window-closed push while a window is open.
         if timer.isEating {
-            let eatingHours = 24 - plan.fastHours
-            let secondsUntilClose = timer.eatingStartTimestamp + eatingHours * 3600 - now
+            let secondsUntilClose = timer.eatingEndTimestamp(fastHours: plan.fastHours) - now
             if secondsUntilClose > 0 {
                 repo.scheduleEatingEndNotification(after: secondsUntilClose)
             } else {

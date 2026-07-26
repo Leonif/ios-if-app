@@ -45,15 +45,19 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         if !newState.hasCelebrated {
             newState.hasCelebrated = true
             newState.completedSessionsCount += 1
-            // Streak: a second goal the same day leaves it untouched; a goal the
-            // day after the last one extends it; anything else (gap, or the first
-            // goal ever) restarts it at 1 — a missed day is a hard reset.
-            if newState.lastGoalDate != dayKey {
-                if let last = newState.lastGoalDate, Clock.isDayBefore(last, dayKey) {
-                    newState.streakCount += 1
-                } else {
-                    newState.streakCount = 1
+            // Streak: a goal the day after the last one extends it; a gap (or the
+            // first goal ever) restarts it at 1 — a missed day is a hard reset.
+            // Day keys sort chronologically, so a stamp that is not newer than the
+            // last goal leaves the run untouched: the same day again, or an earlier
+            // day arriving from a fast back-dated across midnight. Neither can
+            // extend a run, and neither may drag it backwards.
+            if let last = newState.lastGoalDate {
+                if dayKey > last {
+                    newState.streakCount = Clock.isDayBefore(last, dayKey) ? newState.streakCount + 1 : 1
+                    newState.lastGoalDate = dayKey
                 }
+            } else {
+                newState.streakCount = 1
                 newState.lastGoalDate = dayKey
             }
         }

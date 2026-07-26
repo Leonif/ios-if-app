@@ -30,6 +30,15 @@ enum Clock {
         dayKeyFormatter.string(from: date)
     }
 
+    /// The local day a fast's goal counts toward: the day the goal is *crossed*
+    /// (`start + goal`), never the day someone happened to notice it. The single
+    /// definition — the live streak (`CelebrateGoalThunk`) and a stored fast
+    /// (`FastRecord.goalDayKey`) both read it from here, so a back-dated fast whose
+    /// goal landed before midnight credits the same day on both screens.
+    static func goalDayKey(fastStart: Double, goalHours: Double) -> String {
+        dayKey(Date(timeIntervalSince1970: fastStart + goalHours * 3600))
+    }
+
     /// True if `earlier` names the calendar day right before `later` (both day keys).
     static func isDayBefore(_ earlier: String, _ later: String) -> Bool {
         guard let e = dayKeyFormatter.date(from: earlier),

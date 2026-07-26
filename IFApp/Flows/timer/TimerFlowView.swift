@@ -18,12 +18,13 @@ struct TimerScreenProps: Equatable {
     let stagedElapsed: TimeInterval
     let hasCelebrated: Bool
     let isEating: Bool
-    let eatingStartTimestamp: Double
+    /// Epoch seconds the eating window closes — projected from the timer state, not
+    /// recomputed here, so the screen and the close push agree on the moment.
+    let eatingEndTimestamp: Double
     let planIdx: Int
     let ateDay: Int
     let ateMin: Int
-    let streakCount: Int
-    let lastGoalDate: String?
+    let streak: StreakStatus
     /// The header pill only exists once there is a record to open.
     let hasRecords: Bool
     /// Length of the newest finished fast — the eating window's link into history.
@@ -39,9 +40,8 @@ struct TimerScreenProps: Equatable {
         stagedElapsed = state.timerState.stagedElapsed
         hasCelebrated = state.timerState.hasCelebrated
         isEating = state.timerState.isEating
-        eatingStartTimestamp = state.timerState.eatingStartTimestamp
-        streakCount = state.timerState.streakCount
-        lastGoalDate = state.timerState.lastGoalDate
+        eatingEndTimestamp = state.timerState.eatingEndTimestamp(fastHours: state.planState.plan.fastHours)
+        streak = state.timerState.streak
         hasRecords = !state.historyState.records.isEmpty
         lastFastDuration = state.historyState.records
             .max(by: { $0.endTimestamp < $1.endTimestamp })?
@@ -58,32 +58,18 @@ struct TimerScreenProps: Equatable {
     var plan: Plan { Plan(rawValue: planIdx) ?? .default }
     var isMealFresh: Bool { ateMin < 0 }
 
-    /// Eating-window length in hours: the remainder of the 24h day after the fast.
-    var eatingHours: Double { 24 - plan.fastHours }
-
     func elapsed(at now: Date) -> TimeInterval {
         isRunning ? max(0, now.timeIntervalSince1970 - fastStartTimestamp) : stagedElapsed
     }
 
     /// Seconds left in the eating window (until the next fast should start).
     func eatingRemaining(at now: Date) -> TimeInterval {
-        max(0, eatingStartTimestamp + eatingHours * 3600 - now.timeIntervalSince1970)
+        max(0, eatingEndTimestamp - now.timeIntervalSince1970)
     }
-
-    /// Epoch seconds when the eating window closes (start + derived length).
-    var eatingEndTimestamp: Double { eatingStartTimestamp + eatingHours * 3600 }
 
     /// Seconds since the eating window closed (the window-closed count-up).
     func eatingOverElapsed(at now: Date) -> TimeInterval {
         max(0, now.timeIntervalSince1970 - eatingEndTimestamp)
-    }
-
-    /// The streak to display: 0 once a day was missed (last goal before yesterday).
-    /// The persisted counter itself is only rewritten on the next goal.
-    func displayedStreak(at now: Date) -> Int {
-        guard let lastGoalDate else { return 0 }
-        let today = Clock.dayKey(now)
-        return (lastGoalDate == today || Clock.isDayBefore(lastGoalDate, today)) ? streakCount : 0
     }
 }
 
@@ -303,7 +289,7 @@ struct TimerFlowView: View {
             .overlay(alignment: .top) {
                 TimerHeader(
                     plan: props.plan,
-                    streak: props.displayedStreak(at: now),
+                    streak: props.streak.displayed(at: now),
                     hasRecords: props.hasRecords,
                     theme: theme,
                     onEditPlan: { store.dispatch(UIAction.planEditorOpened) },
@@ -462,7 +448,7 @@ struct TimerFlowView: View {
         }
         StreakMilestoneSheet(
             isOpen: props.streakMilestoneOpen,
-            days: props.streakCount,
+            days: props.streak.count,
             theme: theme,
             // ReviewMiddleware listens for this close — the native review request
             // may follow once the milestone moment is fully over.
@@ -516,9 +502,7 @@ struct TimerFlowView: View {
             store.dispatch(MealAction.cleared)
         }
         if state == .eatingOver && props.isMealFresh {
-            let close = Date(timeIntervalSince1970: props.eatingEndTimestamp)
-            let (day, minute) = MealMath.dayAndMinute(of: close)
-            store.dispatch(MealAction.initialized(ateDay: day, ateMin: minute))
+            store.dispatch(SeedLastMealFromWindowCloseThunk())
         }
     }
 
@@ -552,9 +536,10 @@ struct TimerFlowView: View {
             return
         }
 
-        // Genuine first crossing. The day key is stamped here (not in the reducer)
-        // so a fast crossing midnight credits the day the goal was reached.
-        store.dispatch(TimerAction.goalCelebrated(dayKey: Clock.dayKey()))
+        // Genuine first crossing. The thunk stamps the day key (not the reducer, not
+        // this frame) from the fast's own start + goal, so a fast crossing midnight
+        // credits the day the goal was reached — the same day history credits it to.
+        store.dispatch(CelebrateGoalThunk())
         UINotificationFeedbackGenerator().notificationOccurred(.success)
 
         guard !reduceMotion else {
@@ -602,12 +587,10 @@ struct TimerFlowView: View {
     private func clockTime(_ timestamp: Double) -> String {
         guard timestamp > 0 else { return "--" }
         let f = DateFormatter()
-        // Keep the region's 12/24h convention (and the device's 24-Hour Time setting)
-        // but force Western (Latin) digits, so the footer clock matches the manually
-        // built timer/chip numerals instead of showing Eastern-Arabic digits in ar.
-        var localeComponents = Locale.Components(locale: .current)
-        localeComponents.numberingSystem = Locale.NumberingSystem("latn")
-        f.locale = Locale(components: localeComponents)
+        // Keeps the region's 12/24h convention (and the device's 24-Hour Time setting)
+        // while forcing Western (Latin) digits, so the footer clock matches the
+        // manually built timer/chip numerals instead of Eastern-Arabic digits in ar.
+        f.locale = .latinDigits
         f.timeStyle = .short
         f.dateStyle = .none
         return f.string(from: Date(timeIntervalSince1970: timestamp))

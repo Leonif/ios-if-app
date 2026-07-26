@@ -49,11 +49,10 @@ struct FastRecord: Codable, Equatable, Identifiable, Sendable {
     var startDate: Date { Date(timeIntervalSince1970: startTimestamp) }
     var endDate: Date { Date(timeIntervalSince1970: endTimestamp) }
 
-    /// The local day this fast credits to the streak: the day its goal was reached
-    /// (matching the live rule, where a fast crossing midnight credits the day the
-    /// goal actually landed). nil when the goal was never reached.
+    /// The local day this fast credits to the streak — the same rule the live streak
+    /// uses (`Clock.goalDayKey`). nil when the goal was never reached.
     var goalDayKey: String? {
         guard goalReached else { return nil }
-        return Clock.dayKey(Date(timeIntervalSince1970: startTimestamp + goalHours * 3600))
+        return Clock.goalDayKey(fastStart: startTimestamp, goalHours: goalHours)
     }
 }
