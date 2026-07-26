@@ -649,7 +649,7 @@
                   "one" : {
                     "stringUnit" : {
                       "state" : "needs_review",
-                      "value" : "فترة صيام واحدة · %@"
+                      "value" : "فترة صيام واحدة · %2$@"
                     }
                   },
                   "other" : {
@@ -661,7 +661,7 @@
                   "two" : {
                     "stringUnit" : {
                       "state" : "needs_review",
-                      "value" : "فترتا صيام · %@"
+                      "value" : "فترتا صيام · %2$@"
                     }
                   },
                   "zero" : {
@@ -1600,7 +1600,7 @@
                   "one" : {
                     "stringUnit" : {
                       "state" : "needs_review",
-                      "value" : "الأفضل يوم واحد · منذ %@"
+                      "value" : "الأفضل يوم واحد · منذ %2$@"
                     }
                   },
                   "other" : {
@@ -1612,7 +1612,7 @@
                   "two" : {
                     "stringUnit" : {
                       "state" : "needs_review",
-                      "value" : "الأفضل يومان · منذ %@"
+                      "value" : "الأفضل يومان · منذ %2$@"
                     }
                   },
                   "zero" : {
