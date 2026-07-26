@@ -19,6 +19,19 @@ struct HistorySummaryCard: View {
     let stats: HistoryStats
     let theme: ThemeTokens
 
+    @Environment(\.locale) private var locale
+
+    /// CJK writes a counter solid against its counter word — "6일 연속", never
+    /// "6 일 연속" — while the Latin and Cyrillic locales need the space ("6 днів
+    /// поспіль"). The number and the unit are two `Text`s here (the number is display
+    /// type), so the space is the stack's, and it has to follow the locale.
+    private var counterSpacing: CGFloat {
+        switch locale.language.languageCode?.identifier {
+        case "ja", "ko", "zh": return 0
+        default: return 8
+        }
+    }
+
     /// Under three records the dots would be mostly empty — hide them until there
     /// is a rhythm to show.
     private var showsDots: Bool { stats.fastsCount >= 3 }
@@ -36,8 +49,12 @@ struct HistorySummaryCard: View {
                         .overlineTracking(1.5)
                         .foregroundColor(theme.mut)
 
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text("\(streak)")
+                    HStack(alignment: .firstTextBaseline, spacing: counterSpacing) {
+                        // `Text("\(streak)")` would take the LocalizedStringKey path and
+                        // let the locale format the integer — Arabic-Indic "٦" beside the
+                        // Western "118" of the totals below. `String(_: Int)` is always
+                        // Western, like every other number on the screen.
+                        Text(verbatim: String(streak))
                             .font(.bricolage(40))
                             .monospacedDigit()
                             .foregroundColor(theme.ink)

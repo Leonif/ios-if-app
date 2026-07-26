@@ -24,16 +24,12 @@ struct EatingWindowCard: View {
         // The countdown answers "how long left"; the caption answers "until when",
         // which is the question people actually plan a meal around.
         WindowCard(overline: strings.Timer.eatingWindow,
+                   overlineMarked: true,
                    value: hourMinuteSecond(remaining),
                    theme: theme) {
-            HStack(spacing: 7) {
-                Circle()
-                    .fill(theme.accent)
-                    .frame(width: 8, height: 8)
-                Text(strings.Timer.closesAt(closesAt))
-                    .font(.hanken(16, .semibold))
-                    .foregroundColor(theme.ink)
-            }
+            Text(strings.Timer.closesAt(closesAt))
+                .font(.hanken(16, .semibold))
+                .foregroundColor(theme.ink)
         }
     }
 }
@@ -58,10 +54,26 @@ struct EatingOverCard: View {
 /// Shared circular card: overline + H:MM:SS + caption over the pulsing halo.
 private struct WindowCard<Caption: View>: View {
     let overline: String
+    var overlineMarked = false
     let value: String
     let theme: ThemeTokens
     @ViewBuilder let caption: Caption
     @State private var haloDimmed = false
+
+    /// The live dot is part of the overline, not a sibling of it. As inline content of
+    /// the label it gets three things for free that a neighbouring view cannot: it
+    /// mirrors to the right of the text in Arabic (the run order is the text's, so no
+    /// left/right rule is written anywhere), it stays on the first line box when the
+    /// label wraps to two lines instead of centring itself against the whole block, and
+    /// it is sized by the label's font — so it grows with Dynamic Type instead of
+    /// shrinking to a speck at the accessibility sizes.
+    private var overlineText: Text {
+        let label = Text(overline).foregroundStyle(theme.deep)
+        guard overlineMarked else { return label }
+        return Text(Image(systemName: "circle.fill")).foregroundStyle(theme.accent)
+            + Text(" ")
+            + label
+    }
 
     var body: some View {
         VStack(spacing: 10) {
@@ -71,14 +83,14 @@ private struct WindowCard<Caption: View>: View {
             // narrower than the caption's, because it sits nearer the top of the circle
             // — and wraps inside that, in a fixed two-line slot so the countdown and
             // the caption stay put whether the overline takes one line or two.
-            Text(overline)
+            overlineText
                 .font(.hanken(12, .semibold))
                 .overlineTracking(1.9)
-                .foregroundColor(theme.deep)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
                 .minimumScaleFactor(0.75)
                 .frame(width: 160, height: 30)
+                .accessibilityLabel(Text(overline))
 
             Text(value)
                 .font(.bricolage(42))

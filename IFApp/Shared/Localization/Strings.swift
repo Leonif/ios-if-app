@@ -10,6 +10,26 @@
 
 import Foundation
 
+extension Locale {
+    /// The current locale with two things pinned: Western digits and the Gregorian
+    /// calendar.
+    ///
+    /// Digits matter because the app mixes two formatting paths. Durations and dates
+    /// go through `String(format:)` and `HistoryFormat`, which never localise digits,
+    /// so they always read "118". An `Int` interpolated into `String(localized:)` is
+    /// formatted by the locale instead, so in Arabic the same screen rendered "٦"
+    /// beside "118". Pinning the numbering system puts both paths on one system.
+    ///
+    /// The language is left untouched, so translations still resolve normally and
+    /// plural rules still come from the real locale.
+    static var latinDigits: Locale {
+        var components = Locale.Components(locale: .current)
+        components.numberingSystem = Locale.NumberingSystem("latn")
+        components.calendar = .gregorian
+        return Locale(components: components)
+    }
+}
+
 enum strings {
     enum Phase {
         static var fed: String { String(localized: "Fed") }
@@ -58,8 +78,14 @@ enum strings {
         }
 
         /// Overtime pill in the center, e.g. "Goal 16:00 · +0:24".
+        ///
+        /// Goes through `String(format:)` rather than an interpolated
+        /// `String(localized:)` so a translation can reorder the two arguments with
+        /// `%1$@` / `%2$@` — Arabic needs the goal and the overage the other way
+        /// round. Interpolation binds them by position and gives a locale no way to
+        /// swap them. Same shape as `Editorial.beginsIn` above.
         static func goalOvertime(_ goal: String, _ over: String) -> String {
-            String(localized: "Goal \(goal) · +\(over)")
+            String(format: String(localized: "Goal %@ · +%@"), goal, over)
         }
 
         /// Static phase chip shown in the overtime state.
@@ -126,7 +152,7 @@ enum strings {
         static var startingFresh: String { String(localized: "starting fresh") }
 
         /// "2 days ago" (locale-aware plural)
-        static func daysAgo(_ n: Int) -> String { String(localized: "\(n) days ago") }
+        static func daysAgo(_ n: Int) -> String { String(localized: "\(n) days ago", locale: .latinDigits) }
 
         /// "Yesterday 7:00 PM"
         static func yesterdayAt(_ time: String) -> String { String(localized: "Yesterday \(time)") }
@@ -164,11 +190,11 @@ enum strings {
     enum Streak {
         /// "3-day streak" — the flame pill on the main screen.
         static func badge(_ days: Int) -> String {
-            String(localized: "\(days)-day streak")
+            String(localized: "\(days)-day streak", locale: .latinDigits)
         }
         /// Milestone card title, e.g. "7 days in a row".
         static func milestoneTitle(_ days: Int) -> String {
-            String(localized: "\(days) days in a row")
+            String(localized: "\(days) days in a row", locale: .latinDigits)
         }
         static var milestoneSubtitle: String { String(localized: "You've hit your fasting goal every day. Keep the rhythm going.") }
         static var milestoneClose: String { String(localized: "Keep going") }
@@ -210,12 +236,12 @@ enum strings {
 
         /// "Best 9 · since 12 March"
         static func best(_ count: Int, _ date: String) -> String {
-            String(localized: "Best \(count) · since \(date)")
+            String(localized: "Best \(count) · since \(date)", locale: .latinDigits)
         }
 
         /// "9 fasts · 152h" — the month group's aggregate.
         static func groupMeta(_ count: Int, _ hours: String) -> String {
-            String(localized: "\(count) fasts · \(hours)")
+            String(localized: "\(count) fasts · \(hours)", locale: .latinDigits)
         }
 
         /// "of 16h" — the goal beside a fast that fell short of it.

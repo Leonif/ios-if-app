@@ -58,7 +58,12 @@ struct StreakBadge: View {
                 .frame(width: 22, height: 22)
 
                 if days > 0 {
-                    Text("\(days)")
+                    // `Text("\(days)")` would take the LocalizedStringKey path and let
+                    // the locale format the integer — Arabic-Indic "١" in the badge
+                    // beside the Western digits of the history card one tap away.
+                    // `String(_: Int)` is always Western, like every other number in
+                    // the app. Same reason as `HistorySummaryCard`'s streak counter.
+                    Text(verbatim: String(days))
                         .font(.hanken(13.5, .bold))
                         .monospacedDigit()
                         .foregroundColor(theme.ink)

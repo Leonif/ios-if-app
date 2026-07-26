@@ -16,12 +16,10 @@ enum HistoryFormat {
     /// otherwise render Hijri dates here while the streak, the seven-day dots and
     /// every day key in the app are counted on Gregorian days, so the list and the
     /// numbers above it would quietly describe different days.
-    private static var latinLocale: Locale {
-        var components = Locale.Components(locale: .current)
-        components.numberingSystem = Locale.NumberingSystem("latn")
-        components.calendar = .gregorian
-        return Locale(components: components)
-    }
+    ///
+    /// Shared with the string catalog's integer substitutions (`Locale.latinDigits`)
+    /// so both formatting paths render the same digits on the same screen.
+    private static var latinLocale: Locale { .latinDigits }
 
     private static func formatter(template: String) -> DateFormatter {
         let f = DateFormatter()
