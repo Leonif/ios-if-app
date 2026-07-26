@@ -35,15 +35,19 @@ struct IFAppApp: App {
         }
     }
 
-    /// Configures Firebase only when the SDK is linked AND GoogleService-Info.plist
-    /// is bundled. Without the plist, `configure()` would crash — so we guard on it.
+    /// Configures Firebase only when the SDK is linked AND the config plist is
+    /// bundled. Without the plist, `configure()` would crash — so we guard on it.
+    /// Internal builds point at a separate Firebase project ("IF24 Debug") so our
+    /// own testing never lands in the production analytics.
     private static func configureFirebase() {
         #if canImport(FirebaseCore)
-        guard Bundle.main.url(forResource: "GoogleService-Info", withExtension: "plist") != nil else {
-            print("[Analytics] GoogleService-Info.plist missing — Firebase not configured.")
+        let plistName = isInternalBuild ? "GoogleService-Info-Debug" : "GoogleService-Info"
+        guard let plistPath = Bundle.main.path(forResource: plistName, ofType: "plist"),
+              let options = FirebaseOptions(contentsOfFile: plistPath) else {
+            print("[Analytics] \(plistName).plist missing — Firebase not configured.")
             return
         }
-        FirebaseApp.configure()
+        FirebaseApp.configure(options: options)
         tagInternalTraffic()
         #endif
     }
@@ -63,10 +67,16 @@ struct IFAppApp: App {
         #if DEBUG
         return true
         #else
-        // TestFlight and sandbox builds carry a "sandboxReceipt"; App Store
-        // production builds carry "receipt".
-        guard let receiptURL = Bundle.main.appStoreReceiptURL else { return false }
-        return receiptURL.lastPathComponent == "sandboxReceipt"
+        // Only a positively identified App Store build counts as production;
+        // anything else is ours. A locally built Release app also reports a
+        // URL ending in "receipt" — but no file exists there, so the existence
+        // check is what separates it from a real App Store install.
+        // TestFlight carries a "sandboxReceipt" file and stays internal.
+        guard let receiptURL = Bundle.main.appStoreReceiptURL,
+              FileManager.default.fileExists(atPath: receiptURL.path),
+              receiptURL.lastPathComponent == "receipt"
+        else { return true }
+        return false
         #endif
     }
 
