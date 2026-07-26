@@ -32,6 +32,11 @@ enum AnalyticsEvent {
     case lastMealLogged(backdated: Bool, minutesAgo: Int)
     /// User opened the scientific Sources screen.
     case sourcesOpened
+    /// User opened the fasting history screen. `source` = which entry point
+    /// ("streak_badge" / "complete_card" / "eating_window").
+    case historyOpened(source: String)
+    /// User deleted a record from the history (swipe + confirm).
+    case historyRecordDeleted
     /// The native `requestReview` was called. `trigger` = what caused it
     /// ("streak_milestone" / "next_open"). Apple may or may not show the panel.
     case reviewPrompted(trigger: String)
@@ -54,6 +59,8 @@ enum AnalyticsEvent {
         case .timeAdjusted: return "time_adjusted"
         case .lastMealLogged: return "last_meal_logged"
         case .sourcesOpened: return "sources_opened"
+        case .historyOpened: return "history_opened"
+        case .historyRecordDeleted: return "history_record_deleted"
         case .reviewPrompted: return "review_prompted"
         case .streakMilestone: return "streak_milestone"
         case .themeActive: return "theme_active"
@@ -84,7 +91,10 @@ enum AnalyticsEvent {
             return ["trigger": trigger]
         case let .streakMilestone(days):
             return ["days": days]
-        case .appOpened, .fastReset, .eatingWindowStarted, .fastChained, .timeAdjusted, .sourcesOpened:
+        case let .historyOpened(source):
+            return ["source": source]
+        case .appOpened, .fastReset, .eatingWindowStarted, .fastChained, .timeAdjusted, .sourcesOpened,
+             .historyRecordDeleted:
             return [:]
         }
     }

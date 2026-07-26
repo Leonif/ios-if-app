@@ -66,6 +66,66 @@ enum UITestSeed {
             let day = Calendar.current.date(byAdding: .day, value: -daysAgo, to: Date()) ?? Date()
             defaults.set(Clock.dayKey(day), forKey: "streak_last_goal_date")
         }
+
+        // History lives in a file, not in defaults — wipe it alongside the baseline
+        // so a previous run's records can't leak into this one.
+        let history: FastHistoryRepositoryProtocol = container.inject()
+        history.replaceAll([])
+        if args.contains("-seedHistoryEdge") {
+            history.replaceAll(edgeCaseRecords())
+        } else if let count = intArg("-seedHistory") {
+            history.replaceAll(dailyRecords(count: count))
+        }
+    }
+
+    /// `count` fasts, one a day back from yesterday, with a single skipped day so
+    /// the seven-day dots show a real gap.
+    private static func dailyRecords(count: Int) -> [FastRecord] {
+        let calendar = Calendar.current
+        let plan = Plan.p16_8
+        return (0..<max(0, count)).compactMap { index in
+            // Skip four days back to leave one unfilled dot in the last week.
+            let daysAgo = index >= 4 ? index + 2 : index + 1
+            guard let day = calendar.date(byAdding: .day, value: -daysAgo, to: Date()),
+                  let start = calendar.date(bySettingHour: 20, minute: (index * 13) % 60, second: 0, of: day)
+            else { return nil }
+            // 16h02m … 18h12m, varying so the rows don't look generated.
+            let duration = 16 * 3600 + Double((index * 37) % 130) * 60
+            return FastRecord(
+                id: UUID(),
+                startTimestamp: start.timeIntervalSince1970,
+                endTimestamp: start.timeIntervalSince1970 + duration,
+                goalHours: plan.fastHours,
+                planLabel: plan.ratioLabel
+            )
+        }
+    }
+
+    /// The four data shapes the design has to survive: a fast across midnight, one
+    /// past 40 hours, one that fell short of its goal, and two on the same day.
+    private static func edgeCaseRecords() -> [FastRecord] {
+        let calendar = Calendar.current
+        let now = Date()
+
+        func record(daysAgo: Int, hour: Int, minute: Int, duration: TimeInterval, plan: Plan) -> FastRecord? {
+            guard let day = calendar.date(byAdding: .day, value: -daysAgo, to: now),
+                  let start = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: day)
+            else { return nil }
+            return FastRecord(
+                id: UUID(),
+                startTimestamp: start.timeIntervalSince1970,
+                endTimestamp: start.timeIntervalSince1970 + duration,
+                goalHours: plan.fastHours,
+                planLabel: plan.ratioLabel
+            )
+        }
+
+        return [
+            record(daysAgo: 2, hour: 21, minute: 20, duration: 16 * 3600 + 24 * 60, plan: .p16_8),
+            record(daysAgo: 4, hour: 18, minute: 0, duration: 41 * 3600 + 12 * 60, plan: .p20_4),
+            record(daysAgo: 6, hour: 22, minute: 0, duration: 9 * 3600 + 5 * 60, plan: .p16_8),
+            record(daysAgo: 6, hour: 11, minute: 0, duration: 6 * 3600 + 40 * 60, plan: .p16_8),
+        ].compactMap { $0 }
     }
 }
 #endif

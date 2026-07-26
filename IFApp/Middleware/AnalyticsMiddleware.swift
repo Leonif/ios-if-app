@@ -25,6 +25,8 @@ final class AnalyticsMiddleware: Middleware {
             handle(lifecycle)
         case let timer as TimerAction:
             handle(timer, goalHours: app?.planState.plan.fastHours ?? Plan.default.fastHours)
+        case let history as HistoryAction:
+            if case .deleted = history { repo.log(.historyRecordDeleted) }
         default:
             break
         }
@@ -34,6 +36,7 @@ final class AnalyticsMiddleware: Middleware {
         switch action {
         case .appOpened: repo.log(.appOpened)
         case .sourcesOpened: repo.log(.sourcesOpened)
+        case let .historyOpened(source): repo.log(.historyOpened(source: source.rawValue))
         case let .reviewPrompted(trigger): repo.log(.reviewPrompted(trigger: trigger.rawValue))
         case let .streakMilestone(days): repo.log(.streakMilestone(days: days))
         case .appBecameActive: break     // internal gate signal, not a funnel event

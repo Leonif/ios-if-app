@@ -10,4 +10,5 @@ struct AppState: Equatable, Sendable {
     var planState = PlanState()
     var mealState = MealState()
     var uiState = UIState()
+    var historyState = HistoryState()
 }

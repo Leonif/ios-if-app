@@ -117,16 +117,85 @@ final class IFAppUITests: XCTestCase {
                       "Milestone card should close after Keep going")
     }
 
-    /// A seeded 3-day streak renders the flame badge on the idle screen.
+    /// A seeded 3-day streak renders the header streak pill, which is also the way
+    /// into the history.
     func testStreakBadge() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-seedStreak", "3"]
         app.launch()
 
-        XCTAssertTrue(app.otherElements["streak.badge"].waitForExistence(timeout: 15)
-                      || app.staticTexts["streak.badge"].waitForExistence(timeout: 3),
+        XCTAssertTrue(app.buttons["streak.badge"].waitForExistence(timeout: 15),
                       "Streak badge should render with a seeded streak")
         attach(app, "streak-badge")
+    }
+
+    /// No records yet: there is nowhere to go, so the header carries no pill at all.
+    /// The entry point arrives with the first finished fast.
+    func testHistoryNoEntryWithoutRecords() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-uitestReset"]
+        app.launch()
+
+        XCTAssertTrue(app.buttons["timer.sources"].waitForExistence(timeout: 15),
+                      "Timer screen should be up")
+        XCTAssertFalse(app.buttons["streak.badge"].exists,
+                       "With no records there is no way into the history")
+        attach(app, "history-no-entry")
+    }
+
+    /// Records but a broken streak: the pill stays, showing "History" instead of a
+    /// zero, and still opens the screen.
+    func testHistoryEntryWithoutStreak() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-seedHistory", "5"]
+        app.launch()
+
+        let entry = app.buttons["streak.badge"]
+        XCTAssertTrue(entry.waitForExistence(timeout: 15),
+                      "The pill should show with records and no streak")
+        attach(app, "streak-badge-zero")
+        entry.tap()
+
+        XCTAssertTrue(app.otherElements["history.summary"].waitForExistence(timeout: 5),
+                      "The pill should open the history")
+    }
+
+    /// A seeded week of fasts: the summary card and the rows render, and a record
+    /// expands in place.
+    func testHistorySeeded() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-seedHistory", "7", "-seedStreak", "6", "-seedLastGoalDate", "1"]
+        app.launch()
+
+        let entry = app.buttons["streak.badge"]
+        XCTAssertTrue(entry.waitForExistence(timeout: 15), "Streak pill should open the history")
+        entry.tap()
+
+        XCTAssertTrue(app.otherElements["history.summary"].waitForExistence(timeout: 5),
+                      "Summary card should render with seeded records")
+        attach(app, "history-week")
+
+        let row = app.otherElements["history.row"].firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "Records should render as rows")
+        row.tap()
+        attach(app, "history-expanded")
+
+        app.buttons["history.back"].tap()
+        XCTAssertTrue(app.buttons["streak.badge"].waitForExistence(timeout: 5),
+                      "Back should return to the timer screen")
+    }
+
+    /// The data shapes the layout has to survive: across midnight, past 40 hours,
+    /// short of the goal, and two in one day.
+    func testHistoryEdgeCases() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-seedHistoryEdge", "-seedStreak", "4", "-seedLastGoalDate", "1"]
+        app.launch()
+
+        app.buttons["streak.badge"].tap()
+        XCTAssertTrue(app.otherElements["history.summary"].waitForExistence(timeout: 5),
+                      "Summary card should render with seeded edge-case records")
+        attach(app, "history-edge")
     }
 
     /// Opens the redesigned Scientific Sources screen and screenshots it.

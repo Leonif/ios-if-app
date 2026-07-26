@@ -24,6 +24,10 @@ struct TimerScreenProps: Equatable {
     let ateMin: Int
     let streakCount: Int
     let lastGoalDate: String?
+    /// The header pill only exists once there is a record to open.
+    let hasRecords: Bool
+    /// Length of the newest finished fast — the eating window's link into history.
+    let lastFastDuration: TimeInterval?
     let planEditorOpen: Bool
     let mealPickerOpen: Bool
     let streakMilestoneOpen: Bool
@@ -38,6 +42,10 @@ struct TimerScreenProps: Equatable {
         eatingStartTimestamp = state.timerState.eatingStartTimestamp
         streakCount = state.timerState.streakCount
         lastGoalDate = state.timerState.lastGoalDate
+        hasRecords = !state.historyState.records.isEmpty
+        lastFastDuration = state.historyState.records
+            .max(by: { $0.endTimestamp < $1.endTimestamp })?
+            .duration
         planIdx = state.planState.planIdx
         ateDay = state.mealState.ateDay
         ateMin = state.mealState.ateMin
@@ -88,6 +96,10 @@ struct TimerFlowView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var props: TimerScreenProps
     @State private var showSources = false
+    @State private var showHistory = false
+    /// Which entry point opened the history: it names the analytics source, and the
+    /// eating-window one also decides that the record just closed opens with it.
+    @State private var historySource: HistoryEntrySource = .streakBadge
 
     // Goal-reached moment / overtime glow — driven here so the one-shot plays only
     // on a genuine live crossing and is not replayed when relaunching mid-overtime.
@@ -125,6 +137,13 @@ struct TimerFlowView: View {
                 .animation(.easeOut(duration: 0.3), value: props.resetConfirmOpen)
         }
         .sheet(isPresented: $showSources) { SourcesView() }
+        // History is a push, not a sheet: it is deeper into the app, not a dialog
+        // over it.
+        .navigationDestination(isPresented: $showHistory) {
+            HistoryFlowView(store: store, source: historySource,
+                            onStartFast: { store.dispatch(StartFastThunk()) })
+        }
+        .toolbar(.hidden, for: .navigationBar)
         .connect(to: store, mapState: { TimerScreenProps(state: $0) }, onPropsChange: { props = $0 })
         .onAppear {
             store.dispatch(AppLifecycleAction.themeActive(dark: colorScheme == .dark))
@@ -153,9 +172,22 @@ struct TimerFlowView: View {
 
     // MARK: Background (phase-reactive)
 
+    @ViewBuilder
     private func backgroundLayer(theme: ThemeTokens) -> some View {
-        let progress = PhaseProgress.compute(elapsed: props.elapsed(at: Date()), goalHours: props.plan.fastHours)
-        return theme.phaseBackground(progress.phase.color).ignoresSafeArea()
+        // An open window has no phase to react to: its elapsed is zero, which would
+        // tint the screen amber (Fed) as if a meal had just landed. The phase timeline
+        // is already gone from this state — the backdrop follows it.
+        //
+        // `.eatingOver` sits in the same gap: the window has closed but the next fast
+        // is not started, so there is no phase scale on screen and no elapsed to derive
+        // a phase from — same reasoning, same neutral backdrop.
+        let state = currentScreenState()
+        if state == .eating || state == .eatingOver {
+            theme.eatingWindowBackground.ignoresSafeArea()
+        } else {
+            let progress = PhaseProgress.compute(elapsed: props.elapsed(at: Date()), goalHours: props.plan.fastHours)
+            theme.phaseBackground(progress.phase.color).ignoresSafeArea()
+        }
     }
 
     // MARK: Main screen
@@ -189,10 +221,12 @@ struct TimerFlowView: View {
                     if state == .eating {
                         // Eating window: a calm countdown to the next fast — no ring, no phases.
                         VStack(spacing: 20) {
-                            EatingWindowCard(remaining: props.eatingRemaining(at: now), theme: theme)
+                            EatingWindowCard(remaining: props.eatingRemaining(at: now),
+                                             closesAt: clockTime(props.eatingEndTimestamp),
+                                             theme: theme)
                                 .padding(.vertical, 6)
 
-                            EditorialSentence(text: PhaseCopy.complete, theme: theme)
+                            EditorialSentence(text: strings.Editorial.windowOpen, theme: theme)
                         }
                     } else if state == .eatingOver {
                         // Window closed: the count-up is already the next fast in waiting.
@@ -227,15 +261,6 @@ struct TimerFlowView: View {
                             .padding(.vertical, 6)
 
                             EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
-
-                            // Streak badge on the resting states only — the goal /
-                            // complete screens keep their own celebratory copy clean.
-                            if state == .idle || state == .active {
-                                let streak = props.displayedStreak(at: now)
-                                if streak >= 2 {
-                                    StreakBadge(days: streak, theme: theme)
-                                }
-                            }
 
                             if state == .active, let next = progress.nextPhase {
                                 NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
@@ -278,8 +303,11 @@ struct TimerFlowView: View {
             .overlay(alignment: .top) {
                 TimerHeader(
                     plan: props.plan,
+                    streak: props.displayedStreak(at: now),
+                    hasRecords: props.hasRecords,
                     theme: theme,
                     onEditPlan: { store.dispatch(UIAction.planEditorOpened) },
+                    onHistory: { openHistory(from: .streakBadge) },
                     onSettings: { showSources = true }
                 )
                 .padding(.top, headerTop)
@@ -374,13 +402,16 @@ struct TimerFlowView: View {
                 windowOpens: strings.Meal.now,
                 theme: theme,
                 onReset: { store.dispatch(ResetFastThunk()) },
-                onStartEating: { store.dispatch(StartEatingThunk()) }
+                onStartEating: { store.dispatch(StartEatingThunk()) },
+                onHistory: { openHistory(from: .completeCard) }
             )
         case .eating:
             EatingFooterCard(
+                lastFast: props.lastFastDuration.map(hoursMinutes),
                 theme: theme,
                 onSkip: { store.dispatch(TimerAction.eatingEnded) },
-                onStartFast: { store.dispatch(StartFastThunk()) }
+                onStartFast: { store.dispatch(StartFastThunk()) },
+                onHistory: { openHistory(from: .eatingWindow) }
             )
         case .eatingOver:
             EatingOverFooterCard(
@@ -393,6 +424,11 @@ struct TimerFlowView: View {
                 onContinue: { store.dispatch(ContinueFastingThunk()) }
             )
         }
+    }
+
+    private func openHistory(from source: HistoryEntrySource) {
+        historySource = source
+        showHistory = true
     }
 
     // MARK: Overlays (sheets)
@@ -453,7 +489,7 @@ struct TimerFlowView: View {
         case .complete: return PhaseCopy.complete
         case .active: return PhaseCopy.editorial(for: progress.phase)
         case .goalReached: return strings.Editorial.goalReached(Int(props.plan.fastHours))
-        case .eating: return PhaseCopy.complete   // eating renders its own editorial in screen()
+        case .eating: return strings.Editorial.windowOpen   // eating renders its own editorial in screen()
         case .eatingOver: return strings.Editorial.windowClosed
         }
     }

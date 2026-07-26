@@ -13,5 +13,6 @@ func rootReducer(state: AppState, action: Action) -> AppState {
     newState.planState = planReducer(state: state.planState, action: action)
     newState.mealState = mealReducer(state: state.mealState, action: action)
     newState.uiState = uiReducer(state: state.uiState, action: action)
+    newState.historyState = historyReducer(state: state.historyState, action: action)
     return newState
 }

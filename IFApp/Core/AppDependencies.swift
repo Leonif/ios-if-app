@@ -20,5 +20,8 @@ enum AppDependencies {
         container.register(AnalyticsRepositoryProtocol.self) {
             AnalyticsRepository()
         }
+        container.register(FastHistoryRepositoryProtocol.self) {
+            FastHistoryRepository()
+        }
     }
 }

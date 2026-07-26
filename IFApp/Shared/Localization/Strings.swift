@@ -21,7 +21,8 @@ enum strings {
 
     enum Editorial {
         static var idle: String { String(localized: "Start whenever you're ready, or log your last meal to pick up a fast already in progress.") }
-        static var complete: String { String(localized: "Fast complete. Your eating window is open. Refuel gently.") }
+        static var complete: String { String(localized: "Fast complete. Your eating window is ready. Refuel gently.") }
+        static var windowOpen: String { String(localized: "Fast complete. Your eating window is open. Refuel gently.") }
         static var fed: String { String(localized: "Still digesting. Insulin is up and your body is storing the energy from your last meal.") }
         static var sugar: String { String(localized: "Glucose is easing down. Your body is leaning on its glycogen stores for fuel.") }
         static var fat: String { String(localized: "Glycogen is running low. Fat is becoming your main source of energy.") }
@@ -45,12 +46,16 @@ enum strings {
         static var fastComplete: String { String(localized: "FAST COMPLETE") }
         static var goalReached: String { String(localized: "GOAL REACHED") }
         static var eatingWindow: String { String(localized: "EATING WINDOW") }
-        static var fastStartsIn: String { String(localized: "Fast starts in") }
         static var windowClosed: String { String(localized: "WINDOW CLOSED") }
         static var fastingSoFar: String { String(localized: "Fasting so far") }
         static var start: String { String(localized: "Start") }
         static var dailyFast: String { String(localized: "Daily fast") }
         static var lastMeal: String { String(localized: "Last meal · ") }
+
+        /// "Closes 8:00 PM" — the caption under the eating-window countdown.
+        static func closesAt(_ time: String) -> String {
+            String(localized: "Closes \(time)")
+        }
 
         /// Overtime pill in the center, e.g. "Goal 16:00 · +0:24".
         static func goalOvertime(_ goal: String, _ over: String) -> String {
@@ -167,6 +172,69 @@ enum strings {
         }
         static var milestoneSubtitle: String { String(localized: "You've hit your fasting goal every day. Keep the rhythm going.") }
         static var milestoneClose: String { String(localized: "Keep going") }
+    }
+
+    enum History {
+        static var title: String { String(localized: "History") }
+        static var streakOverline: String { String(localized: "Current streak") }
+        static var lastSevenDays: String { String(localized: "Last 7 days") }
+        static var statFasts: String { String(localized: "Fasts") }
+        static var statTotal: String { String(localized: "Total") }
+        static var statLongest: String { String(localized: "Longest") }
+        static var extended: String { String(localized: "Extended") }
+        static var started: String { String(localized: "Started") }
+        static var ended: String { String(localized: "Ended") }
+        static var delete: String { String(localized: "Delete") }
+        static var deleteTitle: String { String(localized: "Delete this fast?") }
+        static var deleteBody: String { String(localized: "It will be removed from your history and your totals.") }
+        static var cancel: String { String(localized: "Cancel") }
+        static var emptyTitle: String { String(localized: "Your fasts gather here") }
+        static var emptyBody: String { String(localized: "Every finished fast is saved with its length, plan and times - so you can look back on the rhythm you are building.") }
+        static var emptyCta: String { String(localized: "Start a fast") }
+        static var firstNote: String { String(localized: "First one saved. Finish tomorrow's fast and your streak begins.") }
+        static var savedToHistory: String { String(localized: "Saved to your history") }
+
+        /// Streak unit beside the big number. The number is drawn separately (display
+        /// type), so the catalog's plural variants carry the word alone — the CLDR
+        /// categories live there, never as a `days == 1` here.
+        static func daysInARow(_ days: Int) -> String {
+            String(localized: "history.streak.unit",
+                   defaultValue: "\(days) days in a row",
+                   comment: "Streak unit under the big number; the number itself is not printed")
+        }
+
+        /// "Last fast · 16h 24m" — the eating window's link into the history.
+        static func lastFast(_ duration: String) -> String {
+            String(localized: "Last fast · \(duration)")
+        }
+
+        /// "Best 9 · since 12 March"
+        static func best(_ count: Int, _ date: String) -> String {
+            String(localized: "Best \(count) · since \(date)")
+        }
+
+        /// "9 fasts · 152h" — the month group's aggregate.
+        static func groupMeta(_ count: Int, _ hours: String) -> String {
+            String(localized: "\(count) fasts · \(hours)")
+        }
+
+        /// "of 16h" — the goal beside a fast that fell short of it.
+        static func ofGoal(_ goal: String) -> String {
+            String(localized: "of \(goal)")
+        }
+
+        /// "Reached Autophagy"
+        static func reached(_ phase: String) -> String {
+            String(localized: "Reached \(phase)")
+        }
+
+        /// VoiceOver label for the history entry point on the main screen.
+        static func entryA11y(_ days: Int) -> String {
+            String(localized: "Fasting history, current streak \(days) days")
+        }
+
+        /// The same label with no streak to announce — the pill reads "History".
+        static var entryA11yNoStreak: String { String(localized: "Fasting history") }
     }
 
     enum Notification {

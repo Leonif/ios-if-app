@@ -16,12 +16,25 @@ enum ReviewPromptTrigger: String {
     case nextOpen = "next_open"
 }
 
+/// Which of the three entry points led into the history. The raw value is the GA4
+/// `source` param: with three ways in, the event alone can't say which one works.
+enum HistoryEntrySource: String {
+    /// The streak pill in the header — present in every state.
+    case streakBadge = "streak_badge"
+    /// "Saved to your history" in the complete card.
+    case completeCard = "complete_card"
+    /// "Last fast · 16h 24m" in the eating-window card.
+    case eatingWindow = "eating_window"
+}
+
 enum AppLifecycleAction: Action {
     case appOpened
     /// The scene became active — cold start or return from background.
     /// Drives the pending "next open" review fallback; not a funnel event.
     case appBecameActive
     case sourcesOpened
+    /// The fasting history screen was opened, and from where.
+    case historyOpened(source: HistoryEntrySource)
     /// The native `requestReview` was called (Apple may or may not show the panel).
     case reviewPrompted(trigger: ReviewPromptTrigger)
     /// A streak milestone (3/7/14/30 days) was reached and its card shown.

@@ -14,6 +14,9 @@ struct PhaseTimeline: View {
     let currentFill: Double
     let isComplete: Bool
     let theme: ThemeTokens
+    /// The history detail panel reuses the bars without their labels — there the
+    /// phase is already named in the line above.
+    var showsLabels: Bool = true
 
     private var currentIndex: Int { currentPhase.rawValue }
 
@@ -47,11 +50,13 @@ struct PhaseTimeline: View {
             }
             .frame(height: 6)
 
-            Text(phase.label)
-                .font(.hanken(10.5, isCurrent ? .bold : .semibold))
-                .foregroundColor(isCurrent ? theme.deep : (isPassed ? theme.sec : theme.faint))
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+            if showsLabels {
+                Text(phase.label)
+                    .font(.hanken(10.5, isCurrent ? .bold : .semibold))
+                    .foregroundColor(isCurrent ? theme.deep : (isPassed ? theme.sec : theme.faint))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
         }
         .frame(maxWidth: .infinity)
     }

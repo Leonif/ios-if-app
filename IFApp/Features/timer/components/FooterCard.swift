@@ -32,6 +32,30 @@ private struct Stat: View {
     }
 }
 
+/// The text link into the history that two footer cards carry: "Saved to your
+/// history" once a fast is done, "Last fast · 16h 24m" while the window is open.
+/// The chevron is the whole navigation affordance.
+private struct HistoryLink: View {
+    let title: String
+    let theme: ThemeTokens
+    let identifier: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Text(title)
+                Image(systemName: "chevron.forward")
+                    .font(.system(size: 9, weight: .semibold))
+            }
+            .font(.hanken(13.5, .semibold))
+            .foregroundColor(theme.deep)
+        }
+        .buttonStyle(.pressable)
+        .accessibilityIdentifier(identifier)
+    }
+}
+
 private struct CardBackground: ViewModifier {
     let theme: ThemeTokens
     func body(content: Content) -> some View {
@@ -94,8 +118,7 @@ struct GoalReachedFooterCard: View {
                 Stat(overline: strings.Footer.over, value: over, valueColor: theme.deep, theme: theme)
             }
             HStack(spacing: 12) {
-                SecondaryButton(title: strings.Footer.reset, theme: theme, action: onReset)
-                    .frame(width: 110)
+                SecondaryButton(title: strings.Footer.reset, theme: theme, minWidth: 110, action: onReset)
                     .accessibilityIdentifier("timer.reset")
                 PrimaryButton(title: strings.Footer.endFast, theme: theme, action: onEndFast)
                     .accessibilityIdentifier("timer.endFast")
@@ -110,19 +133,31 @@ struct GoalReachedFooterCard: View {
 }
 
 /// Eating-window footer: Skip (secondary, back to idle) + Start fast (primary, begins a
-/// new fast early). No stats — the countdown is the hero above.
+/// new fast early). No stats — the countdown is the hero above, and it already names
+/// the closing hour.
+///
+/// The window lasts hours, so it gets its own way into the history: the fast that
+/// just closed is still "today's", and the link opens straight to it. `lastFast` is
+/// nil only until the first record exists.
 struct EatingFooterCard: View {
+    let lastFast: String?       // "16h 24m"
     let theme: ThemeTokens
     let onSkip: () -> Void
     let onStartFast: () -> Void
+    let onHistory: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
-            SecondaryButton(title: strings.Footer.skip, theme: theme, action: onSkip)
-                .frame(width: 110)
-                .accessibilityIdentifier("eating.skip")
-            PrimaryButton(title: strings.Footer.startFast, theme: theme, action: onStartFast)
-                .accessibilityIdentifier("eating.startFast")
+        VStack(spacing: 14) {
+            if let lastFast {
+                HistoryLink(title: strings.History.lastFast(lastFast), theme: theme,
+                            identifier: "eating.lastFast", action: onHistory)
+            }
+            HStack(spacing: 12) {
+                SecondaryButton(title: strings.Footer.skip, theme: theme, minWidth: 110, action: onSkip)
+                    .accessibilityIdentifier("eating.skip")
+                PrimaryButton(title: strings.Footer.startFast, theme: theme, action: onStartFast)
+                    .accessibilityIdentifier("eating.startFast")
+            }
         }
         .modifier(CardBackground(theme: theme))
     }
@@ -137,8 +172,7 @@ struct EatingOverFooterCard: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            SecondaryButton(title: strings.Footer.skip, theme: theme, action: onSkip)
-                .frame(width: 110)
+            SecondaryButton(title: strings.Footer.skip, theme: theme, minWidth: 110, action: onSkip)
                 .accessibilityIdentifier("eatingOver.skip")
             PrimaryButton(title: strings.Footer.continueFasting, theme: theme, action: onContinue)
                 .accessibilityIdentifier("eatingOver.continueFasting")
@@ -153,6 +187,7 @@ struct CompleteFooterCard: View {
     let theme: ThemeTokens
     let onReset: () -> Void
     let onStartEating: () -> Void
+    let onHistory: () -> Void
 
     var body: some View {
         VStack(spacing: 14) {
@@ -161,9 +196,14 @@ struct CompleteFooterCard: View {
                 Rectangle().fill(theme.surfaceLine).frame(width: 1, height: 30)
                 Stat(overline: strings.Footer.windowOpens, value: windowOpens, valueColor: theme.ink, theme: theme)
             }
+
+            // The one moment the user is emotionally ready to look back: the fast
+            // they just finished has landed somewhere.
+            HistoryLink(title: strings.History.savedToHistory, theme: theme,
+                        identifier: "timer.savedToHistory", action: onHistory)
+
             HStack(spacing: 12) {
-                SecondaryButton(title: strings.Footer.reset, theme: theme, action: onReset)
-                    .frame(width: 110)
+                SecondaryButton(title: strings.Footer.reset, theme: theme, minWidth: 110, action: onReset)
                     .accessibilityIdentifier("timer.reset")
                 PrimaryButton(title: strings.Footer.startEatingWindow, theme: theme, action: onStartEating)
             }

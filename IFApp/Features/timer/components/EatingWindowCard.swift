@@ -17,13 +17,24 @@ private func hourMinuteSecond(_ remaining: TimeInterval) -> String {
 
 struct EatingWindowCard: View {
     let remaining: TimeInterval     // seconds until the window closes / fast starts
+    let closesAt: String            // "8:00 PM" — the hour eating has to end by
     let theme: ThemeTokens
 
     var body: some View {
+        // The countdown answers "how long left"; the caption answers "until when",
+        // which is the question people actually plan a meal around.
         WindowCard(overline: strings.Timer.eatingWindow,
                    value: hourMinuteSecond(remaining),
-                   caption: strings.Timer.fastStartsIn,
-                   theme: theme)
+                   theme: theme) {
+            HStack(spacing: 7) {
+                Circle()
+                    .fill(theme.accent)
+                    .frame(width: 8, height: 8)
+                Text(strings.Timer.closesAt(closesAt))
+                    .font(.hanken(16, .semibold))
+                    .foregroundColor(theme.ink)
+            }
+        }
     }
 }
 
@@ -36,25 +47,38 @@ struct EatingOverCard: View {
     var body: some View {
         WindowCard(overline: strings.Timer.windowClosed,
                    value: hourMinuteSecond(sinceClose),
-                   caption: strings.Timer.fastingSoFar,
-                   theme: theme)
+                   theme: theme) {
+            Text(strings.Timer.fastingSoFar)
+                .font(.hanken(14, .regular))
+                .foregroundColor(theme.mut)
+        }
     }
 }
 
 /// Shared circular card: overline + H:MM:SS + caption over the pulsing halo.
-private struct WindowCard: View {
+private struct WindowCard<Caption: View>: View {
     let overline: String
     let value: String
-    let caption: String
     let theme: ThemeTokens
+    @ViewBuilder let caption: Caption
     @State private var haloDimmed = false
 
     var body: some View {
         VStack(spacing: 10) {
+            // Same boundary problem as the caption, one line higher: "WINDOW CLOSED"
+            // is "FENSTER GESCHLOSSEN" in German, and at a large content size it runs
+            // straight out of the circle. It gets the chord width at its own height —
+            // narrower than the caption's, because it sits nearer the top of the circle
+            // — and wraps inside that, in a fixed two-line slot so the countdown and
+            // the caption stay put whether the overline takes one line or two.
             Text(overline)
                 .font(.hanken(12, .semibold))
                 .overlineTracking(1.9)
                 .foregroundColor(theme.deep)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
+                .frame(width: 160, height: 30)
 
             Text(value)
                 .font(.bricolage(42))
@@ -63,9 +87,19 @@ private struct WindowCard: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
 
-            Text(caption)
-                .font(.hanken(14, .regular))
-                .foregroundColor(theme.mut)
+            // The circle is a hard boundary, and the caption is the one line that
+            // varies with the locale ("Fasting so far" is three words in English and
+            // four in Ukrainian). It gets the chord width at its own height minus a
+            // margin, and wraps inside that instead of growing past the edge.
+            //
+            // The slot is a fixed two-line height so the countdown sits in the same
+            // place whether the caption takes one line or two — the card must not
+            // recompose itself from locale to locale.
+            caption
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
+                .frame(width: 176, height: 40)
         }
         .frame(width: 232, height: 232)
         .background(

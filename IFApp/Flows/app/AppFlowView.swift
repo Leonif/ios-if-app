@@ -12,6 +12,9 @@ struct AppFlowView: View {
     let store: Store<AppState>
 
     var body: some View {
-        TimerFlowView(store: store)
+        // The stack exists for the one push in the app — the history screen.
+        NavigationStack {
+            TimerFlowView(store: store)
+        }
     }
 }

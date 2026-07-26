@@ -124,6 +124,52 @@ struct ThemeTokens {
         }
     }
 
+    // MARK: Eating window
+
+    /// The open eating window's backdrop. The window is a pause between fasts, not a
+    /// stage of one: the phase timeline is deliberately absent from this state, so a
+    /// phase-derived tint would be inconsistent with it. Neutral green instead.
+    ///
+    /// Deliberately its own value rather than a reuse of `historyBackground` — two
+    /// different things that happen to land on the same green today.
+    var eatingWindowBackground: RadialGradient {
+        RadialGradient(
+            colors: [Color(hex: isDark ? "#151C17" : "#E9EEE6"), backgroundBase],
+            center: UnitPoint(x: 0.5, y: isDark ? 0.03 : 0.01),
+            startRadius: 0,
+            endRadius: isDark ? 520 : 430
+        )
+    }
+
+    // MARK: History screen
+
+    /// The history backdrop. Same treatment as the timer's phase tint, but neutral
+    /// green — history has no active phase to react to.
+    var historyBackground: RadialGradient {
+        RadialGradient(
+            colors: [Color(hex: isDark ? "#151C17" : "#E9EEE6"), backgroundBase],
+            center: UnitPoint(x: 0.5, y: isDark ? 0.03 : 0.01),
+            startRadius: 0,
+            endRadius: isDark ? 520 : 430
+        )
+    }
+
+    /// Backdrop of an expanded record's detail panel.
+    var historyDetailBg: Color {
+        isDark ? .whiteAlpha(0.04) : Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.055)
+    }
+
+    /// The hairline ghost rings in the empty state.
+    var historyGhostLine: Color {
+        isDark ? .whiteAlpha(0.13) : Color(.sRGB, red: 78/255, green: 90/255, blue: 70/255, opacity: 0.16)
+    }
+
+    /// The phase name under a record's plan pill — the phase color pulled toward
+    /// the text color so it reads as a label, not as a second accent.
+    func historyPhaseLabel(_ phase: Color) -> Color {
+        isDark ? phase.mix(.white, 0.38) : phase.mix(Color(hex: "#2A2A26"), 0.34)
+    }
+
     /// Next-phase chip colors (dot/text/bg/border) derived from the named phase color.
     func chip(for next: Color) -> (dot: Color, text: Color, bg: Color, border: Color) {
         if isDark {

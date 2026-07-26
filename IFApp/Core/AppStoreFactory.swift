@@ -15,12 +15,15 @@ enum AppStoreFactory {
         // UI tests launch with "-uitestReset" to start from a clean idle state.
         if ProcessInfo.processInfo.arguments.contains("-uitestReset") {
             persistence.save(fastStartTimestamp: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false, streakCount: 0, lastGoalDate: nil)
+            let history: FastHistoryRepositoryProtocol = container.inject()
+            history.replaceAll([])
         }
         // UI tests also seed timer/review state via "-seed…" args (see UITestSeed).
         #if DEBUG
         UITestSeed.applyIfNeeded()
         #endif
         let loaded = persistence.load()
+        let history: FastHistoryRepositoryProtocol = container.inject()
 
         let initialState = AppState(
             timerState: TimerState(
@@ -34,7 +37,8 @@ enum AppStoreFactory {
                 streakCount: loaded.streakCount,
                 lastGoalDate: loaded.lastGoalDate
             ),
-            planState: PlanState(planIdx: persistence.loadPlanIdx() ?? Plan.default.rawValue)
+            planState: PlanState(planIdx: persistence.loadPlanIdx() ?? Plan.default.rawValue),
+            historyState: HistoryState(records: history.loadAll().sorted { $0.startTimestamp > $1.startTimestamp })
         )
 
         let core = ImprovedStoreV2(
@@ -42,6 +46,7 @@ enum AppStoreFactory {
             reducer: rootReducer,
             middlewares: [
                 PersistenceMiddleware(),
+                HistoryMiddleware(),
                 StreakMiddleware(),
                 ReviewMiddleware(),
                 AnalyticsMiddleware(),
