@@ -1,415 +1,8 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "1 hour" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ساعة واحدة"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 Std"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 h"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 h"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1時間"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1시간"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 godz"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 год"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1小时"
-          }
-        }
-      }
-    },
-    "2 hours" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ساعتان"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2 Std"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2 h"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2 h"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2時間"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2시간"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2 godz"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2 год"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2小时"
-          }
-        }
-      }
-    },
-    "2:00 - 8:00 PM" : {
-      "comment" : "Eating window for 18:6 plan",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14:00 - 20:00"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14:00 - 20:00"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14:00 - 20:00"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14:00 - 20:00"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14:00 - 20:00"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14:00 - 20:00"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14:00 - 20:00"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14:00 - 20:00"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14:00 - 20:00"
-          }
-        }
-      }
-    },
-    "4:00 - 8:00 PM" : {
-      "comment" : "Eating window for 20:4 plan",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:00 - 20:00"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:00 - 20:00"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:00 - 20:00"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:00 - 20:00"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:00 - 20:00"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:00 - 20:00"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:00 - 20:00"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:00 - 20:00"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "16:00 - 20:00"
-          }
-        }
-      }
-    },
-    "10:00 AM - 8:00 PM" : {
-      "comment" : "Eating window for 14:10 plan",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10:00 - 20:00"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10:00 - 20:00"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10:00 - 20:00"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10:00 - 20:00"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10:00 - 20:00"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10:00 - 20:00"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10:00 - 20:00"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10:00 - 20:00"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10:00 - 20:00"
-          }
-        }
-      }
-    },
-    "12:00 - 8:00 PM" : {
-      "comment" : "Eating window for 16:8 plan",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "12:00 - 20:00"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "12:00 - 20:00"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "12:00 - 20:00"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "12:00 - 20:00"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "12:00 - 20:00"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "12:00 - 20:00"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "12:00 - 20:00"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "12:00 - 20:00"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "12:00 - 20:00"
-          }
-        }
-      }
-    },
-    "30 min" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 دقيقة"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 Min"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 min"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 min"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30分"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30분"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 min"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 хв"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30分钟"
-          }
-        }
-      }
+    " " : {
+
     },
     "%@ begins in %@" : {
       "comment" : "Next phase chip, e.g. 'Autophagy begins in 2h 36m'",
@@ -440,8 +33,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@は%2$@後に始まります"
+            "state" : "needs_review",
+            "value" : "%1$@まであと%2$@"
           }
         },
         "ko" : {
@@ -642,7 +235,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已禁食 %d小时%02d分"
+            "value" : "已断食 %d小时%02d分"
           }
         }
       }
@@ -765,14 +358,49 @@
         }
       }
     },
-    "%lld" : {},
     "%lld days ago" : {
       "comment" : "Meal date stepper, 2+ days back",
       "localizations" : {
         "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "قبل %lld يوم"
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل %lld أيام"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل %lld يومًا"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل يوم واحد"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل %lld يوم"
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل يومين"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل %lld يوم"
+                }
+              }
+            }
           }
         },
         "de" : {
@@ -853,15 +481,51 @@
       "comment" : "Streak milestone card title (3/7/14/30 days)",
       "localizations" : {
         "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld أيام متتالية"
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld أيام متتالية"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld يومًا متتاليًا"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "يوم واحد متتالٍ"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld يوم متتالٍ"
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "يومان متتاليان"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "%lld يوم متتالٍ"
+                }
+              }
+            }
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld Tage am Stück"
+            "value" : "%lld Tage in Folge"
           }
         },
         "es" : {
@@ -878,7 +542,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "%lld日連続"
           }
         },
@@ -962,49 +626,241 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld صيامات · %@"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "few" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld فترات صيام · %@"
+                    }
+                  },
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld فترة صيام · %@"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "فترة صيام واحدة · %@"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld فترة صيام · %@"
+                    }
+                  },
+                  "two" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "فترتا صيام · %@"
+                    }
+                  },
+                  "zero" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld فترات صيام · %@"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld Fastenzeiten · %@"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld Fastenzeit · %@"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld Fastenzeiten · %@"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld ayunos · %@"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld ayunos · %@"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld ayuno · %@"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld ayunos · %@"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld jeûnes · %@"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld jeûnes · %@"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld jeûne · %@"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld jeûnes · %@"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%lld 回 · %@"
+            "state" : "translated",
+            "value" : "%lld回 · %@"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld회 · %@"
+            "value" : "단식 %lld회 · %@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld postów · %@"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "few" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld posty · %@"
+                    }
+                  },
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld postów · %@"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld post · %@"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld postu · %@"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld голодувань · %@"
+            "state" : "needs_review",
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "few" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld пости · %@"
+                    }
+                  },
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld постів · %@"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld піст · %@"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld посту · %@"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
@@ -1021,30 +877,154 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "سلسلة %lld يوم"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "few" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "سلسلة %lld أيام"
+                    }
+                  },
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "سلسلة %lld يومًا"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "سلسلة يوم واحد"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "سلسلة %lld يوم"
+                    }
+                  },
+                  "two" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "سلسلة يومين"
+                    }
+                  },
+                  "zero" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "سلسلة %lld يوم"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%lld Tage in Serie"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld Tag in Folge"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld Tage in Folge"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Racha de %lld días"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "Racha de %lld días"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "Racha de %lld día"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "Racha de %lld días"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Série de %lld jours"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "Série de %lld jours"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "Série de %lld jour"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "Série de %lld jours"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "%lld日連続"
           }
         },
@@ -1122,6 +1102,416 @@
         }
       }
     },
+    "1 hour" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ساعة واحدة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Std"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 h"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 h"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1時間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1시간"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 godz"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 год"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1小时"
+          }
+        }
+      }
+    },
+    "2 hours" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ساعتان"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 Std"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 h"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 h"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2時間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2시간"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 godz"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 год"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2小时"
+          }
+        }
+      }
+    },
+    "2:00 - 8:00 PM" : {
+      "comment" : "Eating window for 18:6 plan",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14:00 - 20:00"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14:00 - 20:00"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14:00 - 20:00"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14:00 - 20:00"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14:00〜20:00"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14:00 - 20:00"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14:00 - 20:00"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14:00 - 20:00"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14:00 - 20:00"
+          }
+        }
+      }
+    },
+    "4:00 - 8:00 PM" : {
+      "comment" : "Eating window for 20:4 plan",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00 - 20:00"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00 - 20:00"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00 - 20:00"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00 - 20:00"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00〜20:00"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00 - 20:00"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00 - 20:00"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00 - 20:00"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00 - 20:00"
+          }
+        }
+      }
+    },
+    "10:00 AM - 8:00 PM" : {
+      "comment" : "Eating window for 14:10 plan",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10:00 - 20:00"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10:00 - 20:00"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10:00 - 20:00"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10:00 - 20:00"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10:00〜20:00"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10:00 - 20:00"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10:00 - 20:00"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10:00 - 20:00"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10:00 - 20:00"
+          }
+        }
+      }
+    },
+    "12:00 - 8:00 PM" : {
+      "comment" : "Eating window for 16:8 plan",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:00 - 20:00"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:00 - 20:00"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:00 - 20:00"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:00 - 20:00"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:00〜20:00"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:00 - 20:00"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:00 - 20:00"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:00 - 20:00"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:00 - 20:00"
+          }
+        }
+      }
+    },
+    "30 min" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 دقيقة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 Min"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 min"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 min"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30分"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30분"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 min"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 хв"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30分钟"
+          }
+        }
+      }
+    },
     "Autophagy" : {
       "comment" : "Phase label",
       "localizations" : {
@@ -1157,8 +1547,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "오토파지"
+            "state" : "needs_review",
+            "value" : "자가포식"
           }
         },
         "pl" : {
@@ -1187,13 +1577,59 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "الأفضل %lld · منذ %@"
+            "value" : "%#@arg1@"
+          },
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "few" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "الأفضل %lld أيام · منذ %@"
+                    }
+                  },
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "الأفضل %lld يومًا · منذ %@"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "الأفضل يوم واحد · منذ %@"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "الأفضل %lld يوم · منذ %@"
+                    }
+                  },
+                  "two" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "الأفضل يومان · منذ %@"
+                    }
+                  },
+                  "zero" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "الأفضل %lld يوم · منذ %@"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bester %lld · seit %@"
+            "value" : "Beste %lld · seit %@"
           }
         },
         "es" : {
@@ -1211,13 +1647,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "最高 %lld · %@ から"
+            "value" : "最高%lld日 · %@から"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "최고 %lld · %@부터"
+            "state" : "translated",
+            "value" : "최고 %lld일 · %@부터"
           }
         },
         "pl" : {
@@ -1268,7 +1704,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "キャンセル"
           }
         },
@@ -1304,7 +1740,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "يغلق %@"
+            "value" : "يُغلق الساعة %@"
           }
         },
         "de" : {
@@ -1385,8 +1821,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "確定"
+            "state" : "needs_review",
+            "value" : "決定"
           }
         },
         "ko" : {
@@ -1443,7 +1879,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "断食を続ける"
           }
         },
@@ -1467,8 +1903,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "继续禁食"
+            "state" : "translated",
+            "value" : "继续断食"
           }
         }
       }
@@ -1502,7 +1938,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "現在の連続日数"
           }
         },
@@ -1566,8 +2002,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "매일 단식"
+            "state" : "needs_review",
+            "value" : "일일 단식"
           }
         },
         "pl" : {
@@ -1579,7 +2015,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Щоденний фастинг"
+            "value" : "Щоденний піст"
           }
         },
         "zh-Hans" : {
@@ -1653,7 +2089,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "التهام ذاتي عميق - إصلاح خلوي"
+            "value" : "التهام ذاتي عميق، إصلاح خلوي"
           }
         },
         "de" : {
@@ -1676,8 +2112,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "深いオートファジー - 細胞の修復"
+            "state" : "translated",
+            "value" : "深いオートファジー・細胞の修復"
           }
         },
         "ko" : {
@@ -1701,7 +2137,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "深度自噬 - 细胞修复"
+            "value" : "深度自噬 · 细胞修复"
           }
         }
       }
@@ -1734,14 +2170,14 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "断食の深いフェーズ。オートファジーが、細胞に不要になったものをリサイクルしています。"
+            "state" : "needs_review",
+            "value" : "断食の深いフェーズ。オートファジーが細胞に不要になったものを再利用しています。"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "단식의 깊은 단계입니다. 오토파지가 세포에 더 이상 필요 없는 것을 재활용하고 있습니다."
+            "state" : "needs_review",
+            "value" : "단식의 깊은 단계예요. 자가포식이 세포에 더 이상 필요 없는 것을 재활용하고 있어요."
           }
         },
         "pl" : {
@@ -1752,8 +2188,8 @@
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Глибока фаза фастингу. Автофагія переробляє те, що клітинам більше не потрібне."
+            "state" : "needs_review",
+            "value" : "Глибока фаза посту. Автофагія переробляє те, що клітинам більше не потрібне."
           }
         },
         "zh-Hans" : {
@@ -1793,7 +2229,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "削除"
           }
         },
@@ -1829,7 +2265,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "حذف هذا الصيام؟"
+            "value" : "حذف هذا السجل؟"
           }
         },
         "de" : {
@@ -1852,7 +2288,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "この断食を削除しますか？"
           }
         },
@@ -1871,7 +2307,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Видалити це голодування?"
+            "value" : "Видалити цей піст?"
           }
         },
         "zh-Hans" : {
@@ -1887,7 +2323,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إخلاء مسؤولية"
+            "value" : "إخلاء المسؤولية"
           }
         },
         "de" : {
@@ -1945,7 +2381,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إخلاء مسؤولية: لا يقدّم هذا التطبيق نصائح طبية. يُرجى استشارة الطبيب قبل اتخاذ أي قرارات متعلقة بالصحة."
+            "value" : "إخلاء المسؤولية: لا يقدّم هذا التطبيق نصائح طبية. يُرجى استشارة الطبيب قبل اتخاذ أي قرارات متعلقة بالصحة."
           }
         },
         "de" : {
@@ -1969,7 +2405,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "免責事項:本アプリは医療アドバイスを提供するものではありません。健康に関する判断の前に医師にご相談ください。"
+            "value" : "免責事項：本アプリは医療アドバイスを提供するものではありません。健康に関する判断の前に医師にご相談ください。"
           }
         },
         "ko" : {
@@ -2131,13 +2567,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "VENTANA DE COMIDA"
+            "value" : "COMIDA"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "FENÊTRE ALIMENTAIRE"
+            "value" : "ALIMENTATION"
           }
         },
         "ja" : {
@@ -2160,8 +2596,8 @@
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "ВІКНО ЇЖІ"
+            "state" : "needs_review",
+            "value" : "ХАРЧУВАННЯ"
           }
         },
         "zh-Hans" : {
@@ -2184,7 +2620,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Essensfenster beendet"
+            "value" : "Essensfenster geschlossen"
           }
         },
         "es" : {
@@ -2196,13 +2632,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Fenêtre de repas terminée"
+            "value" : "Fenêtre alimentaire fermée"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "食事の時間が終了しました"
+            "value" : "食事の時間帯が終了"
           }
         },
         "ko" : {
@@ -2213,14 +2649,14 @@
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Okno jedzenia zamknięte"
+            "state" : "translated",
+            "value" : "Okno żywieniowe zamknięte"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вікно їжі закрилось"
+            "value" : "Вікно харчування закрилося"
           }
         },
         "zh-Hans" : {
@@ -2324,8 +2760,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "경과"
+            "state" : "needs_review",
+            "value" : "경과 시간"
           }
         },
         "pl" : {
@@ -2382,8 +2818,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "경과"
+            "state" : "needs_review",
+            "value" : "경과 시간"
           }
         },
         "pl" : {
@@ -2470,7 +2906,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "انتهى"
+            "value" : "النهاية"
           }
         },
         "de" : {
@@ -2493,14 +2929,14 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "終了"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "종료"
+            "value" : "종료 시각"
           }
         },
         "pl" : {
@@ -2529,7 +2965,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "كل صيام تُنهيه يُحفظ بمدته وخطته وأوقاته - لتعود وترى الإيقاع الذي تبنيه."
+            "value" : "تُحفظ كل فترة صيام مكتملة بمدتها وخطتها وأوقاتها، ليظهر الإيقاع الذي يتكوّن يومًا بعد يوم."
           }
         },
         "de" : {
@@ -2558,8 +2994,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "완료한 단식은 시간, 플랜, 시각과 함께 저장됩니다. 쌓아가는 리듬을 돌아볼 수 있어요."
+            "state" : "translated",
+            "value" : "완료한 단식은 시간, 플랜, 시각과 함께 저장돼요. 쌓아가는 리듬을 돌아볼 수 있어요."
           }
         },
         "pl" : {
@@ -2571,7 +3007,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Кожне завершене голодування зберігається з тривалістю, планом і часом - щоб бачити ритм, який ти будуєш."
+            "value" : "Кожен завершений піст зберігається з тривалістю, планом і часом - щоб ви бачили ритм, який будуєте."
           }
         },
         "zh-Hans" : {
@@ -2612,7 +3048,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "延長"
+            "value" : "24時間超"
           }
         },
         "ko" : {
@@ -2689,7 +3125,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фастинг завершено"
+            "value" : "Піст завершено"
           }
         },
         "zh-Hans" : {
@@ -2710,8 +3146,8 @@
         },
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "FASTEN ABGESCHLOSSEN"
+            "state" : "needs_review",
+            "value" : "BEENDET"
           }
         },
         "es" : {
@@ -2747,7 +3183,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ФАСТИНГ ЗАВЕРШЕНО"
+            "value" : "ПІСТ ЗАВЕРШЕНО"
           }
         },
         "zh-Hans" : {
@@ -2792,8 +3228,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "단식 완료. 식사 시간이 열렸습니다. 부드럽게 다시 시작하세요."
+            "state" : "needs_review",
+            "value" : "단식 완료. 식사 시간이 시작됐어요. 부드럽게 다시 시작하세요."
           }
         },
         "pl" : {
@@ -2805,7 +3241,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фастинг завершено. Вікно харчування відкрите. Відновлюйтеся поступово."
+            "value" : "Піст завершено. Вікно харчування відкрите. Відновлюйтеся поступово."
           }
         },
         "zh-Hans" : {
@@ -2845,14 +3281,14 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "断食完了。食事の時間帯の準備ができました。ゆっくり食事を再開しましょう。"
+            "state" : "needs_review",
+            "value" : "断食完了。食事の時間帯の準備ができました。ゆっくり再開しましょう。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "단식 완료. 식사 시간을 시작할 수 있습니다. 부드럽게 다시 시작하세요."
+            "value" : "단식 완료. 식사 시간을 시작할 수 있어요. 부드럽게 다시 시작하세요."
           }
         },
         "pl" : {
@@ -2864,7 +3300,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фастинг завершено. Вікно харчування готове. Відновлюйтеся поступово."
+            "value" : "Піст завершено. Вікно харчування готове. Відновлюйтеся поступово."
           }
         },
         "zh-Hans" : {
@@ -2910,8 +3346,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@부터 단식 카운트 · %2$@"
+            "state" : "needs_review",
+            "value" : "%1$@부터 단식 시간 계산 · %2$@"
           }
         },
         "pl" : {
@@ -2923,7 +3359,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фастинг від %1$@ · %2$@"
+            "value" : "Піст від %1$@ · %2$@"
           }
         },
         "zh-Hans" : {
@@ -3041,7 +3477,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Історія голодувань"
+            "value" : "Історія постів"
           }
         },
         "zh-Hans" : {
@@ -3058,24 +3494,6 @@
         "ar" : {
           "variations" : {
             "plural" : {
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "سجل الصيام، السلسلة الحالية %lld يوم"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "سجل الصيام، السلسلة الحالية يوم واحد"
-                }
-              },
-              "two" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "سجل الصيام، السلسلة الحالية يومان"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -3088,10 +3506,28 @@
                   "value" : "سجل الصيام، السلسلة الحالية %lld يومًا"
                 }
               },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "سجل الصيام، السلسلة الحالية يوم واحد"
+                }
+              },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "سجل الصيام، السلسلة الحالية %lld يوم"
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "سجل الصيام، السلسلة الحالية يومان"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "سجل الصيام، السلسلة الحالية %lld أيام"
                 }
               }
             }
@@ -3136,16 +3572,16 @@
         "es" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "Historial de ayunos, racha actual %lld día"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "Historial de ayunos, racha actual %lld días"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Historial de ayunos, racha actual %lld día"
                 }
               },
               "other" : {
@@ -3160,16 +3596,16 @@
         "fr" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "Historique des jeûnes, série en cours %lld jour"
-                }
-              },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "Historique des jeûnes, série en cours %lld jours"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Historique des jeûnes, série en cours %lld jour"
                 }
               },
               "other" : {
@@ -3187,7 +3623,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "断食履歴、現在の連続 %lld 日"
+                  "value" : "断食履歴、現在%lld日連続"
                 }
               }
             }
@@ -3208,12 +3644,6 @@
         "pl" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "Historia postów, aktualna seria %lld dzień"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
@@ -3224,6 +3654,12 @@
                 "stringUnit" : {
                   "state" : "needs_review",
                   "value" : "Historia postów, aktualna seria %lld dni"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Historia postów, aktualna seria %lld dzień"
                 }
               },
               "other" : {
@@ -3238,28 +3674,28 @@
         "uk" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Історія голодувань, поточна серія %lld день"
-                }
-              },
               "few" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Історія голодувань, поточна серія %lld дні"
+                  "value" : "Історія постів, поточна серія %lld дні"
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Історія голодувань, поточна серія %lld днів"
+                  "value" : "Історія постів, поточна серія %lld днів"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Історія постів, поточна серія %lld день"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Історія голодувань, поточна серія %lld дня"
+                  "value" : "Історія постів, поточна серія %lld дня"
                 }
               }
             }
@@ -3325,8 +3761,8 @@
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "План фастингу"
+            "state" : "needs_review",
+            "value" : "План посту"
           }
         },
         "zh-Hans" : {
@@ -3371,8 +3807,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "단식 시작"
+            "state" : "needs_review",
+            "value" : "단식 시작 시각"
           }
         },
         "pl" : {
@@ -3384,7 +3820,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фастинг з"
+            "value" : "Піст з"
           }
         },
         "zh-Hans" : {
@@ -3424,7 +3860,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "断食経過時間"
+            "value" : "断食の経過時間"
           }
         },
         "ko" : {
@@ -3441,14 +3877,14 @@
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Стільки ви вже поститесь"
+            "state" : "needs_review",
+            "value" : "Піст триває"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "已禁食时长"
+            "state" : "translated",
+            "value" : "已断食时长"
           }
         }
       }
@@ -3517,7 +3953,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "الصيامات"
+            "value" : "فترات الصيام"
           }
         },
         "de" : {
@@ -3540,7 +3976,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "断食回数"
           }
         },
@@ -3558,8 +3994,8 @@
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Голодування"
+            "state" : "needs_review",
+            "value" : "Постів"
           }
         },
         "zh-Hans" : {
@@ -3576,7 +4012,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "دهون"
+            "value" : "الدهون"
           }
         },
         "de" : {
@@ -3694,7 +4130,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "تم حفظ الأول. أكمل صيام الغد وتبدأ سلسلتك."
+            "value" : "تم حفظ أول صيام لك. بإتمام صيام الغد تبدأ سلسلتك."
           }
         },
         "de" : {
@@ -3723,8 +4159,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "첫 기록을 저장했어요. 내일 단식을 마치면 연속 기록이 시작됩니다."
+            "state" : "translated",
+            "value" : "첫 기록을 저장했어요. 내일 단식을 마치면 연속 기록이 시작돼요."
           }
         },
         "pl" : {
@@ -3736,7 +4172,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перше збережено. Заверши завтрашнє голодування - і почнеться серія."
+            "value" : "Перше збережено. Завершіть завтрашній піст - і почнеться серія."
           }
         },
         "zh-Hans" : {
@@ -3782,7 +4218,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "혈당이 낮아지고 있습니다. 몸이 글리코겐 저장분을 연료로 사용하기 시작합니다."
+            "value" : "혈당이 낮아지고 있어요. 몸이 글리코겐 저장분을 연료로 사용하기 시작해요."
           }
         },
         "pl" : {
@@ -3898,7 +4334,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "글리코겐이 부족해지고 있습니다. 지방이 주요 에너지원이 되고 있습니다."
+            "value" : "글리코겐이 부족해지고 있어요. 지방이 주요 에너지원이 되고 있어요."
           }
         },
         "pl" : {
@@ -3949,7 +4385,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "目標"
           }
         },
@@ -3979,12 +4415,71 @@
         }
       }
     },
+    "Goal · %@" : {
+      "comment" : "Active footer stat overline, e.g. 'Goal · 16h'",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الهدف · %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziel · %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objetivo · %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objectif · %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目標 · %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "목표 · %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cel · %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ціль · %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目标 · %@"
+          }
+        }
+      }
+    },
     "Goal %@ · +%@" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "الهدف %@ · +%@"
+            "value" : "الهدف %1$@ · زيادة %2$@"
           }
         },
         "de" : {
@@ -4054,7 +4549,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "OBJETIVO ALCANZADO"
+            "value" : "ALCANZADO"
           }
         },
         "fr" : {
@@ -4095,65 +4590,6 @@
         }
       }
     },
-    "Goal · %@" : {
-      "comment" : "Active footer stat overline, e.g. 'Goal · 16h'",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الهدف · %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ziel · %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Objetivo · %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Objectif · %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目標 · %@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "목표 · %@"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cel · %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ціль · %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目标 · %@"
-          }
-        }
-      }
-    },
     "History" : {
       "comment" : "History screen title and entry point",
       "localizations" : {
@@ -4183,7 +4619,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "履歴"
           }
         },
@@ -4215,7 +4651,6 @@
     },
     "history.streak.unit" : {
       "comment" : "Streak unit under the big number; the number itself is not printed",
-      "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -4228,24 +4663,6 @@
               "formatSpecifier" : "lld",
               "variations" : {
                 "plural" : {
-                  "zero" : {
-                    "stringUnit" : {
-                      "state" : "needs_review",
-                      "value" : "أيام متتالية"
-                    }
-                  },
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "needs_review",
-                      "value" : "يوم متتالٍ"
-                    }
-                  },
-                  "two" : {
-                    "stringUnit" : {
-                      "state" : "needs_review",
-                      "value" : "يومان متتاليان"
-                    }
-                  },
                   "few" : {
                     "stringUnit" : {
                       "state" : "needs_review",
@@ -4258,10 +4675,28 @@
                       "value" : "يومًا متتاليًا"
                     }
                   },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "يوم متتالٍ"
+                    }
+                  },
                   "other" : {
                     "stringUnit" : {
                       "state" : "needs_review",
                       "value" : "يوم متتالٍ"
+                    }
+                  },
+                  "two" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "أيام متتالية"
+                    }
+                  },
+                  "zero" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "أيام متتالية"
                     }
                   }
                 }
@@ -4336,16 +4771,16 @@
               "formatSpecifier" : "lld",
               "variations" : {
                 "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "needs_review",
-                      "value" : "día seguido"
-                    }
-                  },
                   "many" : {
                     "stringUnit" : {
                       "state" : "needs_review",
                       "value" : "días seguidos"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "día seguido"
                     }
                   },
                   "other" : {
@@ -4370,16 +4805,16 @@
               "formatSpecifier" : "lld",
               "variations" : {
                 "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "needs_review",
-                      "value" : "jour d'affilée"
-                    }
-                  },
                   "many" : {
                     "stringUnit" : {
                       "state" : "needs_review",
                       "value" : "jours d'affilée"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "jour d'affilée"
                     }
                   },
                   "other" : {
@@ -4406,7 +4841,7 @@
                 "plural" : {
                   "other" : {
                     "stringUnit" : {
-                      "state" : "needs_review",
+                      "state" : "translated",
                       "value" : "日連続"
                     }
                   }
@@ -4448,12 +4883,6 @@
               "formatSpecifier" : "lld",
               "variations" : {
                 "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "needs_review",
-                      "value" : "dzień z rzędu"
-                    }
-                  },
                   "few" : {
                     "stringUnit" : {
                       "state" : "needs_review",
@@ -4464,6 +4893,12 @@
                     "stringUnit" : {
                       "state" : "needs_review",
                       "value" : "dni z rzędu"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "dzień z rzędu"
                     }
                   },
                   "other" : {
@@ -4488,12 +4923,6 @@
               "formatSpecifier" : "lld",
               "variations" : {
                 "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "день поспіль"
-                    }
-                  },
                   "few" : {
                     "stringUnit" : {
                       "state" : "translated",
@@ -4504,6 +4933,12 @@
                     "stringUnit" : {
                       "state" : "translated",
                       "value" : "днів поспіль"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "день поспіль"
                     }
                   },
                   "other" : {
@@ -4663,7 +5098,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الآن"
+            "value" : "قبل قليل"
           }
         },
         "de" : {
@@ -4721,7 +5156,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "متابعة الصيام"
+            "value" : "مواصلة الصيام"
           }
         },
         "de" : {
@@ -4744,7 +5179,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "断食を続ける"
           }
         },
@@ -4768,8 +5203,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "继续禁食"
+            "state" : "translated",
+            "value" : "继续断食"
           }
         }
       }
@@ -4780,7 +5215,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "واصل"
+            "value" : "مواصلة"
           }
         },
         "de" : {
@@ -4803,7 +5238,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "続ける"
           }
         },
@@ -4861,14 +5296,14 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "ケトン体が増えています。今、しっかり脂肪を燃焼しています。"
+            "state" : "needs_review",
+            "value" : "ケトン体が増えています。脂肪燃焼が本格的に進んでいます。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "케톤 수치가 오르고 있습니다. 지금 본격적으로 지방을 태우고 있습니다."
+            "value" : "케톤 수치가 오르고 있어요. 지금 본격적으로 지방을 태우고 있어요."
           }
         },
         "pl" : {
@@ -4979,8 +5414,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "過去7日"
+            "state" : "translated",
+            "value" : "過去7日間"
           }
         },
         "ko" : {
@@ -5057,7 +5492,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Останнє голодування · %@"
+            "value" : "Останній піст · %@"
           }
         },
         "zh-Hans" : {
@@ -5155,14 +5590,14 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "最長"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "최장"
+            "value" : "최장 시간"
           }
         },
         "pl" : {
@@ -5273,7 +5708,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "/ %@"
           }
         },
@@ -5307,8 +5742,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "أو حدد بدقة"
+            "state" : "needs_review",
+            "value" : "أو تحديد الوقت بدقة"
           }
         },
         "de" : {
@@ -5337,8 +5772,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "또는 정확히 설정"
+            "state" : "needs_review",
+            "value" : "또는 직접 설정"
           }
         },
         "pl" : {
@@ -5366,7 +5801,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "زيادة"
+            "value" : "الزيادة"
           }
         },
         "de" : {
@@ -5389,7 +5824,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "超過"
           }
         },
@@ -5437,13 +5872,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Alcanzó %@"
+            "value" : "Fase alcanzada: %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%@ atteinte"
+            "value" : "Phase atteinte : %@"
           }
         },
         "ja" : {
@@ -5455,7 +5890,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%@ 도달"
+            "value" : "%@ 단계 도달"
           }
         },
         "pl" : {
@@ -5488,8 +5923,8 @@
         },
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset"
+            "state" : "needs_review",
+            "value" : "Zurücksetzen"
           }
         },
         "es" : {
@@ -5541,7 +5976,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "إعادة ضبط الصيام"
+            "value" : "إعادة ضبط المؤقّت"
           }
         },
         "de" : {
@@ -5564,7 +5999,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "断食をリセット"
           }
         },
@@ -5588,8 +6023,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "重置禁食"
+            "state" : "translated",
+            "value" : "重置断食"
           }
         }
       }
@@ -5599,7 +6034,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "إعادة ضبط هذا الصيام؟"
+            "value" : "إعادة ضبط المؤقّت؟"
           }
         },
         "de" : {
@@ -5622,7 +6057,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "この断食をリセットしますか？"
           }
         },
@@ -5646,8 +6081,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "重置这次禁食？"
+            "state" : "translated",
+            "value" : "重置这次断食？"
           }
         }
       }
@@ -5682,7 +6117,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "履歴に保存しました"
+            "value" : "履歴に保存済み"
           }
         },
         "ko" : {
@@ -5745,8 +6180,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "과학적 출처"
+            "state" : "needs_review",
+            "value" : "과학적 근거"
           }
         },
         "pl" : {
@@ -5797,7 +6232,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "スキップ"
           }
         },
@@ -5916,7 +6351,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "断食を始める"
+            "value" : "断食を開始"
           }
         },
         "ko" : {
@@ -5934,7 +6369,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Почати голодування"
+            "value" : "Почати піст"
           }
         },
         "zh-Hans" : {
@@ -5973,14 +6408,14 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "食事を始める"
+            "state" : "needs_review",
+            "value" : "食事を開始"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "식사 시작"
+            "state" : "needs_review",
+            "value" : "식사 시간 시작"
           }
         },
         "pl" : {
@@ -6031,7 +6466,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "断食を開始"
           }
         },
@@ -6055,8 +6490,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "开始禁食"
+            "state" : "translated",
+            "value" : "开始断食"
           }
         }
       }
@@ -6096,7 +6531,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "준비되면 시작하세요. 또는 마지막 식사를 기록해 이미 진행 중인 단식을 이어갈 수 있습니다."
+            "value" : "준비되면 시작하세요. 또는 마지막 식사를 기록해 이미 진행 중인 단식을 이어갈 수 있어요."
           }
         },
         "pl" : {
@@ -6108,7 +6543,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Почніть, коли будете готові, або вкажіть останній прийом їжі, щоб продовжити вже розпочатий фастинг."
+            "value" : "Почніть, коли будете готові, або вкажіть останній прийом їжі, щоб продовжити вже розпочатий піст."
           }
         },
         "zh-Hans" : {
@@ -6124,8 +6559,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "بدأ"
+            "state" : "needs_review",
+            "value" : "البداية"
           }
         },
         "de" : {
@@ -6154,8 +6589,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "시작됨"
+            "state" : "needs_review",
+            "value" : "시작 시각"
           }
         },
         "pl" : {
@@ -6207,8 +6642,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "新しく開始"
+            "state" : "needs_review",
+            "value" : "今から開始"
           }
         },
         "ko" : {
@@ -6271,8 +6706,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "아직 소화 중입니다. 인슐린이 높아 몸이 마지막 식사의 에너지를 저장하고 있습니다."
+            "state" : "needs_review",
+            "value" : "아직 소화 중이에요. 인슐린이 높아 몸이 마지막 식사의 에너지를 저장하고 있어요."
           }
         },
         "pl" : {
@@ -6416,8 +6851,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "العلم وراء كل مرحلة من مراحل الصيام."
+            "state" : "needs_review",
+            "value" : "الأساس العلمي لكل مرحلة من مراحل الصيام."
           }
         },
         "de" : {
@@ -6446,8 +6881,8 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "각 단식 단계를 뒷받침하는 연구."
+            "state" : "needs_review",
+            "value" : "각 간헐적 단식 단계를 뒷받침하는 연구."
           }
         },
         "pl" : {
@@ -6475,7 +6910,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "سيؤدي هذا إلى إلغاء الصيام الحالي والعودة إلى البداية."
+            "value" : "سيؤدي هذا إلى تجاهل الصيام الحالي والعودة إلى البداية."
           }
         },
         "de" : {
@@ -6522,8 +6957,8 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "这将放弃当前禁食并返回起点。"
+            "state" : "translated",
+            "value" : "这将放弃当前断食并返回起点。"
           }
         }
       }
@@ -6592,7 +7027,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "حان وقت الصيام. ابدأ متى كنت مستعدًا."
+            "value" : "يمكن بدء الصيام في أي وقت."
           }
         },
         "de" : {
@@ -6609,8 +7044,8 @@
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "C'est l'heure de jeûner. Commence quand tu veux."
+            "state" : "translated",
+            "value" : "C'est l'heure de jeûner. Commencez quand vous voulez."
           }
         },
         "ja" : {
@@ -6628,19 +7063,19 @@
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Czas na post. Zacznij, kiedy będziesz gotowy."
+            "value" : "Czas na post. Zacznij, kiedy zechcesz."
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Час поститись. Почни, коли будеш готовий."
+            "state" : "needs_review",
+            "value" : "Час посту. Почніть, коли будете готові."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "该禁食了。准备好随时开始。"
+            "state" : "translated",
+            "value" : "该断食了。准备好随时开始。"
           }
         }
       }
@@ -6732,14 +7167,14 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "合計"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "총합"
+            "value" : "누적 시간"
           }
         },
         "pl" : {
@@ -6790,8 +7225,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "研究を見る"
+            "state" : "needs_review",
+            "value" : "論文を見る"
           }
         },
         "ko" : {
@@ -6824,8 +7259,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "سنعيد تأريخ صيامك إلى الوراء ليبقى المؤقّت دقيقًا."
+            "state" : "needs_review",
+            "value" : "سنحتسب صيامك من ذلك الوقت ليبقى المؤقّت دقيقًا."
           }
         },
         "de" : {
@@ -6854,20 +7289,20 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "타이머가 정확하도록 단식 시작 시각을 소급해 설정합니다."
+            "state" : "needs_review",
+            "value" : "타이머가 정확하도록 단식 시작 시각을 지난 시각으로 맞춰요."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cofniemy datę Twojego postu, aby licznik pozostał dokładny."
+            "value" : "Cofniemy datę twojego postu, aby licznik pozostał dokładny."
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ми відрахуємо фастинг назад, щоб таймер залишався точним."
+            "state" : "needs_review",
+            "value" : "Ми почнемо піст із того часу, щоб таймер залишався точним."
           }
         },
         "zh-Hans" : {
@@ -6918,8 +7353,8 @@
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kiedy ostatnio jadłeś?"
+            "state" : "needs_review",
+            "value" : "Kiedy był ostatni posiłek?"
           }
         },
         "uk" : {
@@ -6941,13 +7376,13 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "انتهت نافذة الأكل"
+            "value" : "انتهت النافذة"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "FENSTER GESCHLOSSEN"
+            "value" : "GESCHLOSSEN"
           }
         },
         "es" : {
@@ -6965,7 +7400,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "ウィンドウ終了"
+            "value" : "食事の時間帯終了"
           }
         },
         "ko" : {
@@ -6999,8 +7434,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "تفتح النافذة"
+            "state" : "needs_review",
+            "value" : "فتح النافذة"
           }
         },
         "de" : {
@@ -7023,14 +7458,14 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "時間帯の開始"
+            "state" : "needs_review",
+            "value" : "食事開始"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "식사 시간 시작"
+            "state" : "needs_review",
+            "value" : "식사 시작"
           }
         },
         "pl" : {
@@ -7041,8 +7476,8 @@
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вікно"
+            "state" : "needs_review",
+            "value" : "Вікно з"
           }
         },
         "zh-Hans" : {
@@ -7205,20 +7640,20 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "목표를 달성했습니다. 식사 시간이 열렸습니다."
+            "state" : "needs_review",
+            "value" : "목표를 달성했어요. 식사 시간이 시작됐어요."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Osiągnąłeś swój cel. Twoje okno żywieniowe jest otwarte."
+            "state" : "needs_review",
+            "value" : "Cel osiągnięty. Twoje okno żywieniowe jest otwarte."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ви досягли мети. Вікно харчування відкрите."
+            "value" : "Ви досягли цілі. Вікно харчування відкрите."
           }
         },
         "zh-Hans" : {
@@ -7235,7 +7670,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "لقد حققت هدف الصيام كل يوم. حافظ على الإيقاع."
+            "value" : "لقد بلغت هدفك في الصيام كل يوم. حافظ على الإيقاع."
           }
         },
         "de" : {
@@ -7259,7 +7694,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "毎日断食の目標を達成しています。この調子で続けましょう。"
+            "value" : "断食の目標を毎日達成しています。このリズムを続けていきましょう。"
           }
         },
         "ko" : {
@@ -7277,7 +7712,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ви досягали цілі фастингу щодня. Тримайте ритм."
+            "value" : "Ви щодня досягали цілі посту. Тримайте ритм."
           }
         },
         "zh-Hans" : {
@@ -7291,9 +7726,45 @@
     "You've reached your %d-hour goal. Every minute now is deeper autophagy." : {
       "localizations" : {
         "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "لقد بلغت هدفك البالغ %d ساعة. كل دقيقة الآن هي التهام ذاتي أعمق."
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ %d ساعات. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ %d ساعةً. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ ساعة واحدة. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ %d ساعة. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ ساعتين. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ %d ساعة. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                }
+              }
+            }
           }
         },
         "de" : {
@@ -7310,8 +7781,8 @@
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Tu as atteint ton objectif de %d heures. Chaque minute est désormais une autophagie plus profonde."
+            "state" : "translated",
+            "value" : "Vous avez atteint votre objectif de %d heures. Chaque minute est désormais une autophagie plus profonde."
           }
         },
         "ja" : {
@@ -7329,7 +7800,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Osiągnąłeś swój %d-godzinny cel. Każda minuta to teraz głębsza autofagia."
+            "value" : "Cel %d godzin osiągnięty. Każda minuta to teraz głębsza autofagia."
           }
         },
         "uk" : {
@@ -7351,13 +7822,13 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "انتهت نافذة الأكل. كل دقيقة منذ ذلك الحين محسوبة بالفعل - واصل صيامك متى كنت مستعدًا."
+            "value" : "انتهت نافذة الأكل. كل دقيقة منذ ذلك الحين محسوبة بالفعل، فواصل صيامك متى كنت مستعدًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dein Essensfenster ist zu Ende. Jede Minute seitdem zählt bereits - setze dein Fasten fort, wann du bereit bist."
+            "value" : "Dein Essensfenster ist geschlossen. Jede Minute seitdem zählt bereits - setze dein Fasten fort, wann du bereit bist."
           }
         },
         "es" : {
@@ -7368,38 +7839,38 @@
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ta fenêtre de repas est terminée. Chaque minute depuis compte déjà - continue ton jeûne quand tu es prêt."
+            "state" : "translated",
+            "value" : "Votre fenêtre alimentaire est fermée. Chaque minute depuis compte déjà - reprenez votre jeûne quand vous êtes prêt."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "食事の時間が終わりました。それからの1分1分がすでにカウントされています。準備ができたら断食を続けましょう。"
+            "value" : "食事の時間帯が終了しました。それ以降の一分一分がすでにカウントされています。準備ができたら断食を続けましょう。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "식사 시간이 끝났습니다. 그 이후의 시간은 이미 계산되고 있어요. 준비되면 단식을 이어가세요."
+            "value" : "식사 시간이 끝났어요. 그 이후의 시간도 이미 단식에 포함돼요. 준비되면 단식을 이어가세요."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Twoje okno jedzenia się zakończyło. Każda minuta od tego momentu już się liczy - kontynuuj post, kiedy będziesz gotowy."
+            "value" : "Twoje okno żywieniowe się zamknęło. Każda minuta od tego momentu już się liczy - kontynuuj post, kiedy zechcesz."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вікно їжі закрилось. Кожна хвилина відтоді вже рахується - продовжуй піст, коли будеш готовий."
+            "value" : "Вікно харчування закрилося. Кожна хвилина відтоді вже рахується - продовжуйте піст, коли будете готові."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "进食窗口已结束。此后的每一分钟都已计入 - 准备好后继续禁食吧。"
+            "state" : "translated",
+            "value" : "进食窗口已结束。此后的每一分钟都已计入，准备好后继续断食吧。"
           }
         }
       }
@@ -7410,7 +7881,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "صياماتك تتجمع هنا"
+            "value" : "هنا تتجمع فترات صيامك"
           }
         },
         "de" : {
@@ -7440,7 +7911,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "여기에 단식이 쌓입니다"
+            "value" : "단식 기록이 여기에 쌓여요"
           }
         },
         "pl" : {
@@ -7451,8 +7922,8 @@
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тут збираються твої голодування"
+            "state" : "needs_review",
+            "value" : "Тут збираються ваші пости"
           }
         },
         "zh-Hans" : {
