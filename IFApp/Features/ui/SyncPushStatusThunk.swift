@@ -4,8 +4,9 @@
 //
 //  Records whether notifications are enabled as a user property. The review
 //  prompt hangs off the goal push, so the funnel is unreadable without knowing
-//  who could even receive it. Runs once per cold launch (from IFAppApp.init),
-//  so a settings change is only picked up on the next app start.
+//  who could even receive it. Runs once per cold launch (from IFAppApp.init):
+//  nothing is asked at launch any more, so this just reports the current state
+//  and picks up permission changes made in iOS Settings between sessions.
 //
 
 import Redux
@@ -26,7 +27,9 @@ struct SyncPushStatusThunk: Thunk {
         analytics.setUserProperty(Self.label(for: status), forName: "push_status")
     }
 
-    private static func label(for status: UNAuthorizationStatus) -> String {
+    /// The `push_status` value for a status. Shared with `StartFastThunk`, which
+    /// rewrites the property right after the user answers the dialog.
+    static func label(for status: UNAuthorizationStatus) -> String {
         switch status {
         case .authorized: return "authorized"
         case .denied: return "denied"

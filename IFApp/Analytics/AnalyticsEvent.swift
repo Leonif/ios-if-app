@@ -42,6 +42,14 @@ enum AnalyticsEvent {
     case reviewPrompted(trigger: String)
     /// A streak milestone card was shown. `days` = the threshold (3/7/14/30).
     case streakMilestone(days: Int)
+    /// User picked a fasting plan in the plan editor. `plan` = the ratio label
+    /// ("16:8"), `goalHours` = that plan's fasting window. Pairs with the
+    /// `current_plan` user property, which carries the same value persistently.
+    case planSelected(plan: String, goalHours: Int)
+    /// The plan editor was closed, carrying whatever plan the user settled on —
+    /// fired even when nothing was touched. `plan_selected` says what was tried
+    /// on, this says what was kept, so the plan mix counts off this one.
+    case planConfirmed(plan: String, goalHours: Int)
     /// The appearance the app is being used in. `dark` = system dark mode.
     /// Fires on screen appear and on live theme switches — count *users* per
     /// `theme` value to see which appearance the audience actually uses.
@@ -63,6 +71,8 @@ enum AnalyticsEvent {
         case .historyRecordDeleted: return "history_record_deleted"
         case .reviewPrompted: return "review_prompted"
         case .streakMilestone: return "streak_milestone"
+        case .planSelected: return "plan_selected"
+        case .planConfirmed: return "plan_confirmed"
         case .themeActive: return "theme_active"
         }
     }
@@ -93,6 +103,12 @@ enum AnalyticsEvent {
             return ["days": days]
         case let .historyOpened(source):
             return ["source": source]
+        case let .planSelected(plan, goalHours),
+             let .planConfirmed(plan, goalHours):
+            return [
+                "plan": plan,
+                "goal_hours": goalHours,
+            ]
         case .appOpened, .fastReset, .eatingWindowStarted, .fastChained, .timeAdjusted, .sourcesOpened,
              .historyRecordDeleted:
             return [:]

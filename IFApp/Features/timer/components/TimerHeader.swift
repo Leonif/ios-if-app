@@ -37,6 +37,7 @@ struct TimerHeader: View {
                 .background(Capsule().fill(theme.iconCircle))
             }
             .buttonStyle(.pressable)
+            .accessibilityIdentifier("timer.plan")
 
             Spacer(minLength: 8)
 

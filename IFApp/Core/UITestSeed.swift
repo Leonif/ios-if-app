@@ -57,6 +57,12 @@ enum UITestSeed {
         if let cel = intArg("-seedCelebrated") { defaults.set(cel == 1, forKey: "has_celebrated") }
         if let p = intArg("-seedPlan") { defaults.set(p, forKey: "plan_idx") }
         if let pc = intArg("-seedPromptCount") { defaults.set(pc, forKey: "review_prompt_count") }
+        // "-seedPendingGoal N": the 3rd-goal review fallback was armed N seconds ago,
+        // so the next open can reach the native request without driving three real
+        // goals first. N past ReviewMiddleware's 4h delay makes the request due.
+        if let sec = intArg("-seedPendingGoal") {
+            defaults.set(Date().addingTimeInterval(-Double(sec)), forKey: "review_pending_goal_at")
+        }
         // Streak: "-seedStreak N" sets the counter; the last-goal day defaults to
         // today so the badge renders, "-seedLastGoalDate D" moves it D days back
         // (D=1 → yesterday, so crossing a goal extends the streak to N+1).

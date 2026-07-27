@@ -9,7 +9,9 @@ import Foundation
 import UserNotifications
 
 protocol NotificationRepositoryProtocol {
-    func requestAuthorization()
+    /// Shows the system permission dialog and returns once the user has answered.
+    @discardableResult
+    func requestAuthorization() async -> Bool
     /// The current notification authorization status.
     func authorizationStatus() async -> UNAuthorizationStatus
     /// One-time cleanup of the legacy fixed daily reminders on existing installs.
@@ -23,8 +25,9 @@ protocol NotificationRepositoryProtocol {
 }
 
 struct NotificationRepository: NotificationRepositoryProtocol {
-    func requestAuthorization() {
-        NotificationManager.shared.requestAuthorization()
+    @discardableResult
+    func requestAuthorization() async -> Bool {
+        await NotificationManager.shared.requestAuthorization()
     }
 
     func authorizationStatus() async -> UNAuthorizationStatus {

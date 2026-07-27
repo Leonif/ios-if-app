@@ -42,6 +42,11 @@ enum AppLifecycleAction: Action {
     /// The goal-reached screen is on display and its moment has finished playing.
     /// Only ever sent from the `goalReached` state — the milestone card hangs off it.
     case goalScreenSettled
+    /// The user just answered the notification permission dialog. Reducers ignore
+    /// it; it exists so NotificationMiddleware re-runs its sync — the goal push
+    /// scheduled on `.started` was rejected while permission did not yet exist.
+    /// Not a funnel event.
+    case pushAuthorizationResolved
     case lastMealLogged(backdated: Bool, minutesAgo: Int)
     /// A fast was started from the window-closed screen — the chain held.
     case fastChained

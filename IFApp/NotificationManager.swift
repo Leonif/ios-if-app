@@ -13,13 +13,15 @@ final class NotificationManager {
     
     private init() {}
 
-    func requestAuthorization() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error {
-                print("Ошибка при запросе разрешения на уведомления: \(error.localizedDescription)")
-            }
-            print("Уведомления разрешены: \(granted)")
-        }
+    /// Shows the system permission dialog and waits for the user's answer. The
+    /// caller must await it: reading `authorizationStatus()` before it returns
+    /// records the state from before the dialog, not the user's decision.
+    /// A thrown error means "not granted" — the read-back of the real status is
+    /// what gets recorded, never this flag.
+    @discardableResult
+    func requestAuthorization() async -> Bool {
+        (try? await UNUserNotificationCenter.current()
+            .requestAuthorization(options: [.alert, .sound, .badge])) ?? false
     }
 
     /// The current notification authorization status (user may change it in Settings).

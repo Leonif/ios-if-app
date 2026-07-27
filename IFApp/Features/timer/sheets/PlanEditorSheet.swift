@@ -64,6 +64,7 @@ struct PlanEditorSheet: View {
             )
 
             PrimaryButton(title: strings.Sheet.done, theme: theme, action: onDone)
+                .accessibilityIdentifier("plan.done")
         }
         .padding(18)
         .background(

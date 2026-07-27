@@ -3,9 +3,9 @@
 //  IFApp
 //
 //  The single place a finished fast is written. Living here rather than in the
-//  thunks keeps one rule for every ending: End fast from active or overtime, and
-//  Reset while a fast is running (a discarded fast is still a fast that happened —
-//  the history screen's swipe-delete is the way to take one back).
+//  thunks keeps one rule for every ending: End fast from active or overtime writes
+//  a record; Reset discards the fast and writes nothing, which is what the reset
+//  confirm sheet promises the user.
 //
 //  Middleware sees state *after* the reducer, so the fast being ended is already
 //  gone from it; the snapshot below carries the timer state as it was one action
@@ -55,11 +55,10 @@ final class HistoryMiddleware: Middleware {
         case let .stopped(elapsed, _):
             // Trust the thunk's elapsed — it already resolved the clock once.
             end = before.fastStartTimestamp + elapsed
-        case .reset:
-            end = Date().timeIntervalSince1970
         default:
-            // .started / .eatingStarted / .goalCelebrated / .timeAdjusted / .eatingEnded
-            // never end a running fast.
+            // .reset discards the fast — the confirm sheet promises exactly that,
+            // so nothing is written. .started / .eatingStarted / .goalCelebrated /
+            // .timeAdjusted / .eatingEnded never end a running fast.
             return
         }
 

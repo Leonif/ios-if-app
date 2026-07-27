@@ -19,7 +19,9 @@ final class IFAppUITests: XCTestCase {
     /// idle -> Start -> active -> End fast -> idle, screenshotting each state.
     func testFastingClickThrough() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-uitestReset"]
+        // Start fast asks for notification permission on a fresh install; the
+        // system dialog would cover the screen and break the drive-through.
+        app.launchArguments += ["-uitestReset", "-suppressPushPrompt"]
         app.launch()
 
         let start = app.buttons["timer.start"]

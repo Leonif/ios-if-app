@@ -206,6 +206,7 @@ struct CompleteFooterCard: View {
                 SecondaryButton(title: strings.Footer.reset, theme: theme, minWidth: 110, action: onReset)
                     .accessibilityIdentifier("timer.reset")
                 PrimaryButton(title: strings.Footer.startEatingWindow, theme: theme, action: onStartEating)
+                    .accessibilityIdentifier("timer.startEatingWindow")
             }
         }
         .modifier(CardBackground(theme: theme))
