@@ -127,14 +127,7 @@ enum strings {
         static var done: String { String(localized: "Done") }
         static var whenDidYouEat: String { String(localized: "When did you last eat?") }
         static var backdateHint: String { String(localized: "We'll back-date your fast so the timer stays accurate.") }
-        static var chip30Min: String { String(localized: "30 min") }
-        static var chip1Hour: String { String(localized: "1 hour") }
-        static var chip2Hours: String { String(localized: "2 hours") }
-        static var date: String { String(localized: "Date") }
-        static var time: String { String(localized: "Time") }
         static var confirm: String { String(localized: "Confirm") }
-        static var orSetExact: String { String(localized: "OR SET EXACT") }
-        static var fastingSince: String { String(localized: "Fasting since") }
     }
 
     enum Window {
@@ -154,9 +147,6 @@ enum strings {
         /// "2 days ago" (locale-aware plural)
         static func daysAgo(_ n: Int) -> String { String(localized: "\(n) days ago", locale: .latinDigits) }
 
-        /// "Yesterday 7:00 PM"
-        static func yesterdayAt(_ time: String) -> String { String(localized: "Yesterday \(time)") }
-
         /// "2h 43m in"
         static func noteIn(_ h: Int, _ m: Int) -> String {
             String(format: String(localized: "%dh %02dm in"), h, m)
@@ -165,6 +155,58 @@ enum strings {
         /// "Fast counts from 7:00 PM · 2h 40m in"
         static func fastCountsFrom(_ from: String, _ note: String) -> String {
             String(localized: "Fast counts from \(from) · \(note)")
+        }
+
+        // MARK: Last-meal picker
+
+        static var chip1h: String { String(localized: "1h", comment: "Meal picker chip: one hour ago") }
+        static var chip3h: String { String(localized: "3h", comment: "Meal picker chip: three hours ago") }
+        static var chipLastNight: String { String(localized: "Last night") }
+        static var setExactTime: String { String(localized: "Set exact time") }
+        static var scaleLimitNote: String { String(localized: "That's as far back as we go.") }
+        static var windowClosedOverline: String { String(localized: "Eating window closed") }
+        static var scaleA11yLabel: String { String(localized: "Time since last meal") }
+
+        // The readout is a whole template per shape, never a duration glued to an
+        // "ago": that word leads in de/es/fr/ar and trails in uk/pl/ja/ko.
+
+        /// "40m ago"
+        static func agoMinutes(_ m: Int) -> String {
+            String(format: String(localized: "%dm ago"), m)
+        }
+        /// "3h ago"
+        static func agoHours(_ h: Int) -> String {
+            String(format: String(localized: "%dh ago"), h)
+        }
+        /// "2h 40m ago"
+        static func agoRelative(_ h: Int, _ m: Int) -> String {
+            String(format: String(localized: "%dh %dm ago"), h, m)
+        }
+        /// "1d 3h ago"
+        static func agoDays(_ d: Int, _ h: Int) -> String {
+            String(format: String(localized: "%dd %dh ago"), d, h)
+        }
+        /// "7d ago"
+        static func agoDaysOnly(_ d: Int) -> String {
+            String(format: String(localized: "%dd ago"), d)
+        }
+
+        /// "Today at 7:50 AM"
+        static func todayAt(_ time: String) -> String { String(localized: "Today at \(time)") }
+        /// "Yesterday at 8:00 PM"
+        static func yesterdayAt(_ time: String) -> String { String(localized: "Yesterday at \(time)") }
+        /// "Sat 18 Jul at 10:30 AM"
+        static func dateAt(_ date: String, _ time: String) -> String {
+            String(localized: "\(date) at \(time)")
+        }
+
+        /// Ribbon tick label, hours — "3h". Deliberately as short as the tick is wide.
+        static func scaleTickHours(_ h: Int) -> String {
+            String(format: String(localized: "%dh"), h)
+        }
+        /// Ribbon tick label, days — "3d".
+        static func scaleTickDays(_ d: Int) -> String {
+            String(format: String(localized: "%dd"), d)
         }
     }
 

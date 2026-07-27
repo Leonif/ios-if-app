@@ -1,8 +1,23 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     " " : {
 
+    },
+    "%@ at %@" : {
+      "comment" : "Clock caption past yesterday, e.g. 'Sat 18 Jul at 10:30 AM'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@ at %@"
+          }
+        }
+      }
     },
     "%@ begins in %@" : {
       "comment" : "Next phase chip, e.g. 'Autophagy begins in 2h 36m'",
@@ -59,6 +74,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@将在%2$@后开始"
+          }
+        }
+      }
+    },
+    "%dd" : {
+      "comment" : "Meal ribbon tick label, days. Must fit the width of one tick - 6 chars max.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%dd"
+          }
+        }
+      }
+    },
+    "%dd %dh ago" : {
+      "comment" : "Meal readout past a day, e.g. '1d 3h ago'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%dd %dh ago"
+          }
+        }
+      }
+    },
+    "%dd ago" : {
+      "comment" : "Meal readout, whole days, e.g. '7d ago'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%dd ago"
           }
         }
       }
@@ -299,6 +350,30 @@
         }
       }
     },
+    "%dh %dm ago" : {
+      "comment" : "Meal readout, hours and minutes, e.g. '2h 40m ago'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%dh %dm ago"
+          }
+        }
+      }
+    },
+    "%dh ago" : {
+      "comment" : "Meal readout, whole hours, e.g. '3h ago'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%dh ago"
+          }
+        }
+      }
+    },
     "%dm" : {
       "comment" : "Duration minutes only, e.g. '36m'",
       "localizations" : {
@@ -354,6 +429,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%d分"
+          }
+        }
+      }
+    },
+    "%dm ago" : {
+      "comment" : "Meal readout under an hour, e.g. '40m ago'. One whole template - 'ago' leads in de/es/fr/ar and trails in uk/pl/ja/ko.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%dm ago"
           }
         }
       }
@@ -1103,6 +1190,7 @@
       }
     },
     "1 hour" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1160,7 +1248,20 @@
         }
       }
     },
+    "1h" : {
+      "comment" : "Meal picker chip: one hour ago. Keep it as short as the English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "1h"
+          }
+        }
+      }
+    },
     "2 hours" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -1273,6 +1374,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "14:00 - 20:00"
+          }
+        }
+      }
+    },
+    "3h" : {
+      "comment" : "Meal picker chip: three hours ago. Keep it as short as the English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "3h"
           }
         }
       }
@@ -1455,6 +1568,7 @@
       }
     },
     "30 min" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2027,6 +2141,7 @@
       }
     },
     "Date" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -3774,6 +3889,7 @@
       }
     },
     "Fasting since" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5561,6 +5677,18 @@
         }
       }
     },
+    "Last night" : {
+      "comment" : "Meal picker chip: yesterday evening. The longest chip - pl/de need ~17 chars.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Last night"
+          }
+        }
+      }
+    },
     "Longest" : {
       "comment" : "Summary stat: longest single fast",
       "localizations" : {
@@ -5739,6 +5867,7 @@
       }
     },
     "OR SET EXACT" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -6200,6 +6329,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "科学来源"
+          }
+        }
+      }
+    },
+    "Set exact time" : {
+      "comment" : "Text link under the meal ribbon; opens the system date picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Set exact time"
           }
         }
       }
@@ -6847,6 +6988,18 @@
         }
       }
     },
+    "That's as far back as we go." : {
+      "comment" : "Under the meal ribbon, only when it hits the 7-day limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "That's as far back as we go."
+          }
+        }
+      }
+    },
     "The research behind each fasting phase." : {
       "localizations" : {
         "ar" : {
@@ -6964,6 +7117,7 @@
       }
     },
     "Time" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7017,6 +7171,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "时间"
+          }
+        }
+      }
+    },
+    "Time since last meal" : {
+      "comment" : "VoiceOver label for the meal ribbon.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Time since last meal"
           }
         }
       }
@@ -7134,6 +7300,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今天"
+          }
+        }
+      }
+    },
+    "Today at %@" : {
+      "comment" : "Clock caption under the meal readout, e.g. 'Today at 7:50 AM'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Today at %@"
           }
         }
       }
@@ -7548,6 +7726,7 @@
     },
     "Yesterday %@" : {
       "comment" : "Fasting-since label, e.g. 'Yesterday 7:00 PM'",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7601,6 +7780,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "昨天 %@"
+          }
+        }
+      }
+    },
+    "Yesterday at %@" : {
+      "comment" : "Clock caption under the meal readout, e.g. 'Yesterday at 8:00 PM'. Replaces the older 'Yesterday %@'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Yesterday at %@"
           }
         }
       }

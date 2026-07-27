@@ -21,7 +21,11 @@ struct ConfirmLastMealThunk: Thunk {
         )
         let fastStart = Clock.now().timeIntervalSince1970 - Double(minutesAgo) * 60
 
-        dispatch(AppLifecycleAction.lastMealLogged(backdated: !meal.isFresh, minutesAgo: minutesAgo))
+        // `backdated` is read off the distance, not off `isFresh`. The flag used to
+        // say "the picker has a value", which after the sheet seeded itself on open
+        // was always true — so the analytics could not tell a real back-date from
+        // someone opening the sheet and confirming straight away.
+        dispatch(AppLifecycleAction.lastMealLogged(backdated: minutesAgo > 0, minutesAgo: minutesAgo))
         // Confirming from the window-closed screen chains the next fast.
         let timer = app.timerState
         let eatingEnd = timer.eatingEndTimestamp(fastHours: app.planState.plan.fastHours)

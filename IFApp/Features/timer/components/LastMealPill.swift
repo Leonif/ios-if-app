@@ -40,6 +40,7 @@ struct LastMealPill: View {
                 )
             }
             .buttonStyle(.pressable)
+            .accessibilityIdentifier("meal.pill")
 
             if let subline {
                 Text(subline)

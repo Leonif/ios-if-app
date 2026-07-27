@@ -24,6 +24,7 @@ struct TimerScreenProps: Equatable {
     let planIdx: Int
     let ateDay: Int
     let ateMin: Int
+    let chipIdx: Int
     let streak: StreakStatus
     /// The header pill only exists once there is a record to open.
     let hasRecords: Bool
@@ -49,6 +50,7 @@ struct TimerScreenProps: Equatable {
         planIdx = state.planState.planIdx
         ateDay = state.mealState.ateDay
         ateMin = state.mealState.ateMin
+        chipIdx = state.mealState.chipIdx
         planEditorOpen = state.uiState.planEditorOpen
         mealPickerOpen = state.uiState.mealPickerOpen
         streakMilestoneOpen = state.uiState.streakMilestoneOpen
@@ -228,7 +230,7 @@ struct TimerFlowView: View {
                                 valueText: mealValue(nowMinute: nowMinute),
                                 subline: mealSubline(nowMinute: nowMinute),
                                 theme: theme,
-                                onTap: { store.dispatch(OpenMealPickerThunk()) }
+                                onTap: { store.dispatch(UIAction.mealPickerOpened) }
                             )
                         }
                     } else {
@@ -261,7 +263,7 @@ struct TimerFlowView: View {
                                     valueText: mealValue(nowMinute: nowMinute),
                                     subline: mealSubline(nowMinute: nowMinute),
                                     theme: theme,
-                                    onTap: { store.dispatch(OpenMealPickerThunk()) }
+                                    onTap: { store.dispatch(UIAction.mealPickerOpened) }
                                 )
                             }
 
@@ -433,14 +435,27 @@ struct TimerFlowView: View {
         }
         if props.mealPickerOpen {
             let nowMinute = Clock.minuteOfDay()
+            let mins = MealMath.minutesAgo(ateDay: props.ateDay, ateMin: props.ateMin,
+                                           nowMinuteOfDay: nowMinute)
+            let moment = MealMath.moment(minutesAgo: mins, nowMinuteOfDay: nowMinute)
             LastMealPickerSheet(
-                dateLabel: MealMath.dateLabel(ateDay: props.ateDay),
-                timeLabel: MealMath.timeLabel(ateMin: props.ateMin),
-                previewText: mealPreview(nowMinute: nowMinute),
+                minutesAgo: mins,
+                nowMinuteOfDay: nowMinute,
+                readout: MealMath.agoLabel(minutesAgo: mins),
+                absoluteLabel: MealMath.absoluteLabel(ateDay: moment.ateDay, ateMin: moment.ateMin),
+                overline: currentScreenState() == .eatingOver ? strings.Meal.windowClosedOverline : nil,
+                selectedChip: props.chipIdx,
                 theme: theme,
-                onQuickChip: { store.dispatch(QuickMealChipThunk(minutesAgo: $0)) },
-                onDayStep: { store.dispatch(MealAction.dayStepped(by: $0)) },
-                onTimeStep: { store.dispatch(MealAction.timeStepped(by: $0)) },
+                onChip: { store.dispatch(PickMealChipThunk($0)) },
+                // Dragging emits a value every snap step — up to ~20 a second. Each of
+                // those has to land in the order the finger produced it, and a thunk
+                // dispatch hops onto an unstructured Task, where ordering is not
+                // promised. So the clock is injected here, at the store's own layer,
+                // and the reducer still receives time as a plain value.
+                onScrub: { store.dispatch(MealAction.scrubbed(minutesAgo: $0,
+                                                              nowMinuteOfDay: Clock.minuteOfDay())) },
+                onFeedback: { store.dispatch(MealFeedbackThunk($0)) },
+                onExactTime: { store.dispatch(SetExactMealTimeThunk($0)) },
                 onConfirm: { store.dispatch(ConfirmLastMealThunk()) },
                 onClose: { store.dispatch(UIAction.mealPickerClosed) }
             )
@@ -575,12 +590,6 @@ struct TimerFlowView: View {
         let from = MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
         let note = MealMath.note(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
         return strings.Meal.fastCountsFrom(from, note)
-    }
-
-    private func mealPreview(nowMinute: Int) -> String {
-        let from = MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
-        let note = MealMath.note(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
-        return "\(from) · \(note)"
     }
 
     /// "8:00 PM" from an epoch timestamp.
