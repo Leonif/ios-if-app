@@ -18,8 +18,11 @@ enum AnalyticsEvent {
     case fastStopped(durationSeconds: Int, completed: Bool, stage: String)
     /// The fast reached its goal (the goal-reached moment fired). `goalHours` = plan window.
     case goalReached(goalHours: Double)
-    /// User reset the timer (a drop-off signal — gave up before finishing).
-    case fastReset
+    /// User reset the timer. `elapsedMinutes` = whole minutes from the start of the
+    /// fast to the reset. That number is the whole point of the event: minutes mean
+    /// the user was fixing a wrong start time, hours mean they abandoned the fast.
+    /// Read as a distribution over buckets, never as an average.
+    case fastReset(elapsedMinutes: Int)
     /// User opened the eating window from the complete screen.
     case eatingWindowStarted
     /// User started the next fast from the window-closed screen (the chain held).
@@ -90,6 +93,8 @@ enum AnalyticsEvent {
                 "completed": completed,
                 "stage": stage,
             ]
+        case let .fastReset(elapsedMinutes):
+            return ["elapsed_minutes": elapsedMinutes]
         case let .lastMealLogged(backdated, minutesAgo):
             return [
                 "backdated": backdated,
@@ -109,7 +114,7 @@ enum AnalyticsEvent {
                 "plan": plan,
                 "goal_hours": goalHours,
             ]
-        case .appOpened, .fastReset, .eatingWindowStarted, .fastChained, .timeAdjusted, .sourcesOpened,
+        case .appOpened, .eatingWindowStarted, .fastChained, .timeAdjusted, .sourcesOpened,
              .historyRecordDeleted:
             return [:]
         }

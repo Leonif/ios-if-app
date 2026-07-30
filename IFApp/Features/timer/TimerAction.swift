@@ -14,8 +14,11 @@ enum TimerAction: Action {
     /// End a fast. `qualifiesAsCompleted` = the fast reached its goal. Analytics-only:
     /// completed fasts are counted on `goalCelebrated`, not here.
     case stopped(elapsed: TimeInterval, qualifiesAsCompleted: Bool)
-    /// Clear everything back to zero.
-    case reset
+    /// Clear everything back to zero. `elapsed` = how long the fast had been running
+    /// at the moment of the reset (staged value when it was not running). Analytics-only:
+    /// the reducer zeroes everything either way. It travels in the action because the
+    /// middleware sees post-reduce state, where the timer is already cleared.
+    case reset(elapsed: TimeInterval)
     /// Manual ± adjustment. `runningStartTimestamp` is non-nil only when the fast is running.
     case timeAdjusted(newElapsed: TimeInterval, runningStartTimestamp: Double?)
     /// The goal-reached moment fired for the current fast (marks it so it plays once).
