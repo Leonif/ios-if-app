@@ -77,9 +77,11 @@ final class AnalyticsMiddleware: Middleware {
             repo.log(.purchaseFailed(trigger: trigger, reason: reason.rawValue))
         case .restoreCompleted:
             repo.log(.restoreCompleted)
-        case .restoreStarted, .restoreFoundNothing, .storeResolved, .entitlementChanged:
+        case .restoreStarted, .restoreFoundNothing, .storeResolved, .entitlementChanged,
+             .nothingToRestoreExpired, .noticeShown, .noticeDismissed:
             // Reading the entitlement is not a funnel step; the property below carries
-            // the outcome. Restore that finds nothing is the same non-event.
+            // the outcome. Restore that finds nothing is the same non-event, and the
+            // two notices report something the user did not do.
             break
         }
     }

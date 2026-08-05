@@ -70,8 +70,11 @@ private struct WindowCard<Caption: View>: View {
     private var overlineText: Text {
         let label = Text(overline).foregroundStyle(theme.deep)
         guard overlineMarked else { return label }
+        // `verbatim`: a plain `Text(" ")` is a localisable literal, and it becomes a
+        // catalog key made of one space with ten empty locales that nobody can ever
+        // fill or retire.
         return Text(Image(systemName: "circle.fill")).foregroundStyle(theme.accent)
-            + Text(" ")
+            + Text(verbatim: " ")
             + label
     }
 

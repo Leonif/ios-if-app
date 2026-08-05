@@ -22,4 +22,16 @@ struct AppState: Equatable, Sendable {
     }
 
     var activeGoalHours: Double { activePlan.fastHours }
+
+    /// Whether the plan the user has *selected* may be used under the entitlement they
+    /// currently hold: the four presets are free, any other length is Pro's.
+    ///
+    /// One definition because two places act on this in opposite directions — the
+    /// editor opens the offer when it is false, the next fast falls back to the
+    /// nearest preset — and both would still compile if only one of them moved. The
+    /// gate drifting apart is silent: the plan gets confirmed without an offer, and
+    /// then the start quietly runs to a different goal.
+    var selectedPlanAllowed: Bool {
+        proState.isPro || planState.plan.isPreset
+    }
 }

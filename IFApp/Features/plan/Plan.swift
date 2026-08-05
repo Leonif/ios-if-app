@@ -8,9 +8,10 @@
 //  in a list cannot express "17 hours", and every label derived from that position
 //  had to be written out case by case.
 //
-//  The eating-window strings for the presets still match the design handoff
-//  (illustrative wall-clock times); the live goal time is computed from
-//  fastStart + fastHours.
+//  A plan states durations and nothing else. The invented wall-clock window the
+//  presets used to print ("12:00 - 8:00 PM") went out with the card that carried
+//  it: this app runs on anchors, so the only true value is how long, and the live
+//  goal time is computed from fastStart + fastHours.
 //
 
 struct Plan: Equatable, Hashable, Sendable {
@@ -58,17 +59,15 @@ struct Plan: Equatable, Hashable, Sendable {
     /// one label per hour.
     var analyticsLabel: String { isPreset ? ratioLabel : "custom:\(hours)" }
 
-    /// Eating window text shown in the plan editor. The presets carry the handoff's
-    /// wall-clock copy; a custom goal has no such copy to carry, so it states the
-    /// window's length instead.
-    var windowLabel: String {
-        switch hours {
-        case 14: return strings.Window.p14_10
-        case 16: return strings.Window.p16_8
-        case 18: return strings.Window.p18_6
-        case 20: return strings.Window.p20_4
-        default: return strings.Duration.goalHours(windowHours)
-        }
+    /// The free plan this one falls back to when the entitlement goes away. Nearest
+    /// by length, and downwards on a tie — a goal the user cannot reach is a worse
+    /// answer than one they overshoot. Only ever reached from a custom length: a
+    /// preset returns itself.
+    var nearestPreset: Plan {
+        Plan.presets.min { a, b in
+            let (da, db) = (abs(a.hours - hours), abs(b.hours - hours))
+            return da == db ? a.hours < b.hours : da < db
+        } ?? .default
     }
 
     var goalLabel: String {

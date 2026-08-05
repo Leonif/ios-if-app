@@ -38,6 +38,15 @@ struct TimerScreenProps: Equatable {
     let mealPickerOpen: Bool
     let streakMilestoneOpen: Bool
     let resetConfirmOpen: Bool
+    /// Whether the lock shows on the custom row, and whether the offer is up.
+    let isPro: Bool
+    let offerOpen: Bool
+    /// Whether the selected plan may be confirmed as it stands — projected from
+    /// `AppState`, not re-derived here, so the editor and the next start agree.
+    let selectedPlanAllowed: Bool
+    /// The one-time notice on screen, and the one still waiting for a neutral moment.
+    let notice: ProNotice?
+    let revocationPending: Bool
 
     init(state: AppState) {
         isRunning = state.timerState.isRunning
@@ -59,6 +68,11 @@ struct TimerScreenProps: Equatable {
         mealPickerOpen = state.uiState.mealPickerOpen
         streakMilestoneOpen = state.uiState.streakMilestoneOpen
         resetConfirmOpen = state.uiState.resetConfirmOpen
+        isPro = state.proState.isPro
+        offerOpen = state.proState.isOfferOpen
+        selectedPlanAllowed = state.selectedPlanAllowed
+        notice = state.proState.notice
+        revocationPending = state.proState.revocationPending
     }
 
     var isMealFresh: Bool { ateMin < 0 }
@@ -126,8 +140,32 @@ struct TimerFlowView: View {
             overlays(theme: theme)
                 .animation(.easeOut(duration: 0.3), value: props.streakMilestoneOpen)
                 .animation(.easeOut(duration: 0.3), value: props.resetConfirmOpen)
+                .animation(.easeOut(duration: 0.3), value: props.notice != nil)
         }
-        .sheet(isPresented: $showSources) { SourcesView() }
+        // The offer is a full surface rather than a `fullScreenCover` because its
+        // appearance is specified in numbers — 28pt of travel over 420ms on a curve
+        // with no overshoot — and the system cover brings its own.
+        .overlay {
+            if props.offerOpen {
+                PaywallFlowView(store: store, phaseColor: offerPhaseColor())
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeOut(duration: 0.2), value: props.offerOpen)
+        .sheet(isPresented: $showSources) {
+            AboutFlowView(store: store).presentationDragIndicator(.visible)
+        }
+        // The About sheet is one of the doors into the offer, and the offer is behind
+        // it. Opening one closes the other.
+        .onChange(of: props.offerOpen) { _, isOpen in
+            if isOpen { showSources = false }
+        }
+        // Edge 6. The nearest neutral moment: not over a running fast, not on the
+        // complete state, not over the goal animation. Nothing is lost by waiting —
+        // the lock is already back, this is only the sentence about it.
+        .onChange(of: noticeMoment) { _, moment in
+            if moment { presentRevocationIfNeutral() }
+        }
         // History is a push, not a sheet: it is deeper into the app, not a dialog
         // over it.
         .navigationDestination(isPresented: $showHistory) {
@@ -144,6 +182,9 @@ struct TimerFlowView: View {
             syncGoalMoment(to: currentScreenState())
             // An eating window may have elapsed while the app was closed.
             reconcileEating(currentScreenState())
+            // A refund can land while the app is shut; the neutral moment is then
+            // this one, and `onChange` below would never fire for it.
+            presentRevocationIfNeutral()
         }
         .onChange(of: colorScheme) { _, new in
             store.dispatch(AppLifecycleAction.themeActive(dark: new == .dark))
@@ -417,6 +458,55 @@ struct TimerFlowView: View {
         }
     }
 
+    // MARK: Pro
+
+    /// True when the entitlement notice is due and the screen is a place to say it.
+    /// Neutral means nothing is in flight: no fast running, no completed fast waiting
+    /// to be acknowledged, no eating window counting down, and no offer or notice
+    /// already on screen.
+    private var noticeMoment: Bool {
+        props.revocationPending
+            && props.notice == nil
+            && !props.offerOpen
+            // The notice is an overlay on this screen, so anything presented above it
+            // would swallow it — and the flag is spent the moment it is shown. The
+            // About sheet is the likeliest one: it is where a refund is noticed.
+            && !showSources
+            && !showHistory
+            && !props.planEditorOpen
+            && !props.mealPickerOpen
+            && !props.streakMilestoneOpen
+            && !props.resetConfirmOpen
+            && currentScreenState() == .idle
+    }
+
+    /// Confirming the plan. A custom length without Pro is where the lock actually
+    /// bites — the picker turned freely up to here. The editor deliberately stays
+    /// open behind the offer: someone who came to change their plan should not be
+    /// returned to the timer to start over.
+    private func confirmPlan() {
+        if !props.selectedPlanAllowed {
+            store.dispatch(ProAction.offerOpened(trigger: .planCustom))
+        } else {
+            store.dispatch(UIAction.planEditorClosed)
+        }
+    }
+
+    private func presentRevocationIfNeutral() {
+        guard noticeMoment else { return }
+        store.dispatch(ProAction.noticeShown(.entitlementRevoked))
+    }
+
+    /// The phase tint the offer inherits — the phase of the screen it was called
+    /// from. An open or closed eating window has no phase on screen, and the offer
+    /// takes the same neutral green the backdrop behind it already uses.
+    private func offerPhaseColor() -> Color {
+        let state = currentScreenState()
+        guard state != .eating, state != .eatingOver else { return Phase.fat.color }
+        return PhaseProgress.compute(elapsed: props.elapsed(at: Date()),
+                                     goalHours: props.goalHours).phase.color
+    }
+
     private func openHistory(from source: HistoryEntrySource) {
         historySource = source
         showHistory = true
@@ -429,9 +519,10 @@ struct TimerFlowView: View {
         if props.planEditorOpen {
             PlanEditorSheet(
                 plan: props.plan,
+                isPro: props.isPro,
                 theme: theme,
                 onSelect: { store.dispatch(PlanAction.selected(hours: $0)) },
-                onDone: { store.dispatch(UIAction.planEditorClosed) },
+                onDone: confirmPlan,
                 onClose: { store.dispatch(UIAction.planEditorClosed) }
             )
             .zIndex(1)
@@ -470,6 +561,12 @@ struct TimerFlowView: View {
             onDismiss: { store.dispatch(UIAction.resetConfirmClosed) }
         )
         .zIndex(3)
+        ProNoticeSheet(
+            notice: props.notice,
+            theme: theme,
+            onDismiss: { store.dispatch(ProAction.noticeDismissed) }
+        )
+        .zIndex(4)
     }
 
     // MARK: Copy / formatting

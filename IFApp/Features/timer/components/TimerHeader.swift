@@ -47,8 +47,12 @@ struct TimerHeader: View {
                 StreakBadge(days: streak, theme: theme, onTap: onHistory)
             }
 
+            // The sheet behind this is no longer a science note but the app's own
+            // document — Pro, privacy, sources. `doc.text` promised a paper;
+            // `info.circle` is the only glyph of the three considered that says
+            // "about this app" without also promising a menu that does not exist.
             Button(action: onSettings) {
-                Image(systemName: "doc.text")
+                Image(systemName: "info.circle")
                     .font(.system(size: 16))
                     .foregroundColor(theme.iconStroke)
                     .frame(width: 34, height: 34)

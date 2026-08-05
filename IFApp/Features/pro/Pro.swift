@@ -63,7 +63,7 @@ enum PaywallTrigger: String, Equatable, Sendable {
 
 /// Why a purchase attempt ended without Pro. Raw values are the GA4 `reason`
 /// parameter, same fixed-list rule as `trigger`.
-enum PurchaseFailure: String, Equatable, Sendable {
+enum PurchaseFailure: String, Equatable, Hashable, Sendable {
     /// The user backed out of Apple's sheet. Not an error state on screen.
     case cancelled
     /// The store could not be reached. This is the one distinction the offer's error
@@ -95,11 +95,46 @@ enum PurchasePhase: Equatable, Sendable {
     case failed(PurchaseFailure)
     /// Restore found the purchase. A confirmation, and then out.
     case restored
+
+    /// Whether the phase describes something still happening off the offer screen,
+    /// and so survives that screen being opened or closed. Ask to Buy is the only
+    /// one: the request is out with whoever approves it and resolves through
+    /// `Transaction.updates` whenever they get to it, which can be long after the
+    /// user walked away. Every other phase is feedback about one presentation and
+    /// says nothing about the next (edge 18 / PW-13).
+    var outlivesOffer: Bool { self == .awaitingApproval }
+}
+
+/// The two things the app has to say after the entitlement goes away. They share
+/// one sheet and differ only in when it appears: the first at the next neutral
+/// moment, the second at the next fast that has to run to a different goal.
+///
+/// They are deliberately not shown together. Told at once, "Pro is gone" swallows
+/// "and your goal is now sixteen hours" — and the second is the one that changes
+/// what the timer does.
+enum ProNotice: Equatable, Sendable {
+    /// Edge 6. The reason is never named: refund and leaving a Family Sharing group
+    /// are the same fact to the user, and one key covers both.
+    case entitlementRevoked
+    /// Edge 17. The other half of edge 9: the fast in flight was allowed to finish
+    /// on its custom goal, so the next one starting shorter has to be said out loud.
+    case goalChanged(fallbackHours: Int)
+
+    /// Whether there is anything to say yet. Edge 17 has no copy in any locale — the
+    /// English source has not been written — so it stays queued rather than opening
+    /// an empty sheet. One place reads this, and it turns itself on when the strings
+    /// land: nothing else has to change.
+    var hasCopy: Bool {
+        switch self {
+        case .entitlementRevoked: return true
+        case .goalChanged: return !strings.Pro.goalChangedTitle.isEmpty
+        }
+    }
 }
 
 /// The six states of the offer screen, as one value. They replace each other in
 /// place — no navigation, one grid — so the screen renders this and nothing else.
-enum OfferState: Equatable, Sendable {
+enum OfferState: Equatable, Hashable, Sendable {
     /// S1 — the offer itself.
     case offer
     /// S2 — a purchase is under way.

@@ -34,4 +34,12 @@ enum ProAction: Action {
     /// back to the offer, now with a verified answer behind it.
     case restoreFoundNothing
     case restoreFailed(PurchaseFailure)
+    /// The transient "nothing to restore" line has had its couple of seconds.
+    case nothingToRestoreExpired
+
+    /// A one-time notice reached its moment and is now on screen. Dispatched by
+    /// whoever owns that moment: the timer flow for edge 6, the start thunk for
+    /// edge 17.
+    case noticeShown(ProNotice)
+    case noticeDismissed
 }

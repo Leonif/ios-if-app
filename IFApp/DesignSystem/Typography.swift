@@ -23,18 +23,46 @@ extension Font {
 
 /// Letter-spacing for the uppercase small-caps overline labels. Suppressed in
 /// right-to-left (Arabic) layouts, where positive tracking breaks the connected
-/// cursive script and makes words read as disjointed letters.
+/// cursive script and makes words read as disjointed letters, and in Korean, where
+/// 1.92pt at 12pt is 0.16em against a word space of 0.263em — enough of the gap
+/// that the eye starts reading syllable blocks as separate words.
 private struct OverlineTracking: ViewModifier {
     let value: CGFloat
     @Environment(\.layoutDirection) private var layoutDirection
+
+    private var suppressed: Bool {
+        layoutDirection == .rightToLeft || Locale.current.language.languageCode?.identifier == "ko"
+    }
+
     func body(content: Content) -> some View {
-        content.tracking(layoutDirection == .rightToLeft ? 0 : value)
+        content.tracking(suppressed ? 0 : value)
+    }
+}
+
+/// Negative letter-spacing on display type. Suppressed in Arabic, where tightening
+/// pulls a connected script apart, and in Korean, where it closes the gap between a
+/// syllable's 받침 and the stem of the next one until the two read as one block.
+private struct DisplayTracking: ViewModifier {
+    let value: CGFloat
+    @Environment(\.layoutDirection) private var layoutDirection
+
+    private var suppressed: Bool {
+        layoutDirection == .rightToLeft || Locale.current.language.languageCode?.identifier == "ko"
+    }
+
+    func body(content: Content) -> some View {
+        content.tracking(suppressed ? 0 : value)
     }
 }
 
 extension View {
     func overlineTracking(_ value: CGFloat) -> some View {
         modifier(OverlineTracking(value: value))
+    }
+
+    /// `em`-relative tracking for display type, e.g. `displayTracking(25, -0.015)`.
+    func displayTracking(_ size: CGFloat, _ em: CGFloat) -> some View {
+        modifier(DisplayTracking(value: size * em))
     }
 }
 

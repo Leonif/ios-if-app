@@ -24,8 +24,16 @@ struct RestorePurchasesThunk: Thunk {
             dispatch(ProAction.restoreCompleted)
         case .nothingToRestore:
             dispatch(ProAction.restoreFoundNothing)
+            // The line retires itself. The wait lives here rather than in the view
+            // because a view that schedules its own delayed work owns a timer whose
+            // lifetime is the frame's, not the answer's.
+            try? await Task.sleep(nanoseconds: Self.transientNanoseconds)
+            dispatch(ProAction.nothingToRestoreExpired)
         case let .failed(reason):
             dispatch(ProAction.restoreFailed(reason))
         }
     }
+
+    /// Long enough to be read once, short enough that it is gone before the next tap.
+    private static let transientNanoseconds: UInt64 = 2_500_000_000
 }

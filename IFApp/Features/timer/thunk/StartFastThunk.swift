@@ -29,9 +29,26 @@ struct StartFastThunk: Thunk {
         let now = Date().timeIntervalSince1970
         // Carry any staged elapsed time into the start so the count continues from there.
         let startTimestamp = now - timer.stagedElapsed
+
+        // Edge 9's second half. A custom length that is no longer paid for cannot be
+        // started, but it also cannot be dropped silently: the person set seventeen
+        // hours and would otherwise get sixteen with nothing said. The fast already
+        // running when the right went away was left alone; this is the next one.
+        let selected = app.planState.plan
+        let plan = app.selectedPlanAllowed ? selected : selected.nearestPreset
+        if plan != selected {
+            dispatch(PlanAction.selected(hours: plan.hours))
+            let notice = ProNotice.goalChanged(fallbackHours: plan.hours)
+            // Queued but unsaid while the copy does not exist: consuming the flag now
+            // would spend the one chance to say it on a blank sheet.
+            if app.proState.goalChangePending, notice.hasCopy {
+                dispatch(ProAction.noticeShown(notice))
+            }
+        }
+
         // The plan as it stands *now* becomes this fast's goal and stops moving.
         dispatch(TimerAction.started(startTimestamp: startTimestamp,
-                                     goalHours: app.planState.plan.fastHours))
+                                     goalHours: plan.fastHours))
 
         await requestPushAuthorizationIfNeeded(dispatch: dispatch)
     }
