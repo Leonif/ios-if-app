@@ -38,11 +38,8 @@ struct StartFastThunk: Thunk {
         let plan = app.selectedPlanAllowed ? selected : selected.nearestPreset
         if plan != selected {
             dispatch(PlanAction.selected(hours: plan.hours))
-            let notice = ProNotice.goalChanged(fallbackHours: plan.hours)
-            // Queued but unsaid while the copy does not exist: consuming the flag now
-            // would spend the one chance to say it on a blank sheet.
-            if app.proState.goalChangePending, notice.hasCopy {
-                dispatch(ProAction.noticeShown(notice))
+            if app.proState.goalChangePending {
+                dispatch(ProAction.noticeShown(.goalChanged(fallbackHours: plan.hours)))
             }
         }
 

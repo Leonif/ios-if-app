@@ -33,6 +33,44 @@ enum Phase: Int, CaseIterable {
         }
     }
 
+    /// The value that goes into GA4 (`fast_stopped.stage`). Deliberately not `label`:
+    /// the label is translated, so the same phase arrived as a different value per
+    /// locale and the dimension could not be grouped at all. Stable English codes,
+    /// written out rather than derived from `rawValue`, so reordering the cases
+    /// cannot silently rewrite history.
+    var analyticsValue: String {
+        switch self {
+        case .fed: return "fed"
+        case .sugar: return "sugar"
+        case .fat: return "fat"
+        case .ketosis: return "ketosis"
+        case .autophagy: return "autophagy"
+        }
+    }
+
+    /// The value that goes into the exported CSV's `phase` column. Same rule as
+    /// `analyticsValue` — a fixed, unlocalised ASCII literal, never `label` — but a
+    /// **different list**, and deliberately not shared with it.
+    ///
+    /// `analyticsValue` is a GA4 dimension whose values were registered against
+    /// existing data: renaming `fed` to `satiety` there would split one phase across
+    /// two values in every report ever run. The CSV list is the one product wrote
+    /// down (decision 14.2) and it names the metabolic state rather than the ring
+    /// colour. Two of the five even agree by accident; that is not a reason to fold
+    /// them, because a change on either side must not travel to the other.
+    ///
+    /// Wrong values here are worse than wrong values in telemetry: a file that has
+    /// already left the phone cannot be corrected afterwards.
+    var exportValue: String {
+        switch self {
+        case .fed: return "satiety"
+        case .sugar: return "glucose"
+        case .fat: return "fat_burning"
+        case .ketosis: return "ketosis"
+        case .autophagy: return "autophagy"
+        }
+    }
+
     /// The four phases shown on the ring (Autophagy is the completed state).
     static let ringPhases: [Phase] = [.fed, .sugar, .fat, .ketosis]
 }

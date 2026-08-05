@@ -32,6 +32,12 @@ struct StubStoreRepository: StoreRepositoryProtocol {
         static let outcome = "-seedStoreOutcome"
         /// `-seedStoreRestore restored|nothing|network|other`.
         static let restore = "-seedStoreRestore"
+        /// `-seedStorePurchaseDelay N` — milliseconds the next Buy spends in flight
+        /// before it resolves. Default 0, so existing flows keep the instant answer
+        /// they were written against. Apple's sheet takes real time and `.purchasing`
+        /// renders while it is up; a stub that answers synchronously never lets that
+        /// phase reach the screen, and the spinner cannot be observed at all.
+        static let purchaseDelay = "-seedStorePurchaseDelay"
         /// `-seedStoreRevokeAfter N` — seconds until the entitlement is taken away,
         /// the way a refund or a departure from Family Sharing arrives. Edge 6 and
         /// edge 17 have no other door: both hang off an update nobody asked for.
@@ -59,6 +65,9 @@ struct StubStoreRepository: StoreRepositoryProtocol {
     }
 
     func purchase() async -> PurchaseOutcome {
+        if let ms = Self.value(Argument.purchaseDelay).flatMap(UInt64.init), ms > 0 {
+            try? await Task.sleep(nanoseconds: ms * 1_000_000)
+        }
         switch Self.value(Argument.outcome) ?? "purchased" {
         case "pending": return .pending
         case "cancelled": return .cancelled

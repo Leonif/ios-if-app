@@ -90,6 +90,41 @@ struct TimerScreenProps: Equatable {
     func eatingOverElapsed(at now: Date) -> TimeInterval {
         max(0, now.timeIntervalSince1970 - eatingEndTimestamp)
     }
+
+    fileprivate func screenState(progress: PhaseProgress, now: Date) -> ScreenState {
+        // An open eating window shows the countdown until it closes. Once closed, the
+        // chain screen (count-up + Continue fasting) holds for 24h, then falls to idle.
+        if isEating {
+            if eatingRemaining(at: now) > 0 { return .eating }
+            return eatingOverElapsed(at: now) < 24 * 3600 ? .eatingOver : .idle
+        }
+        if !isRunning { return stagedElapsed > 0 ? .complete : .idle }
+        // Running: past the goal is the overtime "goal reached" state, else active.
+        return progress.isComplete ? .goalReached : .active
+    }
+
+    /// The screen state derived from the current clock (used off the TimelineView tick).
+    fileprivate func currentScreenState() -> ScreenState {
+        let now = Date()
+        return screenState(progress: PhaseProgress.compute(elapsed: elapsed(at: now),
+                                                           goalHours: goalHours),
+                           now: now)
+    }
+
+    /// The phase tint the offer inherits — the phase of the screen it was called
+    /// from. An open or closed eating window has no phase on screen, and the offer
+    /// takes the same neutral green the backdrop behind it already uses.
+    ///
+    /// It lives on the props rather than on a view because two hosts need it: the
+    /// timer, which is the screen the tint describes, and the root, which is where
+    /// the offer is now presented. A second copy in the root would compile and then
+    /// drift — it is the case invariant 8 is about.
+    func offerPhaseColor() -> Color {
+        let state = currentScreenState()
+        guard state != .eating, state != .eatingOver else { return Phase.fat.color }
+        return PhaseProgress.compute(elapsed: elapsed(at: Date()),
+                                     goalHours: goalHours).phase.color
+    }
 }
 
 private enum ScreenState { case idle, active, goalReached, complete, eating, eatingOver }
@@ -142,16 +177,9 @@ struct TimerFlowView: View {
                 .animation(.easeOut(duration: 0.3), value: props.resetConfirmOpen)
                 .animation(.easeOut(duration: 0.3), value: props.notice != nil)
         }
-        // The offer is a full surface rather than a `fullScreenCover` because its
-        // appearance is specified in numbers — 28pt of travel over 420ms on a curve
-        // with no overshoot — and the system cover brings its own.
-        .overlay {
-            if props.offerOpen {
-                PaywallFlowView(store: store, phaseColor: offerPhaseColor())
-                    .transition(.opacity)
-            }
-        }
-        .animation(.easeOut(duration: 0.2), value: props.offerOpen)
+        // The offer used to be presented here. It moved to `AppFlowView` when the
+        // history's export lock became a second door into it: the history is pushed
+        // on this screen, so an overlay hosted here renders *under* it.
         .sheet(isPresented: $showSources) {
             AboutFlowView(store: store).presentationDragIndicator(.visible)
         }
@@ -179,9 +207,9 @@ struct TimerFlowView: View {
             store.dispatch(AppLifecycleAction.appBecameActive)
             // Restore the settled overtime end-state on a relaunch mid-overtime
             // (onChange below won't fire for the initial state).
-            syncGoalMoment(to: currentScreenState())
+            syncGoalMoment(to: props.currentScreenState())
             // An eating window may have elapsed while the app was closed.
-            reconcileEating(currentScreenState())
+            reconcileEating(props.currentScreenState())
             // A refund can land while the app is shut; the neutral moment is then
             // this one, and `onChange` below would never fire for it.
             presentRevocationIfNeutral()
@@ -197,8 +225,8 @@ struct TimerFlowView: View {
             // cold start is covered by onAppear below — the initial scenePhase
             // may already be .active, so this onChange alone can miss it).
             store.dispatch(AppLifecycleAction.appBecameActive)
-            syncGoalMoment(to: currentScreenState())
-            reconcileEating(currentScreenState())
+            syncGoalMoment(to: props.currentScreenState())
+            reconcileEating(props.currentScreenState())
         }
     }
 
@@ -213,7 +241,7 @@ struct TimerFlowView: View {
         // `.eatingOver` sits in the same gap: the window has closed but the next fast
         // is not started, so there is no phase scale on screen and no elapsed to derive
         // a phase from — same reasoning, same neutral backdrop.
-        let state = currentScreenState()
+        let state = props.currentScreenState()
         if state == .eating || state == .eatingOver {
             theme.eatingWindowBackground.ignoresSafeArea()
         } else {
@@ -228,7 +256,7 @@ struct TimerFlowView: View {
     private func screen(theme: ThemeTokens, now: Date) -> some View {
         let elapsed = props.elapsed(at: now)
         let progress = PhaseProgress.compute(elapsed: elapsed, goalHours: props.goalHours)
-        let state = screenState(progress: progress, now: now)
+        let state = props.screenState(progress: progress, now: now)
         let nowMinute = Clock.minuteOfDay(now)
 
         // Read the real safe-area insets so the top/bottom gaps adapt to the device.
@@ -371,18 +399,6 @@ struct TimerFlowView: View {
         }
     }
 
-    private func screenState(progress: PhaseProgress, now: Date) -> ScreenState {
-        // An open eating window shows the countdown until it closes. Once closed, the
-        // chain screen (count-up + Continue fasting) holds for 24h, then falls to idle.
-        if props.isEating {
-            if props.eatingRemaining(at: now) > 0 { return .eating }
-            return props.eatingOverElapsed(at: now) < 24 * 3600 ? .eatingOver : .idle
-        }
-        if !props.isRunning { return props.stagedElapsed > 0 ? .complete : .idle }
-        // Running: past the goal is the overtime "goal reached" state, else active.
-        return progress.isComplete ? .goalReached : .active
-    }
-
     // MARK: Ring center
 
     @ViewBuilder
@@ -477,7 +493,7 @@ struct TimerFlowView: View {
             && !props.mealPickerOpen
             && !props.streakMilestoneOpen
             && !props.resetConfirmOpen
-            && currentScreenState() == .idle
+            && props.currentScreenState() == .idle
     }
 
     /// Confirming the plan. A custom length without Pro is where the lock actually
@@ -495,16 +511,6 @@ struct TimerFlowView: View {
     private func presentRevocationIfNeutral() {
         guard noticeMoment else { return }
         store.dispatch(ProAction.noticeShown(.entitlementRevoked))
-    }
-
-    /// The phase tint the offer inherits — the phase of the screen it was called
-    /// from. An open or closed eating window has no phase on screen, and the offer
-    /// takes the same neutral green the backdrop behind it already uses.
-    private func offerPhaseColor() -> Color {
-        let state = currentScreenState()
-        guard state != .eating, state != .eatingOver else { return Phase.fat.color }
-        return PhaseProgress.compute(elapsed: props.elapsed(at: Date()),
-                                     goalHours: props.goalHours).phase.color
     }
 
     private func openHistory(from source: HistoryEntrySource) {
@@ -584,14 +590,6 @@ struct TimerFlowView: View {
 
     // MARK: Goal-reached moment
 
-    /// The screen state derived from the current clock (used off the TimelineView tick).
-    private func currentScreenState() -> ScreenState {
-        let now = Date()
-        return screenState(progress: PhaseProgress.compute(elapsed: props.elapsed(at: now),
-                                                           goalHours: props.goalHours),
-                           now: now)
-    }
-
     /// Keeps the persisted eating flag and the Last-meal control in step with the
     /// derived state. An elapsed window holds `isEating` through `.eatingOver` (the
     /// chain screen is computed from the same timestamps); only the 24h timeout
@@ -663,7 +661,7 @@ struct TimerFlowView: View {
         // Let the seal/sweep finish before anything (the review sheet) can cover it.
         // Re-check the state on arrival — the fast may have been ended meanwhile.
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-            guard currentScreenState() == .goalReached else { return }
+            guard props.currentScreenState() == .goalReached else { return }
             store.dispatch(AppLifecycleAction.goalScreenSettled)
         }
     }

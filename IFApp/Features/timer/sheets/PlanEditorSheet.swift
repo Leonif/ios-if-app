@@ -194,15 +194,7 @@ struct PlanEditorSheet: View {
             .pickerStyle(.wheel)
             .frame(height: 170)
             .clipped()
-
-            Text(strings.Sheet.pickerFootnote)
-                .font(.hanken(13))
-                .lineSpacing(13 * 0.3)
-                .foregroundColor(theme.mut)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
         }
+        .padding(.bottom, 12)
     }
 }

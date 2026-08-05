@@ -49,6 +49,10 @@ struct AboutIF24View: View {
 
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openURL) private var openURL
+    /// The sheet is presented, so it starts a fresh environment and does not inherit
+    /// the root's `dynamicTypeSize` ceiling — the accessibility sizes reach this view
+    /// for real, and one slot has to know it.
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private struct Source: Identifiable {
         let id: Int
@@ -124,18 +128,31 @@ struct AboutIF24View: View {
             Button(action: onRestore) {
                 HStack {
                     if showsNothingToRestore {
-                        // Same rule as on the offer: this line never wraps. The slot
-                        // here is the narrower one — 287pt on a 375pt device, not the
-                        // offer's — and at xxLarge German (106.5%) and Ukrainian
-                        // (102.7%) run past it. Shrinking is the honest way out: the
-                        // line is transient and the alternative is an ellipsis in the
-                        // middle of a sentence. Only those two locales ever engage it
-                        // (.939 and .973), and the floor stays clear of ko and ja.
+                        // Same rule as on the offer up to the app's own type ceiling:
+                        // this line does not wrap. The slot here is the narrower one —
+                        // 287pt on a 375pt device, not the offer's — and at xxLarge
+                        // German (106.5%) and Ukrainian (102.7%) run past it. Shrinking
+                        // is the honest way out there: the line is transient and the
+                        // alternative is an ellipsis in the middle of a sentence. Only
+                        // those two locales ever engage it (.939 and .973), and the
+                        // floor stays clear of ko and ja.
+                        //
+                        // Above the ceiling the same floor buys nothing. This sheet is
+                        // presented, so it does not inherit the root cap and really does
+                        // render at the accessibility sizes; there `nothingToRestore`
+                        // needs about .78 of the slot at accessibility1 and far less
+                        // higher up, so a 0.9 floor hands back exactly the ellipsis it
+                        // was chosen to avoid — measured at AX5 in de, ar and ja.
+                        // Wrapping costs one line of card height for the two and a half
+                        // seconds the line is up, and at these sizes the Restore label
+                        // it replaces is already three lines tall, so there is no
+                        // single-line height left to protect.
                         Text(strings.Pro.nothingToRestore)
                             .font(.hanken(16, .medium))
                             .foregroundColor(theme.mut)
-                            .lineLimit(1)
+                            .lineLimit(typeSize.isAccessibilitySize ? nil : 1)
                             .minimumScaleFactor(0.9)
+                            .fixedSize(horizontal: false, vertical: true)
                     } else {
                         Text(strings.Pro.restoreFull)
                             .font(.hanken(16, .medium))
@@ -152,42 +169,98 @@ struct AboutIF24View: View {
         }
     }
 
+    /// Label and status side by side while both fit on one line, stacked when they
+    /// do not — the same move the system Settings rows make, and for the same reason.
+    ///
+    /// It is a layout answer to what looks like a copy problem, and it has to be:
+    /// the status values are the shortest attested forms their languages have. At
+    /// xxLarge — inside the app's own Dynamic Type ceiling, so no accessibility
+    /// setting is needed to reach it — `Awaiting approval` already runs past the slot
+    /// in four locales (de, es, pl, fr), and at the accessibility sizes Ukrainian
+    /// `Неактивний` follows. Squeezed in the side-by-side layout a single long word
+    /// has nowhere to break and splits mid-word against the chevron; given the row's
+    /// full width it simply sits on its own line.
+    ///
+    /// Gating this on `isAccessibilitySize` would have missed the four locales that
+    /// break first, which is why the switch is "does it fit", not "how large is the
+    /// text".
     private func proRow(_ theme: ThemeTokens) -> some View {
-        HStack(spacing: 12) {
-            Text(strings.Pro.productName)
-                .font(.hanken(16, .medium))
-                .foregroundColor(theme.ink)
-            Spacer(minLength: 8)
-            statusValue(theme)
+        ViewThatFits(in: .horizontal) {
+            sideBySideRow(theme)
+            stackedRow(theme)
         }
         .frame(minHeight: 52)
         .padding(.horizontal, 16)
         .contentShape(Rectangle())
     }
 
-    /// The status, a check when it is Active, and a chevron when there is somewhere
-    /// to go. In Japanese the value itself is empty by decision — the slot then hides
-    /// rather than rendering an empty `Text`, and the row's height does not move.
-    @ViewBuilder
-    private func statusValue(_ theme: ThemeTokens) -> some View {
-        HStack(spacing: 8) {
-            if status == .active {
-                Image("pro-check")
-                    .renderingMode(.template)
-                    .foregroundColor(theme.deep)
-                    .frame(width: 16, height: 16)
-                    .background(Circle().fill(theme.primaryButtonBg.opacity(0.18)))
-            }
-            if !status.label.isEmpty {
-                Text(status.label)
-                    .font(.hanken(15))
-                    .foregroundColor(status == .active ? theme.deep : theme.mut)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(minHeight: 20, alignment: .trailing)
-                    .multilineTextAlignment(.trailing)
-                    .accessibilityIdentifier("about.pro.status")
+    /// The preferred shape. Both texts are pinned to one line at their natural width
+    /// so that `ViewThatFits` measures what they really need — a text allowed to wrap
+    /// "fits" any width at all, and the fallback would never be chosen.
+    private func sideBySideRow(_ theme: ThemeTokens) -> some View {
+        HStack(spacing: 12) {
+            rowLabel(theme)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+            Spacer(minLength: 8)
+            HStack(spacing: 8) {
+                activeCheck(theme)
+                statusText(theme, alignment: .trailing)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
             }
             if status.opensOffer { chevron(theme) }
+        }
+    }
+
+    /// Label over value, both against the leading edge, chevron still trailing. The
+    /// status gets the row's whole width here, so it wraps between words instead of
+    /// inside one.
+    private func stackedRow(_ theme: ThemeTokens) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                rowLabel(theme)
+                HStack(spacing: 8) {
+                    activeCheck(theme)
+                    statusText(theme, alignment: .leading)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            if status.opensOffer { chevron(theme) }
+        }
+        .padding(.vertical, 10)
+    }
+
+    private func rowLabel(_ theme: ThemeTokens) -> some View {
+        Text(strings.Pro.productName)
+            .font(.hanken(16, .medium))
+            .foregroundColor(theme.ink)
+    }
+
+    /// Active is the one status that also carries a mark.
+    @ViewBuilder
+    private func activeCheck(_ theme: ThemeTokens) -> some View {
+        if status == .active {
+            Image("pro-check")
+                .renderingMode(.template)
+                .foregroundColor(theme.deep)
+                .frame(width: 16, height: 16)
+                .background(Circle().fill(theme.primaryButtonBg.opacity(0.18)))
+        }
+    }
+
+    /// In Japanese the value is empty by decision — the slot then hides rather than
+    /// rendering an empty `Text`, and the row's height does not move.
+    @ViewBuilder
+    private func statusText(_ theme: ThemeTokens, alignment: TextAlignment) -> some View {
+        if !status.label.isEmpty {
+            Text(status.label)
+                .font(.hanken(15))
+                .foregroundColor(status == .active ? theme.deep : theme.mut)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(minHeight: 20, alignment: alignment == .trailing ? .trailing : .leading)
+                .multilineTextAlignment(alignment)
+                .accessibilityIdentifier("about.pro.status")
         }
     }
 

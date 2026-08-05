@@ -38,17 +38,46 @@ struct PaywallView: View {
             backdrop
             VStack(alignment: .leading, spacing: 0) {
                 closeRow
-                titleSlot
-                bodySlot
-                benefitList
-                Spacer(minLength: 26)
+                // Close above, price and button below, the reading matter between them
+                // in a scroll view. The three parts are what the flexible column was
+                // already doing — the list top-aligned, the price block bottom-pinned —
+                // except the slack now belongs to the scroll view instead of a
+                // `Spacer`, so it can go negative without anything overlapping.
+                //
+                // Why the two controls stay outside it: at xxLarge in German the title
+                // takes two lines and the S4 body four, and a single scroll view over
+                // the whole column would carry Close off the top and Buy off the bottom
+                // at the same moment. Both have to be reachable in one gesture at any
+                // size, and pinning them costs nothing at the sizes the screen was
+                // drawn for — the layout below xxLarge is pixel-identical to the
+                // `Spacer` version.
+                readingBlock
                 bottomBlock
+                    // The old `Spacer(minLength: 26)`, now a gap that cannot collapse:
+                    // it sits outside the scroll view, so a clipped last benefit still
+                    // clears the price by 26pt instead of touching it.
+                    .padding(.top, 26)
             }
             .padding(.horizontal, 24)
             .padding(.top, 16)
             .padding(.bottom, 22)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    /// Title, body and the benefit list. Scrolls only when it has to: the bounce is
+    /// tied to the content size, so at the sizes that fit the screen still reads as
+    /// the fixed surface it is drawn as, with nothing to rubber-band.
+    private var readingBlock: some View {
+        ScrollView(.vertical) {
+            VStack(alignment: .leading, spacing: 0) {
+                titleSlot
+                bodySlot
+                benefitList
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     // MARK: Backdrop

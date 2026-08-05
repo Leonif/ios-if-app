@@ -17,6 +17,12 @@ func historyReducer(state: HistoryState, action: Action) -> HistoryState {
     case let .deleted(id):
         newState.records.removeAll { $0.id == id }
 
+    case let .exportPrepared(file):
+        newState.exportFile = file
+
+    case .exportFinished:
+        newState.exportFile = nil
+
     case .none:
         break
     }

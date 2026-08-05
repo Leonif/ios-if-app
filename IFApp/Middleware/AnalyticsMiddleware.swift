@@ -47,11 +47,27 @@ final class AnalyticsMiddleware: Middleware {
                 repo.log(.planConfirmed(plan: plan.analyticsLabel, goalHours: plan.hours))
             }
         case let history as HistoryAction:
-            if case .deleted = history { repo.log(.historyRecordDeleted) }
+            handle(history)
         case let pro as ProAction:
             handle(pro, trigger: trigger(after: app))
             if let app { reportProStatus(app.proState.entitlement) }
         default:
+            break
+        }
+    }
+
+    private func handle(_ action: HistoryAction) {
+        switch action {
+        case .deleted:
+            repo.log(.historyRecordDeleted)
+        case let .exportFinished(shared):
+            // Only a share that went through. Opening the sheet and backing out is
+            // not an export, and counting it would inflate the one number the
+            // import decision will be read off.
+            if shared { repo.log(.historyExported) }
+        case .recorded, .exportPrepared:
+            // Saving a fast is already covered by `fast_stopped`; writing the file is
+            // a step on the way, not the act.
             break
         }
     }
@@ -128,7 +144,7 @@ final class AnalyticsMiddleware: Middleware {
             repo.log(.fastStopped(
                 durationSeconds: Int(elapsed),
                 completed: qualifies,
-                stage: phase.label
+                stage: phase.analyticsValue
             ))
         case let .reset(elapsed):
             repo.log(.fastReset(elapsedMinutes: Int(elapsed / 60)))

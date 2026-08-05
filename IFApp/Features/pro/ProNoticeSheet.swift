@@ -87,7 +87,7 @@ struct ProNoticeSheet: View {
         // The cause is never named, and no locale mentions money: one key covers
         // both a refund and someone leaving a Family Sharing group.
         case .entitlementRevoked: return strings.Pro.revokedBody
-        case let .goalChanged(hours): return strings.Pro.goalChangedBody(strings.Duration.goalHours(hours))
+        case let .goalChanged(hours): return strings.Pro.goalChangedBody(strings.Duration.hoursSpelled(hours))
         }
     }
 }

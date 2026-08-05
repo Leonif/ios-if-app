@@ -119,17 +119,6 @@ enum ProNotice: Equatable, Sendable {
     /// Edge 17. The other half of edge 9: the fast in flight was allowed to finish
     /// on its custom goal, so the next one starting shorter has to be said out loud.
     case goalChanged(fallbackHours: Int)
-
-    /// Whether there is anything to say yet. Edge 17 has no copy in any locale — the
-    /// English source has not been written — so it stays queued rather than opening
-    /// an empty sheet. One place reads this, and it turns itself on when the strings
-    /// land: nothing else has to change.
-    var hasCopy: Bool {
-        switch self {
-        case .entitlementRevoked: return true
-        case .goalChanged: return !strings.Pro.goalChangedTitle.isEmpty
-        }
-    }
 }
 
 /// The six states of the offer screen, as one value. They replace each other in

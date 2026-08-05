@@ -14,7 +14,10 @@ enum AnalyticsEvent {
     case appOpened
     /// User started a fast. `goalHours` = the chosen plan's fasting window.
     case fastStarted(goalHours: Double)
-    /// User ended a fast. `completed` = the fast had reached its goal.
+    /// User ended a fast. `completed` = the fast had reached its goal. `stage` = the
+    /// phase the fast was in, as a stable code (`fed`/`sugar`/`fat`/`ketosis`/
+    /// `autophagy`) — never the displayed label, which differs per locale and makes
+    /// the dimension impossible to group.
     case fastStopped(durationSeconds: Int, completed: Bool, stage: String)
     /// The fast reached its goal (the goal-reached moment fired). `goalHours` = plan window.
     case goalReached(goalHours: Double)
@@ -40,6 +43,12 @@ enum AnalyticsEvent {
     case historyOpened(source: String)
     /// User deleted a record from the history (swipe + confirm).
     case historyRecordDeleted
+    /// The history was handed to the share sheet as a CSV. No parameters at all —
+    /// deliberately, because a parameter would need a custom definition registered in
+    /// GA4 before submit and none of them would change the one decision this event
+    /// exists to inform: whether an import is ever worth building. A cancelled share
+    /// does not fire it.
+    case historyExported
     /// The native `requestReview` was called. `trigger` = what caused it
     /// ("streak_milestone" / "next_open"). Apple may or may not show the panel.
     case reviewPrompted(trigger: String)
@@ -86,6 +95,7 @@ enum AnalyticsEvent {
         case .sourcesOpened: return "sources_opened"
         case .historyOpened: return "history_opened"
         case .historyRecordDeleted: return "history_record_deleted"
+        case .historyExported: return "history_exported"
         case .reviewPrompted: return "review_prompted"
         case .streakMilestone: return "streak_milestone"
         case .planSelected: return "plan_selected"
@@ -148,7 +158,7 @@ enum AnalyticsEvent {
                 "reason": reason,
             ]
         case .appOpened, .eatingWindowStarted, .fastChained, .timeAdjusted, .sourcesOpened,
-             .historyRecordDeleted, .restoreCompleted:
+             .historyRecordDeleted, .historyExported, .restoreCompleted:
             return [:]
         }
     }

@@ -23,6 +23,9 @@ enum AppDependencies {
         container.register(FastHistoryRepositoryProtocol.self) {
             FastHistoryRepository()
         }
+        container.register(HistoryExportRepositoryProtocol.self) {
+            HistoryExportRepository()
+        }
         container.register(StoreRepositoryProtocol.self) {
             // StoreKit's local test configuration lives on the Xcode scheme, so an app
             // launched by `simctl` never has a store to talk to. `-seedStore` puts a

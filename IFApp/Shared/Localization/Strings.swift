@@ -40,19 +40,19 @@ enum strings {
     }
 
     enum Editorial {
-        static var idle: String { String(localized: "Start whenever you're ready, or log your last meal to pick up a fast already in progress.") }
+        static var idle: String { String(localized: "Start whenever you’re ready, or log your last meal to pick up a fast already in progress.") }
         static var complete: String { String(localized: "Fast complete. Your eating window is ready. Refuel gently.") }
         static var windowOpen: String { String(localized: "Fast complete. Your eating window is open. Refuel gently.") }
         static var fed: String { String(localized: "Still digesting. Insulin is up and your body is storing the energy from your last meal.") }
         static var sugar: String { String(localized: "Glucose is easing down. Your body is leaning on its glycogen stores for fuel.") }
         static var fat: String { String(localized: "Glycogen is running low. Fat is becoming your main source of energy.") }
-        static var ketosis: String { String(localized: "Ketones are climbing. You're well into fat-burning now.") }
+        static var ketosis: String { String(localized: "Ketones are climbing. You’re well into fat-burning now.") }
         static var autophagy: String { String(localized: "Deep in the fast. Autophagy is recycling what your cells no longer need.") }
-        static var windowClosed: String { String(localized: "Your eating window has closed. Every minute since already counts - continue your fast whenever you're ready.") }
+        static var windowClosed: String { String(localized: "Your eating window has closed. Every minute since already counts - continue your fast whenever you’re ready.") }
 
         /// Editorial shown once the goal is reached (overtime). `hours` = plan goal in hours.
         static func goalReached(_ hours: Int) -> String {
-            String(format: String(localized: "You've reached your %d-hour goal. Every minute now is deeper autophagy."), hours)
+            String(format: String(localized: "You’ve reached your %d-hour goal. Every minute now is deeper autophagy."), hours)
         }
 
         /// "Autophagy begins in 2h 36m"
@@ -117,18 +117,16 @@ enum strings {
         static var confirmMessage: String { String(localized: "This discards the current fast and returns to the start.") }
         static var confirmAction: String { String(localized: "Reset fast") }
         static var keepFasting: String { String(localized: "Keep fasting") }
-        static var cancel: String { String(localized: "Cancel") }
     }
 
     enum Sheet {
         static var fastingPlan: String { String(localized: "Fasting plan") }
         static var planSubtitle: String { String(localized: "Pick how long a fast runs. The window starts when you end it.") }
         static var customLength: String { String(localized: "Custom length") }
-        static var customCaption: String { String(localized: "Any length from 1 to 23 hours") }
-        static var pickerFootnote: String { String(localized: "1 to 23 hours. There is no “no window” value - ending a fast always opens one.") }
+        static var customCaption: String { String(localized: "From 1 to 23 hours") }
         static var done: String { String(localized: "Done") }
         static var whenDidYouEat: String { String(localized: "When did you last eat?") }
-        static var backdateHint: String { String(localized: "We'll back-date your fast so the timer stays accurate.") }
+        static var backdateHint: String { String(localized: "We’ll back-date your fast so the timer stays accurate.") }
         static var chip30Min: String { String(localized: "30 min") }
         static var chip1Hour: String { String(localized: "1 hour") }
         static var chip2Hours: String { String(localized: "2 hours") }
@@ -193,15 +191,11 @@ enum strings {
     }
 
     enum Streak {
-        /// "3-day streak" — the flame pill on the main screen.
-        static func badge(_ days: Int) -> String {
-            String(localized: "\(days)-day streak", locale: .latinDigits)
-        }
         /// Milestone card title, e.g. "7 days in a row".
         static func milestoneTitle(_ days: Int) -> String {
             String(localized: "\(days) days in a row", locale: .latinDigits)
         }
-        static var milestoneSubtitle: String { String(localized: "You've hit your fasting goal every day. Keep the rhythm going.") }
+        static var milestoneSubtitle: String { String(localized: "You’ve hit your fasting goal every day. Keep the rhythm going.") }
         static var milestoneClose: String { String(localized: "Keep going") }
     }
 
@@ -222,8 +216,24 @@ enum strings {
         static var emptyTitle: String { String(localized: "Your fasts gather here") }
         static var emptyBody: String { String(localized: "Every finished fast is saved with its length, plan and times - so you can look back on the rhythm you are building.") }
         static var emptyCta: String { String(localized: "Start a fast") }
-        static var firstNote: String { String(localized: "First one saved. Finish tomorrow's fast and your streak begins.") }
+        static var firstNote: String { String(localized: "First one saved. Finish tomorrow’s fast and your streak begins.") }
         static var savedToHistory: String { String(localized: "Saved to your history") }
+        /// The export affordance in the history nav row. The control is the system
+        /// share glyph and carries no caption, so this is its VoiceOver label — and
+        /// the word is `Export`, without the `CSV` token: the format is named once,
+        /// in the offer's benefit title.
+        static var export: String { String(localized: "Export") }
+        /// The hint on the locked control, not its label: the label stays `Export`
+        /// either way, and this is the sentence that tells a VoiceOver user the tap
+        /// leads to the offer rather than to a file. The lock badge says it visually
+        /// and is decorative to the accessibility tree.
+        ///
+        /// "the … screen" is load-bearing, not padding: after "opens", a bare product
+        /// name lands in the "application" class in every language Apple ships, so a
+        /// blind user hears "launches the separate IF24 Pro app", concludes it is not
+        /// installed, and does not tap. The non-breaking space inside the token is the
+        /// catalog's rule for it — all 32 occurrences carry it.
+        static var exportLockedHint: String { String(localized: "Opens the IF24\u{00A0}Pro screen") }
 
         /// Streak unit beside the big number. The number is drawn separately (display
         /// type), so the catalog's plural variants carry the word alone — the CLDR
@@ -272,7 +282,7 @@ enum strings {
         static var goalTitle: String { String(localized: "Fast complete") }
         static var goalBody: String { String(localized: "You reached your goal. Your eating window is open.") }
         static var eatingEndTitle: String { String(localized: "Eating window closed") }
-        static var eatingEndBody: String { String(localized: "Time to fast. Start whenever you're ready.") }
+        static var eatingEndBody: String { String(localized: "Time to fast. Start whenever you’re ready.") }
     }
 
     /// The paid tier: the offer screen, the Pro section of the About sheet, and the
@@ -282,7 +292,7 @@ enum strings {
     /// in Korean the particle that follows it is chosen by its pronunciation, which
     /// stops being decidable the moment the token becomes a `%@`.
     enum Pro {
-        static var productName: String { "IF24 Pro" }
+        static var productName: String { "IF24\u{00A0}Pro" }
 
         // Offer — headline and the framing line under it. The framing line belongs
         // to whichever benefit leads the list, so it changes with the entry point.
@@ -292,7 +302,7 @@ enum strings {
 
         // Offer — the three benefits.
         static var benefitCustomTitle: String { String(localized: "Custom length") }
-        static var benefitCustomBody: String { String(localized: "Any length you choose, not only the four presets.") }
+        static var benefitCustomBody: String { String(localized: "Any whole hour, not only the four presets.") }
         static var benefitExportTitle: String { String(localized: "History as CSV") }
         static var benefitExportBody: String { String(localized: "Export every fast you have logged, whenever you like.") }
         static var benefitFreezeTitle: String { String(localized: "Protected day") }
@@ -321,11 +331,11 @@ enum strings {
         // Offer — states S3…S6.
         static var failedTitle: String { String(localized: "Purchase not completed") }
         static var failedBodyGeneral: String { String(localized: "Something interrupted it before the payment went through. Nothing will be charged.") }
-        static var failedBodyNetwork: String { String(localized: "The purchase could not reach the App Store. Nothing will be charged - try again online.") }
+        static var failedBodyNetwork: String { String(localized: "The purchase could not reach the App\u{00A0}Store. Nothing will be charged - try again online.") }
         static var awaitingTitle: String { String(localized: "Awaiting approval") }
         static var awaitingBody: String { String(localized: "The request went to whoever approves your purchases. Pro switches on the moment they approve it - nothing will be charged before that, and everything you already use stays exactly as it is.") }
         static var unverifiedTitle: String { String(localized: "Purchases not checked yet") }
-        static var unverifiedBody: String { String(localized: "You are offline, so we cannot see what you already own. Restore first - if Pro is on this Apple Account it comes straight back.") }
+        static var unverifiedBody: String { String(localized: "Restore first - if Pro is on this Apple\u{00A0}Account it comes straight back.") }
         static var restoredTitle: String { String(localized: "Purchases restored") }
         static var restoredBody: String { String(localized: "Pro is active on this device. Everything below is open now.") }
         /// Transient answer to a Restore that found nothing. Not a failure and not a
@@ -343,52 +353,34 @@ enum strings {
         static var statusActive: String { String(localized: "Active") }
         static var statusAwaiting: String { String(localized: "Awaiting approval") }
         static var statusUnverified: String { String(localized: "Not checked yet") }
-        static var sectionFooter: String { String(localized: "Restoring works on any device signed in to the same Apple Account.") }
+        static var sectionFooter: String { String(localized: "Restoring works on any device signed in to the same Apple\u{00A0}Account.") }
 
         // Notices — edge 6 and edge 17. One sheet, two moments.
-        static var revokedTitle: String { String(localized: "IF24 Pro is no longer active") }
+        static var revokedTitle: String { String(localized: "IF24\u{00A0}Pro is no longer active") }
         static var revokedBody: String { String(localized: "Your history stays as it is.") }
-        /// Edge 17 / PW-10. No copy exists in any locale, English source included, so
-        /// these are deliberately empty rather than written here — the notice is wired
-        /// end to end and stays silent until product supplies the source. `hasCopy` on
-        /// `ProNotice` is the single place that reads the emptiness.
-        static var goalChangedTitle: String {
-            pendingCopy("pro.notice.goalChanged.title",
-                        String(localized: "pro.notice.goalChanged.title", defaultValue: "",
-                               comment: "Edge 17 title. Awaiting an English source from product."))
-        }
+        /// Edge 17 / PW-10. Keyed by its own English text like every other string
+        /// here, and deliberately so: while a key had an empty default, the catalog
+        /// compiler dropped the entry, Foundation handed the key back verbatim, and
+        /// the sheet rendered `pro.notice.goalChanged.title` on screen (PW-7). With
+        /// the English source as the key that failure cannot be built.
+        static var goalChangedTitle: String { String(localized: "Your goal changed") }
+        /// `%@` is the spelled-out fallback goal ("16 hours") — the vocabulary the
+        /// custom length was set in, so it compares against the 17 just lost without
+        /// arithmetic.
         static func goalChangedBody(_ goal: String) -> String {
-            let format = pendingCopy("pro.notice.goalChanged.body",
-                                     String(localized: "pro.notice.goalChanged.body", defaultValue: "",
-                                            comment: "Edge 17 body. %@ is the goal the next fast falls back to."))
-            return format.isEmpty ? "" : String(format: format, goal)
-        }
-
-        /// Empty when a key that is empty on purpose has nothing to say yet.
-        ///
-        /// `defaultValue` never reaches the screen for these two: the String Catalog
-        /// compiler drops an entry whose value is empty, so at runtime the key is not
-        /// in `Localizable.strings` at all and Foundation takes its own "key not
-        /// found" path — which hands the key back verbatim rather than the default.
-        /// Emptiness therefore has to be read as "resolved to nothing **or** came back
-        /// as itself", or `pro.notice.goalChanged.title` is what the user reads
-        /// (PW-7 / edge 17).
-        private static func pendingCopy(_ key: String, _ resolved: String) -> String {
-            resolved == key ? "" : resolved
+            String(format: String(localized: "Custom lengths need IF24\u{00A0}Pro, so your plan is %@ from now on."), goal)
         }
     }
 
     enum About {
         static var title: String { String(localized: "About IF24") }
-        static var privacyFooter: String { String(localized: "No account, no sign-in. Your fasts stay on your device.") }
+        static var privacyFooter: String { String(localized: "No IF24 account, no sign-in - IF24 never asks who you are. Your history is kept on this device; how long your fasts run is sent as usage data.") }
         /// Closes the science section rather than sitting under a commercial row.
-        static var medicalNote: String { String(localized: "IF24 is not a medical device and does not give medical advice. If you are pregnant, managing diabetes, or taking medication with food, talk to a clinician before changing how you eat.") }
+        static var medicalNote: String { String(localized: "The fasting phases IF24 shows are estimates based on typical timing, not a measurement of your body. IF24 is not a medical device and does not give medical advice. If you are pregnant, managing diabetes, or taking medication with food, talk to a clinician before changing how you eat.") }
     }
 
     enum Sources {
         static var title: String { String(localized: "Scientific Sources") }
-        static var subtitle: String { String(localized: "The research behind each fasting phase.") }
-        static var viewStudy: String { String(localized: "View Study") }
         static var source1: String { String(localized: "Glycogen and its metabolism: some new developments and old themes") }
         static var source2: String { String(localized: "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial") }
         static var source3: String { String(localized: "Fasting-induced FGF21 signaling activates hepatic autophagy and lipid degradation via JMJD3 histone demethylase") }

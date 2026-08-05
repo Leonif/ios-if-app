@@ -17,10 +17,17 @@ import Redux
 struct HistoryProps: Equatable {
     let records: [FastRecord]
     let streak: StreakStatus
+    /// Whether the export is unlocked. `unknown` locks exactly like `free` — Pro is
+    /// never handed out on a guess.
+    let isPro: Bool
+    /// The written CSV waiting to be shared; the share sheet is up while it exists.
+    let exportFile: URL?
 
     init(state: AppState) {
         records = state.historyState.records
         streak = state.timerState.streak
+        isPro = state.proState.isPro
+        exportFile = state.historyState.exportFile
     }
 }
 
@@ -79,6 +86,18 @@ struct HistoryFlowView: View {
             // Drives the entry animation: rows rise into place on the first frame only.
             withAnimation(reduceMotion ? .easeOut(duration: 0.2) : nil) { appeared = true }
         }
+        // Apple's sheet, so it is presented the system way rather than as an overlay
+        // with our own motion numbers.
+        .sheet(isPresented: Binding(
+            get: { props.exportFile != nil },
+            set: { if !$0 { store.dispatch(HistoryAction.exportFinished(shared: false)) } }
+        )) {
+            if let file = props.exportFile {
+                ShareSheet(file: file) { completed in
+                    store.dispatch(HistoryAction.exportFinished(shared: completed))
+                }
+            }
+        }
         .overlay {
             DeleteFastSheet(
                 isOpen: pendingDelete != nil,
@@ -121,9 +140,67 @@ struct HistoryFlowView: View {
                 .foregroundColor(theme.ink)
 
             Spacer()
+
+            // No records, no export: the empty branch below already says what this
+            // screen is for, and a control that can only produce an empty file would
+            // be a dead end needing its own explanation.
+            if !props.records.isEmpty {
+                exportButton(theme: theme)
+            }
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 10)
+    }
+
+    /// The system share affordance, in the same 34pt circle the back button uses —
+    /// the screen's own pattern for a nav control, since the offer handoff draws no
+    /// mockup for this one. Locked, it carries the lock glyph from that handoff.
+    private func exportButton(theme: ThemeTokens) -> some View {
+        Button(action: {
+            // Locked, the control is a door rather than a statement (decision 93).
+            // The trigger is the existing `manual` — by its own definition that value
+            // means "the offer was opened from a permanent entry", and a lock that
+            // sits on the history screen for as long as Pro is not owned is exactly
+            // that. A trigger of its own would split 20-35 monthly impressions into
+            // two columns of noise instead of a distribution.
+            if props.isPro {
+                store.dispatch(ExportHistoryThunk())
+            } else {
+                store.dispatch(ProAction.offerOpened(trigger: .manual))
+            }
+        }) {
+            Image(systemName: "square.and.arrow.up")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(props.isPro ? theme.ink : theme.mut)
+                // The glyph's own baseline sits low inside its box; the nudge puts
+                // the arrow, not the box, in the middle of the circle.
+                .offset(y: -1)
+                .frame(width: 34, height: 34)
+                .background(
+                    Circle().fill(theme.secBg)
+                        .overlay(Circle().stroke(theme.secLine, lineWidth: 1))
+                )
+                .overlay(alignment: .bottomTrailing) {
+                    if !props.isPro {
+                        Image("pro-lock")
+                            .renderingMode(.template)
+                            .foregroundColor(theme.deep)
+                            .padding(3)
+                            .background(
+                                Circle().fill(theme.accent.opacity(0.14))
+                                    .overlay(Circle().stroke(theme.accent.opacity(0.34), lineWidth: 1))
+                            )
+                            .background(Circle().fill(theme.historyBackground))
+                            .offset(x: 2, y: 2)
+                    }
+                }
+        }
+        .buttonStyle(.pressable)
+        .accessibilityLabel(strings.History.export)
+        // The lock badge is decorative to the accessibility tree, so without this the
+        // two states of the control are indistinguishable to VoiceOver.
+        .accessibilityHint(props.isPro ? "" : strings.History.exportLockedHint)
+        .accessibilityIdentifier("history.export")
     }
 
     // MARK: List
