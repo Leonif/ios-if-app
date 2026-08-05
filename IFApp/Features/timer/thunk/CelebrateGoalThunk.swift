@@ -21,7 +21,7 @@ struct CelebrateGoalThunk: Thunk {
 
         let dayKey = Clock.goalDayKey(
             fastStart: timer.fastStartTimestamp,
-            goalHours: app.planState.plan.fastHours
+            goalHours: app.activeGoalHours
         )
         dispatch(TimerAction.goalCelebrated(dayKey: dayKey))
     }

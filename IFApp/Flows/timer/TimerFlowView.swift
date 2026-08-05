@@ -21,7 +21,12 @@ struct TimerScreenProps: Equatable {
     /// Epoch seconds the eating window closes — projected from the timer state, not
     /// recomputed here, so the screen and the close push agree on the moment.
     let eatingEndTimestamp: Double
-    let planIdx: Int
+    /// The plan the user has selected — what the header pill shows and the editor edits.
+    let plan: Plan
+    /// The goal of the cycle on screen. Not the same fact as `plan`: a plan changed
+    /// mid-fast (or a custom goal whose entitlement went away) leaves the fast in
+    /// flight running to the goal it started with.
+    let goalHours: Double
     let ateDay: Int
     let ateMin: Int
     let streak: StreakStatus
@@ -40,13 +45,14 @@ struct TimerScreenProps: Equatable {
         stagedElapsed = state.timerState.stagedElapsed
         hasCelebrated = state.timerState.hasCelebrated
         isEating = state.timerState.isEating
-        eatingEndTimestamp = state.timerState.eatingEndTimestamp(fastHours: state.planState.plan.fastHours)
+        eatingEndTimestamp = state.timerState.eatingEndTimestamp(plan: state.activePlan)
         streak = state.timerState.streak
         hasRecords = !state.historyState.records.isEmpty
         lastFastDuration = state.historyState.records
             .max(by: { $0.endTimestamp < $1.endTimestamp })?
             .duration
-        planIdx = state.planState.planIdx
+        plan = state.planState.plan
+        goalHours = state.activeGoalHours
         ateDay = state.mealState.ateDay
         ateMin = state.mealState.ateMin
         planEditorOpen = state.uiState.planEditorOpen
@@ -55,7 +61,6 @@ struct TimerScreenProps: Equatable {
         resetConfirmOpen = state.uiState.resetConfirmOpen
     }
 
-    var plan: Plan { Plan(rawValue: planIdx) ?? .default }
     var isMealFresh: Bool { ateMin < 0 }
 
     func elapsed(at now: Date) -> TimeInterval {
@@ -171,7 +176,7 @@ struct TimerFlowView: View {
         if state == .eating || state == .eatingOver {
             theme.eatingWindowBackground.ignoresSafeArea()
         } else {
-            let progress = PhaseProgress.compute(elapsed: props.elapsed(at: Date()), goalHours: props.plan.fastHours)
+            let progress = PhaseProgress.compute(elapsed: props.elapsed(at: Date()), goalHours: props.goalHours)
             theme.phaseBackground(progress.phase.color).ignoresSafeArea()
         }
     }
@@ -181,7 +186,7 @@ struct TimerFlowView: View {
     @ViewBuilder
     private func screen(theme: ThemeTokens, now: Date) -> some View {
         let elapsed = props.elapsed(at: now)
-        let progress = PhaseProgress.compute(elapsed: elapsed, goalHours: props.plan.fastHours)
+        let progress = PhaseProgress.compute(elapsed: elapsed, goalHours: props.goalHours)
         let state = screenState(progress: progress, now: now)
         let nowMinute = Clock.minuteOfDay(now)
 
@@ -347,7 +352,7 @@ struct TimerFlowView: View {
         case .active:
             RingCenterActive(elapsed: elapsed, phase: progress.phase, theme: theme)
         case .goalReached:
-            RingCenterGoalReached(elapsed: elapsed, goalSeconds: props.plan.fastHours * 3600, theme: theme)
+            RingCenterGoalReached(elapsed: elapsed, goalSeconds: props.goalHours * 3600, theme: theme)
         case .complete:
             RingCenterComplete(elapsed: elapsed, theme: theme)
         case .eating, .eatingOver:
@@ -368,16 +373,16 @@ struct TimerFlowView: View {
             ActiveFooterCard(
                 startedAt: clockTime(props.fastStartTimestamp),
                 elapsed: hoursMinutes(elapsed),
-                goalLabel: strings.Duration.goalHours(Int(props.plan.fastHours)),
-                goalAt: clockTime(props.fastStartTimestamp + props.plan.fastHours * 3600),
+                goalLabel: strings.Duration.goalHours(Int(props.goalHours)),
+                goalAt: clockTime(props.fastStartTimestamp + props.goalHours * 3600),
                 theme: theme,
                 onEndFast: { store.dispatch(StopFastThunk()) }
             )
         case .goalReached:
             GoalReachedFooterCard(
                 fasted: hoursMinutes(elapsed),
-                goal: hoursMinutes(props.plan.fastHours * 3600),
-                over: "+" + overtimeShort(elapsed - props.plan.fastHours * 3600),
+                goal: hoursMinutes(props.goalHours * 3600),
+                over: "+" + overtimeShort(elapsed - props.goalHours * 3600),
                 theme: theme,
                 onReset: { store.dispatch(UIAction.resetConfirmOpened) },
                 onEndFast: { store.dispatch(StopFastThunk()) }
@@ -425,7 +430,7 @@ struct TimerFlowView: View {
             PlanEditorSheet(
                 plan: props.plan,
                 theme: theme,
-                onSelect: { store.dispatch(PlanAction.selected($0)) },
+                onSelect: { store.dispatch(PlanAction.selected(hours: $0)) },
                 onDone: { store.dispatch(UIAction.planEditorClosed) },
                 onClose: { store.dispatch(UIAction.planEditorClosed) }
             )
@@ -474,7 +479,7 @@ struct TimerFlowView: View {
         case .idle: return PhaseCopy.idle
         case .complete: return PhaseCopy.complete
         case .active: return PhaseCopy.editorial(for: progress.phase)
-        case .goalReached: return strings.Editorial.goalReached(Int(props.plan.fastHours))
+        case .goalReached: return strings.Editorial.goalReached(Int(props.goalHours))
         case .eating: return strings.Editorial.windowOpen   // eating renders its own editorial in screen()
         case .eatingOver: return strings.Editorial.windowClosed
         }
@@ -486,7 +491,7 @@ struct TimerFlowView: View {
     private func currentScreenState() -> ScreenState {
         let now = Date()
         return screenState(progress: PhaseProgress.compute(elapsed: props.elapsed(at: now),
-                                                           goalHours: props.plan.fastHours),
+                                                           goalHours: props.goalHours),
                            now: now)
     }
 

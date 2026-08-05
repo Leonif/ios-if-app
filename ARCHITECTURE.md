@@ -178,10 +178,7 @@ grep -rn "container.inject" IFApp --include='*.swift' | grep "Store<"
 
 **Следуют:** канон — `Shared/Localization/Strings.swift:25`. Потребители: `Features/history/HistoryFormat.swift:22` (→ 6 форматтеров), `Features/timer/components/StreakBadge.swift:66` и `Features/history/components/HistorySummaryCard.swift:57` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте).
 
-**Нарушают: 2** (обе — в работе у `dev`):
-
-- `Features/meal/MealMath.swift` (`timeLabel`) — `f.locale = .current`, ничего не пиннится. Рендерится в шторке last-meal; в арабском даст восточно-арабские цифры рядом с латинскими.
-- `Flows/timer/TimerFlowView.swift` (`clockTime`) — собирает свой latn-локаль инлайном вместо `Locale.latinDigits`. Сегодня работает, но это вторая копия определения: правка канона (как добавление `calendar = .gregorian`) сюда не доедет. Пересекается с пунктом 8.
+**Нарушают: 0.** Обе позиции закрыты и **закоммичены** — сверено на `HEAD` 05.08.2026: `Features/meal/MealMath.swift:45` (`timeLabel`, был `f.locale = .current`) и `Flows/timer/TimerFlowView.swift:593` (`clockTime`, собирал latn-локаль инлайном) — обе теперь `f.locale = .latinDigits`.
 
 **Решение 26.07.2026: `entryA11y` — не нарушение.** `Shared/Localization/Strings.swift:257-259` интерполирует `Int` в `String(localized:)` без `locale: .latinDigits`, тогда как все остальные Int-принимающие аксессоры файла локаль передают (`:155`, `:193`, `:197`, `:239`, `:244`). Доаудит вынес это в нарушения; владелец и `dev` независимо решили иначе, и по одной причине: `entryA11y` — VoiceOver-метка. Для арабского скринридера локальные цифры и есть правильное поведение, а исходное правило речь от изображения не отличало. Поэтому сужена **область правила** (см. выше), а не заведено исключение из списка: исключение следующий прогон нашёл бы снова и снова поднял бы тот же вопрос.
 
@@ -210,11 +207,9 @@ grep -rn 'Text("' IFApp --include='*.swift' | grep '\\('
 
 **Следуют:** 8 тханков — `StartFastThunk:17`, `StopFastThunk:16`, `AdjustTimeThunk:23`, `StartEatingThunk:14`, `OpenMealPickerThunk:12`, `QuickMealChipThunk:16`, `ConfirmLastMealThunk:20-22`, `ContinueFastingThunk:27-29`.
 
-**Нарушают: 2** (правило принято с известным долгом, обе позиции — в работе у `dev`):
-- `Flows/timer/TimerFlowView.swift:557` — `store.dispatch(TimerAction.goalCelebrated(dayKey: Clock.dayKey()))`
-- `Flows/timer/TimerFlowView.swift:519-521` — `MealMath.dayAndMinute(of: close)` → `MealAction.initialized(...)`
+**Нарушают: 0.** Правило было принято с известным долгом в две позиции; обе закрыты и **закоммичены** — сверено на `HEAD` 05.08.2026. `Clock.dayKey()` под `goalCelebrated` ушёл в `Features/timer/thunk/CelebrateGoalThunk.swift`, `MealMath.dayAndMinute` под `MealAction.initialized` — в `Features/meal/thunk/SeedLastMealFromWindowCloseThunk.swift`. В `Flows/` часов, идущих в payload, не осталось.
 
-**Не нарушают:** `TimerFlowView.swift:85`, `:200`, `:449` — чтение часов для отображения, а не для payload.
+**Не нарушают:** `TimerFlowView.swift:111`, `:174`, `:186`, `:435`, `:487` (нумерация `HEAD`) — чтение часов для отображения, а не для payload.
 
 **Как проверить:**
 ```
@@ -261,23 +256,25 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 - `Features/history/FastRecord.swift` — `duration`, `goalFraction`, `isExtended` выведены на записи, с записанной причиной («кэшированное пришлось бы синхронизировать при удалении»)
 - `Core/Clock.swift` — `dayKey` / `isDayBefore` — единственная арифметика календарных дней
 - `Features/plan/PlanState.swift:9` — `plan` как канонический доступ к плану по индексу
-- `Features/timer/TimerState.swift` — `StreakStatus.displayed(at:)` (правка `dev`, в рабочем дереве)
+- `Features/timer/TimerState.swift:22` — `StreakStatus.displayed(at:)` (закоммичено, сверено на `HEAD` 05.08.2026)
 
 **Нарушают: 7.** Номера строк сняты на рабочем дереве **до коммита `dev`** (HEAD `050704e`, четыре файла изменены, два тханка не добавлены в индекс) — после его коммита ссылки поедут, значения останутся.
 
 | # | Что задвоено | Где |
 |---|---|---|
 | 8.1 | Момент закрытия пищевого окна `eatingStart + (24 − fastHours) × 3600` — **5 определений** | `Flows/timer/TimerFlowView.swift:59,68,71` · `Middleware/NotificationMiddleware.swift:54-55` · `Features/timer/thunk/ContinueFastingThunk.swift:22` · `Features/meal/thunk/ConfirmLastMealThunk.swift:27` · `Features/meal/thunk/SeedLastMealFromWindowCloseThunk.swift:17` |
-| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **3 определения** | `Flows/timer/TimerFlowView.swift:62-63` · `Features/timer/thunk/StopFastThunk.swift:17-19` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` |
+| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **4 определения** | `Flows/timer/TimerFlowView.swift:62-63` · `Features/timer/thunk/StopFastThunk.swift:17-19` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` · `Features/timer/thunk/ResetFastThunk.swift:20-22` |
 | 8.3 | День, в который зачисляется достигнутая цель — **2 определения, уже расходятся** | `Features/timer/thunk/CelebrateGoalThunk.swift:15` (`Clock.dayKey()` — «сегодня») · `Features/history/FastRecord.swift:57` (`Clock.dayKey(start + goal)` — вычисленный момент цели) |
 | 8.4 | Предикат «цель достигнута» `elapsed ≥ goalHours × 3600` — **3 определения** | `Features/phase/Phase.swift:54` (`isComplete`) · `Features/history/FastRecord.swift:27` (`goalReached`) · `Features/timer/thunk/StopFastThunk.swift:23` (`qualifies`) |
 | 8.5 | План по индексу с фолбэком `Plan(rawValue:) ?? .default` — **3 копии мимо `PlanState.plan`** | `Flows/timer/TimerFlowView.swift:56` · `Features/timer/thunk/StopFastThunk.swift:22` · `Middleware/NotificationMiddleware.swift:37` |
 | 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:68` · `Flows/timer/TimerFlowView.swift:606` |
 | 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела, включая doc-комментарий** | `Features/timer/components/RingCenter.swift:116-120` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:514-518` (`overtimeShort`) |
 
+**Поправка учёта 05.08.2026 (только измерение, формулировка пункта не менялась).** 8.2 значилось как 3 определения — фактически 4, четвёртое (`ResetFastThunk`) в первом замере не попало в выборку. По 8.1 и 8.5: обе позиции сведены к одному определению в **рабочем дереве** ветки `current-release` (дев-цикл 1.5.0, не закоммичено, ждёт приёмки владельца) — 8.5 исчезло вместе с `Plan(rawValue:)`, когда `Plan` стал value type; 8.1 сведено к `Features/plan/Plan.swift:45` (`windowHours` — почему окно такой длины) плюс `Features/timer/TimerState.swift:79-80` (`eatingEndTimestamp(windowHours:)` — когда оно закроется), то есть правило записано один раз, а арифметика отделена от него. Если правка не будет принята, обе строки таблицы остаются в силе как есть.
+
 Про **8.3** отдельно, потому что это не потенциальное, а состоявшееся расхождение: для поста, забэкдейченного за пределы суток, живой путь зачисляет цель в «сегодня», а запись в истории — во вчера. Текущий стрик (`TimerState.streakCount`) считается по первому правилу, лучший стрик и семидневные точки (`HistoryStats` через `goalDayKey`) — по второму. То есть два числа на экране истории уже сегодня считаются по разным правилам зачисления дня.
 
-**Случай, породивший правило** — расхождение стрика между `TimerScreenProps.displayedStreak(at:)` и `HistoryFlowView.displayedStreak`. Починка `dev` в рабочем дереве: обе проекции сведены на `StreakStatus.displayed(at:)` (`Features/timer/TimerState.swift`). Не закоммичено, ждёт приёмки владельца.
+**Случай, породивший правило** — расхождение стрика между `TimerScreenProps.displayedStreak(at:)` и `HistoryFlowView.displayedStreak`. Починка `dev`: обе проекции сведены на `StreakStatus.displayed(at:)` (`Features/timer/TimerState.swift:22`). Закоммичено, сверено на `HEAD` 05.08.2026.
 
 **Как проверить.** Граф точнее грепа: `codegraph impact` на предполагаемое каноническое определение показывает, кто им пользуется; места, которые считают то же самое и в списке не появляются, — кандидаты в нарушители. Дополнительно по формулам-константам домена:
 ```

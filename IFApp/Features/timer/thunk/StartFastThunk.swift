@@ -29,7 +29,9 @@ struct StartFastThunk: Thunk {
         let now = Date().timeIntervalSince1970
         // Carry any staged elapsed time into the start so the count continues from there.
         let startTimestamp = now - timer.stagedElapsed
-        dispatch(TimerAction.started(startTimestamp: startTimestamp))
+        // The plan as it stands *now* becomes this fast's goal and stops moving.
+        dispatch(TimerAction.started(startTimestamp: startTimestamp,
+                                     goalHours: app.planState.plan.fastHours))
 
         await requestPushAuthorizationIfNeeded(dispatch: dispatch)
     }

@@ -10,7 +10,9 @@ import Redux
 
 enum TimerAction: Action {
     /// Begin a fast. `startTimestamp` already accounts for any staged elapsed time.
-    case started(startTimestamp: Double)
+    /// `goalHours` is the goal this fast runs to — injected at dispatch and pinned in
+    /// state, so it stops following the plan setting once the fast is under way.
+    case started(startTimestamp: Double, goalHours: Double)
     /// End a fast. `qualifiesAsCompleted` = the fast reached its goal. Analytics-only:
     /// completed fasts are counted on `goalCelebrated`, not here.
     case stopped(elapsed: TimeInterval, qualifiesAsCompleted: Bool)

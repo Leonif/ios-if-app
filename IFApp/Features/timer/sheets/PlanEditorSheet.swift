@@ -10,6 +10,8 @@ import SwiftUI
 struct PlanEditorSheet: View {
     let plan: Plan
     let theme: ThemeTokens
+    /// Reports the chosen plan by its length in hours, not by segment position: the
+    /// segments are the four presets, and a plan is no longer a place in that list.
     let onSelect: (Int) -> Void
     let onDone: () -> Void
     let onClose: () -> Void
@@ -40,10 +42,12 @@ struct PlanEditorSheet: View {
             }
 
             SegmentedControl(
-                options: Plan.allCases.map(\.ratioLabel),
-                selectedIndex: plan.rawValue,
+                options: Plan.presets.map(\.ratioLabel),
+                // A custom plan matches no segment: none is highlighted, which is
+                // honest until the Custom row from the 1.5.0 handoff lands below.
+                selectedIndex: Plan.presets.firstIndex(of: plan) ?? -1,
                 theme: theme,
-                onSelect: onSelect
+                onSelect: { onSelect(Plan.presets[$0].hours) }
             )
 
             HStack {

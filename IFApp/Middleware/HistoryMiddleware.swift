@@ -64,12 +64,15 @@ final class HistoryMiddleware: Middleware {
 
         guard end - before.fastStartTimestamp >= Self.minimumDuration else { return }
 
+        // The goal the fast actually ran to: pinned at its start, so a plan change
+        // (or a lost entitlement) part-way through cannot relabel it afterwards.
+        let goalHours = before.resolvedGoalHours(planHours: previousPlan.fastHours)
         let record = FastRecord(
             id: UUID(),
             startTimestamp: before.fastStartTimestamp,
             endTimestamp: end,
-            goalHours: previousPlan.fastHours,
-            planLabel: previousPlan.ratioLabel
+            goalHours: goalHours,
+            planLabel: Plan(goalHours: goalHours).ratioLabel
         )
         repo.append(record)
         dispatch(HistoryAction.recorded(record))

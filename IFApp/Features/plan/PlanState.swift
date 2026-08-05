@@ -4,7 +4,7 @@
 //
 
 struct PlanState: Equatable, Sendable {
-    var planIdx: Int = Plan.default.rawValue
-
-    var plan: Plan { Plan(rawValue: planIdx) ?? .default }
+    /// The selected plan. Stored as the value itself rather than a position in a list:
+    /// a custom goal has no position.
+    var plan: Plan = .default
 }

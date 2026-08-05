@@ -1,0 +1,37 @@
+//
+//  ProAction.swift
+//  IFApp
+//
+
+import Redux
+
+enum ProAction: Action {
+    /// The offer screen opened, and from where.
+    case offerOpened(trigger: PaywallTrigger)
+    /// The offer screen was closed — by the user, or by itself after a purchase.
+    case offerClosed
+
+    /// A store lookup finished: what is owned and what is for sale, together, because
+    /// they are answered by the same round trip and disagreeing halves are worse than
+    /// a slightly later answer.
+    case storeResolved(entitlement: Entitlement, product: ProProductInfo?)
+    /// The entitlement changed under us — a purchase made elsewhere, an approved
+    /// Ask to Buy, a refund, a family member leaving the group.
+    case entitlementChanged(Entitlement)
+
+    case purchaseStarted
+    case purchaseCompleted
+    /// Ask to Buy: the purchase exists but nobody has approved it yet.
+    case purchasePending
+    /// `cancelled` means the user backed out; the screen returns to the offer rather
+    /// than to an error.
+    case purchaseFailed(PurchaseFailure)
+
+    case restoreStarted
+    /// Restore ran and found the purchase.
+    case restoreCompleted
+    /// Restore ran and there was nothing to restore. Not an error: the screen goes
+    /// back to the offer, now with a verified answer behind it.
+    case restoreFoundNothing
+    case restoreFailed(PurchaseFailure)
+}

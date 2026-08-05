@@ -19,8 +19,9 @@ struct StopFastThunk: Thunk {
             : timer.stagedElapsed
         // Analytics-only flag (`fast_stopped.completed`) — it gates nothing. The
         // review prompt now hangs off reaching the goal, not off ending the fast.
-        let goalHours = (Plan(rawValue: app.planState.planIdx) ?? .default).fastHours
-        let qualifies = elapsed >= goalHours * 3600
+        // The goal this fast was started with — not the plan as it stands now, which
+        // the user may have changed (or lost the entitlement for) mid-fast.
+        let qualifies = elapsed >= app.activeGoalHours * 3600
 
         dispatch(TimerAction.stopped(elapsed: elapsed, qualifiesAsCompleted: qualifies))
     }

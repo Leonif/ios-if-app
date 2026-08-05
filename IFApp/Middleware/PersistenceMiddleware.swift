@@ -23,6 +23,7 @@ final class PersistenceMiddleware: Middleware {
             let timer = app.timerState
             repo.save(
                 fastStartTimestamp: timer.fastStartTimestamp,
+                goalHours: timer.goalHours,
                 isRunning: timer.isRunning,
                 completedSessions: timer.completedSessionsCount,
                 hasCelebrated: timer.hasCelebrated,
@@ -32,7 +33,7 @@ final class PersistenceMiddleware: Middleware {
                 lastGoalDate: timer.lastGoalDate
             )
         case is PlanAction:
-            repo.savePlanIdx(app.planState.planIdx)
+            repo.savePlanHours(app.planState.plan.hours)
         default:
             break
         }

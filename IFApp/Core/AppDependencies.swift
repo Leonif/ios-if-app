@@ -23,5 +23,8 @@ enum AppDependencies {
         container.register(FastHistoryRepositoryProtocol.self) {
             FastHistoryRepository()
         }
+        container.register(StoreRepositoryProtocol.self) {
+            StoreRepository()
+        }
     }
 }

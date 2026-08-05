@@ -24,11 +24,12 @@ struct ConfirmLastMealThunk: Thunk {
         dispatch(AppLifecycleAction.lastMealLogged(backdated: !meal.isFresh, minutesAgo: minutesAgo))
         // Confirming from the window-closed screen chains the next fast.
         let timer = app.timerState
-        let eatingEnd = timer.eatingEndTimestamp(fastHours: app.planState.plan.fastHours)
+        let eatingEnd = timer.eatingEndTimestamp(plan: app.activePlan)
         if timer.isEating && Clock.now().timeIntervalSince1970 >= eatingEnd {
             dispatch(AppLifecycleAction.fastChained)
         }
-        dispatch(TimerAction.started(startTimestamp: fastStart))
+        dispatch(TimerAction.started(startTimestamp: fastStart,
+                                     goalHours: app.planState.plan.fastHours))
         dispatch(UIAction.mealPickerClosed)
     }
 }

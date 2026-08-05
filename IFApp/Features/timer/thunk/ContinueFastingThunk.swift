@@ -18,7 +18,7 @@ struct ContinueFastingThunk: Thunk {
         let fastStart: Double
         if meal.isFresh {
             // The seed hasn't landed yet — fall back to the window close moment.
-            fastStart = app.timerState.eatingEndTimestamp(fastHours: app.planState.plan.fastHours)
+            fastStart = app.timerState.eatingEndTimestamp(plan: app.activePlan)
         } else {
             let minutesAgo = MealMath.minutesAgo(
                 ateDay: meal.ateDay,
@@ -29,6 +29,9 @@ struct ContinueFastingThunk: Thunk {
         }
 
         dispatch(AppLifecycleAction.fastChained)
-        dispatch(TimerAction.started(startTimestamp: fastStart))
+        // A new fast: its goal is the plan as it stands now, not the one the window
+        // it chains from was measured with.
+        dispatch(TimerAction.started(startTimestamp: fastStart,
+                                     goalHours: app.planState.plan.fastHours))
     }
 }

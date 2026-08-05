@@ -14,7 +14,7 @@ enum AppStoreFactory {
         let persistence: TimerPersistenceRepositoryProtocol = container.inject()
         // UI tests launch with "-uitestReset" to start from a clean idle state.
         if ProcessInfo.processInfo.arguments.contains("-uitestReset") {
-            persistence.save(fastStartTimestamp: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false, streakCount: 0, lastGoalDate: nil)
+            persistence.save(fastStartTimestamp: 0, goalHours: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false, streakCount: 0, lastGoalDate: nil)
             let history: FastHistoryRepositoryProtocol = container.inject()
             history.replaceAll([])
         }
@@ -28,6 +28,7 @@ enum AppStoreFactory {
         let initialState = AppState(
             timerState: TimerState(
                 fastStartTimestamp: loaded.fastStartTimestamp,
+                goalHours: loaded.goalHours,
                 isRunning: loaded.isRunning,
                 stagedElapsed: 0,
                 completedSessionsCount: loaded.completedSessions,
@@ -37,7 +38,7 @@ enum AppStoreFactory {
                 streakCount: loaded.streakCount,
                 lastGoalDate: loaded.lastGoalDate
             ),
-            planState: PlanState(planIdx: persistence.loadPlanIdx() ?? Plan.default.rawValue),
+            planState: PlanState(plan: persistence.loadPlanHours().map(Plan.init(hours:)) ?? .default),
             historyState: HistoryState(records: history.loadAll().sorted { $0.startTimestamp > $1.startTimestamp })
         )
 
@@ -51,6 +52,7 @@ enum AppStoreFactory {
                 ReviewMiddleware(),
                 AnalyticsMiddleware(),
                 NotificationMiddleware(),
+                StoreMiddleware(),
             ]
         )
 

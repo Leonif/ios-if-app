@@ -14,7 +14,7 @@ import Redux
 struct SeedLastMealFromWindowCloseThunk: Thunk {
     func execute<State: Equatable>(state: State, dispatch: @escaping (Action) -> Void) async {
         guard let app = state as? AppState, app.mealState.isFresh else { return }
-        let close = app.timerState.eatingEndTimestamp(fastHours: app.planState.plan.fastHours)
+        let close = app.timerState.eatingEndTimestamp(plan: app.activePlan)
         let (day, minute) = MealMath.dayAndMinute(of: Date(timeIntervalSince1970: close), now: Clock.now())
         dispatch(MealAction.initialized(ateDay: day, ateMin: minute))
     }

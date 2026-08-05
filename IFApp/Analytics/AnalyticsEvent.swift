@@ -53,6 +53,20 @@ enum AnalyticsEvent {
     /// fired even when nothing was touched. `plan_selected` says what was tried
     /// on, this says what was kept, so the plan mix counts off this one.
     case planConfirmed(plan: String, goalHours: Int)
+    /// The offer screen was shown. `trigger` = which entry point led here
+    /// ("fast_finished" / "plan_custom" / "streak_break" / "manual"). At 20-35 shows a
+    /// month this event is read as a distribution over triggers, never as a rate.
+    case paywallShown(trigger: String)
+    /// The offer screen was closed without a purchase.
+    case paywallDismissed(trigger: String)
+    /// The Buy button was tapped and Apple's sheet was asked for.
+    case purchaseStarted(trigger: String, product: String)
+    case purchaseCompleted(trigger: String, product: String)
+    /// The attempt ended without Pro. `reason` = "cancelled" / "network" / "pending"
+    /// / "other" — "pending" is Ask to Buy, which may still be approved later.
+    case purchaseFailed(trigger: String, reason: String)
+    /// Restore purchases brought the entitlement back.
+    case restoreCompleted
     /// The appearance the app is being used in. `dark` = system dark mode.
     /// Fires on screen appear and on live theme switches — count *users* per
     /// `theme` value to see which appearance the audience actually uses.
@@ -76,6 +90,12 @@ enum AnalyticsEvent {
         case .streakMilestone: return "streak_milestone"
         case .planSelected: return "plan_selected"
         case .planConfirmed: return "plan_confirmed"
+        case .paywallShown: return "paywall_shown"
+        case .paywallDismissed: return "paywall_dismissed"
+        case .purchaseStarted: return "purchase_started"
+        case .purchaseCompleted: return "purchase_completed"
+        case .purchaseFailed: return "purchase_failed"
+        case .restoreCompleted: return "restore_completed"
         case .themeActive: return "theme_active"
         }
     }
@@ -114,8 +134,21 @@ enum AnalyticsEvent {
                 "plan": plan,
                 "goal_hours": goalHours,
             ]
+        case let .paywallShown(trigger), let .paywallDismissed(trigger):
+            return ["trigger": trigger]
+        case let .purchaseStarted(trigger, product),
+             let .purchaseCompleted(trigger, product):
+            return [
+                "trigger": trigger,
+                "product": product,
+            ]
+        case let .purchaseFailed(trigger, reason):
+            return [
+                "trigger": trigger,
+                "reason": reason,
+            ]
         case .appOpened, .eatingWindowStarted, .fastChained, .timeAdjusted, .sourcesOpened,
-             .historyRecordDeleted:
+             .historyRecordDeleted, .restoreCompleted:
             return [:]
         }
     }

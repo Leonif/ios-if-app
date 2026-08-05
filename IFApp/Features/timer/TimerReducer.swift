@@ -11,8 +11,9 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
     var newState = state
 
     switch action as? TimerAction {
-    case let .started(startTimestamp):
+    case let .started(startTimestamp, goalHours):
         newState.fastStartTimestamp = startTimestamp
+        newState.goalHours = goalHours
         newState.isRunning = true
         newState.hasCelebrated = false
         // Starting a fast closes any open eating window.
@@ -27,6 +28,9 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
     case .reset:
         newState.isRunning = false
         newState.fastStartTimestamp = 0
+        // The cycle is gone, so its pinned goal goes with it: the next fast starts
+        // from the plan as it stands then.
+        newState.goalHours = 0
         newState.stagedElapsed = 0
         newState.hasCelebrated = false
         newState.isEating = false
@@ -64,6 +68,8 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
 
     case let .eatingStarted(startTimestamp):
         // Opening the window clears the finished fast (like reset, but into eating).
+        // `goalHours` deliberately survives: the window's length is the rest of the
+        // day left over by the fast that just ended, so it belongs to that goal.
         newState.isRunning = false
         newState.fastStartTimestamp = 0
         newState.stagedElapsed = 0
@@ -74,6 +80,8 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
     case .eatingEnded:
         newState.isEating = false
         newState.eatingStartTimestamp = 0
+        // End of the cycle — nothing is in flight to hold a goal for.
+        newState.goalHours = 0
 
     case .none:
         break

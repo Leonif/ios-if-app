@@ -34,12 +34,14 @@ final class NotificationMiddleware: Middleware {
     /// cancelled otherwise. Idempotent, so it's safe to call on every relevant action.
     private func sync(_ app: AppState) {
         let timer = app.timerState
-        let plan = Plan(rawValue: app.planState.planIdx) ?? .default
+        // The goal of the cycle in flight, not the plan setting: a plan change mid-fast
+        // must not move a push that belongs to a fast already under way.
+        let goalHours = app.activeGoalHours
         let now = Clock.now().timeIntervalSince1970
 
         // Goal push while a fast is running.
         if timer.isRunning {
-            let secondsUntilGoal = timer.fastStartTimestamp + plan.fastHours * 3600 - now
+            let secondsUntilGoal = timer.fastStartTimestamp + goalHours * 3600 - now
             if secondsUntilGoal > 0 {
                 repo.scheduleGoalNotification(after: secondsUntilGoal)
             } else {
@@ -51,7 +53,7 @@ final class NotificationMiddleware: Middleware {
 
         // Eating-window-closed push while a window is open.
         if timer.isEating {
-            let secondsUntilClose = timer.eatingEndTimestamp(fastHours: plan.fastHours) - now
+            let secondsUntilClose = timer.eatingEndTimestamp(plan: app.activePlan) - now
             if secondsUntilClose > 0 {
                 repo.scheduleEatingEndNotification(after: secondsUntilClose)
             } else {

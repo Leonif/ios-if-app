@@ -23,6 +23,7 @@ enum UITestSeed {
 
         // clean baseline
         defaults.set(0.0, forKey: "start_timestamp")
+        defaults.set(0.0, forKey: "goal_hours")
         defaults.set(false, forKey: "is_running")
         defaults.set(0, forKey: "completed_sessions_count")
         defaults.set(false, forKey: "has_celebrated")
@@ -31,7 +32,8 @@ enum UITestSeed {
         defaults.set(0, forKey: "streak_count")
         defaults.removeObject(forKey: "streak_last_goal_date")
         defaults.set(0, forKey: "streak_last_milestone_shown")
-        defaults.removeObject(forKey: "plan_idx")          // fall back to Plan.default
+        defaults.removeObject(forKey: "plan_hours")        // fall back to Plan.default
+        defaults.removeObject(forKey: "plan_idx")          // pre-1.5.0 key, cleared too
         defaults.removeObject(forKey: "review_last_shown")
         defaults.set(0, forKey: "review_prompt_count")
         defaults.removeObject(forKey: "review_pending_goal_at")
@@ -44,6 +46,12 @@ enum UITestSeed {
         if let sec = intArg("-seedElapsed") {
             defaults.set(Date().timeIntervalSince1970 - Double(sec), forKey: "start_timestamp")
             defaults.set(true, forKey: "is_running")
+            // A seeded fast is a fast in flight, so it carries a pinned goal like any
+            // other. "-seedPlanHours" (below) may override it; without one it is the default
+            // plan, which is what the seeded state would have started from.
+            defaults.set(defaults.double(forKey: "goal_hours") > 0
+                         ? defaults.double(forKey: "goal_hours")
+                         : Double(Plan.default.hours), forKey: "goal_hours")
         }
         if let sec = intArg("-seedEatingElapsed") {
             // Eating window opened N seconds ago (fast not running). N past the window
@@ -52,10 +60,26 @@ enum UITestSeed {
             defaults.set(Date().timeIntervalSince1970 - Double(sec), forKey: "eating_start_timestamp")
             defaults.set(true, forKey: "is_eating")
             defaults.set(false, forKey: "is_running")
+            // The window's length belongs to the fast that opened it — same pinning.
+            defaults.set(Double(Plan.default.hours), forKey: "goal_hours")
         }
         if let c = intArg("-seedCount") { defaults.set(c, forKey: "completed_sessions_count") }
         if let cel = intArg("-seedCelebrated") { defaults.set(cel == 1, forKey: "has_celebrated") }
-        if let p = intArg("-seedPlan") { defaults.set(p, forKey: "plan_idx") }
+        // "-seedPlanHours N": N is the plan's length in hours (14/16/18/20, or any
+        // 1-23 custom goal). It also re-pins the goal of a seeded in-flight cycle,
+        // which is what a fast started on that plan would carry.
+        //
+        // Renamed from "-seedPlan N", which took a position in the preset list. The
+        // name changed on purpose rather than the meaning quietly: "-seedPlan 3" is
+        // a valid *hours* value too, so a flow left unchanged would have seeded a
+        // 3-hour plan and looked plausible. Unrecognised now, it seeds nothing and
+        // the plan falls back to the default.
+        if let p = intArg("-seedPlanHours"), Plan.range.contains(p) {
+            defaults.set(p, forKey: "plan_hours")
+            if defaults.bool(forKey: "is_running") || defaults.bool(forKey: "is_eating") {
+                defaults.set(Double(p), forKey: "goal_hours")
+            }
+        }
         if let pc = intArg("-seedPromptCount") { defaults.set(pc, forKey: "review_prompt_count") }
         // "-seedPendingGoal N": the 3rd-goal review fallback was armed N seconds ago,
         // so the next open can reach the native request without driving three real
@@ -88,7 +112,7 @@ enum UITestSeed {
     /// the seven-day dots show a real gap.
     private static func dailyRecords(count: Int) -> [FastRecord] {
         let calendar = Calendar.current
-        let plan = Plan.p16_8
+        let plan = Plan(hours: 16)
         return (0..<max(0, count)).compactMap { index in
             // Skip four days back to leave one unfilled dot in the last week.
             let daysAgo = index >= 4 ? index + 2 : index + 1
@@ -127,10 +151,10 @@ enum UITestSeed {
         }
 
         return [
-            record(daysAgo: 2, hour: 21, minute: 20, duration: 16 * 3600 + 24 * 60, plan: .p16_8),
-            record(daysAgo: 4, hour: 18, minute: 0, duration: 41 * 3600 + 12 * 60, plan: .p20_4),
-            record(daysAgo: 6, hour: 22, minute: 0, duration: 9 * 3600 + 5 * 60, plan: .p16_8),
-            record(daysAgo: 6, hour: 11, minute: 0, duration: 6 * 3600 + 40 * 60, plan: .p16_8),
+            record(daysAgo: 2, hour: 21, minute: 20, duration: 16 * 3600 + 24 * 60, plan: Plan(hours: 16)),
+            record(daysAgo: 4, hour: 18, minute: 0, duration: 41 * 3600 + 12 * 60, plan: Plan(hours: 20)),
+            record(daysAgo: 6, hour: 22, minute: 0, duration: 9 * 3600 + 5 * 60, plan: Plan(hours: 16)),
+            record(daysAgo: 6, hour: 11, minute: 0, duration: 6 * 3600 + 40 * 60, plan: Plan(hours: 16)),
         ].compactMap { $0 }
     }
 }
