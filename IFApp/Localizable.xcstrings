@@ -910,7 +910,7 @@
         },
         "zh-Hans": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "%lld次 · %@"
           }
         }
@@ -2292,55 +2292,55 @@
       "localizations": {
         "ar": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "المدد المخصصة تحتاج إلى IF24 Pro، لذا أصبحت خطتك %@."
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Eigene Dauer gibt es nur mit IF24 Pro, dein Plan ist ab jetzt %@."
           }
         },
         "es": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "La duración personalizada necesita IF24 Pro; a partir de ahora tu plan es %@."
           }
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "La durée personnalisée demande IF24 Pro : votre plan est désormais %@."
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "カスタムの長さにはIF24 Proが必要です。今後のプランは%@になります。"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "단식 시간을 직접 설정하려면 IF24 Pro가 필요해요. 앞으로는 %@ 플랜이에요."
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Własna długość wymaga IF24 Pro, więc od teraz twój plan to %@."
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Довільна тривалість доступна з IF24 Pro, тому відтепер ваш план - %@."
           }
         },
         "zh-Hans": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "自定义时长需要 IF24 Pro，从现在起你的计划是 %@。"
           }
         }
@@ -2496,8 +2496,8 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "깊은 자가포식 - 세포 복구"
+            "state": "translated",
+            "value": "깊은 자가포식 · 세포 복구"
           }
         },
         "pl": {
@@ -2642,8 +2642,8 @@
       "localizations": {
         "ar": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "حذف فترة الصيام هذه؟"
+            "state": "translated",
+            "value": "حذف سجل هذا الصيام؟"
           }
         },
         "de": {
@@ -3284,8 +3284,8 @@
       "localizations": {
         "ar": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "تصدير السجل"
+            "state": "translated",
+            "value": "تصدير"
           }
         },
         "de": {
@@ -4012,8 +4012,8 @@
             "plural": {
               "other": {
                 "stringUnit": {
-                  "state": "needs_review",
-                  "value": "단식 기록, 현재 연속 %lld일"
+                  "state": "translated",
+                  "value": "단식 기록, 현재 %lld일 연속"
                 }
               }
             }
@@ -4084,7 +4084,7 @@
             "plural": {
               "other": {
                 "stringUnit": {
-                  "state": "needs_review",
+                  "state": "translated",
                   "value": "断食历史，当前连续%lld天"
                 }
               }
@@ -4937,8 +4937,8 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "目標 · %@ · +%@"
+            "state": "translated",
+            "value": "目標%@ · +%@"
           }
         },
         "ko": {
@@ -5147,55 +5147,55 @@
       "localizations": {
         "ar": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "لم يعد IF24 Pro نشطًا"
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24 Pro ist nicht mehr aktiv"
           }
         },
         "es": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24 Pro ya no está activo"
           }
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24 Pro n’est plus actif"
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24 Proは使えなくなりました"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24 Pro를 더 이상 사용할 수 없어요"
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24 Pro nie jest już aktywne"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24 Pro більше не активний"
           }
         },
         "zh-Hans": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24 Pro 已不再生效"
           }
         }
@@ -5241,7 +5241,7 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "translated",
+            "state": "needs_review",
             "value": ""
           }
         },
@@ -6794,8 +6794,8 @@
       "localizations": {
         "ja": {
           "stringUnit": {
-            "state": "translated",
-            "value": "IF24 Proはこの端末で有効です。"
+            "state": "needs_review",
+            "value": "IF24 Proはこの端末で有効です。以下の機能はすべて使えます。"
           }
         },
         "ar": {
@@ -7491,55 +7491,55 @@
       "localizations": {
         "ar": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "تعمل استعادة الشراء على أي جهاز بنفس حساب Apple."
+            "state": "translated",
+            "value": "تعمل الاستعادة على أي جهاز بنفس حساب Apple."
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Käufe lassen sich auf jedem Gerät mit demselben Apple Account wiederherstellen."
           }
         },
         "es": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Puedes restaurar tus compras en cualquier dispositivo con la misma cuenta de Apple."
           }
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Vous pouvez restaurer vos achats sur tout appareil connecté au même compte Apple."
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "同じApple Accountの端末なら購入を復元できます。"
           }
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "구입은 동일한 Apple 계정으로 로그인한 기기에서 복원할 수 있어요."
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Zakupy przywrócisz na każdym urządzeniu zalogowanym na tym samym koncie Apple."
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Покупки можна відновити на будь-якому пристрої з тим самим обліковим записом Apple."
           }
         },
         "zh-Hans": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "任何使用相同 Apple 账户的设备都可以恢复购买。"
           }
         }
@@ -8338,7 +8338,7 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24가 보여주는 단식 단계는 일반적인 경과 시간을 바탕으로 추정한 것이고, 몸을 측정한 것이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 임신 중이거나, 당뇨병을 관리 중이거나, 식사와 함께 약을 복용 중이라면 식습관을 바꾸기 전에 의사와 상담하세요."
           }
         },
@@ -8366,25 +8366,25 @@
       "localizations": {
         "ar": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "تعذر وصول الشراء إلى App Store، ولن يتم تحصيل أي مبلغ. حاول مرة أخرى عند عودة الاتصال."
           }
         },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Der Kauf hat den App Store nicht erreicht. Dir wird nichts berechnet. Versuch es online erneut."
           }
         },
         "es": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "La compra no llegó al App Store. No se te cobrará nada: inténtalo con conexión."
           }
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "L’achat n’a pas atteint l’App Store. Rien ne vous sera facturé : réessayez une fois reconnecté."
           }
         },
@@ -8396,25 +8396,25 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "오프라인이어서 App Store에 연결하지 못했어요. 금액은 청구되지 않아요."
           }
         },
         "pl": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "Zakup nie dotarł do App Store. Nie naliczymy żadnej opłaty - spróbuj ponownie online."
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Покупка не дійшла до App Store. Плату не буде стягнено - спробуйте пізніше."
+            "state": "translated",
+            "value": "Покупка не дійшла до App Store. Плату не буде стягнено - спробуйте онлайн."
           }
         },
         "zh-Hans": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "购买没有送达 App Store。不会向你收取任何费用，联网后再试。"
           }
         }
@@ -8467,7 +8467,7 @@
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "الطلب الآن عند الشخص الذي يوافق على مشترياتك. يصبح IF24 Pro متاحًا فور الموافقة، ولن يتم تحصيل أي مبلغ قبل ذلك، وكل ما تستخدمه الآن يبقى كما هو."
+            "value": "الطلب الآن عند الشخص الذي يوافق على مشترياتك. يصبح IF24 Pro نشطًا فور الموافقة، ولن يتم تحصيل أي مبلغ قبل ذلك، وكل ما تستخدمه الآن يبقى كما هو."
           }
         },
         "de": {
@@ -8804,7 +8804,7 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "다시 시도"
           }
         },
@@ -9384,7 +9384,7 @@
         },
         "zh-Hans": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "你已达成%d小时目标。此刻每一分钟都是更深层的自噬。"
           }
         }
@@ -9920,7 +9920,7 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "%#@days@"
           },
           "substitutions": {
@@ -9932,7 +9932,7 @@
                   "other": {
                     "stringUnit": {
                       "state": "translated",
-                      "value": "日連続"
+                      "value": "日"
                     }
                   }
                 }
@@ -9942,7 +9942,7 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "%#@days@"
           },
           "substitutions": {
@@ -9953,7 +9953,7 @@
                 "plural": {
                   "other": {
                     "stringUnit": {
-                      "state": "needs_review",
+                      "state": "translated",
                       "value": "일 연속"
                     }
                   }
@@ -10044,7 +10044,7 @@
         },
         "zh-Hans": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "%#@days@"
           },
           "substitutions": {
