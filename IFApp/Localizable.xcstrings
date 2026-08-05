@@ -682,13 +682,13 @@
                   "few": {
                     "stringUnit": {
                       "state": "needs_review",
-                      "value": "%lld فترات صيام · %@"
+                      "value": "%1$lld فترات صيام · %2$@"
                     }
                   },
                   "many": {
                     "stringUnit": {
                       "state": "needs_review",
-                      "value": "%lld فترة صيام · %@"
+                      "value": "%1$lld فترة صيام · %2$@"
                     }
                   },
                   "one": {
@@ -700,7 +700,7 @@
                   "other": {
                     "stringUnit": {
                       "state": "needs_review",
-                      "value": "%lld فترة صيام · %@"
+                      "value": "%1$lld فترة صيام · %2$@"
                     }
                   },
                   "two": {
@@ -712,7 +712,7 @@
                   "zero": {
                     "stringUnit": {
                       "state": "needs_review",
-                      "value": "%lld فترات صيام · %@"
+                      "value": "%1$lld فترات صيام · %2$@"
                     }
                   }
                 }
@@ -2224,8 +2224,8 @@
         },
         "zh-Hans": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "当前连续"
+            "state": "translated",
+            "value": "当前连续天数"
           }
         }
       }
@@ -8309,7 +8309,7 @@
         "ar": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "مراحل الصيام التي يعرضها تطبيق IF24 تقديرية، استنادًا إلى التوقيت المعتاد، وليست قياسًا لجسمك. تطبيق IF24 ليس جهازًا طبيًا ولا يقدم نصيحة طبية. في حالات الحمل أو السكري أو تناول دواء مع الطعام، استشر طبيبك قبل تغيير نمط طعامك."
+            "value": "مراحل الصيام التي يعرضها تطبيق IF24 هي تقديرات مبنية على التوقيت المعتاد، لا قياس لجسمك. تطبيق IF24 ليس جهازًا طبيًا ولا يقدم نصيحة طبية. في حالات الحمل أو السكري أو تناول دواء مع الطعام، استشر طبيبك قبل تغيير نمط طعامك."
           }
         },
         "de": {
@@ -8326,8 +8326,8 @@
         },
         "fr": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Les phases de jeûne affichées par IF24 sont des estimations fondées sur des durées typiques, pas une mesure de votre corps. IF24 n’est pas un dispositif médical et ne donne pas de conseils médicaux. Si vous êtes enceinte, diabétique ou si vous prenez des médicaments au cours des repas, consultez un professionnel de santé avant de modifier votre alimentation."
+            "state": "translated",
+            "value": "Les phases de jeûne affichées par IF24 sont des estimations fondées sur des durées typiques, et non le résultat d’une mesure de votre corps. IF24 n’est pas un dispositif médical et ne donne pas de conseils médicaux. Si vous êtes enceinte, diabétique ou si vous prenez des médicaments au cours des repas, consultez un professionnel de santé avant de modifier votre alimentation."
           }
         },
         "ja": {
@@ -9740,7 +9740,7 @@
       }
     },
     "history.streak.unit": {
-      "comment": "Streak unit under the big number; the number itself is not printed",
+      "comment": "Streak unit rendered to the RIGHT of the big number in the same HStack\n(HistorySummaryCard), not under it. counterSpacing is 0 for ja/ko/zh, so in\nCJK the number and this string render as one solid token - ko renders\n\"5일 연속\", ja \"5日\". The word \"streak\" itself is carried by the card\noverline - do not repeat it here.",
       "localizations": {
         "ar": {
           "stringUnit": {
@@ -10055,8 +10055,8 @@
                 "plural": {
                   "other": {
                     "stringUnit": {
-                      "state": "needs_review",
-                      "value": "天连续"
+                      "state": "translated",
+                      "value": "天"
                     }
                   }
                 }
@@ -10121,28 +10121,6 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "/ %@"
-          }
-        }
-      }
-    },
-    "pro.notice.goalChanged.body": {
-      "comment": "Edge 17 / PW-10 body. %@ is the goal the next fast falls back to. Awaiting an English source from product; empty on purpose.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": ""
-          }
-        }
-      }
-    },
-    "pro.notice.goalChanged.title": {
-      "comment": "Edge 17 / PW-10. Awaiting an English source from product; empty on purpose.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": ""
           }
         }
       }

@@ -241,7 +241,13 @@ enum strings {
         static func daysInARow(_ days: Int) -> String {
             String(localized: "history.streak.unit",
                    defaultValue: "\(days) days in a row",
-                   comment: "Streak unit under the big number; the number itself is not printed")
+                   comment: """
+                   Streak unit rendered to the RIGHT of the big number in the same HStack
+                   (HistorySummaryCard), not under it. counterSpacing is 0 for ja/ko/zh, so in
+                   CJK the number and this string render as one solid token - ko renders
+                   "5일 연속", ja "5日". The word "streak" itself is carried by the card
+                   overline - do not repeat it here.
+                   """)
         }
 
         /// "Last fast · 16h 24m" — the eating window's link into the history.
