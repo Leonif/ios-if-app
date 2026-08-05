@@ -104,13 +104,19 @@ struct HistoryRow: View {
     }
 
     /// One spoken sentence per row; the ring is decorative and stays hidden.
+    ///
+    /// The plan is spelled out rather than read off the pill: `planLabel` is a ratio
+    /// ("17:7"), and a colon between two numerals is announced as a time of day — a
+    /// row that already speaks the real start and end times would gain a third,
+    /// invented one. Caption plus length, comma-separated like the fields beside it.
     private var accessibilityLabel: String {
         [
             HistoryFormat.duration(record.duration),
             record.goalReached ? strings.History.reached(record.reachedPhase.label)
                                : strings.History.ofGoal(strings.Duration.goalHours(Int(record.goalHours))),
             HistoryFormat.rowSubline(record, isRTL: false),
-            record.planLabel,
+            strings.Sheet.fastingPlan,
+            strings.Duration.hoursSpelled(Int(record.goalHours)),
         ].joined(separator: ", ")
     }
 }
