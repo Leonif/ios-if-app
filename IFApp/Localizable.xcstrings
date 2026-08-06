@@ -5241,7 +5241,7 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": ""
           }
         },
@@ -5968,7 +5968,7 @@
       "localizations": {
         "en": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "No purchases to restore"
           }
         },
