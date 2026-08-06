@@ -1518,8 +1518,8 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "translated",
-            "value": "기본 플랜 네 개 외에도 1시간 단위로 정해요"
+            "state": "needs_review",
+            "value": "기본 플랜 네 개 외에도 1시간 단위로 정할 수 있어요."
           }
         },
         "pl": {
@@ -3373,7 +3373,7 @@
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "기록한 단식을 언제든 전부 가져갈 수 있어요"
+            "value": "기록한 단식을 언제든 전부 가져갈 수 있어요."
           }
         },
         "pl": {
@@ -6296,7 +6296,7 @@
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "한 달에 하루는 놓쳐도 연속 기록이 끊기지 않아요"
+            "value": "한 달에 하루는 놓쳐도 연속 기록이 끊기지 않아요."
           }
         },
         "pl": {
@@ -6482,7 +6482,7 @@
         },
         "ar": {
           "stringUnit": {
-            "state": "translated",
+            "state": "needs_review",
             "value": "فتح شاشة IF24 Pro"
           }
         },
@@ -6794,7 +6794,7 @@
       "localizations": {
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "IF24 Proはこの端末で有効です。以下の機能はすべて使えます。"
           }
         },
