@@ -6319,36 +6319,36 @@
         }
       }
     },
-    "One purchase, for good.": {
+    "One purchase, for good": {
       "localizations": {
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Одна покупка - і ваша."
+            "value": "Одна покупка - і ваша"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein Kauf, der dir bleibt."
+            "value": "Ein Kauf, der dir bleibt"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Una compra, y es tuya."
+            "value": "Una compra, y es tuya"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un achat, qui vous reste."
+            "value": "Un achat, qui vous reste"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Jeden zakup, i już twój."
+            "value": "Jeden zakup, i już twój"
           }
         },
         "zh-Hans": {

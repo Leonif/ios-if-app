@@ -302,7 +302,7 @@ enum strings {
 
         // Offer — headline and the framing line under it. The framing line belongs
         // to whichever benefit leads the list, so it changes with the entry point.
-        static var headline: String { String(localized: "One purchase, for good.") }
+        static var headline: String { String(localized: "One purchase, for good") }
         static var framingCustom: String { String(localized: "Your plan, your number - any length you want, from one hour to twenty-three.") }
         static var framingProtectedDay: String { String(localized: "A missed day stays a missed day - your streak keeps counting from where it was.") }
 
