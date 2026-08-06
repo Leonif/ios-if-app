@@ -279,7 +279,8 @@ struct PaywallView: View {
     private var serviceBlock: some View {
         HStack(spacing: 12) {
             if showsNothingToRestore {
-                // The line takes the whole 342pt, and the divider and Privacy stand
+                // The line takes the whole 327pt — 375 minus the two 24pt gutters
+                // above — and the divider and Privacy stand
                 // down for its two and a half seconds — the same move S5 already
                 // makes. Sharing the row instead would stack it at xxLarge in
                 // Ukrainian and German, growing the block by 1.84pt and shrinking it
