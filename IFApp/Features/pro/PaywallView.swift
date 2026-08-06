@@ -21,9 +21,6 @@ struct PaywallView: View {
     /// Which door the user came in through — it decides which benefit leads, and
     /// the framing line belongs to whichever one that is.
     let trigger: PaywallTrigger
-    /// The phase the user came from, tinting the backdrop so the offer stays
-    /// attached to the screen that called it.
-    let phaseColor: Color
     let theme: ThemeTokens
     /// Restore ran and found nothing: the service block says so, then goes back.
     let showsNothingToRestore: Bool
@@ -33,35 +30,34 @@ struct PaywallView: View {
     let onPrivacy: () -> Void
     let onClose: () -> Void
 
+    /// Content only — the opaque surface it sits on is `PaywallBackdrop`, drawn by the
+    /// flow outside the part that switches. See that type for why.
     var body: some View {
-        ZStack {
-            backdrop
-            VStack(alignment: .leading, spacing: 0) {
-                closeRow
-                // Close above, price and button below, the reading matter between them
-                // in a scroll view. The three parts are what the flexible column was
-                // already doing — the list top-aligned, the price block bottom-pinned —
-                // except the slack now belongs to the scroll view instead of a
-                // `Spacer`, so it can go negative without anything overlapping.
-                //
-                // Why the two controls stay outside it: at xxLarge in German the title
-                // takes two lines and the S4 body four, and a single scroll view over
-                // the whole column would carry Close off the top and Buy off the bottom
-                // at the same moment. Both have to be reachable in one gesture at any
-                // size, and pinning them costs nothing at the sizes the screen was
-                // drawn for — the layout below xxLarge is pixel-identical to the
-                // `Spacer` version.
-                readingBlock
-                bottomBlock
-                    // The old `Spacer(minLength: 26)`, now a gap that cannot collapse:
-                    // it sits outside the scroll view, so a clipped last benefit still
-                    // clears the price by 26pt instead of touching it.
-                    .padding(.top, 26)
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 16)
-            .padding(.bottom, 22)
+        VStack(alignment: .leading, spacing: 0) {
+            closeRow
+            // Close above, price and button below, the reading matter between them
+            // in a scroll view. The three parts are what the flexible column was
+            // already doing — the list top-aligned, the price block bottom-pinned —
+            // except the slack now belongs to the scroll view instead of a
+            // `Spacer`, so it can go negative without anything overlapping.
+            //
+            // Why the two controls stay outside it: at xxLarge in German the title
+            // takes two lines and the S4 body four, and a single scroll view over
+            // the whole column would carry Close off the top and Buy off the bottom
+            // at the same moment. Both have to be reachable in one gesture at any
+            // size, and pinning them costs nothing at the sizes the screen was
+            // drawn for — the layout below xxLarge is pixel-identical to the
+            // `Spacer` version.
+            readingBlock
+            bottomBlock
+                // The old `Spacer(minLength: 26)`, now a gap that cannot collapse:
+                // it sits outside the scroll view, so a clipped last benefit still
+                // clears the price by 26pt instead of touching it.
+                .padding(.top, 26)
         }
+        .padding(.horizontal, 24)
+        .padding(.top, 16)
+        .padding(.bottom, 22)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
@@ -78,25 +74,6 @@ struct PaywallView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .scrollBounceBehavior(.basedOnSize)
-    }
-
-    // MARK: Backdrop
-
-    private var backdrop: some View {
-        ZStack {
-            theme.backgroundBase
-            GeometryReader { geo in
-                EllipticalGradient(
-                    colors: [phaseColor.opacity(theme.isDark ? 0.22 : 0.16), .clear],
-                    center: .top,
-                    startRadiusFraction: 0,
-                    endRadiusFraction: 0.72
-                )
-                .frame(width: geo.size.width * 1.3, height: geo.size.height * 0.55)
-                .position(x: geo.size.width / 2, y: 0)
-            }
-        }
-        .ignoresSafeArea()
     }
 
     // MARK: Header
@@ -399,6 +376,39 @@ struct PaywallView: View {
         case .purchasing, .awaitingApproval: return theme.mut
         default: return theme.deep
         }
+    }
+}
+
+/// The offer's opaque surface: the theme's base colour with the phase glow over it,
+/// tinted by the phase the user came from so the offer stays attached to the screen
+/// that called it.
+///
+/// It is a type of its own, drawn by the flow *outside* the part that switches, and
+/// that is the whole point of it. The six states replace each other by identity and
+/// cross-fade, and halfway through a cross-fade both layers stand at partial alpha —
+/// so a background painted inside the switched layer stops being a background for the
+/// length of the transition. It cost two visible glitches around a purchase: the timer
+/// read through the offer on the way into `Confirming`, and again on the way out after
+/// the charge went through. Anything opaque belongs on this side of the `.id`.
+struct PaywallBackdrop: View {
+    let phaseColor: Color
+    let theme: ThemeTokens
+
+    var body: some View {
+        ZStack {
+            theme.backgroundBase
+            GeometryReader { geo in
+                EllipticalGradient(
+                    colors: [phaseColor.opacity(theme.isDark ? 0.22 : 0.16), .clear],
+                    center: .top,
+                    startRadiusFraction: 0,
+                    endRadiusFraction: 0.72
+                )
+                .frame(width: geo.size.width * 1.3, height: geo.size.height * 0.55)
+                .position(x: geo.size.width / 2, y: 0)
+            }
+        }
+        .ignoresSafeArea()
     }
 }
 
