@@ -51,6 +51,23 @@ struct HistoryStats: Equatable {
         )
     }
 
+    /// Whether the summary card may greet the reader as a beginner.
+    ///
+    /// The card holds two numbers that come from different stores: the streak counter
+    /// lives in the timer's persisted defaults and shipped in 1.4.4, the records live
+    /// in a file and shipped in 1.4.5, and nothing backfilled one from the other.
+    /// Counting only records, the card welcomed everyone who updated from 1.4.4 as a
+    /// first-timer while a four-day streak stood above the sentence (TF-1).
+    ///
+    /// So the note is gated on both: it appears while the history is short *and* the
+    /// counter claims nothing the records cannot account for. That keeps the ordinary
+    /// first fast — one record, streak of one — exactly as it was, and it takes the
+    /// raw counter rather than `displayed(at:)` on purpose: a streak that lapsed
+    /// yesterday displays as 0, and it is still not the streak of a beginner.
+    static func showsFirstNote(fastsCount: Int, streakCount: Int) -> Bool {
+        fastsCount <= 2 && streakCount <= fastsCount
+    }
+
     /// Records grouped by the month they *started* in — the row shows its start date,
     /// so a fast crossing a month boundary belongs to the month the user sees on it.
     static func monthGroups(records: [FastRecord]) -> [HistoryMonthGroup] {

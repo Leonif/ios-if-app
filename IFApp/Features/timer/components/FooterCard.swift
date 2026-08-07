@@ -2,7 +2,8 @@
 //  FooterCard.swift
 //  IFApp
 //
-//  Active: three stats + "End fast". Complete: two stats + Reset / Start eating window.
+//  Active: three stats + "End fast". Complete: two stats + Resume / Skip / Start
+//  eating window.
 //
 
 import SwiftUI
@@ -185,7 +186,11 @@ struct CompleteFooterCard: View {
     let fasted: String          // "16h 02m"
     let windowOpens: String     // "Now"
     let theme: ThemeTokens
-    let onReset: () -> Void
+    let onResume: () -> Void
+    /// Back to idle without opening the window. Named for what it does — the button
+    /// used to read "Reset", which in this state promises to discard a fast that is
+    /// already written to the history.
+    let onSkip: () -> Void
     let onStartEating: () -> Void
     let onHistory: () -> Void
 
@@ -202,13 +207,43 @@ struct CompleteFooterCard: View {
             HistoryLink(title: strings.History.savedToHistory, theme: theme,
                         identifier: "timer.savedToHistory", action: onHistory)
 
+            resumeAction
+
             HStack(spacing: 12) {
-                SecondaryButton(title: strings.Footer.reset, theme: theme, minWidth: 110, action: onReset)
+                SecondaryButton(title: strings.Footer.skip, theme: theme, minWidth: 110, action: onSkip)
+                    // The id stays `timer.reset` while the label no longer does: the
+                    // existing flows address it by this name, and renaming it is a
+                    // separate change from fixing what the button says.
                     .accessibilityIdentifier("timer.reset")
                 PrimaryButton(title: strings.Footer.startEatingWindow, theme: theme, action: onStartEating)
                     .accessibilityIdentifier("timer.startEatingWindow")
             }
         }
         .modifier(CardBackground(theme: theme))
+    }
+
+    /// The undo, on a line of its own.
+    ///
+    /// A line of its own is a measurement, not a preference: status and action side by
+    /// side need 313.7pt of the slot's 295pt in English at xxLarge, and 168% of it in
+    /// German. Stacked, the worst locale uses 72.3%.
+    ///
+    /// No chevron — it goes nowhere. No lead-in ("Ended by mistake?"): that frames the
+    /// tap as a confession, and undo should read as an ordinary thing to want. The text
+    /// is 13.5pt, about 18pt tall, so the tappable area is grown to the HIG minimum
+    /// rather than left at the glyph box. `.semibold` at the least: Arabic glyphs read
+    /// smaller than Latin at the same point size.
+    private var resumeAction: some View {
+        Button(action: onResume) {
+            Text(strings.Complete.resumeFast)
+                .font(.hanken(13.5, .semibold))
+                .foregroundColor(theme.sec)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.pressable)
+        .accessibilityIdentifier("complete.resumeFast")
     }
 }

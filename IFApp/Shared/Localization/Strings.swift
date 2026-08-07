@@ -112,6 +112,14 @@ enum strings {
         }
     }
 
+    enum Complete {
+        /// The undo on the result screen. It promises the *fast* back, not the record
+        /// gone — "Undo" would be ambiguous between the two, and the determiner is
+        /// load-bearing: bare "Resume fast" reads as resuming fasting in general.
+        /// Same family as `Reset this fast?` / `Delete this fast?` below.
+        static var resumeFast: String { String(localized: "Resume this fast") }
+    }
+
     enum Reset {
         static var confirmTitle: String { String(localized: "Reset this fast?") }
         static var confirmMessage: String { String(localized: "This discards the current fast and returns to the start.") }
@@ -216,6 +224,13 @@ enum strings {
         static var emptyTitle: String { String(localized: "Your fasts gather here") }
         static var emptyBody: String { String(localized: "Every finished fast is saved with its length, plan and times - so you can look back on the rhythm you are building.") }
         static var emptyCta: String { String(localized: "Start a fast") }
+        /// The empty state's action while a fast is running. It names the destination
+        /// rather than the direction — the nav chevron already means "back", and a
+        /// second "Back" would read as two different ways out.
+        ///
+        /// English source only for now: `loc` is translating it, and until the table
+        /// lands the other nine locales fall back to this.
+        static var emptyBackToFast: String { String(localized: "Back to your fast") }
         static var firstNote: String { String(localized: "First one saved. Finish tomorrow’s fast and your streak begins.") }
         static var savedToHistory: String { String(localized: "Saved to your history") }
         /// The export affordance in the history nav row. The control is the system

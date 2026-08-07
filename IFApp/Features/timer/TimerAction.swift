@@ -16,6 +16,15 @@ enum TimerAction: Action {
     /// End a fast. `qualifiesAsCompleted` = the fast reached its goal. Analytics-only:
     /// completed fasts are counted on `goalCelebrated`, not here.
     case stopped(elapsed: TimeInterval, qualifiesAsCompleted: Bool)
+    /// Undo of `.stopped` from the result screen: the same fast goes back in flight.
+    /// `startTimestamp` is injected already shifted back by the staged elapsed, so the
+    /// count picks up where it left off.
+    ///
+    /// Not `.started`: that one pins a fresh `goalHours` from the current plan and
+    /// clears `hasCelebrated`, which would rewrite the goal this fast actually ran to
+    /// and replay the goal moment (counting the session and the streak day twice).
+    /// Undo restores, it does not begin.
+    case stopUndone(startTimestamp: Double)
     /// Clear everything back to zero. `elapsed` = how long the fast had been running
     /// at the moment of the reset (staged value when it was not running). Analytics-only:
     /// the reducer zeroes everything either way. It travels in the action because the

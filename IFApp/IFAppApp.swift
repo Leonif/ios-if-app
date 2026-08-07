@@ -82,7 +82,11 @@ struct IFAppApp: App {
 
     var body: some Scene {
         WindowGroup {
+            #if DEBUG || DEVELOPMENT
+            AppFlowView(store: store).debugOverlay()
+            #else
             AppFlowView(store: store)
+            #endif
         }
     }
 }

@@ -19,6 +19,13 @@ enum AnalyticsEvent {
     /// `autophagy`) — never the displayed label, which differs per locale and makes
     /// the dimension impossible to group.
     case fastStopped(durationSeconds: Int, completed: Bool, stage: String)
+    /// The user took an ending back from the result screen. No parameters: the one
+    /// question it answers is whether the undo earns its place, and that is a count.
+    ///
+    /// Note for analysis: the `fast_stopped` it undoes has already fired and stays in
+    /// the counters, so cancelled endings have to be subtracted or `fast_stopped` reads
+    /// high.
+    case fastStopUndone
     /// The fast reached its goal (the goal-reached moment fired). `goalHours` = plan window.
     case goalReached(goalHours: Double)
     /// User reset the timer. `elapsedMinutes` = whole minutes from the start of the
@@ -86,6 +93,7 @@ enum AnalyticsEvent {
         case .appOpened: return "app_opened"
         case .fastStarted: return "fast_started"
         case .fastStopped: return "fast_stopped"
+        case .fastStopUndone: return "fast_stop_undone"
         case .goalReached: return "goal_reached"
         case .fastReset: return "fast_reset"
         case .eatingWindowStarted: return "eating_window_started"
@@ -158,7 +166,7 @@ enum AnalyticsEvent {
                 "reason": reason,
             ]
         case .appOpened, .eatingWindowStarted, .fastChained, .timeAdjusted, .sourcesOpened,
-             .historyRecordDeleted, .historyExported, .restoreCompleted:
+             .historyRecordDeleted, .historyExported, .restoreCompleted, .fastStopUndone:
             return [:]
         }
     }

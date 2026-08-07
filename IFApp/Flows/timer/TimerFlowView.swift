@@ -449,7 +449,11 @@ struct TimerFlowView: View {
                 fasted: hoursMinutes(elapsed),
                 windowOpens: strings.Meal.now,
                 theme: theme,
-                onReset: { store.dispatch(ResetFastThunk()) },
+                onResume: { store.dispatch(ResumeFastThunk()) },
+                // No confirm sheet here, unlike `.goalReached`: nothing irreversible is
+                // left to protect — the fast is already written to the history, and the
+                // way back to it is the action above.
+                onSkip: { store.dispatch(ResetFastThunk()) },
                 onStartEating: { store.dispatch(StartEatingThunk()) },
                 onHistory: { openHistory(from: .completeCard) }
             )

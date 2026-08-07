@@ -9,9 +9,42 @@
 
 import SwiftUI
 
+/// What the one button offers. There is always exactly one, and the state never
+/// appears without it: an empty screen whose only interactive thing is a bare chevron
+/// is the hole this was found in, and hiding a dead CTA would have deepened it rather
+/// than filled it.
+///
+/// The copy above does not vary with this — "no fast has finished yet" is the reason
+/// the screen is empty either way. Only the way out changes.
+enum HistoryEmptyAction {
+    /// Nothing in flight: the invitation to begin one.
+    case startFast
+    /// A fast is already running, and `StartFastThunk` refuses a second — so the
+    /// honest action is the way back to the one going. The label names where it leads
+    /// rather than saying "Back": the chevron already says that.
+    case backToFast
+
+    var title: String {
+        switch self {
+        case .startFast: return strings.History.emptyCta
+        case .backToFast: return strings.History.emptyBackToFast
+        }
+    }
+
+    /// `history.startFast` is unchanged on purpose — the existing suite addresses the
+    /// invitation by that name, and renaming it is not part of adding a second case.
+    var identifier: String {
+        switch self {
+        case .startFast: return "history.startFast"
+        case .backToFast: return "history.empty.backToFast"
+        }
+    }
+}
+
 struct HistoryEmptyState: View {
     let theme: ThemeTokens
-    let onStart: () -> Void
+    let action: HistoryEmptyAction
+    let onTap: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -43,10 +76,11 @@ struct HistoryEmptyState: View {
 
             // Hugs its label rather than spanning the screen like the footer's
             // primary button — an invitation, not the screen's main action.
-            Button(action: onStart) {
-                Text(strings.History.emptyCta)
+            Button(action: onTap) {
+                Text(action.title)
                     .font(.hanken(15, .bold))
                     .foregroundColor(theme.primaryButtonText)
+                    .multilineTextAlignment(.center)
                     .padding(.vertical, 15)
                     .padding(.horizontal, 30)
                     .background(RoundedRectangle(cornerRadius: 15).fill(theme.primaryButtonBg))
@@ -54,7 +88,7 @@ struct HistoryEmptyState: View {
             }
             .buttonStyle(.pressable)
             .padding(.top, 26)
-            .accessibilityIdentifier("history.startFast")
+            .accessibilityIdentifier(action.identifier)
         }
         .frame(maxWidth: .infinity)
     }

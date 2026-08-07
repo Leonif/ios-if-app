@@ -17,6 +17,9 @@ import SwiftUI
 struct HistorySummaryCard: View {
     let streak: Int
     let stats: HistoryStats
+    /// Passed in rather than derived here: the rule needs the streak counter as well
+    /// as the record count, and it is stated once in `HistoryStats.showsFirstNote`.
+    let showsFirstNote: Bool
     let theme: ThemeTokens
 
     @Environment(\.locale) private var locale
@@ -35,10 +38,14 @@ struct HistorySummaryCard: View {
     /// Under three records the dots would be mostly empty — hide them until there
     /// is a rhythm to show.
     private var showsDots: Bool { stats.fastsCount >= 3 }
-    /// The best-streak line needs a week of history before it says anything.
-    private var showsBest: Bool { stats.fastsCount >= 7 && stats.bestStreak > 0 }
-    /// The first fast gets a sentence instead of statistics.
-    private var showsFirstNote: Bool { stats.fastsCount <= 2 }
+    /// The best-streak line needs a week of history before it says anything — and it
+    /// must not say something the number above it contradicts. `bestStreak` is counted
+    /// from the records, the current streak from the carried-over counter, so after an
+    /// update from 1.4.4 "Best 3" could sit under "20 days in a row" (TF-1, same split
+    /// as the first-fast note).
+    private var showsBest: Bool {
+        stats.fastsCount >= 7 && stats.bestStreak > 0 && stats.bestStreak >= streak
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -84,6 +91,10 @@ struct HistorySummaryCard: View {
                     .foregroundColor(theme.deep)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 9)
+                    // No identifier of its own: SwiftUI folds the card's leaves under
+                    // the container's `history.summary`, so one here never resolves —
+                    // an assert on it passed in both directions and proved nothing.
+                    // H12 matches `history.summary` plus the note's text instead.
             } else if showsBest, let since = stats.since {
                 Text(strings.History.best(stats.bestStreak, HistoryFormat.sinceDate(since)))
                     .font(.hanken(13, .medium))

@@ -17,6 +17,9 @@ import Redux
 struct HistoryProps: Equatable {
     let records: [FastRecord]
     let streak: StreakStatus
+    /// Whether a fast is in flight. Picks which action the empty state offers — see
+    /// `HistoryEmptyAction`.
+    let isRunning: Bool
     /// Whether the export is unlocked. `unknown` locks exactly like `free` — Pro is
     /// never handed out on a guess.
     let isPro: Bool
@@ -26,6 +29,7 @@ struct HistoryProps: Equatable {
     init(state: AppState) {
         records = state.historyState.records
         streak = state.timerState.streak
+        isRunning = state.timerState.isRunning
         isPro = state.proState.isPro
         exportFile = state.historyState.exportFile
     }
@@ -63,10 +67,13 @@ struct HistoryFlowView: View {
 
             if props.records.isEmpty {
                 ScrollView {
-                    HistoryEmptyState(theme: theme, onStart: {
-                        onStartFast()
+                    HistoryEmptyState(theme: theme,
+                                      action: props.isRunning ? .backToFast : .startFast) {
+                        // Both leave the screen; only the invitation also has a fast
+                        // to start on the way out.
+                        if !props.isRunning { onStartFast() }
                         dismiss()
-                    })
+                    }
                     .padding(.top, 90)
                 }
             } else {
@@ -75,8 +82,11 @@ struct HistoryFlowView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(theme.historyBackground.ignoresSafeArea())
-        .navigationBarBackButtonHidden(true)
+        // The bar is hidden, and the back button is *not* separately hidden: that
+        // modifier switches the pop gesture off outright. Hiding the bar turns out to
+        // suppress it too, so the gesture is put back by hand below (F-9).
         .toolbar(.hidden, for: .navigationBar)
+        .background(InteractivePopGesture().frame(width: 0, height: 0))
         .connect(to: store, mapState: { HistoryProps(state: $0) }, onPropsChange: { props = $0 })
         .onAppear {
             store.dispatch(AppLifecycleAction.historyOpened(source: source))
@@ -209,8 +219,17 @@ struct HistoryFlowView: View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack(alignment: .leading, spacing: 20) {
                 // Same projection the main screen shows — one rule, one number.
-                HistorySummaryCard(streak: props.streak.displayed(at: Clock.now()), stats: stats, theme: theme)
-                    .padding(.bottom, 2)
+                HistorySummaryCard(
+                    streak: props.streak.displayed(at: Clock.now()),
+                    stats: stats,
+                    // The raw counter, not the projection above it: whether the reader
+                    // is a beginner is a fact about their past, and a streak that
+                    // lapsed yesterday displays as 0 without making them one.
+                    showsFirstNote: HistoryStats.showsFirstNote(fastsCount: stats.fastsCount,
+                                                                streakCount: props.streak.count),
+                    theme: theme
+                )
+                .padding(.bottom, 2)
 
                 // Charts land here in a later release — between the totals and the
                 // first group, so adding them shifts nothing above or below.
@@ -278,6 +297,74 @@ struct HistoryFlowView: View {
         }
         if !reduceMotion {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
+    }
+}
+
+/// Puts the system's edge-swipe back on a screen that hides the navigation bar.
+///
+/// Hiding the bar takes the interactive pop gesture with it, and the recogniser is not
+/// merely disabled — the navigation controller's own delegate vetoes it in
+/// `gestureRecognizerShouldBegin`, so flipping `isEnabled` changes nothing on its own.
+/// Both are done here: the flag, and a delegate that allows the pop whenever there is
+/// something to pop back to.
+///
+/// Why not a `DragGesture`: a hand-rolled one is not the system gesture. It does not
+/// track interactively, it does not mirror itself to the trailing edge in RTL, and it
+/// would compete with the horizontal drag `SwipeToDeleteRow` already owns.
+///
+/// Nothing is drawn — the controller exists only to reach the navigation controller —
+/// so the header is untouched and no system back button can appear: the bar is still
+/// hidden, and hiding it is what hid the button.
+private struct InteractivePopGesture: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController { Host() }
+    func updateUIViewController(_ controller: UIViewController, context: Context) {}
+
+    private final class Host: UIViewController, UIGestureRecognizerDelegate {
+        /// The recogniser belongs to the navigation controller, which outlives this
+        /// screen, so what was borrowed is given back on the way out. A delegate left
+        /// behind on the root is the classic way to wedge navigation for good.
+        private weak var borrowed: UIGestureRecognizer?
+        private weak var previousDelegate: (any UIGestureRecognizerDelegate)?
+        /// Both borrowed properties are given back, not just the delegate: an
+        /// `isEnabled` that was deliberately false somewhere else would otherwise stay
+        /// on after this screen, and that misfires far from here.
+        private var previousEnabled: Bool?
+
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            guard let gesture = navigationController?.interactivePopGestureRecognizer,
+                  gesture.delegate !== self else { return }
+            borrowed = gesture
+            previousDelegate = gesture.delegate
+            previousEnabled = gesture.isEnabled
+            gesture.delegate = self
+            gesture.isEnabled = true
+        }
+
+        override func viewWillDisappear(_ animated: Bool) {
+            super.viewWillDisappear(animated)
+            guard borrowed?.delegate === self else { return }
+            borrowed?.delegate = previousDelegate
+            if let previousEnabled { borrowed?.isEnabled = previousEnabled }
+        }
+
+        /// The depth check is not ceremony: allowing the gesture on the root view
+        /// controller is what makes a navigation controller stop responding to pushes
+        /// afterwards.
+        ///
+        /// Note the delegate is replaced wholesale, not proxied: this type answers two
+        /// of the five methods and the original is no longer asked any of them — the
+        /// rest fall back to the protocol defaults. That holds today only because the
+        /// one behaviour we know it had (simultaneous recognition) is reproduced below.
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            (navigationController?.viewControllers.count ?? 0) > 1
+        }
+
+        /// The rows own a horizontal drag of their own; the two must not run together.
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                               shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
+            false
         }
     }
 }

@@ -12,6 +12,11 @@ import Redux
 enum AppStoreFactory {
     static func make() -> Store<AppState> {
         let persistence: TimerPersistenceRepositoryProtocol = container.inject()
+        // Test hooks, DEBUG-only as a block. "-uitestReset" wipes the timer defaults
+        // *and* the whole history file; a hook that destructive has no business in a
+        // store binary, even though a user has no way to pass a launch argument.
+        // The suite runs on DEBUG builds, so nothing it needs is lost.
+        #if DEBUG
         // UI tests launch with "-uitestReset" to start from a clean idle state.
         if ProcessInfo.processInfo.arguments.contains("-uitestReset") {
             persistence.save(fastStartTimestamp: 0, goalHours: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false, streakCount: 0, lastGoalDate: nil)
@@ -19,7 +24,6 @@ enum AppStoreFactory {
             history.replaceAll([])
         }
         // UI tests also seed timer/review state via "-seed…" args (see UITestSeed).
-        #if DEBUG
         UITestSeed.applyIfNeeded()
         #endif
         let loaded = persistence.load()
@@ -42,18 +46,25 @@ enum AppStoreFactory {
             historyState: HistoryState(records: history.loadAll().sorted { $0.startTimestamp > $1.startTimestamp })
         )
 
+        var middlewares: [Middleware] = [
+            PersistenceMiddleware(),
+            HistoryMiddleware(),
+            StreakMiddleware(),
+            ReviewMiddleware(),
+            AnalyticsMiddleware(),
+            NotificationMiddleware(),
+            StoreMiddleware(),
+        ]
+        // First in the list on purpose: an action that wedges a later middleware is
+        // already on disk by the time it does.
+        #if DEBUG || DEVELOPMENT
+        middlewares.insert(DiagnosticsMiddleware(), at: 0)
+        #endif
+
         let core = ImprovedStoreV2(
             state: initialState,
             reducer: rootReducer,
-            middlewares: [
-                PersistenceMiddleware(),
-                HistoryMiddleware(),
-                StreakMiddleware(),
-                ReviewMiddleware(),
-                AnalyticsMiddleware(),
-                NotificationMiddleware(),
-                StoreMiddleware(),
-            ]
+            middlewares: middlewares
         )
 
         let store = Store(store: core)

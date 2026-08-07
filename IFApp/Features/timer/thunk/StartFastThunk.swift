@@ -26,9 +26,7 @@ struct StartFastThunk: Thunk {
         let timer = app.timerState
         guard !timer.isRunning else { return }
 
-        let now = Date().timeIntervalSince1970
-        // Carry any staged elapsed time into the start so the count continues from there.
-        let startTimestamp = now - timer.stagedElapsed
+        let startTimestamp = timer.startTimestamp(at: Date().timeIntervalSince1970)
 
         // Edge 9's second half. A custom length that is no longer paid for cannot be
         // started, but it also cannot be dropped silently: the person set seventeen

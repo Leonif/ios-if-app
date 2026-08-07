@@ -1656,6 +1656,9 @@
         }
       }
     },
+    "Back to your fast" : {
+      "comment" : "Empty history while a fast is running: the action back to the timer. Names the destination, not the direction - the nav chevron already means back"
+    },
     "Best %lld · since %@" : {
       "comment" : "Best streak and the date the history begins",
       "localizations" : {
@@ -2145,7 +2148,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "단식 계속하기"
+            "value" : "단식 이어가기"
           }
         },
         "pl" : {
@@ -3657,7 +3660,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "断食完了。食事の時間帯が始まりました。ゆっくり食事を再開しましょう。"
+            "value" : "断食完了。食事の時間帯が始まりました。ゆっくり食べ始めましょう。"
           }
         },
         "ko" : {
@@ -3681,7 +3684,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "断食完成。你的进食窗口已开启。请温和地恢复进食。"
+            "value" : "断食完成。你的进食窗口已开启。请温和地进食。"
           }
         }
       }
@@ -3716,7 +3719,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "断食完了。食事の時間帯の準備ができました。ゆっくり再開しましょう。"
+            "value" : "断食完了。食事の時間帯の準備ができました。ゆっくり食べ始めましょう。"
           }
         },
         "ko" : {
@@ -3740,7 +3743,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "断食完成。你的进食窗口已准备就绪。请温和地恢复进食。"
+            "value" : "断食完成。你的进食窗口已准备就绪。请温和地进食。"
           }
         }
       }
@@ -7980,6 +7983,65 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "任何使用相同 Apple 账户的设备都可以恢复购买。"
+          }
+        }
+      }
+    },
+    "Resume this fast" : {
+      "comment" : "Undo on the complete screen: puts the fast that was just ended back in progress",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "استئناف الصيام"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fasten wieder aufnehmen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reanudar ayuno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprendre le jeûne"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "断食を再開する"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "단식 재개"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wznów post"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повернути піст"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复断食"
           }
         }
       }

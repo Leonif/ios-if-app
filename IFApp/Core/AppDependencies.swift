@@ -36,5 +36,10 @@ enum AppDependencies {
             #endif
             return StoreRepository()
         }
+        #if DEBUG || DEVELOPMENT
+        container.register(DiagnosticsLogRepositoryProtocol.self) {
+            DiagnosticsLogRepository()
+        }
+        #endif
     }
 }

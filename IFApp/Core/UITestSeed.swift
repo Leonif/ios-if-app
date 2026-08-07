@@ -80,6 +80,13 @@ enum UITestSeed {
                 defaults.set(Double(p), forKey: "goal_hours")
             }
         }
+        // "-seedGoalHours N": pins the running/eating fast's goal independently of
+        // the plan. Applied last so it overrides whatever "-seedElapsed" or
+        // "-seedPlanHours" set above — needed to seed a fast whose pinned goal
+        // disagrees with the currently-selected plan (dev-task-1.5.0-hardening
+        // B8: resume must restore the pinned goal, not the plan; without this arg
+        // that scenario cannot be constructed at all, not merely by coincidence).
+        if let g = intArg("-seedGoalHours") { defaults.set(Double(g), forKey: "goal_hours") }
         if let pc = intArg("-seedPromptCount") { defaults.set(pc, forKey: "review_prompt_count") }
         // "-seedPendingGoal N": the 3rd-goal review fallback was armed N seconds ago,
         // so the next open can reach the native request without driving three real
@@ -101,7 +108,15 @@ enum UITestSeed {
         // so a previous run's records can't leak into this one.
         let history: FastHistoryRepositoryProtocol = container.inject()
         history.replaceAll([])
-        if args.contains("-seedHistoryEdge") {
+        if args.contains("-seedHistoryCorrupt") {
+            // Puts undecodable bytes where the history file goes, so the failed-decode
+            // path can be walked from a flow or by hand. Goes through the concrete type
+            // on purpose: the protocol only speaks in records, and a record that fails
+            // to decode is not something it can express. The cast is total in practice —
+            // `FastHistoryRepository` is the only conformance — and a miss seeds nothing
+            // rather than pretending it did.
+            (history as? FastHistoryRepository)?.seedCorruptFile()
+        } else if args.contains("-seedHistoryEdge") {
             history.replaceAll(edgeCaseRecords())
         } else if let count = intArg("-seedHistory") {
             history.replaceAll(dailyRecords(count: count))

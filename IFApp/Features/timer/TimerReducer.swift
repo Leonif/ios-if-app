@@ -25,6 +25,16 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.fastStartTimestamp = 0
         newState.stagedElapsed = elapsed
 
+    case let .stopUndone(startTimestamp):
+        // The exact inverse of `.stopped`, and nothing more. `goalHours` stays pinned
+        // (this is the same fast, not a new one), `hasCelebrated` stays as it was (a
+        // fast resumed from overtime must not celebrate its goal a second time), and
+        // `completedSessionsCount` / the streak are untouched because they are written
+        // on reaching the goal, not on ending.
+        newState.isRunning = true
+        newState.fastStartTimestamp = startTimestamp
+        newState.stagedElapsed = 0
+
     case .reset:
         newState.isRunning = false
         newState.fastStartTimestamp = 0

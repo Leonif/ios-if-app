@@ -146,6 +146,8 @@ final class AnalyticsMiddleware: Middleware {
                 completed: qualifies,
                 stage: phase.analyticsValue
             ))
+        case .stopUndone:
+            repo.log(.fastStopUndone)
         case let .reset(elapsed):
             repo.log(.fastReset(elapsedMinutes: Int(elapsed / 60)))
         case .eatingStarted:

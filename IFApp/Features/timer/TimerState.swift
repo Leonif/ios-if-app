@@ -68,6 +68,18 @@ struct TimerState: Equatable, Sendable {
         goalHours > 0 ? goalHours : planHours
     }
 
+    /// Where a fast put in flight at `now` has its start: shifted back by whatever is
+    /// already staged, so the count carries on instead of restarting at zero.
+    ///
+    /// Staged time reaches here two ways — a back-dated last meal ahead of the start,
+    /// and an ending that was taken back — and both are the same arithmetic. One
+    /// definition rather than one per caller: if what counts as elapsed ever grows a
+    /// rule (a pause, a segmented count), a second copy would go on compiling with the
+    /// old one and only the screen it feeds would be wrong.
+    func startTimestamp(at now: Double) -> Double {
+        now - stagedElapsed
+    }
+
     /// Epoch seconds when the open eating window closes. The window length is not
     /// stored, so this is the single definition of the close moment — the countdown
     /// card, the window-closed push, the chained fast and the last-meal seed all read
