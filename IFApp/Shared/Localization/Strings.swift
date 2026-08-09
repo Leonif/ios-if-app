@@ -124,7 +124,7 @@ enum strings {
         static var confirmTitle: String { String(localized: "Reset this fast?") }
         static var confirmMessage: String { String(localized: "This discards the current fast and returns to the start.") }
         static var confirmAction: String { String(localized: "Reset fast") }
-        static var keepFasting: String { String(localized: "Keep fasting") }
+        static var keepFasting: String { String(localized: "Keep this fast") }
     }
 
     enum Sheet {

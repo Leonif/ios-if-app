@@ -1657,7 +1657,63 @@
       }
     },
     "Back to your fast" : {
-      "comment" : "Empty history while a fast is running: the action back to the timer. Names the destination, not the direction - the nav chevron already means back"
+      "comment" : "Empty history while a fast is running: the action back to the timer. Names the destination, not the direction - the nav chevron already means back",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "العودة إلى صيامك"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück zum Fasten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a tu ayuno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revenir à votre jeûne"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "現在の断食へ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "단식으로 돌아가기"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wróć do postu"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повернутись до посту"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "返回当前断食"
+          }
+        }
+      }
     },
     "Best %lld · since %@" : {
       "comment" : "Best streak and the date the history begins",
@@ -2114,6 +2170,7 @@
       }
     },
     "Continue fasting" : {
+      "comment" : "Primary action on the window-closed screen (.eatingOver). Starts the NEXT fast, backdated to the moment the eating window closed; the screen already shows a count-up running and its body says the time since then already counts, so the label must read as carrying on from something in progress, not as starting from zero. The object is deliberately generic — the practice, not a specific session — so do NOT add a determiner: the undetermined object is what tells this apart from \"Keep this fast\" (Reset confirmation sheet), which leaves an already-running fast untouched and changes nothing.",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2147,7 +2204,7 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "단식 이어가기"
           }
         },
@@ -5820,66 +5877,8 @@
         }
       }
     },
-    "Keep fasting" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "مواصلة الصيام"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Weiter fasten"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Seguir en ayuno"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Continuer le jeûne"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "断食を続ける"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "단식 계속하기"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Kontynuuj post"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Продовжити піст"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "继续断食"
-          }
-        }
-      }
-    },
     "Keep going" : {
-      "comment" : "Streak milestone card close button",
+      "comment" : "Dismiss button on the streak milestone card. Encouragement, not an action on a fast — nothing starts, stops or changes. NOT \"Keep this fast\" (Reset sheet) and NOT \"Continue fasting\" (window-closed screen).",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -5933,6 +5932,65 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "继续保持"
+          }
+        }
+      }
+    },
+    "Keep this fast" : {
+      "comment" : "Safe (cancel) action in the Reset confirmation sheet, shown next to the destructive \"Reset fast\"; also reused on the near-goal guard in the End-fast sheet. Tapping it only dismisses the sheet: the fast that is already running keeps running, and nothing is created, saved, deleted or written to history — do not use a verb that could mean \"save\", \"store\" or \"archive\". \"This fast\" is the concrete session named in the sheet title (\"Reset this fast?\"), not the practice of fasting: keep an explicit determiner unless your language already separates the two by the verb itself, and never drop it to shorten the string — the slot is wide and there is no length pressure. The two buttons should read as one opposition (discard it / keep it), not as two unrelated labels. Must not read as \"proceed with the reset\". NOT \"Continue fasting\" (window-closed screen — starts the NEXT fast) and NOT \"Keep going\" (streak card dismiss). The word \"reset\" must not appear: this string is reused on a surface where there is no reset.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مواصلة هذا الصيام"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Fasten beibehalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener este ayuno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder ce jeûne"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この断食を続ける"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단식 유지"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pozostaw ten post"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Залишити цей піст"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保留这次断食"
           }
         }
       }
@@ -7744,7 +7802,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Скинути піст?"
+            "value" : "Скинути цей піст?"
           }
         },
         "zh-Hans" : {
@@ -7993,55 +8051,55 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "استئناف الصيام"
+            "value" : "استئناف هذا الصيام"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fasten wieder aufnehmen"
+            "value" : "Dieses Fasten wieder aufnehmen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reanudar ayuno"
+            "value" : "Reanudar este ayuno"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reprendre le jeûne"
+            "value" : "Reprendre ce jeûne"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "断食を再開する"
+            "value" : "この断食を再開"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "단식 재개"
+            "state" : "translated",
+            "value" : "단식 재개하기"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wznów post"
+            "value" : "Wznów ten post"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Повернути піст"
+            "value" : "Відновити цей піст"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "恢复断食"
+            "value" : "恢复这次断食"
           }
         }
       }
@@ -8168,24 +8226,24 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "تخطّي"
+            "value" : "تخط"
           }
         },
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Überspringen"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Omitir"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Passer"
           }
         },
@@ -8197,13 +8255,13 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "건너뛰기"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pomiń"
           }
         },
@@ -8215,7 +8273,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "跳过"
           }
         }
@@ -8420,7 +8478,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Commencer à manger"
+            "value" : "Passer à table"
           }
         },
         "ja" : {
@@ -9605,7 +9663,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Okno otwiera się"
+            "value" : "Otwarcie"
           }
         },
         "uk" : {
