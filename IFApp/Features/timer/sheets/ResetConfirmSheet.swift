@@ -60,7 +60,7 @@ struct ResetConfirmSheet: View {
             PrimaryButton(title: strings.Reset.confirmAction, theme: theme, action: onConfirm)
                 .padding(.top, 6)
                 .accessibilityIdentifier("reset.confirm")
-            SecondaryButton(title: strings.Reset.keepFasting, theme: theme, action: onDismiss)
+            SecondaryButton(title: strings.Reset.keepThisFast, theme: theme, action: onDismiss)
                 .accessibilityIdentifier("reset.cancel")
         }
         .padding(.horizontal, 24)

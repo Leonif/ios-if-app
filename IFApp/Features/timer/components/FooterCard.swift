@@ -133,9 +133,9 @@ struct GoalReachedFooterCard: View {
     }
 }
 
-/// Eating-window footer: Skip (secondary, back to idle) + Start fast (primary, begins a
-/// new fast early). No stats — the countdown is the hero above, and it already names
-/// the closing hour.
+/// Eating-window footer: Done (secondary, ends the window early) + Start fast (primary,
+/// begins a new fast early). No stats — the countdown is the hero above, and it
+/// already names the closing hour.
 ///
 /// The window lasts hours, so it gets its own way into the history: the fast that
 /// just closed is still "today's", and the link opens straight to it. `lastFast` is
@@ -154,7 +154,7 @@ struct EatingFooterCard: View {
                             identifier: "eating.lastFast", action: onHistory)
             }
             HStack(spacing: 12) {
-                SecondaryButton(title: strings.Footer.skip, theme: theme, minWidth: 110, action: onSkip)
+                SecondaryButton(title: strings.Footer.doneEating, theme: theme, minWidth: 110, action: onSkip)
                     .accessibilityIdentifier("eating.skip")
                 PrimaryButton(title: strings.Footer.startFast, theme: theme, action: onStartFast)
                     .accessibilityIdentifier("eating.startFast")
@@ -164,7 +164,7 @@ struct EatingFooterCard: View {
     }
 }
 
-/// Window-closed footer: Skip (secondary, back to idle) + Continue fasting (primary,
+/// Window-closed footer: Not now (secondary, back to idle) + Continue fasting (primary,
 /// chains the next fast from the Last-meal time). No stats — the count-up is the hero.
 struct EatingOverFooterCard: View {
     let theme: ThemeTokens
@@ -173,7 +173,7 @@ struct EatingOverFooterCard: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            SecondaryButton(title: strings.Footer.skip, theme: theme, minWidth: 110, action: onSkip)
+            SecondaryButton(title: strings.Footer.notNowFast, theme: theme, minWidth: 110, action: onSkip)
                 .accessibilityIdentifier("eatingOver.skip")
             PrimaryButton(title: strings.Footer.continueFasting, theme: theme, action: onContinue)
                 .accessibilityIdentifier("eatingOver.continueFasting")

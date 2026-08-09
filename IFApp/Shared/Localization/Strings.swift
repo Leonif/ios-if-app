@@ -102,6 +102,10 @@ enum strings {
         static var startEatingWindow: String { String(localized: "Start eating window") }
         static var startFast: String { String(localized: "Start fast") }
         static var continueFasting: String { String(localized: "Continue fasting") }
+        /// The `.complete` secondary, and now only that one — see the three keys below.
+        /// It is the last state still on the shared string; its own key is a separate
+        /// change, because "Not now" is the wrong promise there (the offer of the eating
+        /// window has no timeout, and this button is what ends it).
         static var skip: String { String(localized: "Skip") }
         static var goalStat: String { String(localized: "Goal") }
         static var over: String { String(localized: "Over") }
@@ -109,6 +113,28 @@ enum strings {
         /// "Goal · 16h"
         static func goal(_ hours: String) -> String {
             String(localized: "Goal · \(hours)")
+        }
+
+        // Two of the three footer secondaries, split off the shared `skip` above. A
+        // footer secondary is defined by the primary beside it, and one generic verb
+        // could not be right next to "Start fast" and "Continue fasting" at once.
+        // `.complete` is still on `skip` and gets its own key in a later pass.
+        //
+        // Named keys, not English source text — the exception `history.streak.unit`
+        // already makes. Keyed by their English text, `Done` here would land on the
+        // existing `Done` and take the plan sheet's and the paywall's button with it.
+
+        /// `.eating`, beside "Start fast": ends the eating window early. A real activity
+        /// finished, not a sheet dismissed — which is why it is not `Sheet.done`.
+        static var doneEating: String {
+            String(localized: "Footer.doneEating", defaultValue: "Done")
+        }
+
+        /// `.eatingOver`, beside "Continue fasting": the window has already closed, so
+        /// this defers the next fast rather than skipping anything. "Not now" is true
+        /// here — a fast can be started from idle at any time.
+        static var notNowFast: String {
+            String(localized: "Footer.notNowFast", defaultValue: "Not now")
         }
     }
 
@@ -124,7 +150,7 @@ enum strings {
         static var confirmTitle: String { String(localized: "Reset this fast?") }
         static var confirmMessage: String { String(localized: "This discards the current fast and returns to the start.") }
         static var confirmAction: String { String(localized: "Reset fast") }
-        static var keepFasting: String { String(localized: "Keep this fast") }
+        static var keepThisFast: String { String(localized: "Keep this fast") }
     }
 
     enum Sheet {
