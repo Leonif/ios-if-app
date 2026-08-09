@@ -12,13 +12,32 @@
 //  happened. Now the unreadable file is moved aside first, and if it cannot be moved
 //  the repository refuses to write at all.
 //
-//  The envelope carries a schema version. It is written, and still not read: the
-//  migration chain belongs with the first format change, and its place is marked in
-//  `readFile()`. Until then this file's promise is narrower than a migration and it
-//  is worth being exact about — the old bytes survive, not the old records.
+//  The envelope's schema version is read as well as written, and it is read *before*
+//  the records. That order is the whole of it: a file left by a newer build is not
+//  damaged, only younger than this binary, and telling those two apart is what keeps
+//  a TestFlight downgrade from filing someone's history away as corrupt. A newer file
+//  is handed over read-only — this build would write it back in the older shape.
+//
+//  There is still no migration chain; its place is marked in `readFile()`. Until it
+//  exists this file's promise stays narrower than a migration, and it is worth being
+//  exact about — the old bytes survive, not the old records.
 //
 
 import Foundation
+
+/// Why a read did not produce today's records. Raw values are the GA4 `reason`
+/// parameter of `history_load_failed` — a fixed list, same rule as `trigger`.
+enum HistoryLoadFailure: String {
+    /// The file is there and cannot be read at all (disk, permissions).
+    case unreadable
+    /// The bytes are not an envelope this build understands.
+    case decode
+    /// Written by a newer build. Records may still come back; writing does not.
+    case futureSchema = "future_schema"
+    /// Unreadable *and* immovable. The only copy is still where it was, and the
+    /// repository has stopped writing to keep it that way.
+    case quarantineFailed = "quarantine_failed"
+}
 
 protocol FastHistoryRepositoryProtocol {
     func loadAll() -> [FastRecord]
@@ -31,6 +50,14 @@ struct FastHistoryRepository: FastHistoryRepositoryProtocol {
     private struct Envelope: Codable {
         var schemaVersion: Int
         var records: [FastRecord]
+    }
+
+    /// The version on its own. `Envelope` cannot stand in for it: it carries the
+    /// records too, so a file whose records this build cannot parse would fail to
+    /// decode either way — and the version is exactly what separates "corrupt" from
+    /// "written by a newer build".
+    private struct VersionProbe: Decodable {
+        var schemaVersion: Int
     }
 
     /// What the file turned out to be. Every read *and* every write goes through it,
@@ -46,17 +73,27 @@ struct FastHistoryRepository: FastHistoryRepositoryProtocol {
         /// Undecodable bytes that could not be moved (disk, permissions). The only
         /// copy of the user's history is still sitting at `fileURL`.
         case stuck
+        /// An envelope from a newer build. Whatever of it this build could read is
+        /// handed over, and nothing is written back: the records would go out in the
+        /// older shape and the newer ones would be gone. Not quarantined — the file
+        /// is intact, and the build that wrote it can still read it.
+        case readOnly([FastRecord])
 
         var records: [FastRecord] {
-            if case .decoded(let records) = self { return records }
-            return []
+            switch self {
+            case .decoded(let records), .readOnly(let records): return records
+            case .blank, .quarantined, .stuck: return []
+            }
         }
 
         /// A write is allowed unless it would land on data we can neither read nor
-        /// keep. `.quarantined` allows it precisely because the old bytes are safe.
+        /// keep, or on data a newer build understands better than we do.
+        /// `.quarantined` allows it precisely because the old bytes are safe.
         var allowsWrite: Bool {
-            if case .stuck = self { return false }
-            return true
+            switch self {
+            case .blank, .decoded, .quarantined: return true
+            case .stuck, .readOnly: return false
+            }
         }
     }
 
@@ -71,13 +108,22 @@ struct FastHistoryRepository: FastHistoryRepositoryProtocol {
     private static let quarantineLimit = 3
 
     private let directory: URL
+    private let onLoadFailure: (HistoryLoadFailure) -> Void
 
     /// Documents by default. The directory is a parameter so a unit test can point the
     /// repository at a temp folder and exercise the real file behaviour — the decode
-    /// path is what the guard is about, so a fake would test nothing. The app never
-    /// passes one: registration in `AppDependencies` stays `FastHistoryRepository()`.
-    init(directory: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]) {
+    /// path is what the guard is about, so a fake would test nothing.
+    ///
+    /// `onLoadFailure` is how a failure gets out of here. A closure rather than an
+    /// analytics dependency on purpose: this layer knows that a read did not produce
+    /// records and why, and nothing about the event catalog. What that *means* is
+    /// decided where the repository is registered (`AppDependencies`).
+    init(
+        directory: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0],
+        onLoadFailure: @escaping (HistoryLoadFailure) -> Void = { _ in }
+    ) {
         self.directory = directory
+        self.onLoadFailure = onLoadFailure
     }
 
     private var fileURL: URL {
@@ -109,21 +155,50 @@ struct FastHistoryRepository: FastHistoryRepositoryProtocol {
         write(records)
     }
 
+    /// One report per failed read — per call, not per lifetime. A failure that keeps
+    /// happening is meant to keep firing: how often it repeats, and whether it repeats
+    /// on writes as well as on launches, is the part that says how bad it is.
     private func readFile() -> FileState {
         guard FileManager.default.fileExists(atPath: fileURL.path) else { return .blank }
-        guard let data = try? Data(contentsOf: fileURL) else {
-            return quarantine() ? .quarantined : .stuck
-        }
+        guard let data = try? Data(contentsOf: fileURL) else { return quarantining(.unreadable) }
         // A zero-byte file is what an interrupted first write leaves behind. There are
         // no records under it, so quarantining it would only file away emptiness.
         guard !data.isEmpty else { return .blank }
-        guard let envelope = try? JSONDecoder().decode(Envelope.self, from: data) else {
-            return quarantine() ? .quarantined : .stuck
+        // Version first, records second. A file from a newer build may well fail to
+        // decode into today's `FastRecord`, and reaching the decode before the version
+        // would quarantine it as corrupt — destroying, in the name of the guard, the
+        // one case the guard cannot tell apart on the bytes alone.
+        guard let probe = try? JSONDecoder().decode(VersionProbe.self, from: data) else {
+            return quarantining(.decode)
         }
-        // Migration chain goes here when `FastRecord` first changes shape: compare
-        // `envelope.schemaVersion` against `currentSchemaVersion` and upgrade. Today
-        // there is one version, so there is nothing to branch on.
+        if probe.schemaVersion > Self.currentSchemaVersion {
+            onLoadFailure(.futureSchema)
+            // Whatever this build can still make of it. Empty is an honest answer here:
+            // the records exist, this binary just cannot read their shape — and with
+            // writing off, an empty read costs nothing but a bare screen.
+            return .readOnly((try? JSONDecoder().decode(Envelope.self, from: data))?.records ?? [])
+        }
+        // Migration chain goes here when `FastRecord` first changes shape: a
+        // `probe.schemaVersion` below `currentSchemaVersion` is where an upgrade step
+        // is inserted. Today there is one version, so there is nothing to branch on.
+        guard let envelope = try? JSONDecoder().decode(Envelope.self, from: data) else {
+            return quarantining(.decode)
+        }
         return .decoded(envelope.records)
+    }
+
+    /// Moves the unreadable file aside and reports why the read failed.
+    ///
+    /// When the move fails the reason reported is `quarantineFailed` rather than what
+    /// made the bytes unreadable in the first place: only one event goes out per read,
+    /// and of the two facts that one is the one still costing the user their history.
+    private func quarantining(_ reason: HistoryLoadFailure) -> FileState {
+        guard quarantine() else {
+            onLoadFailure(.quarantineFailed)
+            return .stuck
+        }
+        onLoadFailure(reason)
+        return .quarantined
     }
 
     /// Moves the unreadable file aside so the next write starts from a clean path.
@@ -192,6 +267,24 @@ extension FastHistoryRepository {
     /// exists for. Returns the file it wrote, so the caller can log where to look.
     @discardableResult
     func seedCorruptFile(_ data: Data = corruptFixture) -> URL {
+        try? data.write(to: fileURL, options: .atomic)
+        return fileURL
+    }
+
+    /// A well-formed envelope from a schema this build has not shipped yet — the
+    /// `readOnly` path (TF-2), as opposed to `corruptFixture`'s `.decode`/quarantine
+    /// path. One record, goal reached, so the read-only history renders exactly like
+    /// an ordinary one and the only visible difference is that a write after this
+    /// does not change the file on disk.
+    static let futureSchemaFixture = Data(
+        #"{"schemaVersion":99,"records":[{"id":"6F1C2A4E-0000-4000-8000-00000000000C","startTimestamp":1700000000,"endTimestamp":1700061200,"goalHours":16,"planLabel":"16:8"}]}"#.utf8
+    )
+
+    /// Overwrites the history file with `futureSchemaFixture`. QA test hook, mirrors
+    /// `seedCorruptFile` — same reasoning: the protocol only speaks in records, and a
+    /// newer-than-this-build envelope is not something it can express.
+    @discardableResult
+    func seedFutureSchemaFile(_ data: Data = futureSchemaFixture) -> URL {
         try? data.write(to: fileURL, options: .atomic)
         return fileURL
     }

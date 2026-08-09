@@ -6,8 +6,28 @@
 //  so the analysis of "where does the user drop off" maps to named events.
 //  Names are snake_case (Firebase convention, <= 40 chars).
 //
+//  **Anything meant to be read as a breakdown travels as text.** A GA4 custom
+//  dimension reads the parameter's *string* field only; a value logged as a number
+//  (or as a `Bool`, which bridges to `NSNumber`) leaves that field empty and every
+//  row of the report comes back `(not set)`. That is not a theory — it cost the
+//  whole `goal_hours` series from 10.07 to 09.08.2026, and GA4 backfills nothing.
+//  A number stays a number only where the question is an average, i.e. where the
+//  definition in the console is a custom *metric*; today that is `duration_seconds`
+//  alone. See `ARCHITECTURE.md`, "Типы параметров GA4".
+//
 
 import Foundation
+
+/// A number on its way into a GA4 dimension: text, zero-padded to a fixed width.
+///
+/// The padding is not decoration. These dimensions are read by the *shape* of the
+/// distribution, which means sorting by the dimension, and string sort puts `9`
+/// after `16` unless the widths match. Values wider than `width` still log
+/// correctly — only their place in the sort degrades, and at that size the number
+/// is an outlier being read one row at a time anyway.
+private func code(_ value: Int, width: Int) -> String {
+    String(format: "%0\(width)d", value)
+}
 
 enum AnalyticsEvent {
     /// App launched / foregrounded into use.
@@ -56,6 +76,14 @@ enum AnalyticsEvent {
     /// exists to inform: whether an import is ever worth building. A cancelled share
     /// does not fire it.
     case historyExported
+    /// A read of the history file did not produce today's records. `reason` = what
+    /// happened ("unreadable" / "decode" / "future_schema" / "quarantine_failed").
+    ///
+    /// Fires once per failed read, not once per launch: a file that cannot be moved
+    /// aside reports again on every write attempt, and that repetition is the signal.
+    /// The event is expected to be silent forever — it exists to find out whether the
+    /// TF-2 guard ever catches anything before a release changes `FastRecord`'s shape.
+    case historyLoadFailed(reason: String)
     /// The native `requestReview` was called. `trigger` = what caused it
     /// ("streak_milestone" / "next_open"). Apple may or may not show the panel.
     case reviewPrompted(trigger: String)
@@ -104,6 +132,7 @@ enum AnalyticsEvent {
         case .historyOpened: return "history_opened"
         case .historyRecordDeleted: return "history_record_deleted"
         case .historyExported: return "history_exported"
+        case .historyLoadFailed: return "history_load_failed"
         case .reviewPrompted: return "review_prompted"
         case .streakMilestone: return "streak_milestone"
         case .planSelected: return "plan_selected"
@@ -121,36 +150,45 @@ enum AnalyticsEvent {
     var parameters: [String: Any] {
         switch self {
         case let .fastStarted(goalHours):
-            return ["goal_hours": goalHours]
+            return ["goal_hours": code(Int(goalHours.rounded()), width: 2)]
         case let .goalReached(goalHours):
-            return ["goal_hours": goalHours]
+            return ["goal_hours": code(Int(goalHours.rounded()), width: 2)]
         case let .fastStopped(durationSeconds, completed, stage):
             return [
+                // The only number left on purpose: `duration_seconds` is not a
+                // breakdown, it is the raw quantity a custom *metric* would average.
                 "duration_seconds": durationSeconds,
-                "duration_hours": durationSeconds / 3600,
-                "completed": completed,
+                "duration_hours": code(durationSeconds / 3600, width: 3),
+                "completed": completed ? "true" : "false",
                 "stage": stage,
             ]
         case let .fastReset(elapsedMinutes):
-            return ["elapsed_minutes": elapsedMinutes]
+            return ["elapsed_minutes": code(elapsedMinutes, width: 4)]
         case let .lastMealLogged(backdated, minutesAgo):
             return [
+                // Stays a number, and that is the point: the flag is broken at the
+                // source (the meal sheet seeds `ateMin` on open, so after the first
+                // open it is always `true`), and a readable dimension of one value
+                // would look like a metric. It becomes a string when the seeding is
+                // fixed — not before.
                 "backdated": backdated,
-                "minutes_ago": minutesAgo,
+                "minutes_ago": code(minutesAgo, width: 4),
             ]
         case let .themeActive(dark):
             return ["theme": dark ? "dark" : "light"]
         case let .reviewPrompted(trigger):
             return ["trigger": trigger]
         case let .streakMilestone(days):
-            return ["days": days]
+            return ["days": code(days, width: 2)]
         case let .historyOpened(source):
             return ["source": source]
+        case let .historyLoadFailed(reason):
+            return ["reason": reason]
         case let .planSelected(plan, goalHours),
              let .planConfirmed(plan, goalHours):
             return [
                 "plan": plan,
-                "goal_hours": goalHours,
+                "goal_hours": code(goalHours, width: 2),
             ]
         case let .paywallShown(trigger), let .paywallDismissed(trigger):
             return ["trigger": trigger]

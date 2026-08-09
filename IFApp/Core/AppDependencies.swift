@@ -21,7 +21,14 @@ enum AppDependencies {
             AnalyticsRepository()
         }
         container.register(FastHistoryRepositoryProtocol.self) {
-            FastHistoryRepository()
+            // The repository finds the failure; that a failure is worth an analytics
+            // event is decided here, in the composition root, so the file layer stays
+            // ignorant of the event catalog. The analytics repository is resolved on
+            // the call rather than captured — registration order then does not matter.
+            FastHistoryRepository { reason in
+                let analytics: AnalyticsRepositoryProtocol = container.inject()
+                analytics.log(.historyLoadFailed(reason: reason.rawValue))
+            }
         }
         container.register(HistoryExportRepositoryProtocol.self) {
             HistoryExportRepository()

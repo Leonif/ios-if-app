@@ -116,6 +116,12 @@ enum UITestSeed {
             // `FastHistoryRepository` is the only conformance — and a miss seeds nothing
             // rather than pretending it did.
             (history as? FastHistoryRepository)?.seedCorruptFile()
+        } else if args.contains("-seedHistoryFutureSchema") {
+            // Same reasoning as "-seedHistoryCorrupt" above, for the sibling TF-2 path:
+            // a well-formed envelope from a schema this build has not shipped (readOnly),
+            // not an undecodable one (quarantine). QA test hook, added for
+            // dev-task-1.5.0-hardening TF-2 — not in the original seed-arg table.
+            (history as? FastHistoryRepository)?.seedFutureSchemaFile()
         } else if args.contains("-seedHistoryEdge") {
             history.replaceAll(edgeCaseRecords())
         } else if let count = intArg("-seedHistory") {

@@ -2,8 +2,10 @@
 //  AnalyticsRepository.swift
 //  IFApp
 //
-//  Stateless gateway for emitting analytics events. AnalyticsMiddleware is the
-//  only caller — events are never logged directly from views.
+//  Stateless gateway for emitting analytics events. Events are never logged from a
+//  view: they come from AnalyticsMiddleware, which is the caller for everything that
+//  travels as an action, and from the one failure that does not — `history_load_failed`
+//  is found by the file layer, and wired to this gateway in `AppDependencies`.
 //
 
 protocol AnalyticsRepositoryProtocol {
