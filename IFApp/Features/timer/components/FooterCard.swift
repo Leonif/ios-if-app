@@ -229,21 +229,33 @@ struct CompleteFooterCard: View {
     /// German. Stacked, the worst locale uses 72.3%.
     ///
     /// No chevron — it goes nowhere. No lead-in ("Ended by mistake?"): that frames the
-    /// tap as a confession, and undo should read as an ordinary thing to want. The text
-    /// is 13.5pt, about 18pt tall, so the tappable area is grown to the HIG minimum
-    /// rather than left at the glyph box. `.semibold` at the least: Arabic glyphs read
-    /// smaller than Latin at the same point size.
+    /// tap as a confession, and undo should read as an ordinary thing to want.
+    /// `.semibold` at the least: Arabic glyphs read smaller than Latin at the same
+    /// point size.
+    ///
+    /// The 44pt slot is kept, but it belongs to the row, not to the button: the frame is
+    /// on the container, so the card's rhythm is unchanged while the tappable region is
+    /// the glyph box and nothing more. (The frame has to sit on a container — put on the
+    /// Button, even outside `buttonStyle`, it becomes the button's hit region again.)
+    ///
+    /// It used to be the button's own label frame, which left ~13pt of invisible hot area
+    /// above the text, directly under the history link, whose own region stops at its
+    /// glyphs. A tap a few points low on "Saved to your history" landed on the undo
+    /// instead and silently took the just-finished fast back out of the history. For an
+    /// action that destructive, a target that is exactly what the user can see beats a
+    /// target that is comfortably large.
     private var resumeAction: some View {
-        Button(action: onResume) {
-            Text(strings.Complete.resumeFast)
-                .font(.hanken(13.5, .semibold))
-                .foregroundColor(theme.sec)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .contentShape(Rectangle())
+        VStack(spacing: 0) {
+            Button(action: onResume) {
+                Text(strings.Complete.resumeFast)
+                    .font(.hanken(13.5, .semibold))
+                    .foregroundColor(theme.sec)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .buttonStyle(.pressable)
+            .accessibilityIdentifier("complete.resumeFast")
         }
-        .buttonStyle(.pressable)
-        .accessibilityIdentifier("complete.resumeFast")
+        .frame(maxWidth: .infinity, minHeight: 44)
     }
 }
