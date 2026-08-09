@@ -5937,7 +5937,7 @@
       }
     },
     "Keep this fast" : {
-      "comment" : "Safe (cancel) action in the Reset confirmation sheet, shown next to the destructive \"Reset fast\"; also reused on the near-goal guard in the End-fast sheet. Tapping it only dismisses the sheet: the fast that is already running keeps running, and nothing is created, saved, deleted or written to history — do not use a verb that could mean \"save\", \"store\" or \"archive\". \"This fast\" is the concrete session named in the sheet title (\"Reset this fast?\"), not the practice of fasting: keep an explicit determiner unless your language already separates the two by the verb itself, and never drop it to shorten the string — the slot is wide and there is no length pressure. The two buttons should read as one opposition (discard it / keep it), not as two unrelated labels. Must not read as \"proceed with the reset\". NOT \"Continue fasting\" (window-closed screen — starts the NEXT fast) and NOT \"Keep going\" (streak card dismiss). The word \"reset\" must not appear: this string is reused on a surface where there is no reset.",
+      "comment" : "Safe (cancel) action in the Reset confirmation sheet, shown next to the destructive \"Reset fast\". That sheet (ResetConfirmSheet) is the only surface today; a second one — the near-goal guard in the End-fast sheet — is planned for 1.5.1. Do not name the reset operation (\"don't reset\", \"cancel reset\"): the safe half of a destructive pair must not repeat the destructive verb, and on the planned second surface there is nothing to reset. Tapping it only dismisses the sheet: the fast that is already running keeps running, and nothing is created, saved, deleted or written to history — do not use a verb that could mean \"save\", \"store\" or \"archive\". \"This fast\" is the concrete session named in the sheet title (\"Reset this fast?\"), not the practice of fasting: keep an explicit determiner unless your language already separates the two by the verb itself, and never drop it to shorten the string — the slot is wide and there is no length pressure. The two buttons must read as one opposition (discard it / keep it), not as two unrelated labels, and this label must never read as \"proceed with the reset\". NOT \"Continue fasting\" (window-closed screen — starts the NEXT fast) and NOT \"Keep going\" (streak card dismiss).",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8050,8 +8050,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "استئناف هذا الصيام"
+            "state" : "translated",
+            "value" : "استئناف صيامك"
           }
         },
         "de" : {
@@ -8074,8 +8074,8 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "この断食を再開"
+            "state" : "translated",
+            "value" : "断食を再開する"
           }
         },
         "ko" : {
@@ -8109,8 +8109,8 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "حُفظ في سجلك"
+            "state" : "translated",
+            "value" : "تم الحفظ في سجلك"
           }
         },
         "de" : {
@@ -8222,6 +8222,7 @@
       }
     },
     "Skip" : {
+      "comment" : "Secondary button in the timer footer. One string, three states: fast complete, eating window open, eating window closed. In all three the tap does the same thing from the user's side — leave the step being offered and go back to the idle timer. Nothing is recorded, logged, marked or written to history; in particular this must NOT read as \"mark as skipped\" (a status on a record), which is what the same word means in some system apps. Because one string serves three states, never name the object: \"skip the meal\" / \"skip the window\" is wrong in at least one of them — once the window has closed there is nothing left to skip. Keep it a bare generic verb in the platform's own wording for skipping a step.",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8244,7 +8245,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Passer"
+            "value" : "Ignorer"
           }
         },
         "ja" : {
