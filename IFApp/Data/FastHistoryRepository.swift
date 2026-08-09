@@ -62,7 +62,9 @@ struct FastHistoryRepository: FastHistoryRepositoryProtocol {
 
     /// What the file turned out to be. Every read *and* every write goes through it,
     /// because the rule the guard is made of — never write on top of bytes we could
-    /// not read — is a property of writing, not of loading.
+    /// not read — is a property of writing, not of loading. One exception, and it is
+    /// not a user's: the DEBUG hook `wipeFile()` reads through here and then writes
+    /// anyway, because a suite's baseline is not bytes the guard exists to protect.
     private enum FileState {
         /// No file, or an empty one. A first launch, not a failure: nothing is put
         /// into quarantine, because there is nothing in it to lose.
@@ -268,6 +270,30 @@ extension FastHistoryRepository {
     @discardableResult
     func seedCorruptFile(_ data: Data = corruptFixture) -> URL {
         try? data.write(to: fileURL, options: .atomic)
+        return fileURL
+    }
+
+    /// Wipes the history to an empty envelope of the current schema, past the write
+    /// guard. A test hook for the same reason as the two seeders: the guard is a
+    /// property of writing *a user's* bytes, and a suite's baseline is not that.
+    ///
+    /// Needed because `replaceAll([])` honours `allowsWrite`, so once a flow seeds a
+    /// future-schema file (`.readOnly`, TF-2) every later baseline wipe silently does
+    /// nothing and the next flows run on the seeded record — `run.sh all` sorts the
+    /// glob as strings, so H15 really does run before H2-H9, and H3/H4/H8 went red on
+    /// H15's history. Reinstalling the container hid it, which is why the suite only
+    /// caught it in a full run.
+    ///
+    /// Reads before it writes, so the quarantine path is kept: undecodable bytes are
+    /// still moved aside and `onLoadFailure` still fires, exactly as on a normal
+    /// launch. The one state it overrules beyond `.readOnly` is `.stuck` — bytes that
+    /// could be neither read nor moved. Overwriting those is the point here: the run
+    /// needs a clean baseline, and on a simulator container there is nothing under
+    /// them worth keeping.
+    @discardableResult
+    func wipeFile() -> URL {
+        _ = readFile()
+        write([])
         return fileURL
     }
 

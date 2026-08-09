@@ -21,7 +21,11 @@ enum AppStoreFactory {
         if ProcessInfo.processInfo.arguments.contains("-uitestReset") {
             persistence.save(fastStartTimestamp: 0, goalHours: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false, streakCount: 0, lastGoalDate: nil)
             let history: FastHistoryRepositoryProtocol = container.inject()
-            history.replaceAll([])
+            // Not `replaceAll([])`: it is bound by the TF-2 write guard, and this is
+            // the branch that has to survive a future-schema file left by an earlier
+            // flow. It is also the only wipe a "-uitestReset" launch gets — with no
+            // "-seed…" argument `UITestSeed.applyIfNeeded` returns before its own.
+            (history as? FastHistoryRepository)?.wipeFile()
         }
         // UI tests also seed timer/review state via "-seed…" args (see UITestSeed).
         UITestSeed.applyIfNeeded()

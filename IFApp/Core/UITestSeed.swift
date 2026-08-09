@@ -106,8 +106,14 @@ enum UITestSeed {
 
         // History lives in a file, not in defaults — wipe it alongside the baseline
         // so a previous run's records can't leak into this one.
+        //
+        // Through `wipeFile()` rather than `replaceAll([])`: `replaceAll` honours the
+        // TF-2 write guard, so a file left `.readOnly` by an earlier flow's
+        // "-seedHistoryFutureSchema" makes this wipe — and every "-seedHistory" below
+        // it — a silent no-op for the rest of the suite. Same cast as the two seeders,
+        // for the same reason.
         let history: FastHistoryRepositoryProtocol = container.inject()
-        history.replaceAll([])
+        (history as? FastHistoryRepository)?.wipeFile()
         if args.contains("-seedHistoryCorrupt") {
             // Puts undecodable bytes where the history file goes, so the failed-decode
             // path can be walked from a flow or by hand. Goes through the concrete type

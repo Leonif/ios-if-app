@@ -223,6 +223,43 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(reported, [.futureSchema])
     }
 
+    // MARK: - test hooks
+
+    /// The suite's baseline wipe, and the reason it cannot be `replaceAll([])`. A flow
+    /// that seeds a future-schema file (H15) leaves the guard closed for the whole
+    /// container, so every later flow's reset silently kept H15's record — H3/H4/H8
+    /// went red on it. `wipeFile` is the hook that overrules the guard, and after it
+    /// the ordinary seeding path works again because the file is current-schema.
+    func testWipeFileClearsAFutureSchemaFileThatReplaceAllRefuses() {
+        writeEnvelope(schemaVersion: 99, records: [makeRecord(daysAgo: 1)])
+        let repository = makeRepository()
+
+        repository.replaceAll([])
+        XCTAssertEqual(repository.loadAll().count, 1, "the guard is what makes the hook necessary")
+
+        repository.wipeFile()
+
+        XCTAssertEqual(repository.loadAll(), [], "the baseline is clean without a reinstall")
+        XCTAssertEqual(quarantineFiles, [], "a newer file is intact — nothing to quarantine")
+        repository.replaceAll([makeRecord(daysAgo: 2)])
+        XCTAssertEqual(repository.loadAll().count, 1, "and seeding works again after it")
+    }
+
+    /// The hook reads before it writes, so it does not cost the quarantine: bytes that
+    /// would have been filed away on an ordinary launch still are, and the failure is
+    /// still reported.
+    func testWipeFileStillQuarantinesUndecodableBytes() {
+        let repository = makeRepository()
+        repository.seedCorruptFile()
+
+        repository.wipeFile()
+
+        XCTAssertEqual(repository.loadAll(), [])
+        XCTAssertEqual(reported, [.decode])
+        XCTAssertEqual(quarantineFiles.count, 1)
+        XCTAssertEqual(bytes(of: quarantineFiles[0]), FastHistoryRepository.corruptFixture)
+    }
+
     // MARK: - history_load_failed
 
     /// One event per failed read, with the reason that names what happened.
