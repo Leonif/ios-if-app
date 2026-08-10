@@ -115,6 +115,36 @@ enum UITestSeed {
             let day = Calendar.current.date(byAdding: .day, value: -daysAgo, to: Date()) ?? Date()
             defaults.set(Clock.dayKey(day), forKey: "streak_last_goal_date")
         }
+        // "-seedFreezeSpent 1": this calendar month's protected day is already used
+        // up. The criterion it exists for — one freeze per calendar month — needs a
+        // *second* missed day in one month, and a single launch cannot produce the
+        // first one: spending a freeze takes a goal crossed on a day the flow has no
+        // way to travel to. Without this argument the second-miss branch is reachable
+        // from unit tests only.
+        //
+        // The month charged is the one the app itself would debit for the gap this
+        // same seed describes — the month of the *missed* day, asked of
+        // `StreakStatus.freezeMonthCharged(afterGoalOn:)` rather than recomputed here,
+        // so a seed that charges a different month than the rule cannot exist.
+        //
+        // Not "the current month": on the 1st and 2nd those are two different months,
+        // and seeding today's would leave the freeze unspent exactly then — a flow
+        // green for 29 days of the month and red on the other two.
+        //
+        // When the seeded state has no gap at all (last goal today or yesterday) there
+        // is nothing for a freeze to cover, and the plain reading of the argument is
+        // today's month. The gap is checked explicitly instead of falling out of a nil:
+        // "-seedStreak N" alone already writes today into `streak_last_goal_date`, so a
+        // fallback keyed on "no last goal" would never run, and the month of *tomorrow*
+        // would be charged — next month, on the 31st.
+        if intArg("-seedFreezeSpent") == 1 {
+            let today = Clock.dayKey()
+            let gapMonth = defaults.string(forKey: "streak_last_goal_date").flatMap { goal -> String? in
+                guard (Clock.daysBetween(goal, today) ?? 0) >= 2 else { return nil }
+                return StreakStatus.freezeMonthCharged(afterGoalOn: goal)
+            }
+            defaults.set(gapMonth ?? Clock.monthKey(ofDay: today), forKey: "streak_freeze_spent_month")
+        }
 
         // History lives in a file, not in defaults — wipe it alongside the baseline
         // so a previous run's records can't leak into this one.

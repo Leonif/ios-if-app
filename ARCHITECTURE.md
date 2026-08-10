@@ -440,15 +440,32 @@ xcrun simctl get_app_container <UDID> simple-L.if-app.com data
 | Аргумент | Что делает | Где |
 |---|---|---|
 | `-uitestReset` | стирает таймер-дефолты и весь файл истории — чистый idle | `Core/AppStoreFactory.swift` |
-| `-seedElapsed` / `-seedEatingElapsed` / `-seedCount` / `-seedCelebrated` / `-seedPlanHours` / `-seedPromptCount` / `-seedPendingGoal` / `-seedStreak` / `-seedLastGoalDate` | чистый baseline в `UserDefaults` + перечисленные значения | `Core/UITestSeed.swift` |
+| `-seedElapsed` / `-seedEatingElapsed` / `-seedCount` / `-seedCelebrated` / `-seedPlanHours` / `-seedGoalHours` / `-seedPromptCount` / `-seedPendingGoal` / `-seedOfferShown` / `-seedStreak` / `-seedLastGoalDate` / `-seedFreezeSpent` | чистый baseline в `UserDefaults` + перечисленные значения | `Core/UITestSeed.swift` |
 | `-seedHistory N` / `-seedHistoryEdge` | N сгенерированных записей / четыре краевые формы | `Core/UITestSeed.swift` |
-| `-seedHistoryCorrupt` | кладёт в `Documents/fast-history.json` заведомо недекодируемые байты | `Core/UITestSeed.swift` + `Data/FastHistoryRepository.swift` |
+| `-seedHistoryCorrupt` / `-seedHistoryFutureSchema` | кладёт в `Documents/fast-history.json` заведомо недекодируемые байты / конверт схемы, которой эта сборка не знает (ветка `readOnly` гарда TF-2) | `Core/UITestSeed.swift` + `Data/FastHistoryRepository.swift` |
 | `-seedStore` + семейство `-seedStore…` | подставляет `StubStoreRepository` вместо StoreKit — разбор ниже, в разделе «Локальный магазин» | `Core/AppDependencies.swift`, `Data/StubStoreRepository.swift` |
 | `-showReviewPrompt` | шторка отзыва сразу | `IFAppApp.init` |
 
 **Почему `#if DEBUG`, а не «юзер всё равно не передаст».** `-uitestReset` до 07.08.2026 компилировался в релизный бинарник (TF-6). Реализованного пути эксплуатации у него нет, но это деструктивный хук — он стирает историю целиком, — и в сторовой сборке ему нечего делать по тому же признаку, по которому там нет `StubStoreRepository`. Гейт compile-time; гейтить по окружению нельзя по той же причине, что и диагностику: App Review гоняет приложение в sandbox.
 
 **`-seedHistoryCorrupt`.** Пишет 81 байт — конверт, обрезанный посреди первой записи (`{"schemaVersion":1,"records":[{"id":"6F1C…","start`), то есть форму, которую даёт прерванная запись, а не случайный мусор. Фикстура живёт одним определением — `FastHistoryRepository.corruptFixture` — чтобы флоу, юнит-тест и ручной прогон портили файл одинаково. Хук идёт мимо `FastHistoryRepositoryProtocol` (`history as? FastHistoryRepository`) сознательно: протокол говорит только записями, а запись, которая не декодится, им невыразима. Аргумент взаимоисключающий с `-seedHistory` / `-seedHistoryEdge` — ветка `if/else if`, corrupt первый.
+
+**`-seedFreezeSpent 1`.** Заведён 10.08.2026 под критерий приёмки «Freeze: доступна 1 на календарный месяц» (`dev-task-paywall.md:299`). Пишет `streak_freeze_spent_month` — месяц, чья защита уже израсходована. Без него вторая пропажа в одном месяце из флоу недостижима вообще: чтобы потратить заморозку по-настоящему, нужна цель, взятая в день, до которого флоу не доезжает, а один запуск не пересеивает сам себя. Ветка была покрыта только юнитами.
+
+Значение аргумента — `1`, а не месяц: месяц сид не вычисляет, а спрашивает у `StreakStatus.freezeMonthCharged(afterGoalOn:)` — единственного определения правила «кто платит», к которому этой же правкой сведены `freezeCovers(_:)` и `freezeMonth(coveringGapTo:)`. Списывается месяц **дня пропажи**, а не текущий: 1-го и 2-го числа это два разных месяца, и флоу, засеявший текущий, оставил бы заморозку нетронутой именно в эти дни — зелёный 29 дней из 30 и красный в остальные два.
+
+Наличие разрыва сид проверяет **явно** — `Clock.daysBetween(streak_last_goal_date, сегодня) >= 2`, — а не выводит из отсутствия аргумента. Фолбэк «нет `-seedLastGoalDate` → нет разрыва» не сработал бы никогда: `-seedStreak N` сам по себе уже пишет в `streak_last_goal_date` сегодня, и списан оказался бы месяц **завтрашнего** дня — 31-го числа следующий. Когда разрыва действительно нет (цель сегодня или вчера), покрывать нечего и пишется месяц сегодняшнего дня, чтобы аргумент оставался осмысленным сам по себе.
+
+Пара для флоу (проверено на симуляторе 10.08.2026, `iPhone 17`, сегодня 2026-08-10):
+
+```bash
+# заморозка цела: пропущен 2026-08-09, счётчик держится
+-uitestReset -seedStore pro -seedStreak 5 -seedLastGoalDate 2
+# заморозка месяца потрачена: тот же разрыв, но бейдж стрика исчезает
+-uitestReset -seedStore pro -seedStreak 5 -seedLastGoalDate 2 -seedFreezeSpent 1
+```
+
+`-seedStore pro` обязателен: `ownsFreeze` читается из права, а не из стрика, и без Pro пропущенный день сбрасывает счётчик и так — тест прошёл бы «зелёным» не по той причине.
 
 **Юнит-таргет `IFAppTests`.** Заведён 07.08.2026 под TF-2: испортить файл истории с экрана невозможно, поэтому из XCUITest этот дефект не воспроизводится в принципе. XCTest, `@testable import IFApp`, синхронизированная папка (Xcode 16), bundle id `simple-L.if-app.com.tests`, host — `IFApp.app`. Прописан в Test-действии схемы **`IFApp`** (до этого оно было пустым), поэтому:
 
@@ -467,6 +484,7 @@ xcodebuild test -project IFApp.xcodeproj -scheme IFAppUITests ...   # XCUITest �
 - **В DEBUG-сборке кода в `IFApp.app/IFApp` нет.** Xcode 16 кладёт его в `IFApp.app/IFApp.debug.dylib` (main-бинарник — 58 КБ заглушки). `strings` по `IFApp.app/IFApp` на DEBUG-сборке даёт ноль совпадений **всегда** — и проверка «хука в бинарнике нет» пройдёт зелёной там, где он есть. Проверять надо `IFApp.debug.dylib` для DEBUG и `IFApp.app/IFApp` для Release.
 - **Проверка «нет в релизе» обязана быть парной.** Контрольная строка из продуктового кода (`fast-history.json`) должна находиться в обоих бинарниках; иначе ноль по искомой строке не отличить от «`strings` смотрел не туда».
 - **Контейнер данных меняется после `simctl install` другой конфигурации.** Путь из прошлого шага протухает молча — брать заново через `get_app_container` перед каждым чтением.
+- **`Library/Preferences/simple-L.if-app.com.plist` отстаёт от того, что засеяно.** Запись идёт через `cfprefsd`, и чтение файла через несколько секунд после `simctl launch` отдаёт значения **предыдущего** запуска — молча и правдоподобно, потому что ключи те же. Поймано 10.08.2026 на `-seedFreezeSpent`: проверка «месяц берётся из дня пропажи» сначала показала месяц прошлого прогона. Перед чтением приложение надо завершить (`simctl terminate`) и выждать пару секунд. `xcrun simctl spawn <udid> defaults read simple-L.if-app.com` не годится вовсе — дефолты живут в песочнице контейнера, и команда возвращает пусто.
 
 **Как проверить, что гейт стоит:**
 

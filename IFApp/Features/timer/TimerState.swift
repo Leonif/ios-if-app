@@ -44,8 +44,21 @@ struct StreakStatus: Equatable, Sendable {
         guard ownsFreeze,
               let lastGoalDate,
               Clock.daysBetween(lastGoalDate, dayKey) == 2,
-              let missedDay = Clock.nextDay(lastGoalDate) else { return false }
-        return freezeSpentMonth != Clock.monthKey(ofDay: missedDay)
+              let month = Self.freezeMonthCharged(afterGoalOn: lastGoalDate) else { return false }
+        return freezeSpentMonth != month
+    }
+
+    /// The calendar month a freeze spent on the gap opening right after `lastGoalDate`
+    /// is charged to — the month of the *missed* day, per the third condition above.
+    ///
+    /// Extracted 10.08.2026 as the single definition of who pays: the check below, the
+    /// debit in `freezeMonth(coveringGapTo:)` and the `-seedFreezeSpent` test hook all
+    /// ask here. Written out in each of them, the rule could be changed in one place
+    /// and keep compiling everywhere else — and a hook still charging the old month
+    /// would turn the flow that guards "one per calendar month" green while the freeze
+    /// was in fact still available.
+    static func freezeMonthCharged(afterGoalOn lastGoalDate: String) -> String? {
+        Clock.nextDay(lastGoalDate).map(Clock.monthKey(ofDay:))
     }
 
     /// The month a freeze spent on the gap ending at `dayKey` is charged to, or nil
@@ -53,9 +66,8 @@ struct StreakStatus: Equatable, Sendable {
     /// that picks the month is written once, and the reducer that debits it reads the
     /// answer instead of recomputing which day was missed.
     func freezeMonth(coveringGapTo dayKey: String) -> String? {
-        guard freezeCovers(dayKey), let lastGoalDate,
-              let missedDay = Clock.nextDay(lastGoalDate) else { return nil }
-        return Clock.monthKey(ofDay: missedDay)
+        guard freezeCovers(dayKey), let lastGoalDate else { return nil }
+        return Self.freezeMonthCharged(afterGoalOn: lastGoalDate)
     }
 
     /// The number to display: 0 once a day was missed (last goal before yesterday),
