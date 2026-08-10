@@ -530,6 +530,7 @@ struct TimerFlowView: View {
             PlanEditorSheet(
                 plan: props.plan,
                 isPro: props.isPro,
+                selectedPlanAllowed: props.selectedPlanAllowed,
                 theme: theme,
                 onSelect: { store.dispatch(PlanAction.selected(hours: $0)) },
                 onDone: confirmPlan,

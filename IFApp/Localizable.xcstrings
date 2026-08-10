@@ -2753,64 +2753,6 @@
         }
       }
     },
-    "Done" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fertig"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hecho"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminé"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完了"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "완료"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gotowe"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Готово"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完成"
-          }
-        }
-      }
-    },
     "Eating window" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4677,6 +4619,71 @@
         }
       }
     },
+    "Footer.declineWindow" : {
+      "comment" : "Secondary action on the .complete footer card, beside the primary that opens the eating window. THIS IS A DECLINE, NOT A POSTPONEMENT, and the distinction is the whole point of the key. The .complete state has no timeout — it is derived from !isRunning && stagedElapsed > 0 and holds indefinitely, so the offer of the eating window stands until the user acts. Tapping this button returns to idle and makes the window unreachable for the entire cycle: StartEatingThunk is dispatched only from this card, and from idle the eating window does not exist at all. A 'later / not now / maybe afterwards' lexeme therefore promises a second chance the app does not have — do not use one in any locale, even where the platform offers it for the English string. Translate the speech act 'politely decline an offer'. The finished fast is already written to the history: nothing is deleted, discarded or marked, so never use a skip/omit/discard verb either. Row A of three footer secondaries; the other two are separate keys on purpose, because a footer secondary is defined by the primary next to it. Layout: the label shares a 255pt row with the primary; every point above 66.4pt is taken out of the primary's budget.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا، شكرًا"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein danke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No thanks"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No, gracias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non merci"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いいえ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "안 함"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie, dziękuję"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ні, дякую"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "不，谢谢"
+          }
+        }
+      }
+    },
     "Footer.doneEating" : {
       "comment" : "Secondary action on the .eating footer card, beside 'Start fast'. Tapping ends the eating window early and cancels the scheduled end-of-window push. This is the user declaring a real activity finished, NOT a sheet dismissal — do not use the locale's dismiss lexeme (fr 'OK', es 'OK') even where the platform prefers it for the word Done.",
       "localizations" : {
@@ -4803,6 +4810,71 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "以后"
+          }
+        }
+      }
+    },
+    "Footer.startEating" : {
+      "comment" : "Primary action on the .complete footer card: opens the eating window. Replaces the literal key 'Start eating window'. The English source drops the word 'window' for two independent reasons. First, consistency: eight of the ten locales already say only 'start eating' (uk 'Почати їсти', de 'Essen starten', es 'Empezar a comer', fr 'Passer à table', pl 'Zacznij jeść', zh 开始进食, ar ابدأ الأكل, ja 食事を開始) — English was the outlier, and every translator had silently corrected it. Only ko keeps the window in the name, because 식사 시간 is the established Korean term. Second, the concept is named twice on the same card anyway: the stat directly above the button reads WINDOW OPENS. Layout: 153.3pt -> 90.1pt, which takes the English primary off the 0.766 scale it had been sitting on at xxLarge and back to 1.000.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ الأكل"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essen starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start eating"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empezar a comer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer à table"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "食事を開始"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "식사 시간 시작"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zacznij jeść"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Почати їсти"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始进食"
           }
         }
       }
@@ -7007,71 +7079,6 @@
         }
       }
     },
-    "Opens the IF24 Pro screen" : {
-      "comment" : "VoiceOver hint on the locked export control in History; the label stays \"Export\". Says where the tap leads, not what it does.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "فتح شاشة IF24 Pro"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Öffnet den IF24 Pro-Bildschirm"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opens the IF24 Pro screen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abre la pantalla de IF24 Pro"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvre l’écran IF24 Pro"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IF24 Proの画面を開きます"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IF24 Pro 화면을 엽니다."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Otwiera ekran IF24 Pro"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Відкриває екран IF24 Pro"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "打开 IF24 Pro 页面"
-          }
-        }
-      }
-    },
     "OR SET EXACT" : {
       "localizations" : {
         "ar" : {
@@ -7242,6 +7249,71 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选择一次断食的时长。你结束断食时，进食窗口就开始。"
+          }
+        }
+      }
+    },
+    "PlanEditor.confirm" : {
+      "comment" : "Primary button of the plan editor sheet (PlanEditorSheet.swift:85): applies the fasting plan the user has just chosen. This CONFIRMS A CHOICE — do not use the locale's OK/acknowledgement lexeme here, even where the platform prefers it for the English word Done, and do not use a close/dismiss lexeme: nothing is being acknowledged and nothing is merely being closed. Split off the shared literal key 'Done'; the other half is Pro.restoredDone, the primary of the paywall's result panel, which keeps the Done lexeme for a reason of its own. Values are unchanged by this split — this key exists so the two surfaces can never drift into each other again.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hecho"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gotowe"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
           }
         }
       }
@@ -7474,6 +7546,136 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "IF24 Pro 已在这台设备上生效。下面的功能现在都开放了。"
+          }
+        }
+      }
+    },
+    "Pro.lockedDestinationHint" : {
+      "comment" : "VoiceOver hint on any control that is gated by IF24 Pro. Says where the tap leads, not what it does — the label stays truthful and unchanged, and the lock badge is decorative in the accessibility tree, so without this hint the locked and unlocked states of the control are indistinguishable to a blind user. Two consumers: the locked export control in History (HistoryFlowView.swift:212) and the plan-editor confirm button on the non-Pro + custom-length branch, where the tap opens the paywall instead of applying the plan (TimerFlowView.swift:507-513). 'the … screen' is load-bearing, not padding: after 'opens', a bare product name lands in the 'application' class in every language Apple ships, so a blind user hears 'launches the separate IF24 Pro app', concludes it is not installed, and does not tap. The non-breaking space inside the 'IF24 Pro' token is the catalog's rule — all 32 occurrences carry it. Replaces the literal key 'Opens the IF24 Pro screen'; values are unchanged.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يفتح شاشة IF24 Pro"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet den IF24 Pro-Bildschirm"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the IF24 Pro screen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la pantalla de IF24 Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre l’écran IF24 Pro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Proの画面を開きます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Pro 화면을 엽니다."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwiera ekran IF24 Pro"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкриває екран IF24 Pro"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 IF24 Pro 页面"
+          }
+        }
+      }
+    },
+    "Pro.restoredDone" : {
+      "comment" : "Primary button on the paywall in the .restored state (PaywallView.swift:229) - the screen shown after a restore succeeds. This is the primary action of a RESULT PANEL, not the dismissal token of an alert: the screen keeps its title, its badge and its check-marks, and this button sits in the same full-width primaryAction slot (OfferButton) that carries Buy and Restore in the other states. Use the locale's Done lexeme, the word the platform puts on the primary of a finished result panel, and NOT its OK lexeme - Apple separates the two deliberately and ships both in one file (REDEEM_SUCCESS_DONE_BUTTON = Done, REDEEM_OK_BUTTON = OK). Not a close/dismiss lexeme either. Split off the shared literal key 'Done'; the other half is PlanEditor.confirm. Values are unchanged by this split - the key exists so the two surfaces can never drift into each other again.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hecho"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gotowe"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
           }
         }
       }
@@ -8351,65 +8553,6 @@
         }
       }
     },
-    "Skip" : {
-      "comment" : "Secondary button in the timer footer. One string, three states: fast complete, eating window open, eating window closed. In all three the tap does the same thing from the user's side — leave the step being offered and go back to the idle timer. Nothing is recorded, logged, marked or written to history; in particular this must NOT read as \"mark as skipped\" (a status on a record), which is what the same word means in some system apps. Because one string serves three states, never name the object: \"skip the meal\" / \"skip the window\" is wrong in at least one of them — once the window has closed there is nothing left to skip. Keep it a bare generic verb in the platform's own wording for skipping a step.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "تخط"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Überspringen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Omitir"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ignorer"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スキップ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "건너뛰기"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pomiń"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пропустити"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "跳过"
-          }
-        }
-      }
-    },
     "Something interrupted it before the payment went through. Nothing will be charged." : {
       "localizations" : {
         "ar" : {
@@ -8582,64 +8725,6 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "开始断食"
-          }
-        }
-      }
-    },
-    "Start eating window" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ابدأ الأكل"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Essen starten"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empezar a comer"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Passer à table"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "食事を開始"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "식사 시간 시작"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zacznij jeść"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Почати їсти"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开始进食"
           }
         }
       }

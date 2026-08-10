@@ -228,7 +228,7 @@ struct PaywallView: View {
             OfferButton(title: strings.Pro.restoreFull, theme: theme, action: onRestore)
                 .accessibilityIdentifier("paywall.restore")
         case .restored:
-            OfferButton(title: strings.Sheet.done, theme: theme, action: onClose)
+            OfferButton(title: strings.Pro.restoredDone, theme: theme, action: onClose)
                 .accessibilityIdentifier("paywall.done")
         }
     }

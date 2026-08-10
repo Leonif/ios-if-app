@@ -210,12 +210,12 @@ struct CompleteFooterCard: View {
             resumeAction
 
             HStack(spacing: 12) {
-                SecondaryButton(title: strings.Footer.skip, theme: theme, minWidth: 110, action: onSkip)
+                SecondaryButton(title: strings.Footer.declineWindow, theme: theme, minWidth: 110, action: onSkip)
                     // The id stays `timer.reset` while the label no longer does: the
                     // existing flows address it by this name, and renaming it is a
                     // separate change from fixing what the button says.
                     .accessibilityIdentifier("timer.reset")
-                PrimaryButton(title: strings.Footer.startEatingWindow, theme: theme, action: onStartEating)
+                PrimaryButton(title: strings.Footer.startEating, theme: theme, action: onStartEating)
                     .accessibilityIdentifier("timer.startEatingWindow")
             }
         }

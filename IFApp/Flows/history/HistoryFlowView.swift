@@ -207,9 +207,13 @@ struct HistoryFlowView: View {
         }
         .buttonStyle(.pressable)
         .accessibilityLabel(strings.History.export)
-        // The lock badge is decorative to the accessibility tree, so without this the
-        // two states of the control are indistinguishable to VoiceOver.
-        .accessibilityHint(props.isPro ? "" : strings.History.exportLockedHint)
+        // The lock badge is decorative to the accessibility tree and the label above
+        // overrides whatever the glyph would have contributed, so without these two the
+        // locked and unlocked states of the control are indistinguishable to VoiceOver.
+        // The tier goes in the value rather than the hint alone because hints are
+        // switchable and delayed: a gate needs one channel the user cannot turn off.
+        .accessibilityValue(props.isPro ? "" : strings.Pro.productName)
+        .accessibilityHint(props.isPro ? "" : strings.Pro.lockedDestinationHint)
         .accessibilityIdentifier("history.export")
     }
 

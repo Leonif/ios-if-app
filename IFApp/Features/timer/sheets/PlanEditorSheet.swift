@@ -24,6 +24,10 @@ struct PlanEditorSheet: View {
     /// Whether a custom length can be confirmed. The picker ignores this — it turns
     /// either way.
     let isPro: Bool
+    /// Whether the plan now selected can actually be applied. Not a synonym for
+    /// `isPro`: someone without Pro sitting on a preset confirms normally, and only
+    /// this flag knows the difference.
+    let selectedPlanAllowed: Bool
     let theme: ThemeTokens
     /// Reports the chosen plan by its length in hours, not by segment position: the
     /// segments are the four presets, and a plan is no longer a place in that list.
@@ -82,8 +86,13 @@ struct PlanEditorSheet: View {
 
             customRow
 
-            PrimaryButton(title: strings.Sheet.done, theme: theme, action: onDone)
+            PrimaryButton(title: strings.PlanEditor.confirm, theme: theme, action: onDone)
                 .padding(.top, 20)
+                // On this one branch the tap opens the offer instead of applying the
+                // plan, and the label cannot say so without lying on every other
+                // branch. The PRO badge on the custom row above is the part that
+                // survives hints being switched off; this only names the destination.
+                .accessibilityHint(selectedPlanAllowed ? "" : strings.Pro.lockedDestinationHint)
                 .accessibilityIdentifier("plan.done")
         }
         .padding(18)

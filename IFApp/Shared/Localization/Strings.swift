@@ -99,14 +99,8 @@ enum strings {
         static var fasted: String { String(localized: "Fasted") }
         static var windowOpens: String { String(localized: "Window opens") }
         static var reset: String { String(localized: "Reset") }
-        static var startEatingWindow: String { String(localized: "Start eating window") }
         static var startFast: String { String(localized: "Start fast") }
         static var continueFasting: String { String(localized: "Continue fasting") }
-        /// The `.complete` secondary, and now only that one — see the three keys below.
-        /// It is the last state still on the shared string; its own key is a separate
-        /// change, because "Not now" is the wrong promise there (the offer of the eating
-        /// window has no timeout, and this button is what ends it).
-        static var skip: String { String(localized: "Skip") }
         static var goalStat: String { String(localized: "Goal") }
         static var over: String { String(localized: "Over") }
 
@@ -115,17 +109,31 @@ enum strings {
             String(localized: "Goal · \(hours)")
         }
 
-        // Two of the three footer secondaries, split off the shared `skip` above. A
-        // footer secondary is defined by the primary beside it, and one generic verb
-        // could not be right next to "Start fast" and "Continue fasting" at once.
-        // `.complete` is still on `skip` and gets its own key in a later pass.
+        // The primary of the `.complete` card, and the three footer secondaries — each
+        // on its own key now. A footer secondary is defined by the primary beside it,
+        // and one generic verb could not be right next to "Start eating", "Start fast"
+        // and "Continue fasting" at once.
         //
         // Named keys, not English source text — the exception `history.streak.unit`
         // already makes. Keyed by their English text, `Done` here would land on the
-        // existing `Done` and take the plan sheet's and the paywall's button with it.
+        // plan sheet's button and take the paywall's with it.
+
+        /// The `.complete` primary: opens the eating window. English drops the word
+        /// "window" the other nine locales had already dropped — the stat directly
+        /// above the button says WINDOW OPENS, so the card names it once either way.
+        static var startEating: String {
+            String(localized: "Footer.startEating", defaultValue: "Start eating")
+        }
+
+        /// `.complete`, beside "Start eating": declines the window. Not a postponement —
+        /// `.complete` has no timeout, so the offer stands until the user acts, and this
+        /// tap is what puts it out of reach for the rest of the cycle.
+        static var declineWindow: String {
+            String(localized: "Footer.declineWindow", defaultValue: "No thanks")
+        }
 
         /// `.eating`, beside "Start fast": ends the eating window early. A real activity
-        /// finished, not a sheet dismissed — which is why it is not `Sheet.done`.
+        /// finished, not a sheet dismissed — which is why it is not the plan sheet's key.
         static var doneEating: String {
             String(localized: "Footer.doneEating", defaultValue: "Done")
         }
@@ -158,7 +166,6 @@ enum strings {
         static var planSubtitle: String { String(localized: "Pick how long a fast runs. The window starts when you end it.") }
         static var customLength: String { String(localized: "Custom length") }
         static var customCaption: String { String(localized: "From 1 to 23 hours") }
-        static var done: String { String(localized: "Done") }
         static var whenDidYouEat: String { String(localized: "When did you last eat?") }
         static var backdateHint: String { String(localized: "We’ll back-date your fast so the timer stays accurate.") }
         static var chip30Min: String { String(localized: "30 min") }
@@ -169,6 +176,18 @@ enum strings {
         static var confirm: String { String(localized: "Confirm") }
         static var orSetExact: String { String(localized: "OR SET EXACT") }
         static var fastingSince: String { String(localized: "Fasting since") }
+    }
+
+    /// The plan editor's own strings. It shares the rest of its copy with `Sheet`; this
+    /// one button is separate because it used to share a key with the paywall too, and
+    /// the two say the same English word for opposite reasons.
+    enum PlanEditor {
+        /// Applies the plan just chosen. It confirms a choice, so it keeps the Done
+        /// lexeme in every locale — never the OK one, which acknowledges rather than
+        /// decides. Split off the shared `Done`; the other half is `Pro.restoredDone`.
+        static var confirm: String {
+            String(localized: "PlanEditor.confirm", defaultValue: "Done")
+        }
     }
 
     enum Meal {
@@ -264,17 +283,6 @@ enum strings {
         /// the word is `Export`, without the `CSV` token: the format is named once,
         /// in the offer's benefit title.
         static var export: String { String(localized: "Export") }
-        /// The hint on the locked control, not its label: the label stays `Export`
-        /// either way, and this is the sentence that tells a VoiceOver user the tap
-        /// leads to the offer rather than to a file. The lock badge says it visually
-        /// and is decorative to the accessibility tree.
-        ///
-        /// "the … screen" is load-bearing, not padding: after "opens", a bare product
-        /// name lands in the "application" class in every language Apple ships, so a
-        /// blind user hears "launches the separate IF24 Pro app", concludes it is not
-        /// installed, and does not tap. The non-breaking space inside the token is the
-        /// catalog's rule for it — all 32 occurrences carry it.
-        static var exportLockedHint: String { String(localized: "Opens the IF24\u{00A0}Pro screen") }
 
         /// Streak unit beside the big number. The number is drawn separately (display
         /// type), so the catalog's plural variants carry the word alone — the CLDR
@@ -341,6 +349,24 @@ enum strings {
     enum Pro {
         static var productName: String { "IF24\u{00A0}Pro" }
 
+        /// The VoiceOver hint on any control the offer gates: the locked export in
+        /// History, and the plan editor's confirm on the branch where the tap opens the
+        /// offer instead of applying the plan. It says where the tap leads, not what it
+        /// does — the label of each control stays truthful and unchanged.
+        ///
+        /// A hint is never the only carrier: the user can switch hints off, so every
+        /// gated control also names the tier in a channel he cannot suppress.
+        ///
+        /// "the … screen" is load-bearing, not padding: after "opens", a bare product
+        /// name lands in the "application" class in every language Apple ships, so a
+        /// blind user hears "launches the separate IF24 Pro app", concludes it is not
+        /// installed, and does not tap. The non-breaking space inside the token is the
+        /// catalog's rule for it — all 32 occurrences carry it.
+        static var lockedDestinationHint: String {
+            String(localized: "Pro.lockedDestinationHint",
+                   defaultValue: "Opens the IF24\u{00A0}Pro screen")
+        }
+
         // Offer — headline and the framing line under it. The framing line belongs
         // to whichever benefit leads the list, so it changes with the entry point.
         static var headline: String { String(localized: "One purchase, for good") }
@@ -385,6 +411,14 @@ enum strings {
         static var unverifiedBody: String { String(localized: "Restore first - if Pro is on this Apple\u{00A0}Account it comes straight back.") }
         static var restoredTitle: String { String(localized: "Purchases restored") }
         static var restoredBody: String { String(localized: "Pro is active on this device. Everything below is open now.") }
+        /// The primary of the restored panel — the same full-width slot that carries
+        /// Buy and Restore in the other states, on a screen that still has its title,
+        /// its badge and its check-marks. That is a result panel and not an alert, so
+        /// the locale takes its Done lexeme and not its OK one. Split off the shared
+        /// `Done`; the other half is `PlanEditor.confirm`.
+        static var restoredDone: String {
+            String(localized: "Pro.restoredDone", defaultValue: "Done")
+        }
         /// Transient answer to a Restore that found nothing. Not a failure and not a
         /// state of its own: the store answered, the answer was empty. No full stop
         /// in any of the ten locales.

@@ -5,7 +5,7 @@
 //  Shared primary (green) and secondary button shapes used across footer + sheets.
 //
 //  Both keep `labelInset` of horizontal breathing room inside the shape: an English
-//  label ("Skip", "Continue fasting") never comes near the corner radius, but its
+//  label ("Reset", "Continue fasting") never comes near the corner radius, but its
 //  German and Ukrainian counterparts ("Zurücksetzen", "Продовжити піст") are half
 //  again as long and would otherwise sit flush against the rounded edge.
 //
