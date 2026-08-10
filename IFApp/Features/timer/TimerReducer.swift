@@ -52,7 +52,7 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
             newState.fastStartTimestamp = runningStartTimestamp
         }
 
-    case let .goalCelebrated(dayKey):
+    case let .goalCelebrated(dayKey, ownsFreeze):
         // Idempotent by design: syncGoalMoment is called from two places and props
         // update asynchronously, so the guard lives here rather than in the view.
         // Reaching the goal — not tapping "End fast" — is what completes a fast.
@@ -60,14 +60,24 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
             newState.hasCelebrated = true
             newState.completedSessionsCount += 1
             // Streak: a goal the day after the last one extends it; a gap (or the
-            // first goal ever) restarts it at 1 — a missed day is a hard reset.
+            // first goal ever) restarts it at 1 — a missed day is a hard reset,
+            // unless Pro's protected day stands in the gap and this month's is still
+            // unspent, in which case the run carries on and the month is charged.
             // Day keys sort chronologically, so a stamp that is not newer than the
             // last goal leaves the run untouched: the same day again, or an earlier
             // day arriving from a fast back-dated across midnight. Neither can
             // extend a run, and neither may drag it backwards.
             if let last = newState.lastGoalDate {
                 if dayKey > last {
-                    newState.streakCount = Clock.isDayBefore(last, dayKey) ? newState.streakCount + 1 : 1
+                    let streak = state.streak(ownsFreeze: ownsFreeze)
+                    if Clock.isDayBefore(last, dayKey) {
+                        newState.streakCount += 1
+                    } else if let month = streak.freezeMonth(coveringGapTo: dayKey) {
+                        newState.streakCount += 1
+                        newState.freezeSpentMonth = month
+                    } else {
+                        newState.streakCount = 1
+                    }
                     newState.lastGoalDate = dayKey
                 }
             } else {

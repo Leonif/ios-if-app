@@ -23,6 +23,6 @@ struct CelebrateGoalThunk: Thunk {
             fastStart: timer.fastStartTimestamp,
             goalHours: app.activeGoalHours
         )
-        dispatch(TimerAction.goalCelebrated(dayKey: dayKey))
+        dispatch(TimerAction.goalCelebrated(dayKey: dayKey, ownsFreeze: app.proState.isPro))
     }
 }

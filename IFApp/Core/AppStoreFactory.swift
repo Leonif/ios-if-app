@@ -19,7 +19,7 @@ enum AppStoreFactory {
         #if DEBUG
         // UI tests launch with "-uitestReset" to start from a clean idle state.
         if ProcessInfo.processInfo.arguments.contains("-uitestReset") {
-            persistence.save(fastStartTimestamp: 0, goalHours: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false, streakCount: 0, lastGoalDate: nil)
+            persistence.save(fastStartTimestamp: 0, goalHours: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false, streakCount: 0, lastGoalDate: nil, freezeSpentMonth: nil)
             let history: FastHistoryRepositoryProtocol = container.inject()
             // Not `replaceAll([])`: it is bound by the TF-2 write guard, and this is
             // the branch that has to survive a future-schema file left by an earlier
@@ -45,7 +45,8 @@ enum AppStoreFactory {
                 eatingStartTimestamp: loaded.eatingStartTimestamp,
                 isEating: loaded.isEating,
                 streakCount: loaded.streakCount,
-                lastGoalDate: loaded.lastGoalDate
+                lastGoalDate: loaded.lastGoalDate,
+                freezeSpentMonth: loaded.freezeSpentMonth
             ),
             planState: PlanState(plan: persistence.loadPlanHours().map(Plan.init(hours:)) ?? .default),
             historyState: HistoryState(records: history.loadAll().sorted { $0.startTimestamp > $1.startTimestamp }),

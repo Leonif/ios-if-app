@@ -9,8 +9,8 @@
 import Foundation
 
 protocol TimerPersistenceRepositoryProtocol {
-    func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?)
-    func save(fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?)
+    func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?)
+    func save(fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?)
     /// The selected plan's fast length in whole hours. nil = never saved.
     func loadPlanHours() -> Int?
     func savePlanHours(_ hours: Int)
@@ -34,6 +34,10 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         static let legacyPlanIdx = "plan_idx"
         static let streakCount = "streak_count"
         static let streakLastGoalDate = "streak_last_goal_date"
+        /// The calendar month ("yyyy-MM") whose protected day is spent. Absent on
+        /// every install that updated into 1.5.0, which reads as "none spent" — the
+        /// benefit starts available, which is what someone who just bought it expects.
+        static let streakFreezeSpentMonth = "streak_freeze_spent_month"
         static let streakLastMilestoneShown = "streak_last_milestone_shown"
     }
 
@@ -43,7 +47,7 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         self.defaults = defaults
     }
 
-    func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?) {
+    func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?) {
         (
             fastStartTimestamp: defaults.double(forKey: Key.startTimestamp),
             // Absent (state written before 1.5.0) reads as 0, which every reader
@@ -55,11 +59,12 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
             eatingStartTimestamp: defaults.double(forKey: Key.eatingStartTimestamp),
             isEating: defaults.bool(forKey: Key.isEating),
             streakCount: defaults.integer(forKey: Key.streakCount),
-            lastGoalDate: defaults.string(forKey: Key.streakLastGoalDate)
+            lastGoalDate: defaults.string(forKey: Key.streakLastGoalDate),
+            freezeSpentMonth: defaults.string(forKey: Key.streakFreezeSpentMonth)
         )
     }
 
-    func save(fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?) {
+    func save(fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?) {
         defaults.set(fastStartTimestamp, forKey: Key.startTimestamp)
         defaults.set(goalHours, forKey: Key.goalHours)
         defaults.set(isRunning, forKey: Key.isRunning)
@@ -72,6 +77,11 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
             defaults.set(lastGoalDate, forKey: Key.streakLastGoalDate)
         } else {
             defaults.removeObject(forKey: Key.streakLastGoalDate)
+        }
+        if let freezeSpentMonth {
+            defaults.set(freezeSpentMonth, forKey: Key.streakFreezeSpentMonth)
+        } else {
+            defaults.removeObject(forKey: Key.streakFreezeSpentMonth)
         }
     }
 

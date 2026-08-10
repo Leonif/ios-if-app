@@ -16,13 +16,63 @@ struct StreakStatus: Equatable, Sendable {
     var count: Int = 0
     /// Local day key ("yyyy-MM-dd") of the last goal. nil = no goal ever reached.
     var lastGoalDate: String? = nil
+    /// The calendar month ("yyyy-MM") whose protected day is already used up.
+    /// nil = none ever. See `freezeCovers(_:)` for which month gets charged.
+    var freezeSpentMonth: String? = nil
+    /// Whether this install owns the protected day at all — i.e. holds Pro. It is
+    /// not stored with the streak; it is handed in by whoever projects the streak
+    /// (`AppState.streak`, `TimerAction.goalCelebrated`), because the entitlement has
+    /// exactly one home and the streak is not it.
+    var ownsFreeze: Bool = false
 
-    /// The number to display: 0 once a day was missed (last goal before yesterday).
+    /// Whether the protected day can carry a run last extended on `lastGoalDate`
+    /// across to a goal reached on `dayKey`.
+    ///
+    /// Three conditions, and this is the single definition of all three — the
+    /// projection below and the reducer that spends the freeze both ask here:
+    ///
+    /// - **exactly one calendar day was missed** (`dayKey` is two days on from the
+    ///   last goal). Two missed days in a row are a hard reset, as before: one
+    ///   protected day protects one day;
+    /// - **the install owns Pro**. Without it nothing changes — a missed day resets;
+    /// - **the month is unspent**. The month charged is the month of the *missed
+    ///   day*, not of the goal that follows it: the benefit protects a day, so the
+    ///   day being protected is what decides who pays. That is also what makes a day
+    ///   missed on the 31st and a day missed on the 1st two different months'
+    ///   business, which is the plain reading of "one per calendar month".
+    func freezeCovers(_ dayKey: String) -> Bool {
+        guard ownsFreeze,
+              let lastGoalDate,
+              Clock.daysBetween(lastGoalDate, dayKey) == 2,
+              let missedDay = Clock.nextDay(lastGoalDate) else { return false }
+        return freezeSpentMonth != Clock.monthKey(ofDay: missedDay)
+    }
+
+    /// The month a freeze spent on the gap ending at `dayKey` is charged to, or nil
+    /// when there is no such gap. Paired with `freezeCovers(_:)` on purpose: the rule
+    /// that picks the month is written once, and the reducer that debits it reads the
+    /// answer instead of recomputing which day was missed.
+    func freezeMonth(coveringGapTo dayKey: String) -> String? {
+        guard freezeCovers(dayKey), let lastGoalDate,
+              let missedDay = Clock.nextDay(lastGoalDate) else { return nil }
+        return Clock.monthKey(ofDay: missedDay)
+    }
+
+    /// The number to display: 0 once a day was missed (last goal before yesterday),
+    /// unless the protected day still stands between the run and that gap.
     /// The persisted counter itself is only rewritten on the next goal.
+    ///
+    /// The freeze is applied here, to what is shown, and not only when the next goal
+    /// banks it, because the promise sold is that the run does not break — a counter
+    /// that drops to 0 for a day and comes back has already broken it in the only
+    /// place the user can see. Reading it off `ownsFreeze` as it stands *now* is also
+    /// the whole of edge 8: buying Pro during the gap day restores the run it broke,
+    /// and buying a day later does not, which is the 24-hour window stated in days.
     func displayed(at now: Date) -> Int {
         guard let lastGoalDate else { return 0 }
         let today = Clock.dayKey(now)
-        return (lastGoalDate == today || Clock.isDayBefore(lastGoalDate, today)) ? count : 0
+        if lastGoalDate == today || Clock.isDayBefore(lastGoalDate, today) { return count }
+        return freezeCovers(today) ? count : 0
     }
 }
 
@@ -56,10 +106,21 @@ struct TimerState: Equatable, Sendable {
     var streakCount: Int = 0
     /// Local day key ("yyyy-MM-dd") of the last goal. nil = no goal ever reached.
     var lastGoalDate: String? = nil
+    /// The calendar month ("yyyy-MM") whose protected day has been spent, or nil.
+    /// One month is enough to store: the allowance is one per month, so the only
+    /// question ever asked is whether *this* month's is gone.
+    var freezeSpentMonth: String? = nil
 
     /// The streak fields as one value — the only thing screens should project, so the
-    /// missed-day rule is applied once and identically everywhere.
-    var streak: StreakStatus { StreakStatus(count: streakCount, lastGoalDate: lastGoalDate) }
+    /// missed-day rule is applied once and identically everywhere. `ownsFreeze` comes
+    /// from the entitlement, which the timer substate deliberately does not hold;
+    /// callers use `AppState.streak` rather than assembling it themselves.
+    func streak(ownsFreeze: Bool) -> StreakStatus {
+        StreakStatus(count: streakCount,
+                     lastGoalDate: lastGoalDate,
+                     freezeSpentMonth: freezeSpentMonth,
+                     ownsFreeze: ownsFreeze)
+    }
 
     /// The goal of the cycle in flight: the pinned one, or the plan's when nothing is
     /// pinned. The single definition of that fallback — every screen, push, record and

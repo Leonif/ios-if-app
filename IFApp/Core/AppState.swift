@@ -23,6 +23,12 @@ struct AppState: Equatable, Sendable {
 
     var activeGoalHours: Double { activePlan.fastHours }
 
+    /// The streak as screens must project it. It is assembled here rather than on
+    /// `timerState` because one of its four facts — whether the protected day is
+    /// owned — is the entitlement, and the timer substate has no business holding a
+    /// copy of that. Screens read this; nobody builds a `StreakStatus` by hand.
+    var streak: StreakStatus { timerState.streak(ownsFreeze: proState.isPro) }
+
     /// Whether the plan the user has *selected* may be used under the entitlement they
     /// currently hold: the four presets are free, any other length is Pro's.
     ///

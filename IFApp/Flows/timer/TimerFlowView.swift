@@ -59,7 +59,7 @@ struct TimerScreenProps: Equatable {
         hasCelebrated = state.timerState.hasCelebrated
         isEating = state.timerState.isEating
         eatingEndTimestamp = state.timerState.eatingEndTimestamp(plan: state.activePlan)
-        streak = state.timerState.streak
+        streak = state.streak
         hasRecords = !state.historyState.records.isEmpty
         lastFastDuration = state.historyState.records
             .max(by: { $0.endTimestamp < $1.endTimestamp })?

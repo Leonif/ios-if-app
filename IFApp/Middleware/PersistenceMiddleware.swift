@@ -33,7 +33,8 @@ final class PersistenceMiddleware: Middleware {
                 eatingStartTimestamp: timer.eatingStartTimestamp,
                 isEating: timer.isEating,
                 streakCount: timer.streakCount,
-                lastGoalDate: timer.lastGoalDate
+                lastGoalDate: timer.lastGoalDate,
+                freezeSpentMonth: timer.freezeSpentMonth
             )
         case is PlanAction:
             repo.savePlanHours(app.planState.plan.hours)

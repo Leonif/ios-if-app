@@ -31,6 +31,7 @@ enum UITestSeed {
         defaults.set(false, forKey: "is_eating")
         defaults.set(0, forKey: "streak_count")
         defaults.removeObject(forKey: "streak_last_goal_date")
+        defaults.removeObject(forKey: "streak_freeze_spent_month")
         defaults.set(0, forKey: "streak_last_milestone_shown")
         defaults.removeObject(forKey: "plan_hours")        // fall back to Plan.default
         defaults.removeObject(forKey: "plan_idx")          // pre-1.5.0 key, cleared too

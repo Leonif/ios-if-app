@@ -28,7 +28,7 @@ struct HistoryProps: Equatable {
 
     init(state: AppState) {
         records = state.historyState.records
-        streak = state.timerState.streak
+        streak = state.streak
         isRunning = state.timerState.isRunning
         isPro = state.proState.isPro
         exportFile = state.historyState.exportFile

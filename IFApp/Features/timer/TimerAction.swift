@@ -36,7 +36,11 @@ enum TimerAction: Action {
     /// `dayKey` = the local day the goal counts toward (see Clock.dayKey) — injected
     /// at dispatch so the reducer stays pure; a fast crossing midnight credits the
     /// day the goal was actually reached.
-    case goalCelebrated(dayKey: String)
+    /// `ownsFreeze` rides along for the same reason `dayKey` does: the protected day
+    /// is Pro's, the entitlement lives in `ProState`, and the timer reducer is handed
+    /// only its own substate. Read once, at the moment the goal lands, so a purchase
+    /// or a refund arriving later cannot re-decide a streak already banked.
+    case goalCelebrated(dayKey: String, ownsFreeze: Bool)
     /// Open the eating window. `startTimestamp` = when it opened (usually now).
     case eatingStarted(startTimestamp: Double)
     /// Close the eating window back to idle (window elapsed, or skipped).
