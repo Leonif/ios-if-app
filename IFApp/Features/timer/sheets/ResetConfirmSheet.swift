@@ -57,10 +57,24 @@ struct ResetConfirmSheet: View {
                 .font(.hanken(14, .medium))
                 .foregroundColor(theme.mut)
                 .multilineTextAlignment(.center)
-            PrimaryButton(title: strings.Reset.confirmAction, theme: theme, action: onConfirm)
-                .padding(.top, 6)
-                .accessibilityIdentifier("reset.confirm")
-            SecondaryButton(title: strings.Reset.keepThisFast, theme: theme, action: onDismiss)
+            // Destructive, and unlike DeleteFastSheet it does not take a slab of its
+            // own colour either: in a confirmation sheet the fill belongs to the safe
+            // action, so this one is red and plain. Identifiers follow the actions,
+            // not the styles — `reset.confirm` stays on the reset.
+            Button(action: onConfirm) {
+                Text(strings.Reset.confirmAction)
+                    .font(.hanken(17, .bold))
+                    .foregroundColor(.red)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+            }
+            .buttonStyle(.pressable)
+            .padding(.top, 6)
+            .accessibilityIdentifier("reset.confirm")
+
+            PrimaryButton(title: strings.Reset.keepThisFast, theme: theme, action: onDismiss)
                 .accessibilityIdentifier("reset.cancel")
         }
         .padding(.horizontal, 24)
