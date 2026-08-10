@@ -443,7 +443,7 @@ xcrun simctl get_app_container <UDID> simple-L.if-app.com data
 | `-seedElapsed` / `-seedEatingElapsed` / `-seedCount` / `-seedCelebrated` / `-seedPlanHours` / `-seedPromptCount` / `-seedPendingGoal` / `-seedStreak` / `-seedLastGoalDate` | чистый baseline в `UserDefaults` + перечисленные значения | `Core/UITestSeed.swift` |
 | `-seedHistory N` / `-seedHistoryEdge` | N сгенерированных записей / четыре краевые формы | `Core/UITestSeed.swift` |
 | `-seedHistoryCorrupt` | кладёт в `Documents/fast-history.json` заведомо недекодируемые байты | `Core/UITestSeed.swift` + `Data/FastHistoryRepository.swift` |
-| `-seedStore` | подставляет `StubStoreRepository` вместо StoreKit | `Core/AppDependencies.swift` |
+| `-seedStore` + семейство `-seedStore…` | подставляет `StubStoreRepository` вместо StoreKit — разбор ниже, в разделе «Локальный магазин» | `Core/AppDependencies.swift`, `Data/StubStoreRepository.swift` |
 | `-showReviewPrompt` | шторка отзыва сразу | `IFAppApp.init` |
 
 **Почему `#if DEBUG`, а не «юзер всё равно не передаст».** `-uitestReset` до 07.08.2026 компилировался в релизный бинарник (TF-6). Реализованного пути эксплуатации у него нет, но это деструктивный хук — он стирает историю целиком, — и в сторовой сборке ему нечего делать по тому же признаку, по которому там нет `StubStoreRepository`. Гейт compile-time; гейтить по окружению нельзя по той же причине, что и диагностику: App Review гоняет приложение в sandbox.
@@ -480,6 +480,111 @@ strings -a "$R" | grep -c fast-history.json    # 2 — контроль, что 
 ```
 
 Поведенческая проверка сильнее строковой: засеять историю DEBUG-сборкой (`-seedHistory 3`), поставить поверх Release-сборку, запустить её с `-uitestReset` и сверить sha1 файла `Documents/fast-history.json` до и после — он обязан не измениться.
+
+---
+
+## Локальный магазин: как гонять пейвол без App Store Connect (факт, не правило)
+
+Заведено 10.08.2026. Описание механизма, а не инвариант: под него ничего не цитируется.
+
+**Путей два, и они закрывают разные половины.** Ни один не подменяет продакшн: `StoreRepository` — единственная реализация вне DEBUG, `.storekit` действует только при запуске из Xcode.
+
+| | `StubStoreRepository` (launch-аргументы) | `IFApp.storekit` (конфигурация схемы) |
+|---|---|---|
+| Что подменяет | весь `StoreRepositoryProtocol` | ответы настоящего StoreKit 2 |
+| Настоящий код `StoreRepository` | **не выполняется** | выполняется целиком |
+| Работает под `simctl` / Maestro | да | **нет** |
+| Работает при Run из Xcode | да | да |
+| Гейт | `#if DEBUG` + наличие `-seedStore` | схема, в бинарник не попадает вовсе |
+
+### Что можно сделать вообще без всякой оснастки
+
+**Настоящий `Product.products(for:)` уже отвечает на голом симуляторе.** Продукт `if24.pro.lifetime` заведён в ASC 05.08.2026, и StoreKit 2 отдаёт его метаданные без sandbox-аккаунта, без `.storekit` и без схемы. Проверено 10.08.2026 на свежесозданном симуляторе (iOS 26.5), запуск вообще без аргументов:
+
+```
+08:34:13.524  === launch 1.5.0 (1)  ios=26.5  args=none ===
+08:34:13.597  thunk   RefreshEntitlementThunk
+08:34:30.883  action  storeResolved(entitlement: .free, product: Optional(ProProductInfo(id: "if24.pro.lifetime", displayPrice: "$6.99")))
+```
+
+Отсюда два следствия:
+
+- **Проверка «id в коде совпадает с ASC» делается запуском, а не сверкой глазами.** Если `ProCatalog.productID` разойдётся с ASC, `storeResolved` придёт с `product: nil` и экран сядет в S3 `.other`.
+- **Холодный ответ занял 17 секунд** (`13.597` → `30.883`). Всё это время `entitlement == .unknown`, то есть экран оффера показывает S5, а замки ведут в «покупки ещё не проверены». На тёплом симуляторе тот же вызов отвечает за ~0,1 с, так что вживую это не видно и наткнуться на это можно только на первом запуске после установки.
+
+Купить этим путём нельзя: покупка требует либо sandbox-аккаунта Apple, либо `.storekit`.
+
+### Путь 1 — `StubStoreRepository`, launch-аргументы (основной)
+
+Единственный путь, который работает **без единого тапа человека и без Xcode**: конфигурация `.storekit` живёт на схеме, а приложение, запущенное `simctl` — то есть каждый прогон Maestro и каждый скриншот-заход, — схемы не видит вовсе.
+
+Стаб подставляется в `AppDependencies.register()` только при наличии `-seedStore`; без аргумента путь к нему недостижим, вне DEBUG его не существует.
+
+| Аргумент | Значения | Что даёт |
+|---|---|---|
+| `-seedStore` | `free` / `pro` / `unknown` / `missing` | что магазин отвечает про этот install. `unknown` → S5, `missing` → S3 `.other` (id, которого магазин не знает) |
+| `-seedStorePrice` | строка | цена как её отдаёт витрина. Дефолт `COP 29.900,00` — нарочно неудобный, чтобы вёрстка, живущая только на `$6.99`, ломалась здесь, а не в Колумбии |
+| `-seedStoreOutcome` | `purchased` / `pending` / `cancelled` / `network` / `other` | чем кончится следующий Buy |
+| `-seedStorePurchaseDelay` | мс | сколько Buy висит в полёте. Без задержки S2 не успевает отрисоваться |
+| `-seedStoreRestore` | `restored` / `nothing` / `network` / `other` | чем кончится Restore |
+| `-seedStoreRestoreDelay` | мс | то же для Restore: `restoreStarted` кладёт экран в S2, и синхронный ответ этот кадр съедает |
+| `-seedStoreRevokeAfter` | сек | право снимают через N секунд после старта — рефанд или уход из Family Sharing |
+| `-seedStoreGrantAfter` | сек | право **приходит** через N секунд — одобренный Ask to Buy |
+
+Два последних складываются: обе отсечки считаются **от старта, а не друг от друга**, и выдаются в порядке возрастания. `-seedStoreGrantAfter 2 -seedStoreRevokeAfter 5` читается буквально — Pro на второй секунде, снято на пятой.
+
+**Почему `-seedStoreGrantAfter` вообще заведён.** `-seedStoreOutcome pending` доводит до S4 и останавливается там, но Ask to Buy наполовину не рассказан: главное в нём — одобрение, приходящее позже, без перезапуска, через `Transaction.updates`. Настоящий sandbox требует для этого второго Apple Account, организатора семьи и живого человека, который нажмёт Approve. Без аргумента выход из S4 локально недостижим.
+
+Проверено 10.08.2026 (`-seedStore free -seedStoreOutcome pending -seedStoreGrantAfter 20`):
+
+```
+08:37:15.223  action  purchaseStarted    … phase=purchasing      offer=manual
+08:37:15.224  action  purchasePending    … phase=awaitingApproval offer=manual
+08:37:23.726  action  entitlementChanged(.pro)  … ent=pro phase=idle offer=manual
+```
+
+### Путь 2 — `IFApp/IFApp.storekit`, конфигурация схемы
+
+Нужен ровно для того, чего стаб не даёт: **настоящий `StoreRepository` не выполняется под стабом ни строчкой**, а это код, который поедет в стор. Первый IAP в истории апки — и ни один из 138 критериев приёмки через стаб его не касается.
+
+Что даёт сверх стаба: доводимая до конца покупка без sandbox-аккаунта, переключатель Ask to Buy, инъекция ошибок StoreKit по конкретному API, симуляция рефанда, проверка `Transaction.currentEntitlements` и `AppStore.sync()` на настоящем коде.
+
+Файл лежит в `IFApp/IFApp.storekit`: non-consumable `if24.pro.lifetime`, `6.99`, `familyShareable: true`, витрина USA. Идентификатор обязан совпадать с `ProCatalog.productID` и с ASC — иначе локально проверяется не то, что поедет в стор.
+
+**Файл лежит на диске, но к проекту не подключён** — `project.pbxproj` и схемы заводит владелец в Xcode. Пока подключения нет, путь 2 просто не действует; на код и на сборку это не влияет никак. Шаги:
+
+1. В навигаторе Xcode перетащить `IFApp/IFApp.storekit` в группу `IFApp`. В диалоге: **Create groups**, галочка «Copy items if needed» **снята** (файл уже на месте), **Add to targets — ни одной галочки** (это не ресурс, в бандл он не копируется).
+2. Product → Scheme → Edit Scheme → **Run** → вкладка **Options** → поле **StoreKit Configuration** → выбрать `IFApp.storekit`.
+3. Схема `IFApp` — shared, так что в `xcshareddata/xcschemes/IFApp.xcscheme` появится `<StoreKitConfigurationFileReference identifier = "…/IFApp.storekit">` внутри `LaunchAction`. Это ожидаемая часть диффа.
+4. Проверка: Run из Xcode, открыть оффер — цена должна стать `$6.99` (стаб дал бы `COP 29.900,00`), Buy должен доводиться до конца и оставлять Pro.
+5. Переключатели на время прогона: Debug → StoreKit → **Ask To Buy** (доводит настоящий S4), **Enable/Disable Interruptions**; отмена и ошибки — в самом файле, поля `_askToBuyEnabled`, `_failTransactionsEnabled`, `_storeKitErrors`.
+
+Схему **Release/Archive это не трогает**: конфигурация висит на действии Run, в бинарник не компилируется и в архив не попадает.
+
+### Гейт
+
+`StubStoreRepository` целиком под `#if DEBUG`, регистрация в `AppDependencies` — тоже. Гейтить по `environment == .sandbox` нельзя: App Review гоняет приложение в sandbox, то есть у ревьюера такой замок открыт. Проверка (сборки от 10.08.2026):
+
+```bash
+D=<DerivedData>/Build/Products/Debug-iphonesimulator/IFApp.app/IFApp.debug.dylib
+R=<DerivedData>/Build/Products/Release-iphonesimulator/IFApp.app/IFApp
+strings -a "$R" | grep -c -- -seedStore          # 0 — это и есть проверка
+strings -a "$R" | grep -c if24.pro.lifetime      # 2 — контроль, что бинарник вообще читается
+strings -a "$D" | grep -c -- -seedStore          # столько же, сколько констант в StubStoreRepository.Argument
+```
+
+Ожидаемое число по DEBUG нарочно записано формулой, а не константой: семейство `-seedStore…` растёт, и зашитая цифра начинает врать с первого же нового аргумента — этот заход сам поднял её с 6 до 8.
+
+Контрольная строка обязательна и здесь: в DEBUG-сборке кода в `IFApp.app/IFApp` нет вовсе (он в `IFApp.debug.dylib`), и ноль по искомой строке без парного контроля не отличить от «`strings` смотрел не туда».
+
+### Грабли
+
+- **Симулятор — общий ресурс.** 10.08.2026 проверка сорвалась молча: соседний агент перезапустил приложение на том же устройстве посреди 60-секундного ожидания, и снятый экран показывал чужую сессию. Заход, который ждёт дольше пары секунд, должен идти на своём устройстве (`simctl create`), а прочитанное — сверяться со строкой `=== launch … args=… ===` в `Documents/diagnostics.log`.
+- **`diagnostics.log` — самый дешёвый способ проверить магазин.** Он печатает `storeResolved` с ценой и `ent=`/`phase=` после каждого действия, то есть все шесть состояний оффера читаются с диска без единого скриншота.
+- **`-seedStore` начинается с `-seed`**, поэтому включает и обнуление таймерного baseline в `UITestSeed`. Заход про магазин на непустом состоянии таймера этот факт должен учитывать.
+- **Право, выданное `-seedStoreGrantAfter`, не переживает перезапуск, а настоящее — переживает.** `StoreRepository.entitlementUpdates()` на каждом апдейте зовёт `remember(owned)`, то есть одобренный Ask to Buy оседает в `pro_entitlement_verified` и после релонча `refresh()` отдаёт `.pro`. Стаб отдаёт значение в стрим и не пишет никуда: следующий запуск определяется тем, что сказано в `-seedStore`. Критерий «Pro сохранился после перезапуска» через `-seedStoreGrantAfter` не проверяется — он проверяется с другого конца, `-seedStore pro`.
+- **Уведомление о снятии права ждёт нейтрального момента.** `-seedStoreRevokeAfter` на посте в полёте (`-seedElapsed`) шторку не покажет — это не регрессия, а решение 27; для edge 6 сеять надо простой (`-seedPlanHours`), как делает `PW6`.
+- **Контейнер меняется после `simctl install` другой конфигурации** — путь брать заново через `get_app_container`.
 
 ---
 

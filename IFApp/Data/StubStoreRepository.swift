@@ -32,6 +32,11 @@ struct StubStoreRepository: StoreRepositoryProtocol {
         static let outcome = "-seedStoreOutcome"
         /// `-seedStoreRestore restored|nothing|network|other`.
         static let restore = "-seedStoreRestore"
+        /// `-seedStoreRestoreDelay N` — milliseconds the next Restore spends in flight.
+        /// Same reason as `purchaseDelay`: `restoreStarted` puts the screen in S2, and
+        /// a stub that answers synchronously never lets that frame render, so the
+        /// spinner on the Restore path cannot be observed at all. Default 0.
+        static let restoreDelay = "-seedStoreRestoreDelay"
         /// `-seedStorePurchaseDelay N` — milliseconds the next Buy spends in flight
         /// before it resolves. Default 0, so existing flows keep the instant answer
         /// they were written against. Apple's sheet takes real time and `.purchasing`
@@ -42,6 +47,14 @@ struct StubStoreRepository: StoreRepositoryProtocol {
         /// the way a refund or a departure from Family Sharing arrives. Edge 6 and
         /// edge 17 have no other door: both hang off an update nobody asked for.
         static let revokeAfter = "-seedStoreRevokeAfter"
+        /// `-seedStoreGrantAfter N` — seconds until the entitlement *arrives* through
+        /// the same unasked-for door. Pairs with `-seedStoreOutcome pending`: that
+        /// argument reaches S4 and stops there, but Ask to Buy is only half told by
+        /// the wait — the half that matters is the approval landing later, with no
+        /// relaunch, through `Transaction.updates`. Reproducing that for real needs a
+        /// second Apple Account, a family organiser and someone to press Approve, so
+        /// without this argument the transition out of S4 is unreachable locally.
+        static let grantAfter = "-seedStoreGrantAfter"
     }
 
     static var isEnabled: Bool {
@@ -78,6 +91,9 @@ struct StubStoreRepository: StoreRepositoryProtocol {
     }
 
     func restore() async -> RestoreOutcome {
+        if let ms = Self.value(Argument.restoreDelay).flatMap(UInt64.init), ms > 0 {
+            try? await Task.sleep(nanoseconds: ms * 1_000_000)
+        }
         switch Self.value(Argument.restore) ?? "restored" {
         case "nothing": return .nothingToRestore
         case "network": return .failed(.network)
@@ -86,15 +102,37 @@ struct StubStoreRepository: StoreRepositoryProtocol {
         }
     }
 
-    /// One scripted revocation, or nothing at all.
+    /// The scripted unasked-for changes, in the order their seconds put them, or
+    /// nothing at all. Both offsets are counted from launch, not from each other, so
+    /// `-seedStoreGrantAfter 2 -seedStoreRevokeAfter 5` means what it reads like: Pro
+    /// at two seconds, gone at five.
     func entitlementUpdates() -> AsyncStream<Entitlement> {
-        guard let seconds = Self.value(Argument.revokeAfter).flatMap(Double.init) else {
-            return AsyncStream { $0.finish() }
+        var scheduled: [(at: Double, entitlement: Entitlement)] = []
+        if let s = Self.value(Argument.grantAfter).flatMap(Double.init) {
+            scheduled.append((s, .pro))
         }
+        if let s = Self.value(Argument.revokeAfter).flatMap(Double.init) {
+            scheduled.append((s, .free))
+        }
+        guard !scheduled.isEmpty else { return AsyncStream { $0.finish() } }
+        // Ties resolve to the order the arguments are read above — `sort` is not
+        // documented as stable, and equal offsets would otherwise pick a winner the
+        // documented "in ascending order" does not promise.
+        scheduled = scheduled.enumerated()
+            .sorted { ($0.element.at, $0.offset) < ($1.element.at, $1.offset) }
+            .map(\.element)
+
         return AsyncStream { continuation in
             let task = Task {
-                try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-                continuation.yield(.free)
+                var elapsed: Double = 0
+                for step in scheduled {
+                    try? await Task.sleep(nanoseconds: UInt64(max(0, step.at - elapsed) * 1_000_000_000))
+                    // `try?` swallows the cancellation the sleep throws, so without
+                    // this the whole schedule would fire back-to-back on teardown.
+                    guard !Task.isCancelled else { break }
+                    elapsed = step.at
+                    continuation.yield(step.entitlement)
+                }
                 continuation.finish()
             }
             continuation.onTermination = { _ in task.cancel() }
