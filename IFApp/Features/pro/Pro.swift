@@ -46,6 +46,29 @@ enum Entitlement: String, Equatable, Sendable {
     var analyticsValue: String { rawValue }
 }
 
+/// Which finished fasts may carry the one-time offer (rule T1').
+///
+/// A fast abandoned in the first minutes does not qualify, for two reasons that pull
+/// the same way: the first paid request in someone's life should not land on their
+/// first failure, and — the half that costs money — a fast like that must not spend
+/// the single show this install will ever get.
+enum OfferQualification {
+    /// The share of its goal a fast has to reach. A constant rather than logic: the
+    /// final value comes from the distribution of `fast_stopped.duration_hours`, so
+    /// tuning it is changing this number and nothing else.
+    static let minimumGoalFraction = 0.5
+
+    /// Reaching the goal needs no branch of its own — a fast that reached its goal is
+    /// at 100% of it, which is already past the fraction above.
+    ///
+    /// `goalHours` is the goal the fast actually ran to (`AppState.activeGoalHours`),
+    /// not the plan as it stands now: a plan changed mid-fast must not re-decide
+    /// whether the fast that just ended was worth an offer.
+    static func qualifies(elapsed: TimeInterval, goalHours: Double) -> Bool {
+        goalHours > 0 && elapsed >= goalHours * 3600 * minimumGoalFraction
+    }
+}
+
 /// Where the offer was opened from. The raw values are the GA4 `trigger` parameter:
 /// a fixed ASCII list, never a string that also appears on screen. They are named
 /// after the action, not the ordinal — the offer routinely appears on a user's third

@@ -14,6 +14,14 @@ func proReducer(state: ProState, action: Action) -> ProState {
     switch action as? ProAction {
     case let .offerOpened(trigger):
         newState.trigger = trigger
+        if trigger == .fastFinished {
+            // The one-time flag is spent here and nowhere else: on the fact of a
+            // show, which is the same instant `paywall_shown` is logged. Every
+            // suppression on the way to this line leaves it alone, which is what
+            // makes a suppressed show a postponement instead of a loss.
+            newState.autoOfferShown = true
+            newState.autoOfferArmed = false
+        }
         // A fresh presentation starts clean: an error or a confirmation left over from
         // the last time the screen was up is not news about this one. A pending
         // approval is not left over — the request is still out — so the screen opens
@@ -29,6 +37,15 @@ func proReducer(state: ProState, action: Action) -> ProState {
         // (or a failure) actually arrives — edge 18 / PW-13.
         if !newState.phase.outlivesOffer { newState.phase = .idle }
         newState.showsNothingToRestore = false
+
+    case .autoOfferArmed:
+        // Checked against the spent flag here as well as at the show, so an install
+        // that has had its offer never arms one again and nothing downstream has to
+        // remember why it is holding a plan that can never fire.
+        if !newState.autoOfferShown { newState.autoOfferArmed = true }
+
+    case .autoOfferCancelled:
+        newState.autoOfferArmed = false
 
     case let .storeResolved(entitlement, product):
         newState.entitlement = entitlement
@@ -98,6 +115,14 @@ func proReducer(state: ProState, action: Action) -> ProState {
 
     case .none:
         break
+    }
+
+    // The review prompt outranks the offer for the rest of the launch. Ratings are a
+    // growth asset and cost more than one attempt to sell; the flag stays unspent, so
+    // the price of suppressing wrongly (Apple may show nothing at all — the action
+    // means the request was made, not that a panel appeared) is zero.
+    if case AppLifecycleAction.reviewPrompted = action {
+        newState.reviewPromptedThisSession = true
     }
 
     // The offer does not stand open in front of someone who already owns it. Stated

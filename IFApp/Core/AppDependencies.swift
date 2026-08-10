@@ -30,6 +30,9 @@ enum AppDependencies {
                 analytics.log(.historyLoadFailed(reason: reason.rawValue))
             }
         }
+        container.register(ProOfferRepositoryProtocol.self) {
+            ProOfferRepository()
+        }
         container.register(HistoryExportRepositoryProtocol.self) {
             HistoryExportRepository()
         }

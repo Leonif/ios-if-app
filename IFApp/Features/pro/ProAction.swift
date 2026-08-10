@@ -11,6 +11,15 @@ enum ProAction: Action {
     /// The offer screen was closed — by the user, or by itself after a purchase.
     case offerClosed
 
+    /// A fast just ended having reached the quality threshold, so it has earned the
+    /// one-time offer. Arming, not showing: the moment comes later, when the user
+    /// leaves the complete state through the eating window.
+    case autoOfferArmed
+    /// The armed show is off. Dispatched by whoever invalidates the fast behind it —
+    /// the rollback that puts the fast back in flight, and the Reset that throws it
+    /// away. The one-time flag is untouched, so the next qualified fast arms again.
+    case autoOfferCancelled
+
     /// A store lookup finished: what is owned and what is for sale, together, because
     /// they are answered by the same round trip and disagreeing halves are worse than
     /// a slightly later answer.

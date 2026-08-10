@@ -32,6 +32,7 @@ enum AppStoreFactory {
         #endif
         let loaded = persistence.load()
         let history: FastHistoryRepositoryProtocol = container.inject()
+        let offer: ProOfferRepositoryProtocol = container.inject()
 
         let initialState = AppState(
             timerState: TimerState(
@@ -47,7 +48,10 @@ enum AppStoreFactory {
                 lastGoalDate: loaded.lastGoalDate
             ),
             planState: PlanState(plan: persistence.loadPlanHours().map(Plan.init(hours:)) ?? .default),
-            historyState: HistoryState(records: history.loadAll().sorted { $0.startTimestamp > $1.startTimestamp })
+            historyState: HistoryState(records: history.loadAll().sorted { $0.startTimestamp > $1.startTimestamp }),
+            // The only part of the offer that survives a launch. Everything else the
+            // automatic trigger needs is session state and starts empty by design.
+            proState: ProState(autoOfferShown: offer.wasOfferShown())
         )
 
         var middlewares: [Middleware] = [

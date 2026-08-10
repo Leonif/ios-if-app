@@ -47,6 +47,10 @@ struct TimerScreenProps: Equatable {
     /// The one-time notice on screen, and the one still waiting for a neutral moment.
     let notice: ProNotice?
     let revocationPending: Bool
+    /// T1' is owed and the entitlement side has nothing against it. Whether *this*
+    /// screen is a place to show it, and when, is decided here — see
+    /// `scheduleAutoOffer`.
+    let autoOfferPending: Bool
 
     init(state: AppState) {
         isRunning = state.timerState.isRunning
@@ -73,6 +77,7 @@ struct TimerScreenProps: Equatable {
         selectedPlanAllowed = state.selectedPlanAllowed
         notice = state.proState.notice
         revocationPending = state.proState.revocationPending
+        autoOfferPending = state.proState.autoOfferPending
     }
 
     var isMealFresh: Bool { ateMin < 0 }
@@ -193,6 +198,14 @@ struct TimerFlowView: View {
         // the lock is already back, this is only the sentence about it.
         .onChange(of: noticeMoment) { _, moment in
             if moment { presentRevocationIfNeutral() }
+        }
+        // T1'. The eating window opening is the offer's cue, and this edge is where
+        // it is caught rather than inside `screen()`: opening the window flips the
+        // `Group` from the untimed branch to the `TimelineView` one, so the whole
+        // subtree — and any `onChange` living in it — is rebuilt rather than updated.
+        // Out here the view is stable and the edge actually arrives.
+        .onChange(of: props.isEating) { _, isEating in
+            if isEating { scheduleAutoOffer() }
         }
         // History is a push, not a sheet: it is deeper into the app, not a dialog
         // over it.
@@ -480,24 +493,66 @@ struct TimerFlowView: View {
 
     // MARK: Pro
 
-    /// True when the entitlement notice is due and the screen is a place to say it.
-    /// Neutral means nothing is in flight: no fast running, no completed fast waiting
-    /// to be acknowledged, no eating window counting down, and no offer or notice
-    /// already on screen.
-    private var noticeMoment: Bool {
-        props.revocationPending
-            && props.notice == nil
+    /// Nothing is presented over the timer: no sheet, no pushed screen, no offer and
+    /// no notice. One definition because both one-time surfaces need it — the
+    /// revocation notice and the automatic offer — and neither may land under the
+    /// other or under a sheet. Both are spent the moment they are shown, so a show
+    /// that nobody sees is a show lost.
+    private var screenIsClear: Bool {
+        props.notice == nil
             && !props.offerOpen
-            // The notice is an overlay on this screen, so anything presented above it
-            // would swallow it — and the flag is spent the moment it is shown. The
-            // About sheet is the likeliest one: it is where a refund is noticed.
+            // The About sheet is the likeliest cover: it is where a refund is noticed.
             && !showSources
             && !showHistory
             && !props.planEditorOpen
             && !props.mealPickerOpen
             && !props.streakMilestoneOpen
             && !props.resetConfirmOpen
-            && props.currentScreenState() == .idle
+    }
+
+    /// True when the entitlement notice is due and the screen is a place to say it.
+    /// Neutral means nothing is in flight: no fast running, no completed fast waiting
+    /// to be acknowledged, no eating window counting down, and nothing presented over
+    /// the screen.
+    private var noticeMoment: Bool {
+        props.revocationPending && screenIsClear && props.currentScreenState() == .idle
+    }
+
+    /// The delay from the eating window card arriving to the offer starting to rise.
+    /// From the handoff (`design-handoff/paywall/brief.md`). The card has no animated
+    /// transition of its own, so the state change is the moment it is rendered and
+    /// settled, and this is measured from there — the rule the number serves is
+    /// "never over a transition".
+    ///
+    /// It equals the offer's own rise duration in `PaywallFlowView` by coincidence,
+    /// not by construction: the handoff names them as two numbers ("delay 420ms",
+    /// "rise over 420ms") and either may be retuned without the other. Do not fold
+    /// them into one constant.
+    private static let autoOfferDelay: TimeInterval = 0.42
+
+    /// T1'. The one-time offer earned by the fast that just ended, shown once the
+    /// user has left the complete state through the eating window and its card is on
+    /// screen — never on `.complete` itself, where a modal would shift the anchor of
+    /// the window they are about to open.
+    ///
+    /// The goal animation cannot be underneath this by construction: seal and sweep
+    /// belong to `.goalReached`, which is two user actions back by the time the window
+    /// is open.
+    private func scheduleAutoOffer() {
+        guard props.autoOfferPending, props.currentScreenState() == .eating else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.autoOfferDelay) {
+            // Re-checked on arrival, not only on the way in. Everything below can
+            // change during the delay — the window skipped, a sheet opened, the store
+            // answering late, the app backgrounded — and every one of them is a
+            // suppression that must not cost the show. Not dispatching is the entire
+            // mechanism: the flag is spent by `offerOpened` and by nothing else.
+            guard scenePhase == .active,
+                  props.autoOfferPending,
+                  props.currentScreenState() == .eating,
+                  screenIsClear
+            else { return }
+            store.dispatch(ProAction.offerOpened(trigger: .fastFinished))
+        }
     }
 
     /// Confirming the plan. A custom length without Pro is where the lock actually

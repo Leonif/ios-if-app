@@ -23,5 +23,10 @@ struct ResetFastThunk: Thunk {
 
         dispatch(TimerAction.reset(elapsed: elapsed))
         dispatch(MealAction.cleared)
+        // Reset out of the complete state means "this fast was rubbish". Selling a
+        // lifetime purchase on the back of it would spend the one show this install
+        // ever gets on its worst possible second. Suppression, not consumption: the
+        // flag is untouched and the next qualified fast arms a new show.
+        dispatch(ProAction.autoOfferCancelled)
     }
 }

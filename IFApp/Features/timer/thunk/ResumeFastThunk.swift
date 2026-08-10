@@ -32,6 +32,12 @@ struct ResumeFastThunk: Thunk {
         // moment puts the start is `TimerState`'s rule, shared with the start path.
         let startTimestamp = timer.startTimestamp(at: Date().timeIntervalSince1970)
         dispatch(TimerAction.stopUndone(startTimestamp: startTimestamp))
+
+        // The ending that armed the offer is being taken back, so the show armed for
+        // it goes with it — the flag stays whole. This is the main thing standing
+        // between a mis-tapped End fast and a lifetime offer spent on it: a stray
+        // ending at 60% of the goal clears the quality threshold perfectly well.
+        dispatch(ProAction.autoOfferCancelled)
     }
 
     /// The record written by the ending being undone, if there is one.

@@ -27,6 +27,30 @@ struct ProState: Equatable, Sendable {
     /// The notice on screen right now, if any.
     var notice: ProNotice? = nil
 
+    /// T1', spent. The one-time offer is one time for the life of the install, so
+    /// this is the one thing about the offer that outlives a launch — loaded at
+    /// bootstrap, written back on the fact of a show and on nothing else.
+    ///
+    /// It lives in the app's preferences (`ProOfferRepository`), so a cold start and
+    /// an App Store update carry it and a delete-and-reinstall clears it. The second
+    /// half is accepted, not a defect: what keeps the offer away from someone who
+    /// already paid is the entitlement check, not this flag, and a flag that survived
+    /// deletion would only mean a person who reinstalled never sees the offer at all.
+    var autoOfferShown: Bool = false
+
+    /// A qualified fast finished and the offer it earned has not been shown yet.
+    ///
+    /// Deliberately **not** persisted. The plan belongs to the session that finished
+    /// the fast: a session that ends without showing simply drops it, the flag above
+    /// stays whole, and the next qualified fast arms a new one. Persisting it would
+    /// make the offer something that greets a cold start with no fast behind it —
+    /// the ambush rule T1' exists to prevent.
+    var autoOfferArmed: Bool = false
+
+    /// The native review request went out this launch. The offer stands down for the
+    /// rest of it: both are interruptions and only one of them is an asset we keep.
+    var reviewPromptedThisSession: Bool = false
+
     /// Restore ran and found nothing. Transient: the service block says so for a
     /// couple of seconds and goes back to being a link. Not a seventh offer state —
     /// after an empty restore the truth about this user is exactly S1.
@@ -38,6 +62,35 @@ struct ProState: Equatable, Sendable {
     /// stored twice: the screen cannot be open without one, and cannot be closed
     /// while it still has one.
     var isOfferOpen: Bool { trigger != nil }
+
+    /// Whether T1' is owed and nothing on the entitlement side forbids showing it.
+    ///
+    /// Not "show it now": *when* is the business of the screen that renders the
+    /// eating window (`TimerFlowView.scheduleAutoOffer`), because the moment is
+    /// defined by that card being on screen and settled. This side answers only
+    /// "may it", and it is one definition because both the scheduling and the
+    /// re-check on arrival ask it.
+    ///
+    /// Every condition here is a *suppression*, and none of them spends
+    /// `autoOfferShown` — that is the whole mechanism by which a suppressed show is
+    /// a postponement rather than a loss:
+    ///
+    /// - `entitlement == .free` rather than `!isPro`: `unknown` locks like free but
+    ///   must never open the offer by itself (edge 16 / PW-9). The store may answer
+    ///   seconds later; by then this moment has passed and the offer moves on;
+    /// - `product != nil`: no price means no offer to make. We do not open a screen
+    ///   that cannot sell;
+    /// - `phase == .idle`: an attempt already in flight (an Ask to Buy still out) is
+    ///   not something to interrupt with an invitation to buy the same thing.
+    var autoOfferPending: Bool {
+        autoOfferArmed
+            && !autoOfferShown
+            && !reviewPromptedThisSession
+            && entitlement == .free
+            && product != nil
+            && phase == .idle
+            && !isOfferOpen
+    }
 
     /// Which of the six states the offer screen shows.
     ///

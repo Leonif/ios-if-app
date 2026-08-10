@@ -24,5 +24,17 @@ struct StopFastThunk: Thunk {
         let qualifies = elapsed >= app.activeGoalHours * 3600
 
         dispatch(TimerAction.stopped(elapsed: elapsed, qualifiesAsCompleted: qualifies))
+
+        // T1'. The fast that just ended is the only thing that can arm the one-time
+        // offer, and this is the last point where its elapsed time still exists —
+        // `.stopped` stages it, but the goal it ran to is resolved here.
+        //
+        // Arming is not showing. The moment comes later, once the user has left the
+        // complete state through the eating window; everything in between (a rollback,
+        // a Reset, a review prompt, the session simply ending) cancels or suppresses
+        // it without costing the show.
+        if OfferQualification.qualifies(elapsed: elapsed, goalHours: app.activeGoalHours) {
+            dispatch(ProAction.autoOfferArmed)
+        }
     }
 }

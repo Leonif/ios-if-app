@@ -37,6 +37,7 @@ enum UITestSeed {
         defaults.removeObject(forKey: "review_last_shown")
         defaults.set(0, forKey: "review_prompt_count")
         defaults.removeObject(forKey: "review_pending_goal_at")
+        defaults.set(false, forKey: "pro_offer_shown")
 
         func intArg(_ name: String) -> Int? {
             guard let i = args.firstIndex(of: name), i + 1 < args.count else { return nil }
@@ -88,6 +89,16 @@ enum UITestSeed {
         // that scenario cannot be constructed at all, not merely by coincidence).
         if let g = intArg("-seedGoalHours") { defaults.set(Double(g), forKey: "goal_hours") }
         if let pc = intArg("-seedPromptCount") { defaults.set(pc, forKey: "review_prompt_count") }
+        // "-seedOfferShown 1": the automatic offer (T1') has already been spent on
+        // this install. The criterion it exists for — shown exactly once, ever, and
+        // not again after a dismiss — otherwise needs two qualified fasts inside one
+        // launch, and a launch cannot be re-seeded from inside itself.
+        //
+        // There is deliberately no argument for "armed but not yet shown": the plan
+        // to show lives only in the session that finished the fast and is never
+        // persisted, so a flow reaches it the way a user does — end a fast past the
+        // quality threshold, then open the eating window.
+        if let shown = intArg("-seedOfferShown") { defaults.set(shown == 1, forKey: "pro_offer_shown") }
         // "-seedPendingGoal N": the 3rd-goal review fallback was armed N seconds ago,
         // so the next open can reach the native request without driving three real
         // goals first. N past ReviewMiddleware's 4h delay makes the request due.

@@ -159,4 +159,190 @@ final class ProReducerTests: XCTestCase {
         XCTAssertEqual(next.offerState, .offer)
         XCTAssertTrue(next.showsNothingToRestore)
     }
+
+    // MARK: T1' — the quality threshold
+    //
+    // The filter and the one-time flag are the two pieces of the automatic trigger
+    // that no screenshot can hold: both are invisible when they work, and both are the
+    // kind of rule a later refactor breaks without anything going red. The offer is
+    // shown once in the life of an install, so a regression here is not a bug someone
+    // reports — it is an offer that silently never appears, or appears on the fast a
+    // person abandoned after a minute.
+
+    /// Half the goal, exactly as specified. The boundary is checked from both sides
+    /// because "less than 50%" and "at least 50%" is the entire rule.
+    func testHalfTheGoalIsTheThreshold() {
+        let goal = 16.0
+
+        XCTAssertFalse(OfferQualification.qualifies(elapsed: 7 * 3600 + 3599, goalHours: goal))
+        XCTAssertTrue(OfferQualification.qualifies(elapsed: 8 * 3600, goalHours: goal))
+        XCTAssertTrue(OfferQualification.qualifies(elapsed: 9 * 3600, goalHours: goal))
+    }
+
+    /// The fast people abandon in the first minutes — the case the filter exists for.
+    func testAFastAbandonedEarlyDoesNotQualify() {
+        XCTAssertFalse(OfferQualification.qualifies(elapsed: 60, goalHours: 16))
+    }
+
+    /// Reaching the goal needs no branch of its own; it is past the fraction already.
+    /// Stated as a test so a future edit cannot "add the missing goal_reached case"
+    /// and end up with two definitions of the same predicate.
+    func testReachingTheGoalQualifies() {
+        XCTAssertTrue(OfferQualification.qualifies(elapsed: 16 * 3600, goalHours: 16))
+        XCTAssertTrue(OfferQualification.qualifies(elapsed: 21 * 3600, goalHours: 16))
+    }
+
+    /// A custom goal is compared against itself, not against a preset: on a 3-hour
+    /// goal the threshold is 90 minutes.
+    func testTheThresholdFollowsTheGoalTheFastActuallyRanTo() {
+        XCTAssertFalse(OfferQualification.qualifies(elapsed: 89 * 60, goalHours: 3))
+        XCTAssertTrue(OfferQualification.qualifies(elapsed: 90 * 60, goalHours: 3))
+    }
+
+    /// No goal to measure against, no verdict. State written before the goal was
+    /// pinned resolves to the plan upstream; a zero arriving here is not a fast that
+    /// qualified by dividing by nothing.
+    func testAnUnpinnedGoalDoesNotQualify() {
+        XCTAssertFalse(OfferQualification.qualifies(elapsed: 20 * 3600, goalHours: 0))
+    }
+
+    // MARK: T1' — the one-time flag
+
+    /// Free, verified, with a price behind it, and a qualified fast just ended.
+    private func armed() -> ProState {
+        var state = ProState()
+        state.entitlement = .free
+        state.product = product
+        state.autoOfferArmed = true
+        return state
+    }
+
+    func testArmingMakesTheShowPending() {
+        let next = proReducer(state: ProState(entitlement: .free, product: product),
+                              action: ProAction.autoOfferArmed)
+
+        XCTAssertTrue(next.autoOfferArmed)
+        XCTAssertTrue(next.autoOfferPending)
+    }
+
+    /// "Exactly once, ever" held at the earliest point: an install that has had its
+    /// offer never arms another, so nothing later has to carry a plan that can never
+    /// fire.
+    func testAnInstallThatHasHadItsOfferNeverArmsAgain() {
+        var state = ProState(entitlement: .free, product: product)
+        state.autoOfferShown = true
+
+        let next = proReducer(state: state, action: ProAction.autoOfferArmed)
+
+        XCTAssertFalse(next.autoOfferArmed)
+        XCTAssertFalse(next.autoOfferPending)
+    }
+
+    /// The flag is spent on the fact of a show and on nothing else.
+    func testShowingTheOfferSpendsTheFlag() {
+        let next = proReducer(state: armed(),
+                              action: ProAction.offerOpened(trigger: .fastFinished))
+
+        XCTAssertTrue(next.autoOfferShown)
+        XCTAssertFalse(next.autoOfferArmed)
+        XCTAssertTrue(next.isOfferOpen)
+    }
+
+    /// The other three doors are the user's own action and say nothing about the
+    /// automatic one. Someone who opens the offer from the About sheet has not used up
+    /// the show their next finished fast has coming.
+    func testTheOtherDoorsDoNotSpendTheFlag() {
+        for trigger in [PaywallTrigger.planCustom, .manual, .streakBreak] {
+            let next = proReducer(state: armed(),
+                                  action: ProAction.offerOpened(trigger: trigger))
+
+            XCTAssertFalse(next.autoOfferShown, "\(trigger) spent the one-time flag")
+            XCTAssertTrue(next.autoOfferArmed, "\(trigger) disarmed the pending show")
+        }
+    }
+
+    /// Edge 11: after a dismiss it does not come back, this launch or any later one.
+    func testDismissDoesNotBringTheOfferBack() {
+        let shown = proReducer(state: armed(),
+                               action: ProAction.offerOpened(trigger: .fastFinished))
+
+        let dismissed = proReducer(state: shown, action: ProAction.offerClosed)
+
+        XCTAssertTrue(dismissed.autoOfferShown)
+        XCTAssertFalse(dismissed.autoOfferPending)
+        // And a later fast cannot resurrect it.
+        let laterFast = proReducer(state: dismissed, action: ProAction.autoOfferArmed)
+        XCTAssertFalse(laterFast.autoOfferPending)
+    }
+
+    // MARK: T1' — suppressions, none of which spend the flag
+    //
+    // Each of these is the same bargain: the show moves to the next qualified fast and
+    // the install keeps its one offer. The assertion that matters in every one is the
+    // second — `autoOfferShown` still false.
+
+    /// Edge 20: the fast is taken back, so the show armed for it goes too. This is
+    /// what stands between a mis-tapped End fast at 60% of the goal and a lifetime
+    /// offer spent on it.
+    func testCancellingAnArmedShowLeavesTheFlagWhole() {
+        let next = proReducer(state: armed(), action: ProAction.autoOfferCancelled)
+
+        XCTAssertFalse(next.autoOfferArmed)
+        XCTAssertFalse(next.autoOfferShown)
+        // The next qualified fast arms normally.
+        let rearmed = proReducer(state: next, action: ProAction.autoOfferArmed)
+        XCTAssertTrue(rearmed.autoOfferPending)
+    }
+
+    /// The review prompt outranks the offer for the rest of the launch. `reviewPrompted`
+    /// means the request was made — Apple may have shown nothing — which is exactly why
+    /// suppressing on it has to be free.
+    func testAReviewPromptSuppressesTheOfferWithoutSpendingIt() {
+        let next = proReducer(state: armed(),
+                              action: AppLifecycleAction.reviewPrompted(trigger: .streakMilestone))
+
+        XCTAssertTrue(next.reviewPromptedThisSession)
+        XCTAssertFalse(next.autoOfferPending)
+        XCTAssertTrue(next.autoOfferArmed)
+        XCTAssertFalse(next.autoOfferShown)
+    }
+
+    /// Edge 16 / PW-9: an entitlement nobody has been able to check yet gates like
+    /// free, but the offer never opens on its own there — we do not invite a second
+    /// purchase of something this install may already own.
+    func testAnUnverifiedEntitlementSuppressesTheOffer() {
+        var state = armed()
+        state.entitlement = .unknown
+
+        XCTAssertFalse(state.autoOfferPending)
+        XCTAssertFalse(state.autoOfferShown)
+    }
+
+    /// No price, no offer: the screen is a frame built around one, and a store that
+    /// did not answer cannot sell anything.
+    func testAMissingProductSuppressesTheOffer() {
+        var state = armed()
+        state.product = nil
+
+        XCTAssertFalse(state.autoOfferPending)
+        XCTAssertFalse(state.autoOfferShown)
+    }
+
+    /// Edge 10: an owner is never shown any of the three automatic triggers.
+    func testAnOwnerHasNoPendingOffer() {
+        var state = armed()
+        state.entitlement = .pro
+
+        XCTAssertFalse(state.autoOfferPending)
+    }
+
+    /// An Ask to Buy still out with whoever approves it is an attempt in flight. The
+    /// automatic offer does not interrupt it to sell the same thing again.
+    func testAnAttemptInFlightSuppressesTheOffer() {
+        var state = armed()
+        state.phase = .awaitingApproval
+
+        XCTAssertFalse(state.autoOfferPending)
+        XCTAssertFalse(state.autoOfferShown)
+    }
 }

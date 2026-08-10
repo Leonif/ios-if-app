@@ -94,10 +94,17 @@ final class AnalyticsMiddleware: Middleware {
         case .restoreCompleted:
             repo.log(.restoreCompleted)
         case .restoreStarted, .restoreFoundNothing, .storeResolved, .entitlementChanged,
-             .nothingToRestoreExpired, .noticeShown, .noticeDismissed:
+             .nothingToRestoreExpired, .noticeShown, .noticeDismissed,
+             .autoOfferArmed, .autoOfferCancelled:
             // Reading the entitlement is not a funnel step; the property below carries
             // the outcome. Restore that finds nothing is the same non-event, and the
             // two notices report something the user did not do.
+            //
+            // Arming and cancelling the automatic offer are deliberately silent: the
+            // funnel counts shows, and a show is `offerOpened` above. An armed plan
+            // that never fires is not a paywall the user saw, and logging it would put
+            // the one readable number of this release — the distribution over
+            // triggers — out by the whole suppression rate.
             break
         }
     }
