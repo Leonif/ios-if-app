@@ -38,7 +38,7 @@ func proReducer(state: ProState, action: Action) -> ProState {
         // Losing a right that was verifiably held is the one transition the user has
         // to be told about — a refund, or a family member leaving the group. Both
         // notices are armed here and shown much later, at two different moments.
-        if state.entitlement == .pro, entitlement != .pro {
+        if state.isPro, entitlement != .pro {
             newState.revocationPending = true
             newState.goalChangePending = true
         }
@@ -61,11 +61,6 @@ func proReducer(state: ProState, action: Action) -> ProState {
     case .purchaseCompleted:
         newState.entitlement = .pro
         newState.phase = .idle
-        // A bought offer has nothing left to say, so it closes itself — there is no
-        // seventh "just purchased" state to land on. Clearing the entry point is what
-        // closes it; the analytics middleware reads the trigger off its pre-reduce
-        // snapshot, so `purchase_completed` still carries the door it came in through.
-        newState.trigger = nil
 
     case .purchasePending:
         newState.phase = .awaitingApproval
@@ -103,6 +98,35 @@ func proReducer(state: ProState, action: Action) -> ProState {
 
     case .none:
         break
+    }
+
+    // The offer does not stand open in front of someone who already owns it. Stated
+    // once, over the state, rather than three times over the three ways the right can
+    // arrive: buying it here, an Ask to Buy approved minutes later, and the store
+    // answering `.pro` for a purchase made elsewhere are different actions with the
+    // same consequence — there is nothing left to sell.
+    //
+    // The condition is `idle` and not "the screen shows S1", because idle is exactly
+    // "nothing in flight to be about": every other phase is feedback on an attempt and
+    // has its own frame to finish in (S2 while it settles, S4 while approval is out,
+    // S6 for the restore confirmation, S3 for a failure worth reading). With the
+    // machinery idle, an open offer is only ever an invitation to buy — and the tap it
+    // invites does nothing at all, since `PurchaseProThunk` guards on `isPro`.
+    //
+    // Clearing the entry point is what closes the screen; there is no seventh "just
+    // purchased" state to land on. Analytics is unaffected: the middleware reads the
+    // trigger off its pre-reduce snapshot, so `purchase_completed` still carries the
+    // door the user came in through.
+    //
+    // Standing over the whole switch, it also refuses to *open* the offer for an
+    // owner: `offerOpened` sets the entry point and this takes it straight back. That
+    // is deliberate and today unreachable — all three doors are shut from outside
+    // (`AboutIF24View.opensOffer`, the history export button, the plan editor) — but
+    // if a fourth one is ever added without its own guard, note that the analytics
+    // middleware logs `paywall_shown` on the action, so it would report a screen that
+    // never appeared. The guard belongs on the door, not here.
+    if newState.isPro, newState.phase == .idle {
+        newState.trigger = nil
     }
 
     return newState
