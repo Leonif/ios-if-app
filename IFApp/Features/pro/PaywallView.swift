@@ -8,8 +8,9 @@
 //  from what the text actually took, never pinned to the English measurement — the
 //  S4 body is 56pt in English and 76.5pt in Korean at the same type size.
 //
-//  Every vertical slot is a `minHeight`. A `frame(height:)` anywhere in this file
-//  would clip Japanese and Korean at the default type size, straight out of the box.
+//  Every vertical slot is a `minHeight`. A `frame(height:)` on any slot that carries
+//  text would clip Japanese and Korean at the default type size, straight out of the
+//  box.
 //
 
 import SwiftUI
@@ -64,6 +65,13 @@ struct PaywallView: View {
     /// Title, body and the benefit list. Scrolls only when it has to: the bounce is
     /// tied to the content size, so at the sizes that fit the screen still reads as
     /// the fixed surface it is drawn as, with nothing to rubber-band.
+    ///
+    /// The bottom edge dissolves over `Self.fadeHeight` instead of being cut: the
+    /// handoff's overflow frame (`IF24 Pro Offer.dc.html`, group E — "Dynamic Type
+    /// xxLarge · S1") draws a 36pt gradient to the background over the scrolling
+    /// region, and the scroll view shipped without it. On a 375×667 screen the
+    /// English S1 needs about 150pt more than it gets, so what a guillotined edge
+    /// reads as there is a rendering fault, not "there is more below".
     private var readingBlock: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0) {
@@ -74,7 +82,28 @@ struct PaywallView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .scrollBounceBehavior(.basedOnSize)
+        // The fade is drawn over the viewport, so the last line has to be able to
+        // travel out from under it — otherwise scrolling to the end leaves the very
+        // words the fade exists to promise half-transparent. The inset is exactly the
+        // fade's height and only ever adds scrollable slack: content that fits still
+        // sits at the top with the gradient over empty space.
+        .contentMargins(.bottom, Self.fadeHeight, for: .scrollContent)
+        // As a mask rather than the handoff's opaque `--bg` overlay: the offer's
+        // surface carries the phase tint (`PaywallBackdrop`), and a flat rectangle of
+        // the base colour would print a pale block over it. Fading the content's own
+        // alpha is the same picture on any backdrop.
+        .mask {
+            VStack(spacing: 0) {
+                Color.black
+                LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                    .frame(height: Self.fadeHeight)
+            }
+        }
     }
+
+    /// Height of the bottom fade over the scrolling region — 36pt, from the overflow
+    /// frame in `IF24 Pro Offer.dc.html` (the number is not in `spec.md`).
+    private static let fadeHeight: CGFloat = 36
 
     // MARK: Header
 
