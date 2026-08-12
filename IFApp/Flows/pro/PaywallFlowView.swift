@@ -77,7 +77,7 @@ struct PaywallFlowView: View {
                     showsNothingToRestore: props.showsNothingToRestore,
                     onBuy: { store.dispatch(PurchaseProThunk()) },
                     onRestore: { store.dispatch(RestorePurchasesThunk()) },
-                    onPrivacy: { openURL(Self.privacyURL) },
+                    onPrivacy: { openURL(SiteLinks.privacyPolicy) },
                     onClose: { store.dispatch(ProAction.offerClosed) }
                 )
                 .id(props.state)
@@ -116,6 +116,4 @@ struct PaywallFlowView: View {
             props = next
         })
     }
-
-    private static let privacyURL = URL(string: "https://leonif.github.io/if24-site/privacy.html")!
 }
