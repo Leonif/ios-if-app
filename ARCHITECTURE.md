@@ -147,13 +147,15 @@ grep -rnE "Date\(\)|Clock\.(now|dayKey|minuteOfDay)\(\)|UUID\(\)|Locale\.current
 
 | # | Эффект | Где |
 |---|---|---|
-| 2.1 | Хаптика `UINotificationFeedbackGenerator().notificationOccurred(.success)` | `Flows/timer/TimerFlowView.swift:738` |
-| 2.2 | Хаптика `UIImpactFeedbackGenerator(style: .light).impactOccurred()` | `Flows/history/HistoryFlowView.swift:303` |
-| 2.4 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + 1.6)` | `Flows/timer/TimerFlowView.swift:758` |
-| 2.5 | Подмена делегата чужого рекогнайзера — `gesture.delegate = self`, `gesture.isEnabled = true` | `Flows/history/HistoryFlowView.swift:345-346` (`InteractivePopGesture.Host`, объявлен `:327`, монтируется `:89`) |
-| 2.6 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + autoOfferDelay)` — `scheduleAutoOffer`, T1' | `Flows/timer/TimerFlowView.swift:576` |
+| 2.1 | Хаптика `UINotificationFeedbackGenerator().notificationOccurred(.success)` | `Flows/timer/TimerFlowView.swift:822` |
+| 2.2 | Хаптика `UIImpactFeedbackGenerator(style: .light).impactOccurred()` | `Flows/history/HistoryFlowView.swift:311` |
+| 2.4 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + 1.6)` | `Flows/timer/TimerFlowView.swift:842` |
+| 2.5 | Подмена делегата чужого рекогнайзера — `gesture.delegate = self`, `gesture.isEnabled = true` | `Flows/history/HistoryFlowView.swift:353-354` (`InteractivePopGesture.Host`, объявлен `:331`, монтируется `:95`) |
+| 2.6 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + autoOfferDelay)` — `scheduleAutoOffer`, T1' | `Flows/timer/TimerFlowView.swift:624` |
 
-**Номера строк пересняты 07.08.2026 на остановившемся рабочем дереве `current-release` (не закоммичено, дев-цикл 1.5.x принят владельцем).** Было 643 / 280 / 663 (`HEAD` `218a7a8`, снимок 06.08.2026), стало 647 / 299 / 667. Значения 2.1, 2.2 и 2.4 не менялись — только позиции.
+**Номера строк пересняты 18.08.2026 на `HEAD` `b24be30`.** Все пять адресов проверены грепом по дереву: 738→822, 303→311, 758→842, 345-346→353-354 (объявление 327→331, монтирование 89→95), 576→624. Сами позиции не менялись — только адреса; сдвинули их коммиты IF-5 после `a76cf55`, который был последним пересчётом. Расхождение нашёл `architect` на ревью 18.08.2026 — оно уже было в `HEAD` и к правке, на которой всплыло, отношения не имеет.
+
+Предыдущий пересчёт (07.08.2026, остановившееся рабочее дерево): было 643 / 280 / 663 (`HEAD` `218a7a8`, снимок 06.08.2026), стало 647 / 299 / 667.
 
 **Пересняты снова 17.08.2026, после ревью диффа IF-9** (постоянная дверь в Pro на главном; правки приняты, дерево остановлено, `HEAD` `7c6c1fc`). Стало 738 / 303 / 758 / 345-346. Ни одну из четырёх позиций дифф IF-9 не трогал — сдвинулись только номера.
 
