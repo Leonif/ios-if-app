@@ -147,15 +147,17 @@ grep -rnE "Date\(\)|Clock\.(now|dayKey|minuteOfDay)\(\)|UUID\(\)|Locale\.current
 
 | # | Эффект | Где |
 |---|---|---|
-| 2.1 | Хаптика `UINotificationFeedbackGenerator().notificationOccurred(.success)` | `Flows/timer/TimerFlowView.swift:738` |
-| 2.2 | Хаптика `UIImpactFeedbackGenerator(style: .light).impactOccurred()` | `Flows/history/HistoryFlowView.swift:303` |
-| 2.4 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + 1.6)` | `Flows/timer/TimerFlowView.swift:758` |
-| 2.5 | Подмена делегата чужого рекогнайзера — `gesture.delegate = self`, `gesture.isEnabled = true` | `Flows/history/HistoryFlowView.swift:345-346` (`InteractivePopGesture.Host`, объявлен `:327`, монтируется `:89`) |
-| 2.6 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + autoOfferDelay)` — `scheduleAutoOffer`, T1' | `Flows/timer/TimerFlowView.swift:576` |
+| 2.1 | Хаптика `UINotificationFeedbackGenerator().notificationOccurred(.success)` | `Flows/timer/TimerFlowView.swift:806` |
+| 2.2 | Хаптика `UIImpactFeedbackGenerator(style: .light).impactOccurred()` | `Flows/history/HistoryFlowView.swift:311` |
+| 2.4 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + 1.6)` | `Flows/timer/TimerFlowView.swift:826` |
+| 2.5 | Подмена делегата чужого рекогнайзера — `gesture.delegate = self`, `gesture.isEnabled = true` | `Flows/history/HistoryFlowView.swift:353-354` (`InteractivePopGesture.Host`, объявлен `:331`, монтируется `:95`) |
+| 2.6 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + autoOfferDelay)` — `scheduleAutoOffer`, T1' | `Flows/timer/TimerFlowView.swift:622` |
 
 **Номера строк пересняты 07.08.2026 на остановившемся рабочем дереве `current-release` (не закоммичено, дев-цикл 1.5.x принят владельцем).** Было 643 / 280 / 663 (`HEAD` `218a7a8`, снимок 06.08.2026), стало 647 / 299 / 667. Значения 2.1, 2.2 и 2.4 не менялись — только позиции.
 
-**Пересняты снова 17.08.2026, после ревью диффа IF-9** (постоянная дверь в Pro на главном; правки приняты, дерево остановлено, `HEAD` `7c6c1fc`). Стало 738 / 303 / 758 / 345-346. Ни одну из четырёх позиций дифф IF-9 не трогал — сдвинулись только номера.
+**Пересняты 18.08.2026, при ревью диффа IF-5** (закреплённый футер экрана результата, worktree `wt/footer` от `20456c7`, дерево остановлено перед коммитом). Стало 806 / 311 / 826 / 622 / 353-354. Дифф IF-5 добавил ~40 строк в `TimerFlowView` выше этих позиций; остальной сдвиг приехал из базы — то есть позиции 17.08 устарели уже в момент коммита, потому что снимались на незакоммиченном дереве. Значения не менялись, только позиции.
+
+**Пересняты 17.08.2026, после ревью диффа IF-9** (постоянная дверь в Pro на главном; правки приняты, дерево остановлено, `HEAD` `7c6c1fc`). Стало 738 / 303 / 758 / 345-346. Ни одну из четырёх позиций дифф IF-9 не трогал — сдвинулись только номера.
 
 **2.6 — не находка сегодняшнего диффа, а дыра в учёте.** Позиция лежит в `HEAD` (`git show HEAD:…` — обе `asyncAfter` на месте, `:539` и `:721`), то есть приехала в дев-цикле 1.5.0 вместе с автооффером T1' и не попала в таблицу тогда же, когда её сосед 2.4 в ней уже стоял. Греп пункта её ловил всё это время — прогон 07.08.2026 отдал пять строк по `Flows/`, а в таблицу перенесли четыре.
 
@@ -243,7 +245,7 @@ grep -rn "UserDefaults" IFApp/Flows IFApp/Features --include='*.swift'
 
 **Зачем.** Компонент, дотянувшийся до стора, нельзя отрендерить в SwiftUI-превью и нельзя поставить на второй экран — он тащит за собой всё состояние приложения. Его перерисовка перестаёт быть предсказуемой: она зависит уже не от входных пропсов, а от того, что там в сторе. И хендофф из Claude Design перестаёт ложиться 1:1 — dev вынужден затаскивать стор в вёрстку, чтобы собрать макет.
 
-**Следуют:** 6 объявлений — `IFAppApp.swift:21`, `Flows/app/AppFlowView.swift:20`, `Flows/timer/TimerFlowView.swift:133`, `Flows/history/HistoryFlowView.swift:39`, `Flows/pro/PaywallFlowView.swift:37`, `Flows/pro/AboutFlowView.swift:36` (номера пересняты 07.08.2026; считается объявление поля, инициализаторы тех же типов идут следом и отдельными объявлениями не считаются). Было 4; два флоу пейвола добавились в дев-цикле 1.5.0, оба лежат в `Flows/` и правилу соответствуют — счёт вырос, нарушений не прибавилось. Все 23 компонента и шторки принимают значения + замыкания (`FooterCard`, `RingCenter`, `TimerHeader`, `PlanEditorSheet`, `LastMealPickerSheet`, `HistoryRow`, `StreakBadge`, …).
+**Следуют:** 6 объявлений — `IFAppApp.swift:22`, `Flows/app/AppFlowView.swift:20`, `Flows/timer/TimerFlowView.swift:146`, `Flows/history/HistoryFlowView.swift:39`, `Flows/pro/PaywallFlowView.swift:43`, `Flows/pro/AboutFlowView.swift:36` (пересняты 18.08.2026) (номера пересняты 07.08.2026; считается объявление поля, инициализаторы тех же типов идут следом и отдельными объявлениями не считаются). Было 4; два флоу пейвола добавились в дев-цикле 1.5.0, оба лежат в `Flows/` и правилу соответствуют — счёт вырос, нарушений не прибавилось. Все 23 компонента и шторки принимают значения + замыкания (`FooterCard`, `RingCenter`, `TimerHeader`, `PlanEditorSheet`, `LastMealPickerSheet`, `HistoryRow`, `StreakBadge`, …).
 
 **Нарушают:** 0.
 
@@ -271,7 +273,7 @@ grep -rn "container.inject" IFApp --include='*.swift' | grep "Store<"
 
 **Зачем.** Уже стрельнуло: на одном экране в арабском стояли рядом «٦» и «118». Причина структурная — `String(format:)` цифры не локализует никогда, а `Int`, интерполированный в `String(localized:)`, локализует всегда. Без единой точки пиннинга каждое новое место форматирования — это лотерея, и заметна она только на арабской локали, то есть в самом конце цикла или в сторе. Второе, что пиннит `latinDigits`, — григорианский календарь: без него `ar_SA` отрисует в истории даты хиджры, тогда как стрик, семидневные точки и все day-key считаются по григорианским дням, и список начнёт описывать другие дни, чем цифры над ним.
 
-**Следуют:** канон — `Shared/Localization/Strings.swift:25`. Потребители: `Features/history/HistoryFormat.swift:23` (→ 6 форматтеров), `Features/meal/MealMath.swift:45`, `Flows/timer/TimerFlowView.swift:782` (`clockTime`), пять Int-принимающих аксессоров в `Strings.swift` (`:156`, `:192`, `:204`, `:275`, `:280`), и `Features/timer/components/StreakBadge.swift:66` + `Features/history/components/HistorySummaryCard.swift:64` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте). Номера пересняты 07.08.2026.
+**Следуют:** канон — `Shared/Localization/Strings.swift:25`. Потребители: `Features/history/HistoryFormat.swift:23` (→ 6 форматтеров), `Features/meal/MealMath.swift:45`, `Flows/timer/TimerFlowView.swift:850` (`clockTime`), пять Int-принимающих аксессоров в `Strings.swift` (`:156`, `:192`, `:204`, `:275`, `:280`), и `Features/timer/components/StreakBadge.swift:66` + `Features/history/components/HistorySummaryCard.swift:64` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте). Номера пересняты 07.08.2026.
 
 **Три позиции пересняты 17.08.2026, при ревью диффа IF-10** (RTL/ar; дерево остановлено перед коммитом). `HistoryFormat` 22 → 23: шапка файла выросла на строку при выносе изолята в `BidiText`. `clockTime` 697 → 782: `TimerFlowView` рос дев-циклами 1.5.x, и позиция была устаревшей ещё до этого диффа — то есть промах не диффа, а того, что при снятии 17.08 по пункту 2 остальные пункты не пересматривались. Значения не менялись, только позиции.
 
@@ -363,10 +365,12 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 
 | # | Что задвоено | Где |
 |---|---|---|
-| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **4 определения** | `Flows/timer/TimerFlowView.swift:81` · `Features/timer/thunk/StopFastThunk.swift:17-19` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` · `Features/timer/thunk/ResetFastThunk.swift:20-22` |
-| 8.4 | Предикат «цель достигнута» `elapsed ≥ goalHours × 3600` — **3 определения** | `Features/phase/Phase.swift:88-93` (`PhaseProgress.isComplete`) · `Features/history/FastRecord.swift:27` (`goalReached`) · `Features/timer/thunk/StopFastThunk.swift:24` (`qualifies`) |
-| 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:67-70` · `Flows/timer/TimerFlowView.swift:794` |
-| 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела, включая doc-комментарий** | `Features/timer/components/RingCenter.swift:116` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:705` (`overtimeShort`) |
+| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **3 определения** | `Flows/timer/TimerFlowView.swift:94` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` · `Features/timer/thunk/ResetFastThunk.swift:20-22` |
+| 8.4 | Предикат «цель достигнута» `elapsed ≥ goalHours × 3600` — **3 определения** | `Features/phase/Phase.swift:89-92` (`PhaseProgress.isComplete`) · `Features/history/FastRecord.swift:27` (`goalReached`) · `Features/endfast/thunk/ConfirmEndFastThunk.swift:41` (`qualifies`) |
+| 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:67-70` · `Flows/timer/TimerFlowView.swift:863-865` |
+| 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела, включая doc-комментарий** | `Features/timer/components/RingCenter.swift:116` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:773` (`overtimeShort`) |
+
+**Все четыре строки пересняты 18.08.2026, при ревью диффа IF-5** (worktree `wt/footer`, дерево остановлено). Две строки были не только сдвинуты, а называли несуществующий файл: `StopFastThunk.swift` удалён вместе с переходом «End fast» на шторку-коррекцию, и стоял он в двух строках сразу. 8.2 из-за этого упало с 4 определений до 3 — не починкой, а исчезновением одного из мест; 8.4 осталось 3, третье переехало в `ConfirmEndFastThunk:41`. Ни одна из двух строк ссылку на удалённый файл не пережила бы при проверке грепом — их переносили из версии в версию как текст. Значения остальных не менялись.
 
 **Номера 8.6 и 8.7 пересняты 17.08.2026, при ревью диффа IF-10** (дерево остановлено перед коммитом). `HistoryFormat` 66-69 → 67-70 — сдвиг от этого диффа, шапка файла выросла на строку. `TimerFlowView` 704-707 → 794 (`hoursMinutes`) и 614 → 705 (`overtimeShort`) — устарели раньше, файл рос дев-циклами 1.5.x; `RingCenter:116` не сдвинулся. Оба задвоения на месте, значения не менялись.
 
