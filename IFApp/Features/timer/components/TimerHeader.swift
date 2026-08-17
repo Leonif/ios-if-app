@@ -131,41 +131,95 @@ struct TimerHeader: View {
     /// app means "your progress" (the ring, the seal, the halo), and lending it to the
     /// one commercial element would paint selling in the colour of achievement.
     ///
-    /// An outline instead of a fill is the one thing that tells it apart from its
-    /// three neighbours, all of which are filled: two identical filled capsules at
-    /// either end of the row would read as a matched pair of controls of one class
-    /// (P-2).
+    /// It is told apart from its three filled neighbours by material and by word, not
+    /// by colour: `surface-quiet` is the design system's "this has weight, and it is
+    /// not an action" rank, a step firmer than the green wash the icon circle and the
+    /// plan capsule wear, and the wordmark it carries is a mark rather than a label.
+    /// The outline it used to wear did that job too, but paid for it by being the one
+    /// unfilled thing in a row of fills — which reads as unfinished rather than as a
+    /// class of its own (P-2).
     private var proButton: some View {
         Button(action: onPro) {
             // `verbatim` is load-bearing, not style: handing `Text` a bare string
             // literal takes the `LocalizedStringKey` path, and the next catalog sync
-            // would lift "Pro" out as a new key across ten locales — for a label that
-            // is not translated in any of them (the same reason as `StreakBadge`'s
-            // digits). The literal form is spelled out in prose rather than quoted
-            // here because the acceptance check for this control is a grep for it.
+            // would lift the mark out as a new key across ten locales — for a label
+            // that is not translated in any of them (the same reason as
+            // `StreakBadge`'s digits).
             //
             // The line limit and the scale factor never fire on three Latin glyphs at
             // any text size; they are there for the second someone translates the
             // label anyway, and they are what makes that a squeeze instead of a
             // truncation.
-            Text(verbatim: "Pro")
-                .font(.hanken(13, .medium))
-                .foregroundColor(theme.mut)
+            //
+            // The wordmark, not the word: caps at 12pt / 600 with .16em of tracking
+            // are what the handoff calls the premium work — the spacing does it, so
+            // nothing is spent on a crown, a gradient or the accent. Caps are safe to
+            // set verbatim in all ten locales for the same reason the word was, and
+            // the spoken label below is what keeps a screen reader from spelling the
+            // three letters out.
+            Text(verbatim: "PRO")
+                .font(.hanken(12, .semibold))
+                // Plain `tracking`, not `overlineTracking`: that modifier drops the
+                // spacing in Arabic and Korean because it exists for text those
+                // locales actually set in their own script, and this is three Latin
+                // glyphs everywhere. The badge in the plan editor reaches for the flat
+                // modifier for the same reason, though at a quarter of this value —
+                // it is a badge inside a row of text, not a mark. The tracking trails
+                // the last glyph exactly as the letter spacing does in the handoff's
+                // own render, so the two agree.
+                .tracking(12 * 0.16)
+                // `ink` on a light fill, and that is the whole contrast fix. Measured
+                // on the running build the outlined label sat at 2.76:1 against the
+                // backdrop — under the 3:1 a control owes, and paler than the caption
+                // beside it: the door you pay through, drawn in the colour of a
+                // footnote. On `surfaceQuiet` the mark reads at 12.2:1 light and
+                // 13.7:1 dark — clear of the threshold rather than balanced on it, and
+                // above the ~9 the handoff predicted. No new shade enters the header
+                // either: the fill is a system rank, drawn for the reversible-action
+                // surfaces of the consequence sheets as much as for this control,
+                // which is why it lives in the theme. Today this is its only caller.
+                .foregroundColor(theme.ink)
                 .lineLimit(1)
                 .minimumScaleFactor(0.85)
-                // 10pt, not the 13 of the plan pill: the whole capsule has to stay
-                // within 44.5pt at the xxLarge ceiling, which is what keeps the
-                // header whole in the tightest measured frame (fr, 375pt).
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
-                .overlay(Capsule().stroke(theme.iconStroke, lineWidth: 1))
-                // The outline stays its own height and the target becomes 44. The
-                // shape is a rectangle, not the capsule it is drawn as, and unlike
-                // the streak badge — that one is wide enough that a capsule target
-                // costs nothing, while this one is barely wider than it is tall, so
-                // capsule corners would eat most of what the 44 was for. Its
-                // neighbour below does the same, and the 8pt row spacing keeps the
-                // two rectangles apart.
+                // A real capsule of the row's own height, and the *pinning* is as much
+                // of the fix as the fill. The label used to scale with the text size
+                // while both neighbours — the 34pt info circle and the 34pt streak
+                // pill — did not, so at the xxLarge ceiling the padding grew the
+                // outline to 44×37 (measured) against a 34×34 circle: the emptiest
+                // control in the row also the largest, which reads as a placeholder.
+                // Below the ceiling it was 39.5×33, a capsule with 6.5pt of straight
+                // run between its two end caps — the pinched lozenge the wiki calls
+                // out, neither circle nor pill.
+                //
+                // The width is not the wash the handoff expected, and its arithmetic
+                // does not survive contact with this file: it buys the mark back by
+                // dropping a 1pt border and taking the side padding 13 → 11, but the
+                // padding here was 10, and the border was an `.overlay`, which costs
+                // no layout width at all. Nothing was returned and 2pt were spent.
+                // Measured on the 375pt frame the control goes 39.5 → 49pt at the
+                // default text size and 44 → 54.5pt at the xxLarge ceiling.
+                //
+                // Affordable anyway, and measured rather than assumed — the row has
+                // been on its edge since IF-18. In the tightest state that can be
+                // reached (French, the largest type, a two-digit streak beside a 14:10
+                // plan) the row lands on the same rung of the ladder as before, with
+                // 55.5pt of slack left between the plan capsule and the cluster, down
+                // from 64.5. Nothing gave way that had not given way already.
+                //
+                // The height is clamped, not merely floored, which is safe while
+                // `AppFlowView` caps dynamic type at xxLarge: the mark's line box is
+                // well inside 34 there. Raising that ceiling is what would need this
+                // looked at again.
+                .padding(.horizontal, 11)
+                .frame(height: 34)
+                .background(Capsule().fill(theme.surfaceQuiet))
+                // The fill stays its own height and the target becomes 44. The shape
+                // is a rectangle, not the capsule it is drawn as, and unlike the
+                // streak badge — that one is wide enough that a capsule target costs
+                // nothing, while this one is barely wider than it is tall, so capsule
+                // corners would eat most of what the 44 was for. Its neighbour below
+                // does the same, and the 8pt row spacing keeps the two rectangles
+                // apart.
                 .frame(height: 44)
                 .contentShape(Rectangle())
         }

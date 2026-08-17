@@ -27,6 +27,14 @@ struct ThemeTokens {
     let secLine: Color
     let iconCircle: Color
     let iconStroke: Color
+    /// The quiet fill — the material the handoff gives to "this has weight, and it
+    /// is not an action". A rank of its own rather than a reuse of `secBg` or
+    /// `iconCircle`: those two are white-on-white and a green wash, and neither
+    /// carries `ink` at the contrast this rank owes. The Pro control in the header is
+    /// its first caller; the reversible-action surfaces of the consequence sheets are
+    /// drawn on it too and land next, which is why it is a token and not a colour
+    /// spelled out inside one view.
+    let surfaceQuiet: Color
     let sheetBg: Color
     let segTrack: Color
     let segActive: Color
@@ -55,6 +63,7 @@ struct ThemeTokens {
         secLine: Color(.sRGB, red: 78/255, green: 90/255, blue: 70/255, opacity: 0.18),
         iconCircle: Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.10),
         iconStroke: Color(hex: "#8C887E"),
+        surfaceQuiet: Color(hex: "#EFEDE6"),
         sheetBg: Color(hex: "#FCFBF7"),
         segTrack: Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.10),
         segActive: Color(hex: "#FFFFFF"),
@@ -80,6 +89,7 @@ struct ThemeTokens {
         secLine: .whiteAlpha(0.16),
         iconCircle: .whiteAlpha(0.07),
         iconStroke: Color(hex: "#9CA0AA"),
+        surfaceQuiet: Color(hex: "#23252B"),
         sheetBg: Color(hex: "#16171C"),
         segTrack: .whiteAlpha(0.06),
         segActive: .whiteAlpha(0.14),
