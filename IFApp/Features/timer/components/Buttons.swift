@@ -19,6 +19,7 @@ struct PrimaryButton: View {
     let title: String
     let theme: ThemeTokens
     var cornerRadius: CGFloat = 15
+    var height: CGFloat = 52
     let action: () -> Void
 
     var body: some View {
@@ -30,7 +31,7 @@ struct PrimaryButton: View {
                 .minimumScaleFactor(0.7)
                 .padding(.horizontal, labelInset)
                 .frame(maxWidth: .infinity)
-                .frame(height: 52)
+                .frame(height: height)
                 .background(RoundedRectangle(cornerRadius: cornerRadius).fill(theme.primaryButtonBg))
                 .shadow(color: theme.buttonShadow, radius: 14, x: 0, y: 8)
         }

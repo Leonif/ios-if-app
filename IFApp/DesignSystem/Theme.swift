@@ -188,6 +188,40 @@ struct ThemeTokens {
         isDark ? phase.mix(.white, 0.38) : phase.mix(Color(hex: "#2A2A26"), 0.34)
     }
 
+    // MARK: Last-meal scale
+
+    /// Ordinary snap-step ticks on the last-meal ribbon.
+    var scaleTickMinor: Color {
+        isDark ? .whiteAlpha(0.16) : Color(.sRGB, red: 78/255, green: 90/255, blue: 70/255, opacity: 0.22)
+    }
+
+    /// Hour and day ticks — the ones the eye counts by.
+    var scaleTickMajor: Color {
+        isDark ? .whiteAlpha(0.34) : Color(.sRGB, red: 78/255, green: 90/255, blue: 70/255, opacity: 0.42)
+    }
+
+    /// The midnight rule: the only calendar mark on an otherwise relative scale.
+    var scaleTickDayBreak: Color {
+        isDark
+            ? Color(.sRGB, red: 133/255, green: 185/255, blue: 124/255, opacity: 0.55)
+            : Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.50)
+    }
+
+    /// Selected quick-chip fill.
+    var chipSelectedBg: Color {
+        isDark
+            ? Color(.sRGB, red: 133/255, green: 185/255, blue: 124/255, opacity: 0.16)
+            : Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.14)
+    }
+
+    /// Selected quick-chip border. Fill + border weight + text color together, so the
+    /// selection survives color blindness.
+    var chipSelectedBorder: Color {
+        isDark
+            ? Color(.sRGB, red: 133/255, green: 185/255, blue: 124/255, opacity: 0.48)
+            : Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.45)
+    }
+
     /// Next-phase chip colors (dot/text/bg/border) derived from the named phase color.
     func chip(for next: Color) -> (dot: Color, text: Color, bg: Color, border: Color) {
         if isDark {

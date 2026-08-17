@@ -28,7 +28,7 @@ final class AnalyticsEventTests: XCTestCase {
         .eatingWindowStarted,
         .fastChained,
         .timeAdjusted,
-        .lastMealLogged(backdated: true, minutesAgo: 7),
+        .lastMealLogged(backdated: true, minutesAgo: 7, inputMethod: "ribbon"),
         .sourcesOpened,
         .historyOpened(source: "streak_badge"),
         .historyRecordDeleted,
@@ -51,10 +51,11 @@ final class AnalyticsEventTests: XCTestCase {
     ///
     /// `duration_seconds` is the raw quantity behind a custom *metric* (an average
     /// fast length), and a metric reads the numeric field — text would break it.
-    /// `backdated` is broken at the source (the meal sheet seeds `ateMin` on open,
-    /// so the flag is always `true` after the first open); leaving it unreadable is
-    /// deliberate, so that it is not registered and mistaken for a working split.
-    private static let numericOnPurpose: Set<String> = ["duration_seconds", "backdated"]
+    /// `backdated` used to be the second entry here, because the meal sheet seeded
+    /// `ateMin` on open and the flag was therefore always `true`. The last-meal
+    /// ribbon removed the seeding, so the flag became honest and became a string
+    /// with it — there is nothing left in this set but the metric.
+    private static let numericOnPurpose: Set<String> = ["duration_seconds"]
 
     func testEveryBreakdownParameterIsAString() {
         for event in Self.catalog {
@@ -87,7 +88,7 @@ final class AnalyticsEventTests: XCTestCase {
             "0045"
         )
         XCTAssertEqual(
-            AnalyticsEvent.lastMealLogged(backdated: true, minutesAgo: 7)
+            AnalyticsEvent.lastMealLogged(backdated: true, minutesAgo: 7, inputMethod: "ribbon")
                 .parameters["minutes_ago"] as? String, "0007"
         )
         XCTAssertEqual(

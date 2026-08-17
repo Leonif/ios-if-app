@@ -61,8 +61,9 @@ enum AnalyticsEvent {
     /// User nudged the elapsed time (manual ± correction).
     case timeAdjusted
     /// User confirmed the Last-meal picker. `backdated` = started in the past
-    /// (logged a real meal time) vs fresh "now"; `minutesAgo` = how far back.
-    case lastMealLogged(backdated: Bool, minutesAgo: Int)
+    /// (logged a real meal time) vs fresh "now"; `minutesAgo` = how far back;
+    /// `inputMethod` = which control produced the answer (`MealInputMethod`).
+    case lastMealLogged(backdated: Bool, minutesAgo: Int, inputMethod: String)
     /// User opened the scientific Sources screen.
     case sourcesOpened
     /// User opened the fasting history screen. `source` = which entry point
@@ -175,15 +176,22 @@ enum AnalyticsEvent {
             ]
         case let .fastReset(elapsedMinutes):
             return ["elapsed_minutes": code(elapsedMinutes, width: 4)]
-        case let .lastMealLogged(backdated, minutesAgo):
+        case let .lastMealLogged(backdated, minutesAgo, inputMethod):
             return [
-                // Stays a number, and that is the point: the flag is broken at the
-                // source (the meal sheet seeds `ateMin` on open, so after the first
-                // open it is always `true`), and a readable dimension of one value
-                // would look like a metric. It becomes a string when the seeding is
-                // fixed — not before.
-                "backdated": backdated,
+                // A string as of the meal-ribbon release, and the condition for that
+                // was named when it was left a number: the flag was broken at the
+                // source, because the sheet seeded `ateMin` on open and so read
+                // `true` after the first open regardless. The ribbon does not seed —
+                // `MealState` holds a distance and starts at zero — so the flag now
+                // says what it claims and can be registered as a dimension.
+                "backdated": backdated ? "true" : "false",
                 "minutes_ago": code(minutesAgo, width: 4),
+                // Which control produced the answer: chip / ribbon / exact, plus
+                // untouched and seeded for the two cases that are none of the three.
+                // The whole point of the ribbon is that it is reachable at any
+                // distance, and this is the only parameter that can show whether it
+                // is actually reached for — so it is a dimension and must be text.
+                "input_method": inputMethod,
             ]
         case let .themeActive(dark):
             return ["theme": dark ? "dark" : "light"]

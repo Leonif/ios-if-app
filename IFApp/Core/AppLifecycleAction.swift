@@ -50,7 +50,7 @@ enum AppLifecycleAction: Action {
     /// scheduled on `.started` was rejected while permission did not yet exist.
     /// Not a funnel event.
     case pushAuthorizationResolved
-    case lastMealLogged(backdated: Bool, minutesAgo: Int)
+    case lastMealLogged(backdated: Bool, minutesAgo: Int, inputMethod: String)
     /// A fast was started from the window-closed screen — the chain held.
     case fastChained
     /// The app is being viewed in a given appearance. `dark` = system dark mode
