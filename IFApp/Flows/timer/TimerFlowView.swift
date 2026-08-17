@@ -41,9 +41,6 @@ struct TimerScreenProps: Equatable {
     /// Whether the lock shows on the custom row, and whether the offer is up.
     let isPro: Bool
     let offerOpen: Bool
-    /// Whether the selected plan may be confirmed as it stands — projected from
-    /// `AppState`, not re-derived here, so the editor and the next start agree.
-    let selectedPlanAllowed: Bool
     /// The one-time notice on screen, and the one still waiting for a neutral moment.
     let notice: ProNotice?
     let revocationPending: Bool
@@ -74,7 +71,6 @@ struct TimerScreenProps: Equatable {
         resetConfirmOpen = state.uiState.resetConfirmOpen
         isPro = state.proState.isPro
         offerOpen = state.proState.isOfferOpen
-        selectedPlanAllowed = state.selectedPlanAllowed
         notice = state.proState.notice
         revocationPending = state.proState.revocationPending
         autoOfferPending = state.proState.autoOfferPending
@@ -555,16 +551,19 @@ struct TimerFlowView: View {
         }
     }
 
-    /// Confirming the plan. A custom length without Pro is where the lock actually
-    /// bites — the picker turned freely up to here. The editor deliberately stays
-    /// open behind the offer: someone who came to change their plan should not be
-    /// returned to the timer to start over.
-    private func confirmPlan() {
-        if !props.selectedPlanAllowed {
+    /// Confirming the plan, with the length the editor is showing. A custom length
+    /// without Pro is where the lock actually bites — the picker turned freely up to
+    /// here, and this is the first and only point at which what it turned to is
+    /// written into the store. The editor deliberately stays open behind the offer:
+    /// someone who came to change their plan should not be returned to the timer to
+    /// start over, and the draft it is holding survives with it.
+    private func confirmPlan(hours: Int) {
+        guard Plan(hours: hours).allowed(isPro: props.isPro) else {
             store.dispatch(ProAction.offerOpened(trigger: .planCustom))
-        } else {
-            store.dispatch(UIAction.planEditorClosed)
+            return
         }
+        store.dispatch(PlanAction.selected(hours: hours))
+        store.dispatch(UIAction.planEditorClosed)
     }
 
     private func presentRevocationIfNeutral() {
@@ -585,7 +584,6 @@ struct TimerFlowView: View {
             PlanEditorSheet(
                 plan: props.plan,
                 isPro: props.isPro,
-                selectedPlanAllowed: props.selectedPlanAllowed,
                 theme: theme,
                 onSelect: { store.dispatch(PlanAction.selected(hours: $0)) },
                 onDone: confirmPlan,

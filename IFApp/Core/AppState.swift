@@ -29,15 +29,18 @@ struct AppState: Equatable, Sendable {
     /// copy of that. Screens read this; nobody builds a `StreakStatus` by hand.
     var streak: StreakStatus { timerState.streak(ownsFreeze: proState.isPro) }
 
-    /// Whether the plan the user has *selected* may be used under the entitlement they
-    /// currently hold: the four presets are free, any other length is Pro's.
+    /// Whether the plan **in the store** may be used under the entitlement now held:
+    /// the four presets are free, any other length is Pro's.
     ///
-    /// One definition because two places act on this in opposite directions — the
-    /// editor opens the offer when it is false, the next fast falls back to the
-    /// nearest preset — and both would still compile if only one of them moved. The
-    /// gate drifting apart is silent: the plan gets confirmed without an offer, and
-    /// then the start quietly runs to a different goal.
+    /// The rule itself is `Plan.allowed(isPro:)`; this is only the question asked
+    /// about the stored plan, and its one consumer is the fallback in
+    /// `StartFastThunk` at the next start. The editor deliberately does not read it:
+    /// the length on the wheel is a draft inside the sheet and never reaches the
+    /// store unless the same rule lets it, so a projection off state would always
+    /// answer about the previous plan. Both ask the one definition, so it cannot drift —
+    /// and drifting here is silent: a plan confirmed without an offer, and then a
+    /// start that quietly runs to a different goal.
     var selectedPlanAllowed: Bool {
-        proState.isPro || planState.plan.isPreset
+        planState.plan.allowed(isPro: proState.isPro)
     }
 }

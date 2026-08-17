@@ -94,8 +94,13 @@ enum AnalyticsEvent {
     /// `current_plan` user property, which carries the same value persistently.
     case planSelected(plan: String, goalHours: Int)
     /// The plan editor was closed, carrying whatever plan the user settled on —
-    /// fired even when nothing was touched. `plan_selected` says what was tried
-    /// on, this says what was kept, so the plan mix counts off this one.
+    /// fired even when nothing was touched, so the plan mix counts off this one.
+    ///
+    /// It no longer contrasts with `plan_selected` as "tried on" against "kept":
+    /// since PW-U1 the wheel turns a draft inside the sheet and writes nothing, so
+    /// a length that was spun to and abandoned produces neither event. Both now fire
+    /// on a plan that got through the gate, and the series before 1.5.1 counted the
+    /// wheel's passing values as well.
     case planConfirmed(plan: String, goalHours: Int)
     /// The offer screen was shown. `trigger` = which entry point led here
     /// ("fast_finished" / "plan_custom" / "streak_break" / "manual"). At 20-35 shows a

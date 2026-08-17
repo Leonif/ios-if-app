@@ -53,6 +53,17 @@ struct Plan: Equatable, Hashable, Sendable {
     /// Whether this is one of the four lengths that are free for everyone.
     var isPreset: Bool { Plan.presets.contains(self) }
 
+    /// Whether a plan of this length may be confirmed under the entitlement held.
+    ///
+    /// The single definition of the gate, written on the plan rather than on
+    /// `AppState`, because the two questions asked of it are about two different
+    /// plans: the editor asks about the length now on the wheel, which is
+    /// deliberately not in the store until it passes here, and
+    /// `AppState.selectedPlanAllowed` asks about the length that is in the store
+    /// (the next start reads it through that projection). A rule hosted on state
+    /// could only ever answer the second.
+    func allowed(isPro: Bool) -> Bool { isPro || isPreset }
+
     /// The value that goes into GA4 (`plan_selected` / `plan_confirmed` /
     /// `current_plan`). Presets keep their ratio so the existing breakdown survives;
     /// custom goals collapse into `custom:17` rather than spraying the dimension with
