@@ -33,30 +33,6 @@ private struct Stat: View {
     }
 }
 
-/// The text link into the history that two footer cards carry: "Saved to your
-/// history" once a fast is done, "Last fast · 16h 24m" while the window is open.
-/// The chevron is the whole navigation affordance.
-private struct HistoryLink: View {
-    let title: String
-    let theme: ThemeTokens
-    let identifier: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 5) {
-                Text(title)
-                Image(systemName: "chevron.forward")
-                    .font(.system(size: 9, weight: .semibold))
-            }
-            .font(.hanken(13.5, .semibold))
-            .foregroundColor(theme.deep)
-        }
-        .buttonStyle(.pressable)
-        .accessibilityIdentifier(identifier)
-    }
-}
-
 private struct CardBackground: ViewModifier {
     let theme: ThemeTokens
     func body(content: Content) -> some View {
@@ -182,9 +158,23 @@ struct EatingOverFooterCard: View {
     }
 }
 
+/// The result card, mode C of the consequence genre: pinned above the home indicator,
+/// outside the scroll. Every point it grows is taken from the scrolling middle, so the
+/// budget is one sentence and nothing else may be added to it.
+///
+/// Two things changed against 1.5.0 and both are about rank. The card now *says* what
+/// the two exits cost, in a slot that carries exactly one sentence — never none, never
+/// two — and the undo is a control on the quiet material instead of the quietest text
+/// on the card. The history row left the pinned zone altogether (it is drawn under the
+/// phase scale in the scrolling middle): a navigation with no consequence was reading
+/// as the final step of the stack, directly under the only reversible action.
 struct CompleteFooterCard: View {
     let fasted: String          // "16h 02m"
     let windowOpens: String     // "Now"
+    /// The single sentence of the mode-C slot, already arbitrated by the path the fast
+    /// ended on. The card does not choose it: which of the two is true is a fact about
+    /// the fast, not about the footer.
+    let consequence: String
     let theme: ThemeTokens
     let onResume: () -> Void
     /// Back to idle without opening the window. Named for what it does — the button
@@ -192,7 +182,6 @@ struct CompleteFooterCard: View {
     /// already written to the history.
     let onSkip: () -> Void
     let onStartEating: () -> Void
-    let onHistory: () -> Void
 
     var body: some View {
         VStack(spacing: 14) {
@@ -202,12 +191,19 @@ struct CompleteFooterCard: View {
                 Stat(overline: strings.Footer.windowOpens, value: windowOpens, valueColor: theme.ink, theme: theme)
             }
 
-            // The one moment the user is emotionally ready to look back: the fast
-            // they just finished has landed somewhere.
-            HistoryLink(title: strings.History.savedToHistory, theme: theme,
-                        identifier: "timer.savedToHistory", action: onHistory)
+            ConsequenceInset(text: consequence, theme: theme, identifier: "complete.consequence")
 
-            resumeAction
+            // The undo, on the same quiet material as the sentence that explains why it
+            // exists: the warning and the way out are visibly one family. It is 50pt
+            // tall against the 18pt of text it replaces — the only reversible control on
+            // the card used to be the one thing on it below the HIG minimum, and rank
+            // that rests on grey does not survive Arabic, where grey semibold reads
+            // stronger than in Latin. Fill and height are locale-independent.
+            //
+            // No chevron — it goes nowhere. No lead-in ("Ended by mistake?"): that frames
+            // the tap as a confession, and undo should read as an ordinary thing to want.
+            QuietActionButton(title: strings.Complete.resumeFast, theme: theme, action: onResume)
+                .accessibilityIdentifier("complete.resumeFast")
 
             HStack(spacing: 12) {
                 SecondaryButton(title: strings.Footer.declineWindow, theme: theme, minWidth: 110, action: onSkip)
@@ -220,42 +216,5 @@ struct CompleteFooterCard: View {
             }
         }
         .modifier(CardBackground(theme: theme))
-    }
-
-    /// The undo, on a line of its own.
-    ///
-    /// A line of its own is a measurement, not a preference: status and action side by
-    /// side need 313.7pt of the slot's 295pt in English at xxLarge, and 168% of it in
-    /// German. Stacked, the worst locale uses 72.3%.
-    ///
-    /// No chevron — it goes nowhere. No lead-in ("Ended by mistake?"): that frames the
-    /// tap as a confession, and undo should read as an ordinary thing to want.
-    /// `.semibold` at the least: Arabic glyphs read smaller than Latin at the same
-    /// point size.
-    ///
-    /// The 44pt slot is kept, but it belongs to the row, not to the button: the frame is
-    /// on the container, so the card's rhythm is unchanged while the tappable region is
-    /// the glyph box and nothing more. (The frame has to sit on a container — put on the
-    /// Button, even outside `buttonStyle`, it becomes the button's hit region again.)
-    ///
-    /// It used to be the button's own label frame, which left ~13pt of invisible hot area
-    /// above the text, directly under the history link, whose own region stops at its
-    /// glyphs. A tap a few points low on "Saved to your history" landed on the undo
-    /// instead and silently took the just-finished fast back out of the history. For an
-    /// action that destructive, a target that is exactly what the user can see beats a
-    /// target that is comfortably large.
-    private var resumeAction: some View {
-        VStack(spacing: 0) {
-            Button(action: onResume) {
-                Text(strings.Complete.resumeFast)
-                    .font(.hanken(13.5, .semibold))
-                    .foregroundColor(theme.sec)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .buttonStyle(.pressable)
-            .accessibilityIdentifier("complete.resumeFast")
-        }
-        .frame(maxWidth: .infinity, minHeight: 44)
     }
 }
