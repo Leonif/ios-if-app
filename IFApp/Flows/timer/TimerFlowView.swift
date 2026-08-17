@@ -38,6 +38,10 @@ struct TimerScreenProps: Equatable {
     let mealPickerOpen: Bool
     let streakMilestoneOpen: Bool
     let resetConfirmOpen: Bool
+    /// The end-of-fast correction sheet, whole. Unlike the other sheets it is not a
+    /// flag: which of its four cards is on screen, and every label on them, is
+    /// decided from this one value.
+    let endFast: EndFastState
     /// Whether the lock shows on the custom row, and whether the offer is up.
     let isPro: Bool
     /// Whether the header's Pro entry has anyone to sell to. `isPro` cannot answer
@@ -75,6 +79,7 @@ struct TimerScreenProps: Equatable {
         mealPickerOpen = state.uiState.mealPickerOpen
         streakMilestoneOpen = state.uiState.streakMilestoneOpen
         resetConfirmOpen = state.uiState.resetConfirmOpen
+        endFast = state.endFastState
         isPro = state.proState.isPro
         isVerifiedFree = state.proState.isVerifiedFree
         offerOpen = state.proState.isOfferOpen
@@ -145,6 +150,9 @@ struct TimerFlowView: View {
     @State private var props: TimerScreenProps
     @State private var showSources = false
     @State private var showHistory = false
+    /// The record History should open on — the fast a refusal named, so the person
+    /// sent there to delete it does not have to hunt for it.
+    @State private var historyFocus: UUID?
     /// Which entry point opened the history: it names the analytics source, and the
     /// eating-window one also decides that the record just closed opens with it.
     @State private var historySource: HistoryEntrySource = .streakBadge
@@ -213,7 +221,7 @@ struct TimerFlowView: View {
         // History is a push, not a sheet: it is deeper into the app, not a dialog
         // over it.
         .navigationDestination(isPresented: $showHistory) {
-            HistoryFlowView(store: store, source: historySource,
+            HistoryFlowView(store: store, source: historySource, focusRecordID: historyFocus,
                             onStartFast: { store.dispatch(StartFastThunk()) })
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -454,7 +462,7 @@ struct TimerFlowView: View {
                 goalLabel: strings.Duration.goalHours(Int(props.goalHours)),
                 goalAt: clockTime(props.fastStartTimestamp + props.goalHours * 3600),
                 theme: theme,
-                onEndFast: { store.dispatch(StopFastThunk()) }
+                onEndFast: { store.dispatch(OpenEndFastThunk()) }
             )
         case .goalReached:
             GoalReachedFooterCard(
@@ -463,7 +471,7 @@ struct TimerFlowView: View {
                 over: "+" + overtimeShort(elapsed - props.goalHours * 3600),
                 theme: theme,
                 onReset: { store.dispatch(UIAction.resetConfirmOpened) },
-                onEndFast: { store.dispatch(StopFastThunk()) }
+                onEndFast: { store.dispatch(OpenEndFastThunk()) }
             )
         case .complete:
             CompleteFooterCard(
@@ -516,6 +524,7 @@ struct TimerFlowView: View {
             && !props.mealPickerOpen
             && !props.streakMilestoneOpen
             && !props.resetConfirmOpen
+            && !props.endFast.isOpen
     }
 
     /// True when the entitlement notice is due and the screen is a place to say it.
@@ -608,8 +617,9 @@ struct TimerFlowView: View {
         store.dispatch(ProAction.noticeShown(.entitlementRevoked))
     }
 
-    private func openHistory(from source: HistoryEntrySource) {
+    private func openHistory(from source: HistoryEntrySource, focusing recordID: UUID? = nil) {
         historySource = source
+        historyFocus = recordID
         showHistory = true
     }
 
@@ -640,6 +650,27 @@ struct TimerFlowView: View {
                 onTimeStep: { store.dispatch(MealAction.timeStepped(by: $0)) },
                 onConfirm: { store.dispatch(ConfirmLastMealThunk()) },
                 onClose: { store.dispatch(UIAction.mealPickerClosed) }
+            )
+            .zIndex(1)
+        }
+        if props.endFast.isOpen {
+            EndFastSheet(
+                state: props.endFast,
+                now: Clock.now().timeIntervalSince1970,
+                theme: theme,
+                onChip: { store.dispatch(EndFastChipThunk(offset: $0)) },
+                onStep: { store.dispatch(EndFastStepThunk(minutes: $0)) },
+                onConfirm: { store.dispatch(ConfirmEndFastThunk()) },
+                // The safe action is the named form of closing the sheet, so it does
+                // exactly what the scrim does and nothing else: no record, no streak
+                // change, the fast carries on from the same start.
+                onKeepFast: { store.dispatch(EndFastAction.closed) },
+                onPickAnotherTime: { store.dispatch(EndFastAction.refusalWithdrawn) },
+                onOpenConflict: { record in
+                    store.dispatch(EndFastAction.closed)
+                    openHistory(from: .endFastOverlap, focusing: record.id)
+                },
+                onClose: { store.dispatch(EndFastAction.closed) }
             )
             .zIndex(1)
         }

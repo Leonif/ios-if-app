@@ -154,6 +154,69 @@ enum strings {
         static var resumeFast: String { String(localized: "Resume this fast") }
     }
 
+    /// The end-of-fast correction sheet. Its own namespace rather than more of
+    /// `Sheet`, because the two sheets ask about opposite ends of the same fast and
+    /// the distinction is carried by a single adverb in English ("last") that other
+    /// languages have to spell out on the verb — a shared key would be true in
+    /// English and undifferentiated everywhere else.
+    enum EndFast {
+        /// The header of the picker states. Deliberately not `Sheet.whenDidYouEat`
+        /// ("When did you last eat?"): at this moment the meal that ended the fast
+        /// *is* the last one, so the old line is not false — it just stops
+        /// distinguishing the two questions.
+        static var title: String { String(localized: "When did you eat?") }
+        static var hint: String { String(localized: "Your eating window starts from this moment.") }
+
+        /// The near-goal header. It asks rather than states, because at this distance
+        /// from the goal the question is genuinely open.
+        static var nearGoalTitle: String { String(localized: "End this fast?") }
+
+        /// The consequence line, in whole minutes and never a duration format. Arabic
+        /// agrees the numeral across six CLDR classes and four of them are reachable
+        /// under a 15-minute threshold, so "0 h 10" is not expressible there at all.
+        /// The subject is the time, never the person: no encouragement in this line,
+        /// in any locale.
+        static func minutesLeft(_ minutes: Int) -> String {
+            String(localized: "\(minutes) minutes left to your goal", locale: .latinDigits)
+        }
+
+        /// The overtime line. The subject is the app's own instrument — the timer —
+        /// and never the person's fast: the line shows precisely when the app is
+        /// *assuming* they have already eaten, so asserting their fast is running
+        /// asserts something it does not know.
+        static func timerRanPast(_ duration: String) -> String {
+            String(format: String(localized: "The timer has run %@ past your goal"), duration)
+        }
+
+        static var fastEnds: String { String(localized: "Fast ends") }
+        static var endNow: String { String(localized: "End now") }
+        static var setTheTime: String { String(localized: "Set the time") }
+        static var chip1Hour: String { String(localized: "1 h ago") }
+
+        static func chipMinutesAgo(_ minutes: Int) -> String {
+            String(localized: "\(minutes) min ago", locale: .latinDigits)
+        }
+
+        /// "Yesterday · goal end" — the caption under the exact-time value when it is
+        /// still sitting where the sheet put it.
+        static func goalEndCaption(_ day: String) -> String {
+            String(format: String(localized: "%@ · goal end"), day)
+        }
+
+        /// The refusal's own header. It does not reuse the picker's: over a body that
+        /// is no longer a picker, "When did you eat?" describes nothing on screen.
+        static var refusalTitle: String { String(localized: "That time is taken") }
+
+        /// The refusal names the fast in the way — a refusal that does not say what
+        /// is blocking it is the silent "no" this state replaces.
+        static func refusalReason(_ span: String) -> String {
+            String(format: String(localized: "This overlaps a fast you already saved (%@). Pick another time, or open that fast and delete it."), span)
+        }
+
+        static var pickAnotherTime: String { String(localized: "Pick another time") }
+        static var openThatFast: String { String(localized: "Open that fast") }
+    }
+
     enum Reset {
         static var confirmTitle: String { String(localized: "Reset this fast?") }
         static var confirmMessage: String { String(localized: "This discards the current fast and returns to the start.") }

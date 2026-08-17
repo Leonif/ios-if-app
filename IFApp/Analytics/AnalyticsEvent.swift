@@ -38,7 +38,7 @@ enum AnalyticsEvent {
     /// phase the fast was in, as a stable code (`fed`/`sugar`/`fat`/`ketosis`/
     /// `autophagy`) — never the displayed label, which differs per locale and makes
     /// the dimension impossible to group.
-    case fastStopped(durationSeconds: Int, completed: Bool, stage: String)
+    case fastStopped(durationSeconds: Int, completed: Bool, stage: String, backdatedMinutes: Int)
     /// The user took an ending back from the result screen. No parameters: the one
     /// question it answers is whether the undo earns its place, and that is a count.
     ///
@@ -158,7 +158,7 @@ enum AnalyticsEvent {
             return ["goal_hours": code(Int(goalHours.rounded()), width: 2)]
         case let .goalReached(goalHours):
             return ["goal_hours": code(Int(goalHours.rounded()), width: 2)]
-        case let .fastStopped(durationSeconds, completed, stage):
+        case let .fastStopped(durationSeconds, completed, stage, backdatedMinutes):
             return [
                 // The only number left on purpose: `duration_seconds` is not a
                 // breakdown, it is the raw quantity a custom *metric* would average.
@@ -166,6 +166,12 @@ enum AnalyticsEvent {
                 "duration_hours": code(durationSeconds / 3600, width: 3),
                 "completed": completed ? "true" : "false",
                 "stage": stage,
+                // How far behind the tap the ending was placed. Read as a
+                // distribution: zero is "confirmed as it stood", minutes are a
+                // correction, hours are someone who forgot to stop — the population
+                // the correction sheet exists for, and the one the old `fast_stopped`
+                // silently counted as having fasted that long.
+                "end_backdated_minutes": code(backdatedMinutes, width: 4),
             ]
         case let .fastReset(elapsedMinutes):
             return ["elapsed_minutes": code(elapsedMinutes, width: 4)]

@@ -21,7 +21,7 @@ final class AnalyticsEventTests: XCTestCase {
     private static let catalog: [AnalyticsEvent] = [
         .appOpened,
         .fastStarted(goalHours: 16),
-        .fastStopped(durationSeconds: 57_600, completed: true, stage: "ketosis"),
+        .fastStopped(durationSeconds: 57_600, completed: true, stage: "ketosis", backdatedMinutes: 0),
         .fastStopUndone,
         .goalReached(goalHours: 8),
         .fastReset(elapsedMinutes: 45),
@@ -94,11 +94,12 @@ final class AnalyticsEventTests: XCTestCase {
             AnalyticsEvent.streakMilestone(days: 7).parameters["days"] as? String, "07"
         )
         let stopped = AnalyticsEvent.fastStopped(
-            durationSeconds: 57_600, completed: true, stage: "ketosis"
+            durationSeconds: 57_600, completed: true, stage: "ketosis", backdatedMinutes: 150
         ).parameters
         XCTAssertEqual(stopped["duration_hours"] as? String, "016")
         XCTAssertEqual(stopped["completed"] as? String, "true")
         XCTAssertEqual(stopped["duration_seconds"] as? Int, 57_600)
+        XCTAssertEqual(stopped["end_backdated_minutes"] as? String, "0150")
     }
 
     /// Every event name in the catalog appears exactly once, so a case added to the
