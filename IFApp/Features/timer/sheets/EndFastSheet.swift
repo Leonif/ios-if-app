@@ -208,6 +208,10 @@ struct EndFastSheet: View {
                         .background(RoundedRectangle(cornerRadius: 12).fill(theme.surfaceQuiet))
                 }
                 .buttonStyle(.pressable)
+                // Keyed by position for the same reason the row is: the labels are
+                // translated into ten languages and two of them can coincide, so a
+                // flow that named a chip by its text would be naming a moving target.
+                .accessibilityIdentifier("endFast.chip.\(index)")
             }
         }
     }
