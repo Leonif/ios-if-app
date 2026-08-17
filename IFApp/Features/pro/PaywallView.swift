@@ -223,7 +223,7 @@ struct PaywallView: View {
                 // the button, at body size.
                 Text(strings.Pro.wedge)
                     .font(.hanken(17))
-                    .foregroundColor(theme.sec)
+                    .foregroundColor(wedgeColor)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(minHeight: 24, alignment: .leading)
                     .padding(.bottom, 8)
@@ -397,6 +397,17 @@ struct PaywallView: View {
         case .purchasing, .awaitingApproval: return theme.mut
         case .unverified: return theme.sec
         default: return theme.ink
+        }
+    }
+
+    /// The wedge dims with the price block rather than on its own ladder (PW-U4).
+    /// Left at `--secondary` it became the darkest thing on the screen in exactly the
+    /// states where the price above it is standing back — and the wedge is an
+    /// argument for the price, so it cannot outrank it.
+    private var wedgeColor: Color {
+        switch state {
+        case .purchasing, .awaitingApproval: return theme.mut
+        default: return theme.sec
         }
     }
 
