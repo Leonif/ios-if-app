@@ -58,6 +58,22 @@ struct ProState: Equatable, Sendable {
 
     var isPro: Bool { entitlement == .pro }
 
+    /// Whether this install may be *sold* to: the store answered, and it answered
+    /// `free`.
+    ///
+    /// Not the same question as `isPro`, and the difference is `unknown`. Gating goes
+    /// through `isPro`, so it locks on a guess — we never hand out Pro we have not
+    /// verified. Selling on a guess is the opposite error and costs more: the one
+    /// person `unknown` describes is often someone who already paid and merely moved
+    /// to a new phone, and every surface that sells would be telling him his purchase
+    /// is gone (edge 16 / PW-9).
+    ///
+    /// It has a name because two surfaces ask it: the offer that opens itself (T1',
+    /// below) and the permanent entry in the timer header. Written out at both, the
+    /// day the rule for `unknown` moves is the day one of them keeps the old one and
+    /// still compiles.
+    var isVerifiedFree: Bool { entitlement == .free }
+
     /// Whether the offer screen is up. Derived from the entry point rather than
     /// stored twice: the screen cannot be open without one, and cannot be closed
     /// while it still has one.
@@ -75,9 +91,9 @@ struct ProState: Equatable, Sendable {
     /// `autoOfferShown` — that is the whole mechanism by which a suppressed show is
     /// a postponement rather than a loss:
     ///
-    /// - `entitlement == .free` rather than `!isPro`: `unknown` locks like free but
-    ///   must never open the offer by itself (edge 16 / PW-9). The store may answer
-    ///   seconds later; by then this moment has passed and the offer moves on;
+    /// - `isVerifiedFree` rather than `!isPro`: `unknown` locks like free but must
+    ///   never open the offer by itself. The store may answer seconds later; by then
+    ///   this moment has passed and the offer moves on;
     /// - `product != nil`: no price means no offer to make. We do not open a screen
     ///   that cannot sell;
     /// - `phase == .idle`: an attempt already in flight (an Ask to Buy still out) is
@@ -86,7 +102,7 @@ struct ProState: Equatable, Sendable {
         autoOfferArmed
             && !autoOfferShown
             && !reviewPromptedThisSession
-            && entitlement == .free
+            && isVerifiedFree
             && product != nil
             && phase == .idle
             && !isOfferOpen

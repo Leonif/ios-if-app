@@ -192,6 +192,13 @@ struct PlanEditorSheet: View {
                 Text(verbatim: "PRO")
                     .font(.hanken(12, .semibold))
                     .tracking(12 * 0.04)
+                    // Caps is a textbook trigger for letter-by-letter speech, so the
+                    // badge said "피-알-오" rather than a product name. The render is
+                    // the accepted mockup and stays; only what it *says* is fixed, and
+                    // it now says what the header control says. Not hidden from
+                    // accessibility instead: this badge is the channel that survives
+                    // hints being switched off (see the confirm button below).
+                    .accessibilityLabel(strings.Pro.productName)
             }
             .foregroundColor(theme.deep)
             .padding(.leading, 9)

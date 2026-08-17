@@ -2,7 +2,8 @@
 //  TimerHeader.swift
 //  IFApp
 //
-//  Top row on every state: plan pill (opens plan editor) + settings circle.
+//  Top row on every state: plan pill (opens plan editor) + streak badge + the Pro
+//  entry + settings circle.
 //
 
 import SwiftUI
@@ -14,12 +15,41 @@ struct TimerHeader: View {
     let streak: Int
     /// Whether there is any finished fast to look at.
     let hasRecords: Bool
+    /// The permanent door into the offer. Whether it belongs on screen at all is
+    /// decided by the flow (a verified `free` entitlement, and not in the goal
+    /// moment) — the header only lays it out and gives it up first when the row
+    /// runs out of width.
+    let showsPro: Bool
     let theme: ThemeTokens
     let onEditPlan: () -> Void
     let onHistory: () -> Void
+    let onPro: () -> Void
     let onSettings: () -> Void
 
     var body: some View {
+        // The order things give way in, and it is a decision rather than a
+        // convenience: the plan name goes first (the ratio beside it already says
+        // what it says), then the Pro control leaves the row whole, and the streak
+        // badge yields nothing — not its word, not its presence. A badge stripped
+        // down to a bare ring with a chevron is a finding the wiki already has
+        // (F-3a); reproducing it at accessibility text sizes to keep a control that
+        // was just added would be fixing one thing by breaking its neighbour.
+        //
+        // Measured on whole rows rather than per control: a nested `ViewThatFits`
+        // inside the pill is measured with an unspecified width and so always
+        // reports its widest candidate, which would drop the Pro control *before*
+        // the plan name — the ladder upside down.
+        ViewThatFits(in: .horizontal) {
+            row(withPlanName: true, withPro: showsPro)
+            row(withPlanName: false, withPro: showsPro)
+            // Last rung. With `showsPro == false` this repeats the one above, which
+            // is what makes the ladder one list instead of two branches: a
+            // conditional inside `ViewThatFits` collapses into a single candidate.
+            row(withPlanName: false, withPro: false)
+        }
+    }
+
+    private func row(withPlanName: Bool, withPro: Bool) -> some View {
         HStack(spacing: 8) {
             Button(action: onEditPlan) {
                 // The plan name is context the ratio already carries: "16:8" plus the
@@ -29,13 +59,10 @@ struct TimerHeader: View {
                 // Fasten") all at once — the name steps aside rather than wrapping the
                 // pill onto a second line or shrinking to a size the ratio beside it
                 // contradicts. Measured per render, so a roomy header keeps the name.
-                ViewThatFits(in: .horizontal) {
-                    pill(withName: true)
-                    pill(withName: false)
-                }
-                .padding(.vertical, 7)
-                .padding(.horizontal, 13)
-                .background(Capsule().fill(theme.iconCircle))
+                pill(withName: withPlanName)
+                    .padding(.vertical, 7)
+                    .padding(.horizontal, 13)
+                    .background(Capsule().fill(theme.iconCircle))
             }
             .buttonStyle(.pressable)
             .accessibilityIdentifier("timer.plan")
@@ -51,6 +78,8 @@ struct TimerHeader: View {
                 StreakBadge(days: streak, theme: theme, onTap: onHistory)
             }
 
+            if withPro { proButton }
+
             // The sheet behind this is no longer a science note but the app's own
             // document — Pro, privacy, sources. `doc.text` promised a paper;
             // `info.circle` is the only glyph of the three considered that says
@@ -61,10 +90,69 @@ struct TimerHeader: View {
                     .foregroundColor(theme.iconStroke)
                     .frame(width: 34, height: 34)
                     .background(Circle().fill(theme.iconCircle))
+                    // The circle stays 34pt and the target becomes 44, the way the
+                    // streak badge already does it. Below the HIG minimum it got away
+                    // with it while its nearest neighbour was a Spacer away; with a
+                    // second small control right beside it, an occasional near miss
+                    // becomes a systematic one that lands on the wrong control (F-4).
+                    .frame(height: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.pressable)
             .accessibilityIdentifier("timer.sources")
         }
+    }
+
+    /// The permanent way into the offer, and deliberately furniture rather than a
+    /// shopfront: no icon, no gradient, and not the accent colour — the accent in this
+    /// app means "your progress" (the ring, the seal, the halo), and lending it to the
+    /// one commercial element would paint selling in the colour of achievement.
+    ///
+    /// An outline instead of a fill is the one thing that tells it apart from its
+    /// three neighbours, all of which are filled: two identical filled capsules at
+    /// either end of the row would read as a matched pair of controls of one class
+    /// (P-2).
+    private var proButton: some View {
+        Button(action: onPro) {
+            // `verbatim` is load-bearing, not style: handing `Text` a bare string
+            // literal takes the `LocalizedStringKey` path, and the next catalog sync
+            // would lift "Pro" out as a new key across ten locales — for a label that
+            // is not translated in any of them (the same reason as `StreakBadge`'s
+            // digits). The literal form is spelled out in prose rather than quoted
+            // here because the acceptance check for this control is a grep for it.
+            //
+            // The line limit and the scale factor never fire on three Latin glyphs at
+            // any text size; they are there for the second someone translates the
+            // label anyway, and they are what makes that a squeeze instead of a
+            // truncation.
+            Text(verbatim: "Pro")
+                .font(.hanken(13, .medium))
+                .foregroundColor(theme.mut)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                // 10pt, not the 13 of the plan pill: the whole capsule has to stay
+                // within 44.5pt at the xxLarge ceiling, which is what keeps the
+                // header whole in the tightest measured frame (fr, 375pt).
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .overlay(Capsule().stroke(theme.iconStroke, lineWidth: 1))
+                // The outline stays its own height and the target becomes 44. The
+                // shape is a rectangle, not the capsule it is drawn as, and unlike
+                // the streak badge — that one is wide enough that a capsule target
+                // costs nothing, while this one is barely wider than it is tall, so
+                // capsule corners would eat most of what the 44 was for. Its
+                // neighbour below does the same, and the 8pt row spacing keeps the
+                // two rectangles apart.
+                .frame(height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.pressable)
+        .accessibilityIdentifier("timer.pro")
+        // "Pro" read aloud on its own tells a blind user nothing, so the label is the
+        // product's whole name; the hint is the one every gated control already
+        // shares, and this is its third consumer.
+        .accessibilityLabel(strings.Pro.productName)
+        .accessibilityHint(strings.Pro.lockedDestinationHint)
     }
 
     /// One candidate row for the pill. `fixedSize` is what makes the choice honest:

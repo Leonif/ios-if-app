@@ -80,8 +80,16 @@ enum PaywallTrigger: String, Equatable, Sendable {
     case planCustom = "plan_custom"
     /// T2: a broken streak, offering the freeze.
     case streakBreak = "streak_break"
-    /// T4: the Pro row in the About IF24 sheet — the permanent entry.
+    /// T4: a permanent entry the user had to go looking for — the Pro row in the
+    /// About IF24 sheet, and the locked export in History.
     case manual
+    /// The `Pro` control in the timer header. Kept apart from `manual` on purpose:
+    /// that value means "the user went looking for the offer", this one means "the
+    /// door was on screen and got tapped", and the whole point of putting a door on
+    /// the home screen is the hypothesis that it becomes the main manual entry. Folded
+    /// into `manual` it would make the one number this release exists to read —
+    /// the distribution over triggers — unreadable.
+    case home
 }
 
 /// Why a purchase attempt ended without Pro. Raw values are the GA4 `reason`

@@ -40,6 +40,12 @@ struct TimerScreenProps: Equatable {
     let resetConfirmOpen: Bool
     /// Whether the lock shows on the custom row, and whether the offer is up.
     let isPro: Bool
+    /// Whether the header's Pro entry has anyone to sell to. `isPro` cannot answer
+    /// it: the question turns on `unknown`, which locks like free but must not be
+    /// sold to, and the negation of `isPro` folds it in on the wrong side. The
+    /// definition lives on `ProState`, shared with the automatic offer, so the two
+    /// surfaces cannot drift apart on what `unknown` means.
+    let isVerifiedFree: Bool
     let offerOpen: Bool
     /// The one-time notice on screen, and the one still waiting for a neutral moment.
     let notice: ProNotice?
@@ -70,6 +76,7 @@ struct TimerScreenProps: Equatable {
         streakMilestoneOpen = state.uiState.streakMilestoneOpen
         resetConfirmOpen = state.uiState.resetConfirmOpen
         isPro = state.proState.isPro
+        isVerifiedFree = state.proState.isVerifiedFree
         offerOpen = state.proState.isOfferOpen
         notice = state.proState.notice
         revocationPending = state.proState.revocationPending
@@ -374,10 +381,15 @@ struct TimerFlowView: View {
                     plan: props.plan,
                     streak: props.streak.displayed(at: now),
                     hasRecords: props.hasRecords,
+                    showsPro: showsProEntry(state: state),
                     theme: theme,
                     onEditPlan: { store.dispatch(UIAction.planEditorOpened) },
                     onHistory: { openHistory(from: .streakBadge) },
-                    onSettings: { showSources = true }
+                    // The offer is presented from the root and its state is derived
+                    // from `ProState`, so a fifth door is a fifth dispatch and
+                    // nothing else — no presentation, no branch in the offer.
+                    onPro: { store.dispatch(ProAction.offerOpened(trigger: .home)) },
+                    onSettings: openSources
                 )
                 .padding(.top, headerTop)
                 .padding(.horizontal, 24)
@@ -512,6 +524,31 @@ struct TimerFlowView: View {
     /// the screen.
     private var noticeMoment: Bool {
         props.revocationPending && screenIsClear && props.currentScreenState() == .idle
+    }
+
+    /// Whether the permanent Pro entry belongs in the header right now.
+    ///
+    /// Two conditions, and they answer different questions. `isVerifiedFree` is about
+    /// the person: only a verified free entitlement is sold to, and after the purchase
+    /// the control disappears for good — the one reward the app can hand over in
+    /// silence is that it stops selling. The screen state is about the moment: the
+    /// goal frame is where the ring, the seal and the sweep say the fast was taken,
+    /// and T1' already pays for the rule that nothing is sold in it. A control that
+    /// stood there permanently would walk around that rule by construction.
+    private func showsProEntry(state: ScreenState) -> Bool {
+        props.isVerifiedFree && state != .goalReached && state != .complete
+    }
+
+    /// The About sheet — the app's own document, and one of the doors into the offer.
+    ///
+    /// The event goes out here, at the single point the sheet is opened from, rather
+    /// than from the sheet itself: a redraw is not an opening. It has been declared,
+    /// mapped and handled since the sheet shipped and was never dispatched, so the
+    /// reach of the app's only permanent door has read zero for as long as it has
+    /// existed — which is the number the new entry has to be compared against.
+    private func openSources() {
+        store.dispatch(AppLifecycleAction.sourcesOpened)
+        showSources = true
     }
 
     /// The delay from the eating window card arriving to the offer starting to rise.
