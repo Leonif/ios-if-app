@@ -36,14 +36,6 @@ struct EndFastSheet: View {
     let onOpenConflict: (FastRecord) -> Void
     let onClose: () -> Void
 
-    /// The consequence message rises after the card it sits in has settled — never
-    /// over a transition. Both numbers come from 1.5.0's accepted motion and are two
-    /// values on purpose: the wait and the travel may be retuned apart.
-    private static let messageDelay: TimeInterval = 0.42
-    private static let messageRise: TimeInterval = 0.42
-
-    @State private var messageShown = false
-
     var body: some View {
         ZStack(alignment: .top) {
             Color(.sRGB, red: 24/255, green: 20/255, blue: 14/255, opacity: 0.22)
@@ -55,16 +47,6 @@ struct EndFastSheet: View {
                 .padding(.top, 64)
         }
         .transition(.opacity)
-        .onAppear {
-            guard !reduceMotion else { messageShown = true; return }
-            // The wait is a property of the curve, not a scheduled job: `.delay` keeps
-            // the pause inside the animation the view already declares, so there is no
-            // timer to outlive the sheet if it closes during those 0.42s.
-            withAnimation(.timingCurve(0.22, 0.8, 0.3, 1, duration: Self.messageRise)
-                            .delay(Self.messageDelay)) {
-                messageShown = true
-            }
-        }
     }
 
     // MARK: Card
@@ -163,26 +145,11 @@ struct EndFastSheet: View {
     }
 
     /// The consequence message: the app's third register, next to prose and buttons.
-    /// It is not tappable and must never look it — no press state, no chevron, and a
-    /// radius small enough that it cannot be mistaken for a card.
+    /// The genre itself lives in `ConsequenceInset` — the same component the pinned
+    /// footer of the result screen draws, so the two surfaces cannot drift into two
+    /// dialects of one sentence.
     private func consequenceInset(_ text: String) -> some View {
-        HStack(spacing: 0) {
-            Text(text)
-                .font(.hanken(14, .medium))
-                .lineSpacing(14 * 0.35)
-                .foregroundColor(theme.ink)
-                .fixedSize(horizontal: false, vertical: true)
-                // Only the message moves. The fill it sits in is drawn with the card
-                // and never animates.
-                .opacity(messageShown ? 1 : 0)
-                .offset(y: messageShown ? 0 : 28)
-                .accessibilityIdentifier("endFast.consequence")
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 12).fill(theme.surfaceQuiet))
+        ConsequenceInset(text: text, theme: theme, identifier: "endFast.consequence")
     }
 
     // MARK: Chips

@@ -122,6 +122,25 @@ enum EndFastMath {
         return isGoalEnd ? strings.EndFast.goalEndCaption(day) : day
     }
 
+    /// Whether a fast this far from its goal is inside the near-goal guard.
+    ///
+    /// Whole minutes, rounded up: 15:00 left is 15 minutes and inside the guard, 15:01
+    /// is 16 and outside it. Rounding down would put a fast 15:59 short of its goal
+    /// inside a guard that says "15 minutes left".
+    ///
+    /// One rule in one place because two surfaces ask it: the sheet, deciding whether
+    /// to warn before the end, and the result footer, deciding which consequence
+    /// sentence is true afterwards. The inputs are deliberately not the same moment —
+    /// the sheet asks about the fast as it stands when it opens, the footer about the
+    /// fast that was actually recorded, so someone who back-dated the end further sees
+    /// the warning and then the ordinary line. That is the footer describing what was
+    /// saved. What must not drift is the threshold itself: two copies of "how close is
+    /// close" would eventually disagree, and the disagreement would be silence, since
+    /// the footer's near-goal sentence is the only place the lost day is ever named.
+    static func isNearGoal(secondsLeft: Double) -> Bool {
+        secondsLeft > 0 && Int(ceil(secondsLeft / 60)) <= EndFastState.nearGoalThresholdMinutes
+    }
+
     /// Whole calendar days between the day of `timestamp` and today.
     static func daysBefore(_ timestamp: Double, now: Double) -> Int {
         let cal = Calendar.current
@@ -155,12 +174,26 @@ enum EndFastMath {
         return "\(BidiText.isolate(clock(end))) · \(strings.Duration.hm(total / 3600, (total / 60) % 60))"
     }
 
-    /// "Mon 9:00 AM - 1:10 AM" — the saved fast a refusal names. Both ends, because
+    /// "Mon 9:00 AM‑1:10 AM" — the saved fast a refusal names. Both ends, because
     /// one of them is what the person has to move away from and they cannot know
     /// which without seeing the span.
+    ///
+    /// The span never breaks across lines. An ASCII hyphen with ordinary spaces on
+    /// both sides gave the layout two break points *inside a single value*: the line
+    /// ended on "(Yesterday 9:00 -" and the next one opened with "1:10)", so the one
+    /// line that exists to name the conflicting fast read as two unrelated times.
+    /// Found independently by the Korean and Japanese passes.
     static func recordSpan(_ record: FastRecord, now: Double) -> String {
         let from = dayAndClock(record.startTimestamp, now: now)
         let to = BidiText.isolate(clock(record.endTimestamp))
-        return "\(from) - \(to)"
+        return "\(from)\(spanSeparator)\(to)"
+    }
+
+    /// Non-breaking spaces around the separator everywhere, and no separator spaces
+    /// at all in Japanese: the range there is written with the full-width wave dash
+    /// (12:00〜21:45), which carries its own side bearings and looks padded with
+    /// spaces around it.
+    private static var spanSeparator: String {
+        Locale.current.language.languageCode?.identifier == "ja" ? "\u{301C}" : "\u{00A0}-\u{00A0}"
     }
 }

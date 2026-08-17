@@ -4438,6 +4438,136 @@
         }
       }
     },
+    "Footer.consequenceDefault" : {
+      "comment" : "Consequence slot of the result-screen footer (mode C, pinned outside the scroll), ordinary path: leaving the screen closes the just-written record for good. Bound to the EVENT of leaving, never to a position on screen: 'either action below' was false in this very layout, because 'Resume this fast' sits directly under the sentence and is the one action that does not end the fast — and spatial deixis survives neither RTL nor any reordering of the row. Same slot as Footer.consequenceNearGoal and mutually exclusive with it: exactly one sentence is ever on screen, never none and never both. Layout: 267pt wide in code. The Arabic line holds one line with 13.1pt to spare, about two letters — it is CLOSED FOR ADDITIONS: one more word costs a second line and 23pt of the scrolling middle.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "مغادرة هذه الشاشة تُنهي الصيام نهائيًا."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlässt du diese Ansicht, endet dieses Fasten endgültig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leaving this screen ends this fast for good."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al salir de esta pantalla, el ayuno termina definitivamente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En quittant cet écran, ce jeûne se termine définitivement."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この画面を離れると、断食の終了は取り消せなくなります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 화면을 나가면 단식이 완전히 끝나요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyjście z tego ekranu kończy ten post na dobre."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вихід із цього екрана завершує піст остаточно."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "离开此页面后，本次断食将彻底结束。"
+          }
+        }
+      }
+    },
+    "Footer.consequenceNearGoal" : {
+      "comment" : "Consequence slot of the result-screen footer (mode C, pinned outside the scroll), near-goal path: the fast was ended short of its goal, so today is not counted. The loss is named through the STREAK, not through 'today's goal' — the streak is what the person visibly loses and the term is already fixed in all ten locales. Do NOT say the streak broke: whether it did is decided by the streak state, and this line is silent about it on purpose. No encouragement and no call to action in any locale ('almost made it' / 'catch up tomorrow' reads, on a sunnah fast, as the app not understanding what the person is doing). %@ is the length of the fast, the existing '%dh %02dm' token (ja renders it 15時間50分); in ja the token stays at the head of the sentence, where it cannot be split by a line break. Layout: the slot is two lines by design, 267pt wide in code, minHeight 66pt at the default type size and 76pt at the xxLarge ceiling. A third line is not affordable — the footer is outside the scroll and every point it grows is taken from the scrolling middle.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "مدة صيامك %@. اليوم غير محسوب ضمن سلسلتك."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ gefastet — der Tag zählt nicht für deine Serie."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You fasted %@ — today doesn't count toward your streak."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayunaste %@: este día no cuenta para tu racha."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeûne de %@ : ce jour ne compte pas dans votre série."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@の断食でしたが、今日は連続記録に含まれません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ 동안 단식했지만 오늘은 연속 기록에 포함되지 않아요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post trwał %@ — ten dzień nie liczy się do serii."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Піст тривав %@ — цей день не зараховано до серії."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "断食 %@，今天不计入连续天数。"
+          }
+        }
+      }
+    },
     "Footer.declineWindow" : {
       "comment" : "Secondary action on the .complete footer card, beside the primary that opens the eating window. THIS IS A DECLINE, NOT A POSTPONEMENT, and the distinction is the whole point of the key. The .complete state has no timeout — it is derived from !isRunning && stagedElapsed > 0 and holds indefinitely, so the offer of the eating window stands until the user acts. Tapping this button returns to idle and makes the window unreachable for the entire cycle: StartEatingThunk is dispatched only from this card, and from idle the eating window does not exist at all. A 'later / not now / maybe afterwards' lexeme therefore promises a second chance the app does not have — do not use one in any locale, even where the platform offers it for the English string. Translate the speech act 'politely decline an offer'. The finished fast is already written to the history: nothing is deleted, discarded or marked, so never use a skip/omit/discard verb either. Row A of three footer secondaries; the other two are separate keys on purpose, because a footer secondary is defined by the primary next to it. Layout: the label shares a 255pt row with the primary; every point above 66.4pt is taken out of the primary's budget.",
       "localizations" : {

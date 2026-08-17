@@ -144,6 +144,38 @@ enum strings {
         static var notNowFast: String {
             String(localized: "Footer.notNowFast", defaultValue: "Not now")
         }
+
+        // The consequence slot of the `.complete` footer — mode C of the genre. It
+        // carries exactly one sentence, never none and never two, and which one is
+        // decided by the path the fast ended on, not by muting either of them: a fast
+        // ended inside the near-goal guard is the one case where the loss would
+        // otherwise be named nowhere at all.
+
+        /// The near-goal path: the fast was ended short of the goal, so the day is not
+        /// counted. Named through the streak, because that is what the person visibly
+        /// loses and the term is already fixed in all ten locales. It deliberately does
+        /// *not* say the streak broke — whether it did is the streak's business, and
+        /// this line stays quiet about it. `%@` is the fast's length, the existing
+        /// `%dh %02dm` token (ja renders it 15時間50分).
+        static func consequenceNearGoal(_ duration: String) -> String {
+            String(format: String(localized: "Footer.consequenceNearGoal",
+                                  defaultValue: "You fasted %@ — today doesn't count toward your streak."),
+                   duration)
+        }
+
+        /// The ordinary path: leaving the screen closes the record for good. Bound to
+        /// the event, never to a position ("either action below" was false in this very
+        /// layout — `Resume this fast` sits directly under the sentence and is the one
+        /// action that does *not* end the fast — and spatial deixis survives neither
+        /// RTL nor any future reordering of the row).
+        ///
+        /// It holds only while exactly one exit from this screen leaves the fast
+        /// alive. A second such exit re-arbitrates the sentence rather than translating
+        /// around it.
+        static var consequenceDefault: String {
+            String(localized: "Footer.consequenceDefault",
+                   defaultValue: "Leaving this screen ends this fast for good.")
+        }
     }
 
     enum Complete {

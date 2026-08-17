@@ -29,11 +29,10 @@ struct OpenEndFastThunk: Thunk {
         let entry: EndFastEntry
         let defaultEnd: Double
         if secondsLeft > 0 {
-            // Whole minutes, rounded up: 15:00 left is 15 minutes and inside the
-            // guard, 15:01 is 16 and outside it. Rounding down would put a fast
-            // 15:59 short of its goal inside a guard that says "15 minutes left".
+            // The threshold rule lives in `EndFastMath` — the result footer asks the
+            // same question about the same fast when it picks its consequence line.
             let minutesLeft = Int(ceil(secondsLeft / 60))
-            entry = minutesLeft <= EndFastState.nearGoalThresholdMinutes
+            entry = EndFastMath.isNearGoal(secondsLeft: secondsLeft)
                 ? .nearGoal(minutesLeft: max(1, minutesLeft))
                 : .ordinary
             defaultEnd = now

@@ -370,6 +370,23 @@ struct TimerFlowView: View {
                                           isComplete: state == .complete || state == .goalReached,
                                           theme: theme)
                                 .padding(.top, 2)
+
+                            // The door into the history, landed here rather than in the
+                            // footer. In the pinned zone it stood last in the stack —
+                            // the strongest position after the primary — so a
+                            // zero-consequence navigation outranked the only reversible
+                            // control on the card, and it cost the unmeasured surface
+                            // height it could not spare. Down here the footer edge, the
+                            // strongest divider on the screen, separates it from the
+                            // actions; it keeps its label, its chevron and a 44pt target,
+                            // and takes `mut` because it is a signpost, not a choice
+                            // being weighed.
+                            if state == .complete {
+                                HistoryLink(title: strings.History.savedToHistory, theme: theme,
+                                            identifier: "timer.savedToHistory",
+                                            tint: theme.mut, minHeight: 44,
+                                            action: { openHistory(from: .completeCard) })
+                            }
                         }
                     }
                 }
@@ -479,14 +496,14 @@ struct TimerFlowView: View {
             CompleteFooterCard(
                 fasted: hoursMinutes(elapsed),
                 windowOpens: strings.Meal.now,
+                consequence: consequenceLine(elapsed: elapsed),
                 theme: theme,
                 onResume: { store.dispatch(ResumeFastThunk()) },
                 // No confirm sheet here, unlike `.goalReached`: nothing irreversible is
                 // left to protect — the fast is already written to the history, and the
                 // way back to it is the action above.
                 onSkip: { store.dispatch(ResetFastThunk()) },
-                onStartEating: { store.dispatch(StartEatingThunk()) },
-                onHistory: { openHistory(from: .completeCard) }
+                onStartEating: { store.dispatch(StartEatingThunk()) }
             )
         case .eating:
             EatingFooterCard(
@@ -507,6 +524,26 @@ struct TimerFlowView: View {
                 onContinue: { store.dispatch(ContinueFastingThunk()) }
             )
         }
+    }
+
+    /// The one sentence of the result footer's consequence slot — never none, never
+    /// two, and chosen by the path the fast ended on rather than by muting either line.
+    ///
+    /// Muting was the alternative on the table: say nothing after the near-goal guard
+    /// so the genre does not warn twice. But the footer sentence *is* the loss the
+    /// guard was warning about, and muting it means the fast that fell 10 minutes short
+    /// is exactly the one where nothing on screen ever says the day was not counted —
+    /// the unsaid consequence this component exists to say.
+    ///
+    /// Derived from the fast on screen, not stored: the near-goal path is a fact about
+    /// how long the fast ran against its goal, and a third copy of that fact is how a
+    /// screen ends up disagreeing with the sheet that preceded it.
+    private func consequenceLine(elapsed: TimeInterval) -> String {
+        let secondsLeft = props.goalHours * 3600 - elapsed
+        guard EndFastMath.isNearGoal(secondsLeft: secondsLeft) else {
+            return strings.Footer.consequenceDefault
+        }
+        return strings.Footer.consequenceNearGoal(hoursMinutes(elapsed))
     }
 
     // MARK: Pro
