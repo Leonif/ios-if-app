@@ -345,8 +345,13 @@ struct AboutIF24View: View {
             .padding(.horizontal, 16)
     }
 
+    /// `forward`, not `right`. A disclosure indicator points on ahead, and ahead is
+    /// leftward in Arabic; the absolute glyph would stay aimed right after the row
+    /// mirrored, back at the label it is supposed to lead away from. `ExternalLinkArrow`
+    /// below is mirrored by hand for the opposite reason — `arrow.up.right` has no
+    /// semantic twin to switch to.
     private func chevron(_ theme: ThemeTokens) -> some View {
-        Image(systemName: "chevron.right")
+        Image(systemName: "chevron.forward")
             .font(.system(size: 13, weight: .medium))
             .foregroundColor(theme.mut)
     }

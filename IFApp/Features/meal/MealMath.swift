@@ -49,11 +49,19 @@ enum MealMath {
     }
 
     /// "Fasting since" label: "Now" when fresh, else a day-prefixed clock time.
+    ///
+    /// The clock time is isolated, all three branches of it. Not only the two that
+    /// visibly sit inside a sentence here: the bare one is no less a substitution,
+    /// because every caller composes this value further — into "… · 2h 40m in" for
+    /// the picker preview, into `fastCountsFrom` for the subline — and by then the
+    /// clock is a token in the middle of a line like the other two. Isolating at the
+    /// point the clock enters the string, rather than at each place it ends up, is
+    /// what keeps that true for the next caller as well.
     static func fromLabel(ateDay: Int, ateMin: Int, nowMinuteOfDay: Int) -> String {
         guard ateMin >= 0, minutesAgo(ateDay: ateDay, ateMin: ateMin, nowMinuteOfDay: nowMinuteOfDay) > 0 else {
             return strings.Meal.now
         }
-        let time = timeLabel(ateMin: ateMin)
+        let time = BidiText.isolate(timeLabel(ateMin: ateMin))
         switch ateDay {
         case 0: return time
         case 1: return strings.Meal.yesterdayAt(time)

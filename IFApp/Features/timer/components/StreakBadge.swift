@@ -76,6 +76,21 @@ struct StreakBadge: View {
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(theme.mut)
             }
+            // The ceiling, and the same pair `pill(withName:)` carries next door for
+            // the same reason `TimerHeader` writes down there: inside a `ViewThatFits`
+            // a candidate reports the width it could squeeze down to, so without this
+            // the widest rung always "fits" and the badge pays for it afterwards. It
+            // was paying — a 3-day streak on a 375pt screen rendered as a clipped digit
+            // in en and as nothing at all in ar, leaving the bare ring and chevron that
+            // F-3a is about, on the one control the header says yields nothing.
+            //
+            // Both halves are needed and neither is decorative: `lineLimit` stops the
+            // word wrapping, `fixedSize` is what makes the reported width honest, so
+            // the ladder drops the plan name — which the header already ranks as the
+            // first thing to give — instead of crushing the badge. No scale factor
+            // beside them, deliberately: yielding nothing means not shrinking either.
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
             .padding(.leading, 6)
             .padding(.trailing, 10)
             .padding(.vertical, 5)

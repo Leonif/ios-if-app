@@ -215,7 +215,10 @@ struct PlanEditorSheet: View {
                 .monospacedDigit()
                 .foregroundColor(theme.deep)
         } else {
-            Image(systemName: "chevron.right")
+            // `forward`, not `right`: this is a disclosure indicator, so it means "on
+            // ahead", and ahead is leftward in Arabic. `chevron.right` would keep
+            // pointing right after the row mirrored, back into the label.
+            Image(systemName: "chevron.forward")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(theme.mut)
         }

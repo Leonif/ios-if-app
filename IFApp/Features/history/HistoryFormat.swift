@@ -4,8 +4,9 @@
 //
 //  Dates and times for the history screen. Formats come from the locale (so de gets
 //  24h and "Fr 24. Juli"), but the digits are forced Latin like everywhere else in
-//  the app, and time tokens are wrapped in an LTR isolate so "8:40 PM" doesn't come
-//  apart inside an Arabic sentence.
+//  the app, and time tokens are wrapped in an isolate so "8:40 PM" doesn't come apart
+//  inside an Arabic sentence. The isolate is `BidiText.isolate` — it used to be a
+//  private copy here, which is why nothing outside this file had one.
 //
 
 import Foundation
@@ -40,7 +41,7 @@ enum HistoryFormat {
 
     /// "Fri 24, 8:40 PM" — the detail panel's Started / Ended values.
     static func dateTime(_ date: Date) -> String {
-        "\(shortDate(date)), \(isolate(time(date)))"
+        "\(shortDate(date)), \(BidiText.isolate(time(date)))"
     }
 
     /// "JULY 2026" — the month group header (uppercased at the call site's discretion).
@@ -79,13 +80,8 @@ enum HistoryFormat {
     static func rowSubline(_ record: FastRecord, isRTL: Bool) -> String {
         let arrow = isRTL ? "←" : "→"
         if record.isExtended {
-            return "\(rowDate(record.startDate)) \(arrow) \(shortDate(record.endDate)) · \(isolate(time(record.endDate)))"
+            return "\(rowDate(record.startDate)) \(arrow) \(shortDate(record.endDate)) · \(BidiText.isolate(time(record.endDate)))"
         }
-        return "\(rowDate(record.startDate)) · \(isolate(time(record.startDate))) \(arrow) \(isolate(time(record.endDate)))"
-    }
-
-    /// Wraps a digit run in an LTR isolate so bidirectional text can't reorder it.
-    private static func isolate(_ text: String) -> String {
-        "\u{2066}\(text)\u{2069}"
+        return "\(rowDate(record.startDate)) · \(BidiText.isolate(time(record.startDate))) \(arrow) \(BidiText.isolate(time(record.endDate)))"
     }
 }

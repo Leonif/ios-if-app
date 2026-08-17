@@ -18,9 +18,17 @@ struct SegmentedControl: View {
             ForEach(Array(options.enumerated()), id: \.offset) { idx, title in
                 let isSelected = idx == selectedIndex
                 Button { onSelect(idx) } label: {
+                    // The chips split the track into equal thirds, so a title that
+                    // outgrows its third has nowhere to go: with no ceiling it wrapped
+                    // and grew the control instead of clipping, which is why an
+                    // automated hunt for truncations never saw it. The floor is what
+                    // makes the ceiling safe — "ساعة واحدة" and "1 Stunde" at the
+                    // xxLarge cap squeeze rather than lose their tail.
                     Text(title)
                         .font(.hanken(13.5, .semibold))
                         .foregroundColor(isSelected ? theme.deep : theme.mut)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                         .frame(maxWidth: .infinity)
                         .frame(height: 38)
                         .background(
