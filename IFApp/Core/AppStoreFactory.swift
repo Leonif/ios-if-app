@@ -29,6 +29,10 @@ enum AppStoreFactory {
         }
         // UI tests also seed timer/review state via "-seed…" args (see UITestSeed).
         UITestSeed.applyIfNeeded()
+        // "-dumpFontMetrics" measures the UIFontMetrics curve. It writes a file, so it
+        // is a side effect like any other; it lives in `Debug/` for that reason (the
+        // invariant-2 exception, 07.08.2026) and is merely *called* from here.
+        FontMetricsDump.runIfNeeded()
         #endif
         let loaded = persistence.load()
         let history: FastHistoryRepositoryProtocol = container.inject()
