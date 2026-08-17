@@ -4560,65 +4560,6 @@
         }
       }
     },
-    "First one saved. Finish tomorrow’s fast and your streak begins." : {
-      "comment" : "Note on the summary card after the first fast",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "تم حفظ أول صيام لك. بإتمام صيام الغد تبدأ سلسلتك."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Das erste ist gespeichert. Beende morgen dein Fasten und deine Serie beginnt."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "El primero está guardado. Termina el ayuno de mañana y tu racha comienza."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Le premier est enregistré. Terminez le jeûne de demain et votre série commence."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "最初の1回を保存しました。明日の断食を終えると連続記録が始まります。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "첫 기록을 저장했어요. 내일 단식을 마치면 연속 기록이 시작돼요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Pierwszy zapisany. Ukończ jutrzejszy post, a zacznie się seria."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Перше збережено. Завершіть завтрашній піст - і почнеться серія."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "第一次已保存。完成明天的断食，连续记录就开始了。"
-          }
-        }
-      }
-    },
     "Footer.declineWindow" : {
       "comment" : "Secondary action on the .complete footer card, beside the primary that opens the eating window. THIS IS A DECLINE, NOT A POSTPONEMENT, and the distinction is the whole point of the key. The .complete state has no timeout — it is derived from !isRunning && stagedElapsed > 0 and holds indefinitely, so the offer of the eating window stands until the user acts. Tapping this button returns to idle and makes the window unreachable for the entire cycle: StartEatingThunk is dispatched only from this card, and from idle the eating window does not exist at all. A 'later / not now / maybe afterwards' lexeme therefore promises a second chance the app does not have — do not use one in any locale, even where the platform offers it for the English string. Translate the speech act 'politely decline an offer'. The finished fast is already written to the history: nothing is deleted, discarded or marked, so never use a skip/omit/discard verb either. Row A of three footer secondaries; the other two are separate keys on purpose, because a footer secondary is defined by the primary next to it. Layout: the label shares a 255pt row with the primary; every point above 66.4pt is taken out of the primary's budget.",
       "localizations" : {
@@ -5457,6 +5398,94 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "导出为 CSV"
+          }
+        }
+      }
+    },
+    "history.entry.a11yLastStreak" : {
+      "comment" : "VoiceOver label of the streak pill on the main screen when the run has\nended and its number is still shown, drained of accent.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fasting history, last streak %#@days@"
+          },
+          "substitutions" : {
+            "days" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld day"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "history.streak.ended" : {
+      "comment" : "Sentence on the history summary card under the big number, in the state\nwhere the streak has just ended (shown for 7 days after the missed day).\nThe number is the run that was lost. Plural categories belong in the\ncatalog. Up to 3 lines at xxLarge in a 299pt slot. No blame, no call to\naction, no mention of the paid freeze.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That streak ended at %#@days@. The next one starts with your next completed goal."
+          },
+          "substitutions" : {
+            "days" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld day"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "history.streak.firstFast" : {
+      "comment" : "Note on the summary card over the first fasts, under the streak counter.\nReplaces the old promise that tomorrow starts the streak. States the rule:\nonly a day whose goal was reached counts. Neutral, no blame, no exclamation.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First fast logged. A streak counts the days you reach your goal."
+          }
+        }
+      }
+    },
+    "history.streak.lastOverline" : {
+      "comment" : "Overline over the big streak number on the history summary card, in the\nstate where the run has ended. Uppercased in the UI. Hard budget 146pt,\nkeep it to two short words.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last streak"
           }
         }
       }

@@ -13,21 +13,46 @@
 //
 //  No unit word beside the number: pluralising a 12.5pt word across ten locales
 //  (six categories in Arabic, four in Polish) is not worth one word. It stays where
-//  there is room — the summary card and the VoiceOver label. A broken streak shows
-//  the word "History" instead of a number, since "0 days" is not a thing.
+//  there is room — the summary card and the VoiceOver label.
+//
+//  Three states, and not one of them carries a word. The pill used to read "History"
+//  once the run broke, which changed its class from "my number" to a screen name, and
+//  cost width the header does not have: the text budget on the rung that still carries
+//  the Pro capsule is 72.0pt at the base size, and the shortest two-word candidate
+//  about a streak runs 78pt in all ten locales. So a run that has just broken keeps
+//  its number, drained of accent, and a pill with nothing to count carries the history
+//  glyph instead — a signboard on the door, where the bare ring was a door without one
+//  (S-2, F-3a). The glyph is a fixed 17pt box that Dynamic Type never grows, which is
+//  what makes the state cost the same in every locale at every text size.
 //
 
 import SwiftUI
 
 struct StreakBadge: View {
-    let days: Int
+    /// The three states as one value, projected once in `StreakStatus.display(at:)`
+    /// so this pill and the summary card cannot disagree about which one holds.
+    let display: StreakDisplay
     let theme: ThemeTokens
     let onTap: () -> Void
 
     private static let milestones = [3, 7, 14, 30, 60]
 
+    /// The number the state carries, 0 when the pill shows the glyph instead. Read off
+    /// the projection rather than unwrapped here — one definition, two surfaces.
+    private var days: Int { display.count }
+
+    /// VoiceOver says in words what the pill is not allowed to spend width on: whether
+    /// the number is a run in progress or the one that ended.
+    private var accessibilityLabel: String {
+        switch display {
+        case .alive(let days): return strings.History.entryA11y(days)
+        case .justEnded(let days): return strings.History.entryA11yLastStreak(days)
+        case .none: return strings.History.entryA11yNoStreak
+        }
+    }
+
     /// Progress toward the next milestone; a streak past the last one stays full.
-    private var progress: Double {
+    private func progress(_ days: Int) -> Double {
         guard let next = Self.milestones.first(where: { $0 > days }) else { return 1 }
         let previous = Self.milestones.last(where: { $0 <= days }) ?? 0
         return Double(days - previous) / Double(next - previous)
@@ -36,28 +61,26 @@ struct StreakBadge: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 6) {
-                ZStack {
-                    // A broken streak dims the track a step below its usual weight, so
-                    // the empty ring reads as "nothing here yet" rather than "progress
-                    // is zero". Dimming the track itself, not switching to a text token:
-                    // `faint` is *darker* than the track and would shout instead.
-                    Circle()
-                        .stroke(days > 0 ? theme.ringTrack : theme.ringTrack.opacity(0.55), lineWidth: 2.2)
-                    // The arc layer is absent, not zero-length: a round cap on a
-                    // zero-length trim leaves a dot at 12 o'clock that reads as one day.
-                    if days > 0 {
+                if days > 0 {
+                    ZStack {
                         Circle()
-                            .trim(from: 0, to: max(0.02, progress))
-                            .stroke(theme.accent, style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
+                            .stroke(theme.ringTrack, lineWidth: 2.2)
+                        Circle()
+                            .trim(from: 0, to: max(0.02, progress(days)))
+                            // A run that has ended keeps its arc and loses the accent:
+                            // `faint` on the usual track says "this was progress" without
+                            // letting it read as progress still being made. The accent in
+                            // this app means "your progress now", and lending it to a run
+                            // that is over would be the app disagreeing with itself.
+                            .stroke(display.hasEnded ? theme.faint : theme.accent,
+                                    style: StrokeStyle(lineWidth: 2.2, lineCap: .round))
                             .rotationEffect(.degrees(-90))
                     }
-                }
-                // The 22pt slot holds an 18pt ring: the stroke is centred on that
-                // circle, so the ring reads 20.2pt across, as in the mockups.
-                .padding(2)
-                .frame(width: 22, height: 22)
+                    // The 22pt slot holds an 18pt ring: the stroke is centred on that
+                    // circle, so the ring reads 20.2pt across, as in the mockups.
+                    .padding(2)
+                    .frame(width: 22, height: 22)
 
-                if days > 0 {
                     // `Text("\(days)")` would take the LocalizedStringKey path and let
                     // the locale format the integer — Arabic-Indic "١" in the badge
                     // beside the Western digits of the history card one tap away.
@@ -66,11 +89,21 @@ struct StreakBadge: View {
                     Text(verbatim: String(days))
                         .font(.hanken(13.5, .bold))
                         .monospacedDigit()
-                        .foregroundColor(theme.ink)
+                        .foregroundColor(display.hasEnded ? theme.mut : theme.ink)
                 } else {
-                    Text(strings.History.title)
-                        .font(.hanken(13, .semibold))
-                        .foregroundColor(theme.ink)
+                    // A clock face inside a counter-clockwise arc: time, turned back.
+                    // Fixed at 17pt and never scaled by Dynamic Type — that constancy is
+                    // the whole reason this state is free in every locale. It does not
+                    // mirror in RTL (a clock runs clockwise everywhere, and a mirrored
+                    // return arc reads as fast-forward); only the pill and the chevron do.
+                    Image("history-arrow")
+                        .renderingMode(.template)
+                        .foregroundColor(theme.sec)
+                        .frame(width: 17, height: 17)
+                        // The ring's slot carries 2pt of its own padding, so the leading
+                        // inset below is measured for it; the glyph has none and takes
+                        // the difference here instead of widening the pill.
+                        .padding(.leading, 4)
                 }
                 Image(systemName: "chevron.forward")
                     .font(.system(size: 9, weight: .semibold))
@@ -104,6 +137,6 @@ struct StreakBadge: View {
         }
         .buttonStyle(.pressable)
         .accessibilityIdentifier("streak.badge")
-        .accessibilityLabel(days > 0 ? strings.History.entryA11y(days) : strings.History.entryA11yNoStreak)
+        .accessibilityLabel(accessibilityLabel)
     }
 }

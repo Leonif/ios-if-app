@@ -255,6 +255,19 @@ enum strings {
     enum History {
         static var title: String { String(localized: "History") }
         static var streakOverline: String { String(localized: "Current streak") }
+        /// The same overline once the run is over: it renames the number as past, and
+        /// carries no verdict — the sentence under the number says what happened. The
+        /// short class deliberately ("Streak ended" fills 100% of the slot in Ukrainian,
+        /// with no slack for a retranslation).
+        static var lastStreakOverline: String {
+            String(localized: "history.streak.lastOverline",
+                   defaultValue: "Last streak",
+                   comment: """
+                   Overline over the big streak number on the history summary card, in the
+                   state where the run has ended. Uppercased in the UI. Hard budget 146pt,
+                   keep it to two short words.
+                   """)
+        }
         static var lastSevenDays: String { String(localized: "Last 7 days") }
         static var statFasts: String { String(localized: "Fasts") }
         static var statTotal: String { String(localized: "Total") }
@@ -276,7 +289,21 @@ enum strings {
         /// English source only for now: `loc` is translating it, and until the table
         /// lands the other nine locales fall back to this.
         static var emptyBackToFast: String { String(localized: "Back to your fast") }
-        static var firstNote: String { String(localized: "First one saved. Finish tomorrow’s fast and your streak begins.") }
+        /// The note under the counter on the first fasts. It states the *rule* rather
+        /// than the outcome: the old copy ("First one saved. Finish tomorrow's fast and
+        /// your streak begins.") promised the day was banked, and it showed after a fast
+        /// that fell short of the goal too — where nothing was banked at all (F-2). A
+        /// streak day is a goal reached, and that is the one thing worth saying to
+        /// someone who has not built one yet. No reproach: it never says what went wrong.
+        static var firstNote: String {
+            String(localized: "history.streak.firstFast",
+                   defaultValue: "First fast logged. A streak counts the days you reach your goal.",
+                   comment: """
+                   Note on the summary card over the first fasts, under the streak counter.
+                   Replaces the old promise that tomorrow starts the streak. States the rule:
+                   only a day whose goal was reached counts. Neutral, no blame, no exclamation.
+                   """)
+        }
         static var savedToHistory: String { String(localized: "Saved to your history") }
         /// The export affordance in the history nav row. The control is the system
         /// share glyph and carries no caption, so this is its VoiceOver label — and
@@ -296,6 +323,23 @@ enum strings {
                    CJK the number and this string render as one solid token - ko renders
                    "5일 연속", ja "5日". The word "streak" itself is carried by the card
                    overline - do not repeat it here.
+                   """)
+        }
+
+        /// The sentence under the counter once the run has ended: it names what the
+        /// number now is, and how the next one starts. The pill shows the lost number;
+        /// this is the only place that says out loud that it ended. Without reproach and
+        /// without a sell — the way back is a goal reached, not a purchase.
+        static func streakEnded(_ days: Int) -> String {
+            String(localized: "history.streak.ended",
+                   defaultValue: "That streak ended at \(days) days. The next one starts with your next completed goal.",
+                   locale: .latinDigits,
+                   comment: """
+                   Sentence on the history summary card under the big number, in the state
+                   where the streak has just ended (shown for 7 days after the missed day).
+                   The number is the run that was lost. Plural categories belong in the
+                   catalog. Up to 3 lines at xxLarge in a 299pt slot. No blame, no call to
+                   action, no mention of the paid freeze.
                    """)
         }
 
@@ -329,7 +373,20 @@ enum strings {
             String(localized: "Fasting history, current streak \(days) days")
         }
 
-        /// The same label with no streak to announce — the pill reads "History".
+        /// The label while the lost run is still on the pill. VoiceOver gets the word
+        /// the pill is not allowed to spend width on — "last", not "current" — so the
+        /// number is not heard as a run still going.
+        static func entryA11yLastStreak(_ days: Int) -> String {
+            String(localized: "history.entry.a11yLastStreak",
+                   defaultValue: "Fasting history, last streak \(days) days",
+                   comment: """
+                   VoiceOver label of the streak pill on the main screen when the run has
+                   ended and its number is still shown, drained of accent.
+                   """)
+        }
+
+        /// The same label with no streak to announce — the pill carries the history
+        /// glyph and no number at all.
         static var entryA11yNoStreak: String { String(localized: "Fasting history") }
     }
 

@@ -379,7 +379,7 @@ struct TimerFlowView: View {
             .overlay(alignment: .top) {
                 TimerHeader(
                     plan: props.plan,
-                    streak: props.streak.displayed(at: now),
+                    streak: props.streak.display(at: now),
                     hasRecords: props.hasRecords,
                     showsPro: showsProEntry(state: state),
                     theme: theme,

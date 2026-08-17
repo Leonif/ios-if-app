@@ -224,7 +224,7 @@ struct HistoryFlowView: View {
             LazyVStack(alignment: .leading, spacing: 20) {
                 // Same projection the main screen shows — one rule, one number.
                 HistorySummaryCard(
-                    streak: props.streak.displayed(at: Clock.now()),
+                    display: props.streak.display(at: Clock.now()),
                     stats: stats,
                     // The raw counter, not the projection above it: whether the reader
                     // is a beginner is a fact about their past, and a streak that

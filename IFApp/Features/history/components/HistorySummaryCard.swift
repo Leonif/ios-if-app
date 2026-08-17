@@ -15,7 +15,10 @@
 import SwiftUI
 
 struct HistorySummaryCard: View {
-    let streak: Int
+    /// The streak as one of its three states, projected in `StreakStatus.display(at:)`
+    /// — the same value the header pill draws, so the number and the sentence under it
+    /// can never come from two different readings of the same counter.
+    let display: StreakDisplay
     let stats: HistoryStats
     /// Passed in rather than derived here: the rule needs the streak counter as well
     /// as the record count, and it is stated once in `HistoryStats.showsFirstNote`.
@@ -23,6 +26,13 @@ struct HistorySummaryCard: View {
     let theme: ThemeTokens
 
     @Environment(\.locale) private var locale
+
+    /// The number in the counter: the live run, or the one that ended — read off the
+    /// projection, never re-derived here. Both are the persisted counter, never
+    /// `bestStreak`, which is recounted from the rows and can be smaller than the run
+    /// just lost (the same split as TF-1).
+    private var streak: Int { display.count }
+    private var hasEnded: Bool { display.hasEnded }
 
     /// CJK writes a counter solid against its counter word — "6일 연속", never
     /// "6 일 연속" — while the Latin and Cyrillic locales need the space ("6 днів
@@ -51,7 +61,11 @@ struct HistorySummaryCard: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(strings.History.streakOverline.uppercased())
+                    // The overline is what re-labels the number as past. The sentence
+                    // below carries the fact that the run ended; up here it would cost
+                    // the slot its slack in Ukrainian for nothing.
+                    Text((hasEnded ? strings.History.lastStreakOverline
+                                   : strings.History.streakOverline).uppercased())
                         .font(.hanken(11, .semibold))
                         .overlineTracking(1.5)
                         .foregroundColor(theme.mut)
@@ -64,7 +78,10 @@ struct HistorySummaryCard: View {
                         Text(verbatim: String(streak))
                             .font(.bricolage(40))
                             .monospacedDigit()
-                            .foregroundColor(theme.ink)
+                            // Drained of accent once the run is over, exactly as the pill
+                            // drains it: the number is still the person's, but it is no
+                            // longer a number going anywhere.
+                            .foregroundColor(hasEnded ? theme.mut : theme.ink)
                         Text(strings.History.daysInARow(streak))
                             .font(.hanken(14.5, .semibold))
                             .foregroundColor(theme.sec)
@@ -85,7 +102,16 @@ struct HistorySummaryCard: View {
                 }
             }
 
-            if showsFirstNote {
+            // The three branches of the text slot are exclusive, and the ended run
+            // comes first: it is the only one of them that says something the reader
+            // does not already know from the number above it.
+            if hasEnded {
+                Text(strings.History.streakEnded(streak))
+                    .font(.hanken(14, .medium))
+                    .foregroundColor(theme.sec)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 9)
+            } else if showsFirstNote {
                 Text(strings.History.firstNote)
                     .font(.hanken(14, .medium))
                     .foregroundColor(theme.deep)

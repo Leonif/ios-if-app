@@ -10,9 +10,9 @@ import SwiftUI
 
 struct TimerHeader: View {
     let plan: Plan
-    /// A broken streak still shows the pill (as "History"); no records and no streak
-    /// shows none.
-    let streak: Int
+    /// The streak as the pill draws it — live number, the number a broken run left
+    /// behind, or nothing to count. No records and nothing to count shows no pill.
+    let streak: StreakDisplay
     /// Whether there is any finished fast to look at.
     let hasRecords: Bool
     /// The permanent door into the offer. Whether it belongs on screen at all is
@@ -97,8 +97,8 @@ struct TimerHeader: View {
             // counts as something to open too — emptying the history mid-fast used to
             // shut the door for the rest of the fast, and the app then spent ~10 hours
             // telling someone on a two-day run that they had no streak.
-            if hasRecords || streak > 0 {
-                StreakBadge(days: streak, theme: theme, onTap: onHistory)
+            if hasRecords || streak != .none {
+                StreakBadge(display: streak, theme: theme, onTap: onHistory)
             }
 
             if withPro { proButton }

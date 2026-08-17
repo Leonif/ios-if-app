@@ -86,6 +86,61 @@ struct StreakStatus: Equatable, Sendable {
         if lastGoalDate == today || Clock.isDayBefore(lastGoalDate, today) { return count }
         return freezeCovers(today) ? count : 0
     }
+
+    /// How long a run that has just broken keeps being named on screen, in days from
+    /// the last goal. It exists because `count` is not rewritten until the next goal:
+    /// without a window, someone who missed a day in March would still be reading
+    /// "that streak ended at six days" in June. Past it the app says nothing about the
+    /// lost run — which is the plain "no streak" state, not a second kind of silence.
+    static let lostRunFreshnessDays = 7
+
+    /// What the streak surfaces should show — the single projection of the three
+    /// states, so the pill and the summary card cannot disagree about which one holds.
+    ///
+    /// `.justEnded` carries `count`, the persisted counter, and never `bestStreak`:
+    /// the best run is recomputed from history rows and after an update from 1.4.4 can
+    /// be *smaller* than the run that was actually lost. Naming a number below the one
+    /// the person remembers is worse than naming none.
+    func display(at now: Date) -> StreakDisplay {
+        let shown = displayed(at: now)
+        if shown > 0 { return .alive(shown) }
+        guard count > 0, let lastGoalDate,
+              let gap = Clock.daysBetween(lastGoalDate, Clock.dayKey(now)),
+              gap <= Self.lostRunFreshnessDays else { return .none }
+        return .justEnded(count)
+    }
+}
+
+/// The three states the streak can be in on screen. A separate type rather than an
+/// `Int` plus a `Bool`: the pill and the card each have to pick one of three branches,
+/// and the pair spells two of them the same way (0 and "just ended at 0" both mean
+/// nothing to show) while allowing a fourth that cannot happen.
+enum StreakDisplay: Equatable, Sendable {
+    /// A run in progress — the number to show.
+    case alive(Int)
+    /// A run that broke inside the freshness window — the number that was lost.
+    case justEnded(Int)
+    /// Nothing to name: never started, or the lost run is no longer news.
+    case none
+
+    /// The number this state carries — the run in progress, or the run that was lost.
+    /// 0 when there is nothing to count. The single definition of it: the pill and the
+    /// summary card both read this rather than unwrapping the cases themselves, which
+    /// is how the two came to show different numbers for one state before.
+    var count: Int {
+        switch self {
+        case .alive(let days), .justEnded(let days): return days
+        case .none: return 0
+        }
+    }
+
+    /// Whether that number is a run that is over — the one bit both surfaces branch on
+    /// (drained accent, past-tense overline, the sentence). Written once here for the
+    /// same reason as `count`.
+    var hasEnded: Bool {
+        if case .justEnded = self { return true }
+        return false
+    }
 }
 
 struct TimerState: Equatable, Sendable {
