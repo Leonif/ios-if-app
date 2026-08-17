@@ -155,12 +155,26 @@ enum EndFastMath {
         return "\(BidiText.isolate(clock(end))) · \(strings.Duration.hm(total / 3600, (total / 60) % 60))"
     }
 
-    /// "Mon 9:00 AM - 1:10 AM" — the saved fast a refusal names. Both ends, because
+    /// "Mon 9:00 AM‑1:10 AM" — the saved fast a refusal names. Both ends, because
     /// one of them is what the person has to move away from and they cannot know
     /// which without seeing the span.
+    ///
+    /// The span never breaks across lines. An ASCII hyphen with ordinary spaces on
+    /// both sides gave the layout two break points *inside a single value*: the line
+    /// ended on "(Yesterday 9:00 -" and the next one opened with "1:10)", so the one
+    /// line that exists to name the conflicting fast read as two unrelated times.
+    /// Found independently by the Korean and Japanese passes.
     static func recordSpan(_ record: FastRecord, now: Double) -> String {
         let from = dayAndClock(record.startTimestamp, now: now)
         let to = BidiText.isolate(clock(record.endTimestamp))
-        return "\(from) - \(to)"
+        return "\(from)\(spanSeparator)\(to)"
+    }
+
+    /// Non-breaking spaces around the separator everywhere, and no separator spaces
+    /// at all in Japanese: the range there is written with the full-width wave dash
+    /// (12:00〜21:45), which carries its own side bearings and looks padded with
+    /// spaces around it.
+    private static var spanSeparator: String {
+        Locale.current.language.languageCode?.identifier == "ja" ? "\u{301C}" : "\u{00A0}-\u{00A0}"
     }
 }
