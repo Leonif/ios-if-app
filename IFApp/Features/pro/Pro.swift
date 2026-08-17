@@ -90,6 +90,16 @@ enum PaywallTrigger: String, Equatable, Sendable {
     /// into `manual` it would make the one number this release exists to read —
     /// the distribution over triggers — unreadable.
     case home
+    /// No entry point on record. Not a door and never dispatched: it is what the
+    /// reporting falls back to for an event raised while no offer is open, which
+    /// today means restore run from the About sheet's own button.
+    ///
+    /// It exists because `manual` used to serve as both — its own value and the
+    /// fallback — so the one column the release is read by counted two different
+    /// things at once, and a restore nobody opened an offer for inflated the very
+    /// door `home` has to be compared against. A value that means "we do not know"
+    /// has to be visibly absent from the distribution, not hidden inside a door.
+    case unknown
 }
 
 /// Why a purchase attempt ended without Pro. Raw values are the GA4 `reason`

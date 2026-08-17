@@ -111,10 +111,17 @@ final class AnalyticsMiddleware: Middleware {
 
     /// The entry point to report. The state holds it while the offer is up; on the
     /// dismissal the reducer has already cleared it, so the pre-reduce snapshot
-    /// answers. Restore can also be run from the About sheet with no offer open at
-    /// all — the trigger is then `manual`, which is the door that sheet is.
+    /// answers. Restore can also be run from the About sheet's own button with no
+    /// offer open at all, and then neither snapshot holds a door — the trigger is
+    /// `unknown`, not `manual`.
+    ///
+    /// It used to be `manual`, and that put two different things in one column: the
+    /// permanent entries the user went looking for, and every event that simply had
+    /// no entry point to report. The distribution over triggers is what 1.5.1's new
+    /// doors are measured by, and they are measured against `manual` — so this
+    /// fallback has to sit outside it.
     private func trigger(after app: AppState?) -> String {
-        (app?.proState.trigger ?? previousPro?.trigger ?? .manual).rawValue
+        (app?.proState.trigger ?? previousPro?.trigger ?? .unknown).rawValue
     }
 
     private func reportProStatus(_ entitlement: Entitlement) {

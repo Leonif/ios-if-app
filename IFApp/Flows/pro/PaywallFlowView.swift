@@ -28,7 +28,13 @@ private struct PaywallProps: Equatable {
         isOpen = state.proState.isOfferOpen
         self.state = state.proState.offerState
         price = state.proState.product?.displayPrice
-        trigger = state.proState.trigger ?? .manual
+        // Only the closed-offer snapshot reaches the `nil` branch (`onPropsChange`
+        // drops props with `isOpen == false`), so this decides nothing anyone sees:
+        // the card reads the trigger to order its benefits, and `unknown` orders them
+        // exactly as `manual` did. It is spelled `unknown` because it is not the door
+        // — the value naming a door the user did not come through, even off-screen,
+        // is how the two meanings got mixed in the first place.
+        trigger = state.proState.trigger ?? .unknown
         showsNothingToRestore = state.proState.showsNothingToRestore
     }
 }
