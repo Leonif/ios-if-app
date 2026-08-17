@@ -25,6 +25,9 @@ enum HistoryEntrySource: String {
     case completeCard = "complete_card"
     /// "Last fast · 16h 24m" in the eating-window card.
     case eatingWindow = "eating_window"
+    /// "Open that fast" in the end-fast sheet's refusal: the record standing in the
+    /// way of a back-dated ending, opened so it can be deleted.
+    case endFastOverlap = "end_fast_overlap"
 }
 
 enum AppLifecycleAction: Action {

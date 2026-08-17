@@ -56,3 +56,31 @@ struct FastRecord: Codable, Equatable, Identifiable, Sendable {
         return Clock.goalDayKey(fastStart: startTimestamp, goalHours: goalHours)
     }
 }
+
+extension FastRecord {
+    /// Whether this record's span and `[start, end]` share any time at all.
+    ///
+    /// Half-open on both sides, which settles the three cases that decide whether a
+    /// back-dated ending is allowed to be written:
+    ///
+    /// - **end to end** — a new fast beginning exactly when a saved one ended is not
+    ///   an overlap. That is the ordinary shape of a day and refusing it would refuse
+    ///   the common case.
+    /// - **nested** — a span entirely inside a saved one is an overlap. It is the
+    ///   shape that produced the defect: two records for one night, `TOTAL` counting
+    ///   the shared hours twice.
+    /// - **identical bounds** — an overlap. Two records naming the same span are the
+    ///   same fast written twice, whatever the arithmetic of touching says.
+    func overlaps(start: Double, end: Double) -> Bool {
+        start < endTimestamp && end > startTimestamp
+    }
+
+    /// The first saved fast an interval collides with, newest first, or nil when the
+    /// interval is free. Newest first because that is the one the person is most
+    /// likely to recognise, and the refusal names exactly one.
+    static func firstOverlap(in records: [FastRecord], start: Double, end: Double) -> FastRecord? {
+        records
+            .sorted { $0.endTimestamp > $1.endTimestamp }
+            .first { $0.overlaps(start: start, end: end) }
+    }
+}

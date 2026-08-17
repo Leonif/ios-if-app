@@ -16,12 +16,16 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.goalHours = goalHours
         newState.isRunning = true
         newState.hasCelebrated = false
+        newState.fastEndTimestamp = 0
         // Starting a fast closes any open eating window.
         newState.isEating = false
         newState.eatingStartTimestamp = 0
 
-    case let .stopped(elapsed, _):
+    case let .stopped(elapsed, _, _):
         newState.isRunning = false
+        // Derived from the payload and the state as it stands, not from the clock:
+        // the confirmed end is exactly the start plus what was confirmed as elapsed.
+        newState.fastEndTimestamp = state.fastStartTimestamp + elapsed
         newState.fastStartTimestamp = 0
         newState.stagedElapsed = elapsed
 
@@ -34,6 +38,7 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.isRunning = true
         newState.fastStartTimestamp = startTimestamp
         newState.stagedElapsed = 0
+        newState.fastEndTimestamp = 0
 
     case .reset:
         newState.isRunning = false
@@ -42,6 +47,7 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         // from the plan as it stands then.
         newState.goalHours = 0
         newState.stagedElapsed = 0
+        newState.fastEndTimestamp = 0
         newState.hasCelebrated = false
         newState.isEating = false
         newState.eatingStartTimestamp = 0
@@ -93,6 +99,7 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.isRunning = false
         newState.fastStartTimestamp = 0
         newState.stagedElapsed = 0
+        newState.fastEndTimestamp = 0
         newState.hasCelebrated = false
         newState.isEating = true
         newState.eatingStartTimestamp = startTimestamp

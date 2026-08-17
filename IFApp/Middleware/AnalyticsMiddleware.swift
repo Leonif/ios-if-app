@@ -153,12 +153,13 @@ final class AnalyticsMiddleware: Middleware {
         switch action {
         case .started:
             repo.log(.fastStarted(goalHours: goalHours))
-        case let .stopped(elapsed, qualifies):
+        case let .stopped(elapsed, qualifies, backdatedMinutes):
             let phase = PhaseProgress.compute(elapsed: elapsed, goalHours: goalHours).phase
             repo.log(.fastStopped(
                 durationSeconds: Int(elapsed),
                 completed: qualifies,
-                stage: phase.analyticsValue
+                stage: phase.analyticsValue,
+                backdatedMinutes: backdatedMinutes
             ))
         case .stopUndone:
             repo.log(.fastStopUndone)

@@ -76,3 +76,69 @@ struct SecondaryButton: View {
         .fixedSize(horizontal: minWidth != nil, vertical: false)
     }
 }
+
+/// The full-width actions of the consequence sheets, stacked one under the other.
+///
+/// Not `PrimaryButton` with a different number: three of its properties are wrong
+/// here and each for its own reason.
+///
+/// - **No `minimumScaleFactor`.** A label naturally wider than ~153pt at the xxLarge
+///   ceiling renders *below* base size under a floor of 0.7 — someone who turned text
+///   up gets smaller type on the one control that matters, and no automated hunt for
+///   truncation sees it because there is no truncation. The label wraps instead, and
+///   the shape grows with it.
+/// - **`minHeight`, not `height`.** Same reason: a box measured off the English
+///   mock-up overflows in German, and the defect looks like overlap rather than a clip.
+/// - **No drop shadow.** These sit on a sheet card, not over a scrolling screen; the
+///   shadow that lifts the footer's primary off the timer only muddies the edge here.
+struct SheetPrimaryButton: View {
+    let title: String
+    let theme: ThemeTokens
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.hanken(16, .bold))
+                .foregroundColor(theme.primaryButtonText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, labelInset)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(RoundedRectangle(cornerRadius: 16).fill(theme.primaryButtonBg))
+        }
+        .buttonStyle(.pressable)
+    }
+}
+
+/// The reversible action of the consequence sheets: `Keep this fast`, `Open that
+/// fast`. Drawn on the quiet material rather than as a bordered secondary, which is
+/// what keeps it from reading as a third option in a list of choices — it is the
+/// named form of closing the sheet, the thing the scrim tap does, spelled out. Last
+/// element, no chevron, full width.
+struct QuietActionButton: View {
+    let title: String
+    let theme: ThemeTokens
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.hanken(16, .bold))
+                .foregroundColor(theme.ink)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, labelInset)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(theme.surfaceQuiet)
+                        .overlay(RoundedRectangle(cornerRadius: 16)
+                            .stroke(theme.surfaceQuietLine, lineWidth: 1))
+                )
+        }
+        .buttonStyle(.pressable)
+    }
+}

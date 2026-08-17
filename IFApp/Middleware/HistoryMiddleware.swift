@@ -52,7 +52,7 @@ final class HistoryMiddleware: Middleware {
 
         let end: Double
         switch action {
-        case let .stopped(elapsed, _):
+        case let .stopped(elapsed, _, _):
             // Trust the thunk's elapsed — it already resolved the clock once.
             end = before.fastStartTimestamp + elapsed
         default:

@@ -15,7 +15,12 @@ enum TimerAction: Action {
     case started(startTimestamp: Double, goalHours: Double)
     /// End a fast. `qualifiesAsCompleted` = the fast reached its goal. Analytics-only:
     /// completed fasts are counted on `goalCelebrated`, not here.
-    case stopped(elapsed: TimeInterval, qualifiesAsCompleted: Bool)
+    ///
+    /// `backdatedMinutes` = how far behind the tap the confirmed end was placed. It
+    /// rides in the action rather than being derived downstream because it is the
+    /// difference between two moments and only one of them survives the reduce: the
+    /// clock at the tap is gone by the time any middleware sees the state.
+    case stopped(elapsed: TimeInterval, qualifiesAsCompleted: Bool, backdatedMinutes: Int)
     /// Undo of `.stopped` from the result screen: the same fast goes back in flight.
     /// `startTimestamp` is injected already shifted back by the staged elapsed, so the
     /// count picks up where it left off.

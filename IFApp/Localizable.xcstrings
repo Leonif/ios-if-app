@@ -10544,6 +10544,145 @@
           }
         }
       }
+    },
+    "When did you eat?" : {
+      "comment" : "End-fast sheet header (S1/S3). Distinct from 'When did you last eat?' - that one asks about the meal BEFORE the fast, this one about the meal that ENDED it.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "Your eating window starts from this moment." : {
+      "comment" : "End-fast sheet hint (S1). Replaced by the consequence line in S2/S3.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "End this fast?" : {
+      "comment" : "End-fast sheet header, near-goal state (S2).",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "%lld minutes left to your goal" : {
+      "comment" : "Near-goal consequence line (S2). WHOLE MINUTES ONLY, never a duration format. No encouragement in any locale: the subject is the time, not the person.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 minute left to your goal"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld minutes left to your goal"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "The timer has run %@ past your goal" : {
+      "comment" : "Overtime line (S3). %@ = duration. Subject must stay the app's timer, never the person's fast or body.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "Fast ends" : {
+      "comment" : "Preview row label in the end-fast sheet. Pairs with a clock + duration value; NO YEAR in the value.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "End now" : {
+      "comment" : "Primary action, near-goal state (S2) of the end-fast sheet. 275pt, one line.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "Set the time" : {
+      "comment" : "Primary action, overtime state (S3) of the end-fast sheet. 275pt, one line.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "1 h ago" : {
+      "comment" : "Preset chip in the end-fast sheet. Chip slot is 95.7pt and does not grow with text size.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "%lld min ago" : {
+      "comment" : "Preset chip in the end-fast sheet. Chip slot is 95.7pt and does not grow with text size - keep it short.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld min ago"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld min ago"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%@ · goal end" : {
+      "comment" : "Caption under the exact-time value (S3). %@ = a day name (Today / Yesterday / n days ago).",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "That time is taken" : {
+      "comment" : "Header of the refusal state (S4) of the end-fast sheet. Its own header on purpose.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "This overlaps a fast you already saved (%@). Pick another time, or open that fast and delete it." : {
+      "comment" : "Refusal reason (S4). %@ = the saved fast's span. Budgeted at 4 German lines. ar: do not use bare السجل for a single record - it also names the History screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "Pick another time" : {
+      "comment" : "Primary action of the refusal state (S4): back to the picker, previous choice kept.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
+    },
+    "Open that fast" : {
+      "comment" : "Second action of the refusal state (S4): opens the blocking record in History so it can be deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+
+      }
     }
   },
   "version" : "1.0"

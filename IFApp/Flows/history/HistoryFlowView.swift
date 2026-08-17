@@ -41,6 +41,10 @@ struct HistoryFlowView: View {
     /// arrives with the fast that just closed already open — it is what the link
     /// named ("Last fast · 16h 24m"), so the screen should not make it be hunted for.
     let source: HistoryEntrySource
+    /// A record to open expanded. The eating-window entry names its record in the
+    /// link it was tapped from; the overlap refusal names one in its reason. Both
+    /// arrive at a screen where hunting for it is the whole cost of the trip.
+    let focusRecordID: UUID?
     let onStartFast: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme
@@ -51,9 +55,11 @@ struct HistoryFlowView: View {
     @State private var pendingDelete: FastRecord?
     @State private var appeared = false
 
-    init(store: Store<AppState>, source: HistoryEntrySource, onStartFast: @escaping () -> Void) {
+    init(store: Store<AppState>, source: HistoryEntrySource, focusRecordID: UUID? = nil,
+         onStartFast: @escaping () -> Void) {
         self.store = store
         self.source = source
+        self.focusRecordID = focusRecordID
         self.onStartFast = onStartFast
         _props = State(initialValue: HistoryProps(state: store.getCurrentState()))
     }
@@ -90,7 +96,9 @@ struct HistoryFlowView: View {
         .connect(to: store, mapState: { HistoryProps(state: $0) }, onPropsChange: { props = $0 })
         .onAppear {
             store.dispatch(AppLifecycleAction.historyOpened(source: source))
-            if source == .eatingWindow {
+            if let focusRecordID {
+                expandedID = focusRecordID
+            } else if source == .eatingWindow {
                 expandedID = HistoryStats.monthGroups(records: props.records).first?.records.first?.id
             }
             // Drives the entry animation: rows rise into place on the first frame only.

@@ -35,6 +35,12 @@ struct ThemeTokens {
     /// drawn on it too and land next, which is why it is a token and not a colour
     /// spelled out inside one view.
     let surfaceQuiet: Color
+    /// The hairline that keeps a control drawn on `surfaceQuiet` from dissolving into
+    /// the sheet behind it. Its own value rather than `surfaceLine`: the quiet fill
+    /// sits almost on top of the sheet colour, so the edge it needs is lighter than
+    /// the one a card draws against the app background, and reusing the card's would
+    /// have redrawn a button as a panel.
+    let surfaceQuietLine: Color
     let sheetBg: Color
     let segTrack: Color
     let segActive: Color
@@ -64,6 +70,7 @@ struct ThemeTokens {
         iconCircle: Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.10),
         iconStroke: Color(hex: "#8C887E"),
         surfaceQuiet: Color(hex: "#EFEDE6"),
+        surfaceQuietLine: Color(.sRGB, red: 78/255, green: 90/255, blue: 70/255, opacity: 0.10),
         sheetBg: Color(hex: "#FCFBF7"),
         segTrack: Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.10),
         segActive: Color(hex: "#FFFFFF"),
@@ -90,6 +97,7 @@ struct ThemeTokens {
         iconCircle: .whiteAlpha(0.07),
         iconStroke: Color(hex: "#9CA0AA"),
         surfaceQuiet: Color(hex: "#23252B"),
+        surfaceQuietLine: .whiteAlpha(0.07),
         sheetBg: Color(hex: "#16171C"),
         segTrack: .whiteAlpha(0.06),
         segActive: .whiteAlpha(0.14),

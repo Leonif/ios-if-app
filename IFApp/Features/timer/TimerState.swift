@@ -157,6 +157,16 @@ struct TimerState: Equatable, Sendable {
     var isRunning: Bool = false
     /// Elapsed seconds to display while NOT running (paused/staged value). Not persisted.
     var stagedElapsed: TimeInterval = 0
+    /// Epoch seconds the fast that just ended was confirmed to have ended at. 0 = no
+    /// ending on the table.
+    ///
+    /// It exists because the ending is now a moment the user chose, and the moment
+    /// has to outlive the fast it belonged to: `.stopped` clears `fastStartTimestamp`,
+    /// and without this the result screen no longer knows any absolute time at all —
+    /// which is why the eating window used to open from the tap instead of from the
+    /// meal. Not persisted, like `stagedElapsed` beside it: the result screen does not
+    /// survive a cold start, and a stale anchor would be worse than none.
+    var fastEndTimestamp: Double = 0
     /// Count of fasts that reached the "completed" threshold — gates the review prompt.
     var completedSessionsCount: Int = 0
     /// Whether the goal-reached moment already fired for the current fast. Persisted so
