@@ -271,7 +271,9 @@ grep -rn "container.inject" IFApp --include='*.swift' | grep "Store<"
 
 **Зачем.** Уже стрельнуло: на одном экране в арабском стояли рядом «٦» и «118». Причина структурная — `String(format:)` цифры не локализует никогда, а `Int`, интерполированный в `String(localized:)`, локализует всегда. Без единой точки пиннинга каждое новое место форматирования — это лотерея, и заметна она только на арабской локали, то есть в самом конце цикла или в сторе. Второе, что пиннит `latinDigits`, — григорианский календарь: без него `ar_SA` отрисует в истории даты хиджры, тогда как стрик, семидневные точки и все day-key считаются по григорианским дням, и список начнёт описывать другие дни, чем цифры над ним.
 
-**Следуют:** канон — `Shared/Localization/Strings.swift:25`. Потребители: `Features/history/HistoryFormat.swift:22` (→ 6 форматтеров), `Features/meal/MealMath.swift:45`, `Flows/timer/TimerFlowView.swift:697` (`clockTime`), пять Int-принимающих аксессоров в `Strings.swift` (`:156`, `:192`, `:204`, `:275`, `:280`), и `Features/timer/components/StreakBadge.swift:66` + `Features/history/components/HistorySummaryCard.swift:64` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте). Номера пересняты 07.08.2026.
+**Следуют:** канон — `Shared/Localization/Strings.swift:25`. Потребители: `Features/history/HistoryFormat.swift:23` (→ 6 форматтеров), `Features/meal/MealMath.swift:45`, `Flows/timer/TimerFlowView.swift:782` (`clockTime`), пять Int-принимающих аксессоров в `Strings.swift` (`:156`, `:192`, `:204`, `:275`, `:280`), и `Features/timer/components/StreakBadge.swift:66` + `Features/history/components/HistorySummaryCard.swift:64` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте). Номера пересняты 07.08.2026.
+
+**Три позиции пересняты 17.08.2026, при ревью диффа IF-10** (RTL/ar; дерево остановлено перед коммитом). `HistoryFormat` 22 → 23: шапка файла выросла на строку при выносе изолята в `BidiText`. `clockTime` 697 → 782: `TimerFlowView` рос дев-циклами 1.5.x, и позиция была устаревшей ещё до этого диффа — то есть промах не диффа, а того, что при снятии 17.08 по пункту 2 остальные пункты не пересматривались. Значения не менялись, только позиции.
 
 **Нарушают: 0.** Обе позиции закрыты и **закоммичены** — сверено на `HEAD` 05.08.2026: `Features/meal/MealMath.swift:45` (`timeLabel`, был `f.locale = .current`) и `Flows/timer/TimerFlowView.swift:593` (`clockTime`, собирал latn-локаль инлайном) — обе теперь `f.locale = .latinDigits`.
 
@@ -363,8 +365,10 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 |---|---|---|
 | 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **4 определения** | `Flows/timer/TimerFlowView.swift:81` · `Features/timer/thunk/StopFastThunk.swift:17-19` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` · `Features/timer/thunk/ResetFastThunk.swift:20-22` |
 | 8.4 | Предикат «цель достигнута» `elapsed ≥ goalHours × 3600` — **3 определения** | `Features/phase/Phase.swift:88-93` (`PhaseProgress.isComplete`) · `Features/history/FastRecord.swift:27` (`goalReached`) · `Features/timer/thunk/StopFastThunk.swift:24` (`qualifies`) |
-| 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:66-69` · `Flows/timer/TimerFlowView.swift:704-707` |
-| 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела, включая doc-комментарий** | `Features/timer/components/RingCenter.swift:116` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:614` (`overtimeShort`) |
+| 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:67-70` · `Flows/timer/TimerFlowView.swift:794` |
+| 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела, включая doc-комментарий** | `Features/timer/components/RingCenter.swift:116` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:705` (`overtimeShort`) |
+
+**Номера 8.6 и 8.7 пересняты 17.08.2026, при ревью диффа IF-10** (дерево остановлено перед коммитом). `HistoryFormat` 66-69 → 67-70 — сдвиг от этого диффа, шапка файла выросла на строку. `TimerFlowView` 704-707 → 794 (`hoursMinutes`) и 614 → 705 (`overtimeShort`) — устарели раньше, файл рос дев-циклами 1.5.x; `RingCenter:116` не сдвинулся. Оба задвоения на месте, значения не менялись.
 
 **Три позиции закрыты (учёт 07.08.2026).**
 
