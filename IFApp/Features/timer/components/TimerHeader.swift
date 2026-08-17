@@ -29,27 +29,50 @@ struct TimerHeader: View {
     var body: some View {
         // The order things give way in, and it is a decision rather than a
         // convenience: the plan name goes first (the ratio beside it already says
-        // what it says), then the Pro control leaves the row whole, and the streak
-        // badge yields nothing — not its word, not its presence. A badge stripped
-        // down to a bare ring with a chevron is a finding the wiki already has
-        // (F-3a); reproducing it at accessibility text sizes to keep a control that
-        // was just added would be fixing one thing by breaking its neighbour.
+        // what it says), then the pencil, then the Pro control leaves the row whole,
+        // and the streak badge yields nothing — not its word, not its presence. A
+        // badge stripped down to a bare ring with a chevron is a finding the wiki
+        // already has (F-3a); reproducing it at accessibility text sizes to keep a
+        // control that was just added would be fixing one thing by breaking its
+        // neighbour.
+        //
+        // The pencil rung exists because the row above it had no slack left. At
+        // 375pt, the largest type and the longest of the ten History words
+        // ("Historique"), it asks for every point it has — 327 of 327, about one
+        // point in hand — and the fifth glyph of the ratio costs one tabular digit.
+        // Measured on the running app the pill goes 79.5pt → 89.5pt, so `14:10` (and
+        // any custom goal of 10-14 hours) overran and fell straight past the Pro
+        // control to the last rung.
+        //
+        // Dropping the pencil takes the pill to 69pt: 20.5pt freed, 10.5pt of it
+        // left over after the overrun is paid. Squeezing the pill's horizontal
+        // padding from 13 to 8 was the other candidate and was tried on the device:
+        // it frees exactly 10pt and renders a 79.5pt pill — the same width, and so
+        // the same 327-of-327 row, that this bug was found sitting on. It buys the
+        // fix by moving back onto the edge it fell off, and pays for it in a spacing
+        // value the mockups pin.
+        //
+        // The Pro control is not a rung to spend on a hair's width: it exists
+        // because of an Apple rejection, and it is what raises the event for
+        // entering the offer from the main screen, so no locale may reach a row
+        // without it while there is anything cheaper left to give.
         //
         // Measured on whole rows rather than per control: a nested `ViewThatFits`
         // inside the pill is measured with an unspecified width and so always
         // reports its widest candidate, which would drop the Pro control *before*
         // the plan name — the ladder upside down.
         ViewThatFits(in: .horizontal) {
-            row(withPlanName: true, withPro: showsPro)
-            row(withPlanName: false, withPro: showsPro)
+            row(withPlanName: true, withPencil: true, withPro: showsPro)
+            row(withPlanName: false, withPencil: true, withPro: showsPro)
+            row(withPlanName: false, withPencil: false, withPro: showsPro)
             // Last rung. With `showsPro == false` this repeats the one above, which
             // is what makes the ladder one list instead of two branches: a
             // conditional inside `ViewThatFits` collapses into a single candidate.
-            row(withPlanName: false, withPro: false)
+            row(withPlanName: false, withPencil: false, withPro: false)
         }
     }
 
-    private func row(withPlanName: Bool, withPro: Bool) -> some View {
+    private func row(withPlanName: Bool, withPencil: Bool, withPro: Bool) -> some View {
         HStack(spacing: 8) {
             Button(action: onEditPlan) {
                 // The plan name is context the ratio already carries: "16:8" plus the
@@ -59,7 +82,7 @@ struct TimerHeader: View {
                 // Fasten") all at once — the name steps aside rather than wrapping the
                 // pill onto a second line or shrinking to a size the ratio beside it
                 // contradicts. Measured per render, so a roomy header keeps the name.
-                pill(withName: withPlanName)
+                pill(withName: withPlanName, withPencil: withPencil)
                     .padding(.vertical, 7)
                     .padding(.horizontal, 13)
                     .background(Capsule().fill(theme.iconCircle))
@@ -158,7 +181,7 @@ struct TimerHeader: View {
     /// One candidate row for the pill. `fixedSize` is what makes the choice honest:
     /// without it a candidate reports the width it could squeeze down to, and the
     /// wider one always "fits" — by breaking words.
-    private func pill(withName: Bool) -> some View {
+    private func pill(withName: Bool, withPencil: Bool) -> some View {
         HStack(spacing: 7) {
             Text(plan.ratioLabel)
                 .font(.hanken(15, .bold))
@@ -169,9 +192,17 @@ struct TimerHeader: View {
                     .font(.hanken(13, .medium))
                     .foregroundColor(theme.mut)
             }
-            Image(systemName: "pencil")
-                .font(.system(size: 13))
-                .foregroundColor(theme.iconStroke)
+            // The last thing the pill has to give before the row starts costing
+            // controls. It is the hint that the ratio is editable, not the way in:
+            // the whole capsule is the button either way, and an unlabelled SF
+            // symbol adds nothing to the spoken label, so dropping it costs a
+            // sighted user a cue and a VoiceOver user nothing. On the one row that
+            // cannot afford it the glyph goes and the control stays.
+            if withPencil {
+                Image(systemName: "pencil")
+                    .font(.system(size: 13))
+                    .foregroundColor(theme.iconStroke)
+            }
         }
         .lineLimit(1)
         .fixedSize(horizontal: true, vertical: false)
