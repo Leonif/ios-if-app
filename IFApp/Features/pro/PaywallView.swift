@@ -223,7 +223,7 @@ struct PaywallView: View {
                 // the button, at body size.
                 Text(strings.Pro.wedge)
                     .font(.hanken(17))
-                    .foregroundColor(theme.sec)
+                    .foregroundColor(wedgeColor)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(minHeight: 24, alignment: .leading)
                     .padding(.bottom, 8)
@@ -400,6 +400,17 @@ struct PaywallView: View {
         }
     }
 
+    /// The wedge dims with the price block rather than on its own ladder (PW-U4).
+    /// Left at `--secondary` it became the darkest thing on the screen in exactly the
+    /// states where the price above it is standing back — and the wedge is an
+    /// argument for the price, so it cannot outrank it.
+    private var wedgeColor: Color {
+        switch state {
+        case .purchasing, .awaitingApproval: return theme.mut
+        default: return theme.sec
+        }
+    }
+
     private var badgeColor: Color {
         switch state {
         case .purchasing, .awaitingApproval: return theme.mut
@@ -427,13 +438,44 @@ struct PaywallBackdrop: View {
         ZStack {
             theme.backgroundBase
             GeometryReader { geo in
-                EllipticalGradient(
-                    colors: [phaseColor.opacity(theme.isDark ? 0.22 : 0.16), .clear],
-                    center: .top,
-                    startRadiusFraction: 0,
-                    endRadiusFraction: 0.72
+                // The handoff writes the tint as one CSS declaration:
+                // `radial-gradient(130% 55% at 50% 0%, phase 16%, transparent 72%)`.
+                // Those two numbers are *radii* — 1.3 screen widths across and 0.55
+                // screen heights down from a centre sitting on the top edge — so the
+                // ellipse's own box is twice each of them, and the strong end of the
+                // gradient has to land on the top edge of the screen.
+                //
+                // It shipped with the radii used as the box (`1.3w × 0.55h`) and the
+                // colour at `.top` of that box. Positioned at `y: 0` the box is
+                // centred on the top edge, which put the gradient's core a quarter of
+                // a screen *above* the screen: what reached the frame was the faded
+                // tail, measured at 5-7% where the handoff asks for 16%, and gone by
+                // a sixth of the way down. The phase was in the picture and could not
+                // be seen — PW-U3 read that as the feature being absent.
+                //
+                // Drawn as a circular ramp squashed into the ellipse rather than with
+                // `EllipticalGradient`, because the CSS ramp is linear in alpha and
+                // ends at a stated fraction of the radius: `endRadiusFraction` is a
+                // fraction of a size SwiftUI does not name, and measured against the
+                // handoff it ran a third of a screen long. `startRadius`/`endRadius`
+                // are points, and the 72% stop is then the number from the CSS rather
+                // than a value fitted to it.
+                let radius = geo.size.width * 1.3
+                RadialGradient(
+                    gradient: Gradient(stops: [
+                        .init(color: phaseColor.opacity(theme.isDark ? 0.22 : 0.16), location: 0),
+                        // The far stop keeps the phase's hue and drops only its alpha:
+                        // fading to `.clear` fades towards transparent *black*, which
+                        // prints a grey haze halfway down the light theme.
+                        .init(color: phaseColor.opacity(0), location: 0.72),
+                        .init(color: phaseColor.opacity(0), location: 1)
+                    ]),
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: radius
                 )
-                .frame(width: geo.size.width * 1.3, height: geo.size.height * 0.55)
+                .frame(width: radius * 2, height: radius * 2)
+                .scaleEffect(x: 1, y: geo.size.height * 0.55 / radius)
                 .position(x: geo.size.width / 2, y: 0)
             }
         }
