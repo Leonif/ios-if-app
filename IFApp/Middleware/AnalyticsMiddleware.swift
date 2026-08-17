@@ -140,8 +140,9 @@ final class AnalyticsMiddleware: Middleware {
         case .appBecameActive: break     // internal gate signal, not a funnel event
         case .goalScreenSettled: break   // internal gate signal, not a funnel event
         case .pushAuthorizationResolved: break // re-schedule signal, not a funnel event
-        case let .lastMealLogged(backdated, minutesAgo):
-            repo.log(.lastMealLogged(backdated: backdated, minutesAgo: minutesAgo))
+        case let .lastMealLogged(backdated, minutesAgo, inputMethod):
+            repo.log(.lastMealLogged(backdated: backdated, minutesAgo: minutesAgo,
+                                     inputMethod: inputMethod))
         case .fastChained:
             repo.log(.fastChained)
         case let .themeActive(dark):

@@ -27,8 +27,10 @@ struct TimerScreenProps: Equatable {
     /// mid-fast (or a custom goal whose entitlement went away) leaves the fast in
     /// flight running to the goal it started with.
     let goalHours: Double
-    let ateDay: Int
-    let ateMin: Int
+    /// The picker's value as the user expressed it — a distance. It is turned into
+    /// a clock time only for display, right where it is displayed.
+    let minutesAgo: Int
+    let chipIdx: Int
     let streak: StreakStatus
     /// The header pill only exists once there is a record to open.
     let hasRecords: Bool
@@ -73,8 +75,8 @@ struct TimerScreenProps: Equatable {
             .duration
         plan = state.planState.plan
         goalHours = state.activeGoalHours
-        ateDay = state.mealState.ateDay
-        ateMin = state.mealState.ateMin
+        minutesAgo = state.mealState.minutesAgo
+        chipIdx = state.mealState.chipIdx
         planEditorOpen = state.uiState.planEditorOpen
         mealPickerOpen = state.uiState.mealPickerOpen
         streakMilestoneOpen = state.uiState.streakMilestoneOpen
@@ -88,7 +90,7 @@ struct TimerScreenProps: Equatable {
         autoOfferPending = state.proState.autoOfferPending
     }
 
-    var isMealFresh: Bool { ateMin < 0 }
+    var isMealFresh: Bool { minutesAgo == 0 }
 
     func elapsed(at now: Date) -> TimeInterval {
         isRunning ? max(0, now.timeIntervalSince1970 - fastStartTimestamp) : stagedElapsed
@@ -326,7 +328,7 @@ struct TimerFlowView: View {
                                 valueText: mealValue(nowMinute: nowMinute),
                                 subline: mealSubline(nowMinute: nowMinute),
                                 theme: theme,
-                                onTap: { store.dispatch(OpenMealPickerThunk()) }
+                                onTap: { store.dispatch(UIAction.mealPickerOpened) }
                             )
                         }
                     } else {
@@ -359,7 +361,7 @@ struct TimerFlowView: View {
                                     valueText: mealValue(nowMinute: nowMinute),
                                     subline: mealSubline(nowMinute: nowMinute),
                                     theme: theme,
-                                    onTap: { store.dispatch(OpenMealPickerThunk()) }
+                                    onTap: { store.dispatch(UIAction.mealPickerOpened) }
                                 )
                             }
 
@@ -640,14 +642,28 @@ struct TimerFlowView: View {
         }
         if props.mealPickerOpen {
             let nowMinute = Clock.minuteOfDay()
+            let mins = props.minutesAgo
+            // Reading the clock to *show* a value is what the flow is for; the value
+            // that travels in the action below is the distance, with no clock in it.
+            let moment = MealMath.moment(minutesAgo: mins, nowMinuteOfDay: nowMinute)
             LastMealPickerSheet(
-                dateLabel: MealMath.dateLabel(ateDay: props.ateDay),
-                timeLabel: MealMath.timeLabel(ateMin: props.ateMin),
-                previewText: mealPreview(nowMinute: nowMinute),
+                minutesAgo: mins,
+                nowMinuteOfDay: nowMinute,
+                readout: MealMath.agoLabel(minutesAgo: mins),
+                absoluteLabel: MealMath.absoluteLabel(ateDay: moment.ateDay, ateMin: moment.ateMin),
+                overline: props.currentScreenState() == .eatingOver ? strings.Meal.windowClosedOverline : nil,
+                selectedChip: props.chipIdx,
                 theme: theme,
-                onQuickChip: { store.dispatch(QuickMealChipThunk(minutesAgo: $0)) },
-                onDayStep: { store.dispatch(MealAction.dayStepped(by: $0)) },
-                onTimeStep: { store.dispatch(MealAction.timeStepped(by: $0)) },
+                onChip: { store.dispatch(PickMealChipThunk($0)) },
+                // A plain action, not a thunk. Dragging emits a value every snap
+                // step — up to ~20 a second — and each has to land in the order the
+                // finger produced it, while a thunk dispatch hops onto an
+                // unstructured `Task` where ordering is not promised. That is only
+                // affordable because the payload is a bare distance: there is no
+                // clock to inject, so there is nothing a thunk would have been for.
+                onScrub: { store.dispatch(MealAction.scrubbed(minutesAgo: $0)) },
+                onFeedback: { store.dispatch(MealFeedbackThunk($0)) },
+                onExactTime: { store.dispatch(SetExactMealTimeThunk($0)) },
                 onConfirm: { store.dispatch(ConfirmLastMealThunk()) },
                 onClose: { store.dispatch(UIAction.mealPickerClosed) }
             )
@@ -793,20 +809,14 @@ struct TimerFlowView: View {
     }
 
     private func mealValue(nowMinute: Int) -> String {
-        props.isMealFresh ? strings.Meal.justNow : MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
+        props.isMealFresh ? strings.Meal.justNow : MealMath.fromLabel(minutesAgo: props.minutesAgo, nowMinuteOfDay: nowMinute)
     }
 
     private func mealSubline(nowMinute: Int) -> String? {
         guard !props.isMealFresh else { return nil }
-        let from = MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
-        let note = MealMath.note(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
+        let from = MealMath.fromLabel(minutesAgo: props.minutesAgo, nowMinuteOfDay: nowMinute)
+        let note = MealMath.note(minutesAgo: props.minutesAgo)
         return strings.Meal.fastCountsFrom(from, note)
-    }
-
-    private func mealPreview(nowMinute: Int) -> String {
-        let from = MealMath.fromLabel(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
-        let note = MealMath.note(ateDay: props.ateDay, ateMin: props.ateMin, nowMinuteOfDay: nowMinute)
-        return "\(from) · \(note)"
     }
 
     /// "8:00 PM" from an epoch timestamp.
