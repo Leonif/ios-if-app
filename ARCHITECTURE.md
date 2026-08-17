@@ -271,7 +271,7 @@ grep -rn "container.inject" IFApp --include='*.swift' | grep "Store<"
 
 **Зачем.** Уже стрельнуло: на одном экране в арабском стояли рядом «٦» и «118». Причина структурная — `String(format:)` цифры не локализует никогда, а `Int`, интерполированный в `String(localized:)`, локализует всегда. Без единой точки пиннинга каждое новое место форматирования — это лотерея, и заметна она только на арабской локали, то есть в самом конце цикла или в сторе. Второе, что пиннит `latinDigits`, — григорианский календарь: без него `ar_SA` отрисует в истории даты хиджры, тогда как стрик, семидневные точки и все day-key считаются по григорианским дням, и список начнёт описывать другие дни, чем цифры над ним.
 
-**Следуют:** канон — `Shared/Localization/Strings.swift:25`. Потребители: `Features/history/HistoryFormat.swift:23` (→ 6 форматтеров), `Features/meal/MealMath.swift:74`, `Flows/timer/TimerFlowView.swift:829` (`clockTime`), пять Int-принимающих аксессоров в `Strings.swift` (`:156`, `:192`, `:204`, `:275`, `:280`), и `Features/timer/components/StreakBadge.swift:66` + `Features/history/components/HistorySummaryCard.swift:64` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте). Номера пересняты 07.08.2026; `MealMath` 45 → 74 и `TimerFlowView` 782 → 829 — сдвиг от диффа IF-4 (18.08.2026), значения не менялись.
+**Следуют:** канон — `Shared/Localization/Strings.swift:25`. Потребители: `Features/history/HistoryFormat.swift:23` (→ 6 форматтеров), `Features/meal/MealMath.swift:74`, `Flows/timer/TimerFlowView.swift:829` (`clockTime`), `Features/endfast/EndFastMath.swift:137` (`clock`) и `:147` (`weekday`) — оба заведены IF-5 18.08.2026 и локаль пиннят, пункт 5 соблюдён; то, что тело форматтера при этом четвёртое в дереве, — вопрос пункта 8 (нарушение 8.8), а не этого, пять Int-принимающих аксессоров в `Strings.swift` (`:156`, `:192`, `:204`, `:275`, `:280`), и `Features/timer/components/StreakBadge.swift:66` + `Features/history/components/HistorySummaryCard.swift:64` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте). Номера пересняты 07.08.2026; `MealMath` 45 → 74 и `TimerFlowView` 782 → 829 — сдвиг от диффа IF-4 (18.08.2026), значения не менялись.
 
 **Новые Int-аксессоры IF-4 идут вторым законным путём.** `Meal.agoMinutes` / `agoRelative` / `agoDays` / `scaleTickHours` / `scaleTickDays` в `Strings.swift` собраны через `String(format:)`, а не через интерполяцию в `String(localized:)`. `locale: .latinDigits` им поэтому не нужен и не передаётся: `String(format:)` цифры не локализует никогда — это тот самый путь, который в разделе «Зачем» назван безопасным. Записано, чтобы следующий прогон не завёл на них ложное нарушение по грепу «Int-аксессор без locale».
 
@@ -353,22 +353,37 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 - `Features/history/HistoryStats.swift` — все агрегаты истории, с прямо записанной в шапке причиной (никаких инкрементальных счётчиков)
 - `Features/meal/MealMath.swift` — `minutesAgo`, `clamped`, `fastStart` и подписи; вызывается из `TimerFlowView`, `ConfirmLastMealThunk`, `ContinueFastingThunk`, `SeedLastMealFromWindowCloseThunk`, `SetExactMealTimeThunk`. `fastStart(minutesAgo:now:)` и `clamped` заведены 18.08.2026 (IF-4): старт поста от залогированного приёма пищи был выписан формулой в обоих тханках, и копии уже разъехались — пол «не начинать пост в будущем» стоял только на одном пути. Домен теперь клампится в одном месте, и через него проходит каждый способ ввода (лента, чип, точное время, сид). **Единственная позиция пункта 8, у которой есть регрессионный гард:** `IFAppTests/MealPickerTests.swift` проверяет и саму формулу, и её пол, и то, что кламп стоит на входе в состояние. Гард держит определение, а не число вызовов — разъехаться сведённые места он не помешает, если кто-то выпишет формулу заново рядом; от этого по-прежнему защищает только ревью
 - `Features/history/FastRecord.swift` — `duration`, `goalFraction`, `isExtended` выведены на записи, с записанной причиной («кэшированное пришлось бы синхронизировать при удалении»)
-- `Core/Clock.swift` — `dayKey` / `isDayBefore` — единственная арифметика календарных дней
+- `Features/endfast/EndFastMath.swift:69` — `resolve(_:now:selected:)`: что значит нажатый чип. Единственное раскрытие `EndFastChipOffset` в момент; зовут `EndFastMath.chips:56` (чтобы построить подпись) и `EndFastPickThunk:26` (чтобы записать значение), поэтому чип не может сказать одно, а выставить другое. **Заведено 18.08.2026 (IF-5), проверено по сути:** второго тела арифметики смещения в дереве нет, включая `EndFastReducer` и `EndFastSheet`
+- `Features/endfast/EndFastState.swift:47,53,57,60` — пороги шторки (`nearGoalThresholdMinutes`, `overtimeNeutralThreshold`, `minimumFastDuration`, `stepMinutes`) как именованные константы, а не литералы по месту вызова
+- `Features/meal/MealState.swift:46` — `set(minutesAgo:chip:via:)`: единственная точка изменения ответа «когда ел». Все четыре способа ввода (лента, чип, точное время, сид) идут через неё, поэтому кламп и учёт `inputMethod` не могут разъехаться между ними (IF-4)
+- `Core/Clock.swift:29` — `dayKey`, `:48` `daysBetween`, `:55` `isDayBefore`, `:61` `nextDay` — календарная арифметика **по day-key**. Формулировка «единственная арифметика календарных дней» снята 18.08.2026: с IF-5 те же сутки считаются и от timestamp'ов (`EndFastMath.daysBefore`), см. нарушение 8.10
 - `Features/plan/PlanState.swift:9` — `plan` как канонический доступ к плану
-- `Features/timer/TimerState.swift:22` — `StreakStatus.displayed(at:)` (закоммичено, сверено 07.08.2026)
-- `Features/timer/TimerState.swift:67` — `resolvedGoalHours(planHours:)`: что считается «целью текущего цикла»
-- `Features/timer/TimerState.swift:80` — `startTimestamp(at:)`: куда попадает старт поста, запускаемого при накопленном `stagedElapsed`. Зовут `StartFastThunk:29` и `ResumeFastThunk:33` (заведено 07.08.2026, см. ниже)
-- `Features/timer/TimerState.swift:97` — `eatingEndTimestamp(plan:)`: когда закроется пищевое окно. Зовут `NotificationMiddleware:56`, `ContinueFastingThunk:21`, `ConfirmLastMealThunk:27`, `SeedLastMealFromWindowCloseThunk:17`, `TimerFlowView:57`
+- `Features/timer/TimerState.swift:83` — `StreakStatus.displayed(at:)` (закоммичено, сверено 07.08.2026; номер переснят 18.08.2026)
+- `Features/timer/TimerState.swift:205` — `resolvedGoalHours(planHours:)`: что считается «целью текущего цикла»
+- `Features/timer/TimerState.swift:217` — `startTimestamp(at:)`: куда попадает старт поста, запускаемого при накопленном `stagedElapsed`. Зовут `StartFastThunk:29` и `ResumeFastThunk:33` (заведено 07.08.2026, см. ниже)
+- `Features/timer/TimerState.swift:235` — `eatingEndTimestamp(plan:)`: когда закроется пищевое окно. Зовут `NotificationMiddleware:56`, `ContinueFastingThunk:26`, `ConfirmLastMealThunk:32`, `SeedLastMealFromWindowCloseThunk:17`, `TimerFlowView:70`
 - `Features/plan/Plan.swift:46` — `windowHours`: **почему** окно такой длины (остаток суток). Отделено от арифметики «когда закроется» сознательно — правило и его применение живут врозь
 
-**Нарушают: 4.** Было 7. Номера сняты 07.08.2026 на остановившемся дереве `current-release` (дев-цикл 1.5.x принят владельцем, не закоммичено).
+**Нарушают: 8.** Было 4. Прирост — не регрессия одного диффа: все четыре новые позиции (8.8-8.11) — это правила отображения и календарной арифметики, у которых первое тело лежало в `HistoryFormat` / `MealMath` / `Clock` задолго до IF-5, а IF-5 добавил к каждому по второму (по четвёртому — в 8.8) телу в `EndFastMath`. Найдены сплошным проходом 18.08.2026, а не диффом: `diff`-режим видит новое тело, но не видит, что где-то в другом слое уже лежит первое. Это тот же класс промаха, что описан по 8.3 ниже.
 
 | # | Что задвоено | Где |
 |---|---|---|
-| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **4 определения** | `Flows/timer/TimerFlowView.swift:81` · `Features/timer/thunk/StopFastThunk.swift:17-19` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` · `Features/timer/thunk/ResetFastThunk.swift:20-22` |
-| 8.4 | Предикат «цель достигнута» `elapsed ≥ goalHours × 3600` — **3 определения** | `Features/phase/Phase.swift:88-93` (`PhaseProgress.isComplete`) · `Features/history/FastRecord.swift:27` (`goalReached`) · `Features/timer/thunk/StopFastThunk.swift:24` (`qualifies`) |
+| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **3 определения** (было 4) | `Flows/timer/TimerFlowView.swift:96` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` · `Features/timer/thunk/ResetFastThunk.swift:20-22` |
+| 8.4 | Предикат «цель достигнута» `elapsed ≥ goalHours × 3600` — **3 определения** | `Features/phase/Phase.swift:88-93` (`PhaseProgress.isComplete`) · `Features/history/FastRecord.swift:27` (`goalReached`) · `Features/endfast/thunk/ConfirmEndFastThunk.swift:41` (`qualifies`) |
 | 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:67-70` · `Flows/timer/TimerFlowView.swift:836` |
 | 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела, включая doc-комментарий** | `Features/timer/components/RingCenter.swift:116` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:752` (`overtimeShort`) |
+| 8.8 | Настенные часы «9:10 AM»: `DateFormatter` + `.latinDigits` + `.short` / `.none` — **4 тела** | `Features/history/HistoryFormat.swift:58-63` (`time`) · `Features/meal/MealMath.swift:66-77` (`timeLabel`) · `Features/endfast/EndFastMath.swift:135-141` (`clock`) · `Flows/timer/TimerFlowView.swift:823-833` (`clockTime`) |
+| 8.9 | Название дня по расстоянию: `0 → Today`, `1 → Yesterday`, `n → n days ago` — **2 тела на одних и тех же ключах** | `Features/meal/MealMath.swift:57-63` (`dateLabel`) · `Features/endfast/EndFastMath.swift:115-123` (`dayCaption`) |
+| 8.10 | Целые календарные сутки между двумя моментами (календарём, не делением на 86400) — **2 тела, с одинаковым DST-обоснованием в комментарии** | `Core/Clock.swift:48-52` (`daysBetween`, от day-key) · `Features/endfast/EndFastMath.swift:126-131` (`daysBefore`, от timestamp) |
+| 8.11 | Как пишется диапазон одного `FastRecord` — **2 тела, уже разъехавшиеся** | `Features/history/HistoryFormat.swift:79-85` (`rowSubline`: стрелка, зеркалится по `isRTL`) · `Features/endfast/EndFastMath.swift:161-165` (`recordSpan`: дефис, направление не учитывается) |
+
+**8.2 уменьшилось на одно определение.** `StopFastThunk` исчез в IF-5 (`a6c04e6`), его заменил `ConfirmEndFastThunk`, который прошедшее время **не** выводит: он берёт подтверждённый конец из шторки и считает `end − start` под гардом `timer.isRunning`. Это другое правило, а не четвёртая копия того же. Строка таблицы, ссылавшаяся на несуществующий файл, — то, ради чего этот заход и был назначен.
+
+**8.11 был наблюдением, стал нарушением.** В прошлом проходе он записан как «локале-зависимый разделитель диапазона, которого `loc` не видит». Сплошной проход показал, что дело хуже формулировки: `recordSpan` и `rowSubline` описывают **один и тот же объект** — сохранённый пост, — и уже расходятся. В `ar` строка истории переворачивает стрелку, а строка отказа в шторке склеивает концы дефисом в исходном порядке. Тест пункта 8 («может ли одно место остаться со старым правилом и продолжить компилироваться») даёт «да», причём оно уже осталось.
+
+**8.8 / 8.9 / 8.10 — не про инвариант 5.** Все четыре форматтера 8.8 берут `Locale.latinDigits`, то есть пункт 5 соблюдён; задвоено то, из чего форматтер собирается, а это область пункта 8. Разводить их важно, чтобы починка 8.8 не читалась как починка 5: свести четыре тела в одно можно, ничего не меняя в поведении.
+
+**Что осталось спорным и решает владелец.** `EndFastMath:155` и `EndFastSheet:162` пишут по месту `strings.Duration.hm(total / 3600, (total / 60) % 60)`. В таблицу они **не** внесены: разбор секунд на часы и минуты пункт 8 сам называет дешёвой арифметикой на месте, а определение формата — это `strings.Duration.hm`, и оно одно. Если владелец считает иначе, это меняет границу правила, а не счёт по нему.
 
 **Номера 8.6 и 8.7 пересняты снова 18.08.2026, при ревью диффа IF-4:** `TimerFlowView` 794 → 836 (`hoursMinutes`) и 705 → 752 (`overtimeShort`) — сдвиг от этого диффа, `HistoryFormat` и `RingCenter` не двигались, оба задвоения на месте. Предыдущая пересъёмка:
 
@@ -376,7 +391,7 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 
 **Три позиции закрыты (учёт 07.08.2026).**
 
-- **8.1** (момент закрытия пищевого окна, было 5 определений) — сведено к `Features/plan/Plan.swift:46` (`windowHours` — почему окно такой длины) плюс `Features/timer/TimerState.swift:97` (`eatingEndTimestamp(plan:)` — когда оно закроется). Правило записано один раз, арифметика отделена от него. Греп `24 - .*fastHours` пуст.
+- **8.1** (момент закрытия пищевого окна, было 5 определений) — сведено к `Features/plan/Plan.swift:46` (`windowHours` — почему окно такой длины) плюс `Features/timer/TimerState.swift:235` (`eatingEndTimestamp(plan:)` — когда оно закроется). Правило записано один раз, арифметика отделена от него. Греп `24 - .*fastHours` пуст.
 - **8.5** (план по индексу с фолбэком, было 3 копии) — исчезло вместе с `Plan(rawValue:)`, когда `Plan` стал value type. Греп `Plan(rawValue:` пуст.
 - **8.3** (день зачисления достигнутой цели, было 2 расходящихся определения) — **оба места давно зовут `Clock.goalDayKey`**: `CelebrateGoalThunk.swift:22` и `FastRecord.swift:56`. Сегодняшний дев-цикл тут ни при чём — сверено по `git show HEAD`, в коммите уже так. Значит строка висела в таблице устаревшей как минимум с 06.08, и предыдущие два прогона `architect` её не перепроверили: измерение переносилось из версии в версию как факт. **Пересчитывать надо каждую строку таблицы, а не только те, которых касался дифф** — иначе документ накапливает вымышленные нарушения, а они дороже пропущенных: по ним заводят работу, которой нет.
 
@@ -396,6 +411,12 @@ grep -rn "24 - .*fastHours" IFApp --include='*.swift'          # окно пит
 grep -rn "goalHours \* 3600\|fastHours \* 3600" IFApp --include='*.swift'
 grep -rn "Plan(rawValue:" IFApp --include='*.swift'            # ожидаем PlanState.plan
 grep -rn "stagedElapsed" IFApp --include='*.swift'             # ожидаем один elapsed
+```
+Правила отображения граф не ловит совсем — они не зовут друг друга, в этом и беда. По ним только греп, и проверять надо весь тюльпан, а не дифф:
+```
+grep -rn "timeStyle = .short" IFApp --include='*.swift'        # 8.8: ожидаем одно тело
+grep -rn "Meal.yesterday\b\|Meal.daysAgo" IFApp --include='*.swift'  # 8.9: ожидаем одно тело
+grep -rn "startOfDay" IFApp --include='*.swift'                # 8.10: ожидаем Clock и только его
 ```
 
 ---
