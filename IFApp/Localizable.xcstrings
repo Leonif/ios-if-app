@@ -5,6 +5,12 @@
       "comment" : "Clock caption past yesterday, e.g. 'Sat 18 Jul at 10:30 AM'.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ في %@"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -27,6 +33,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ à %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ %@"
           }
         },
         "pl" : {
@@ -112,6 +130,12 @@
       "comment" : "Meal ribbon tick label, days. Must fit the width of one tick - 6 chars max.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%d ي"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -134,6 +158,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%dj"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d日"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d일"
           }
         },
         "pl" : {
@@ -160,6 +196,12 @@
       "comment" : "Meal readout past a day, e.g. '1d 3h ago'. The readout has no plural substitution, here or in the English source: its units are abbreviated and an abbreviation is not governed by number. Keep every locale's unit abbreviated - a whole word would need a plural branch this key does not have, and would render \"vor 1 Tagen\" on the commonest value.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "قبل %d ي %d س"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
@@ -182,6 +224,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "il y a %d j %d h"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d日%d時間前"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d일 %d시간 전"
           }
         },
         "pl" : {
@@ -444,6 +498,12 @@
       "comment" : "Meal readout, hours and minutes, e.g. '2h 40m ago'. The readout has no plural substitution, here or in the English source: its units are abbreviated and an abbreviation is not governed by number. Keep every locale's unit abbreviated - a whole word would need a plural branch this key does not have, and would render \"vor 1 Tagen\" on the commonest value.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قبل %d س %d د"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -466,6 +526,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "il y a %d h %d min"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d時間%d分前"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d시간 %d분 전"
           }
         },
         "pl" : {
@@ -551,6 +623,12 @@
       "comment" : "Meal readout under an hour, e.g. '40m ago'. One whole template - 'ago' leads in de/es/fr/ar and trails in uk/pl/ja/ko. The readout has no plural substitution, here or in the English source: its units are abbreviated and an abbreviation is not governed by number. Keep every locale's unit abbreviated - a whole word would need a plural branch this key does not have, and would render \"vor 1 Tagen\" on the commonest value.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قبل %d د"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -573,6 +651,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "il y a %d min"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d分前"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d분 전"
           }
         },
         "pl" : {
@@ -1374,6 +1464,12 @@
       "comment" : "Meal picker chip: one hour ago. Keep it as short as the English.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قبل ساعة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1396,6 +1492,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 h"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "1時間前"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1시간"
           }
         },
         "pl" : {
@@ -1422,6 +1530,12 @@
       "comment" : "Meal picker chip: three hours ago. Keep it as short as the English.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قبل 3 ساعات"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1444,6 +1558,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "3 h"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "3時間前"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3시간"
           }
         },
         "pl" : {
@@ -3560,6 +3686,12 @@
       "comment" : "Meal picker chip: yesterday evening. The longest chip - pl/de need ~17 chars.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مساء أمس"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3582,6 +3714,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hier soir"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昨夜"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "어젯밤"
           }
         },
         "pl" : {
@@ -3608,6 +3752,12 @@
       "comment" : "Toolbar button of the exact-time wheel in the last-meal picker (LastMealPickerSheet.swift): commits the moment the wheel is standing on. This CONFIRMS A CHOICE — take the locale's Done lexeme, never its OK/acknowledgement one and never a close/dismiss one, same as PlanEditor.confirm. Split off the shared literal key 'Done' for the same reason that one was.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3630,6 +3780,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
           }
         },
         "pl" : {
@@ -3656,6 +3818,12 @@
       "comment" : "Text link under the meal ribbon; opens the system date picker.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديد الوقت بدقة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3678,6 +3846,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Heure exacte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時刻を指定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정확한 시간 설정"
           }
         },
         "pl" : {
@@ -3704,6 +3884,12 @@
       "comment" : "Under the meal ribbon, only when it hits the 7-day limit.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذا أبعد وقت يمكن اختياره."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3726,6 +3912,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible de remonter plus loin."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "さかのぼれるのはここまでです。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여기까지만 거슬러 올라갈 수 있어요."
           }
         },
         "pl" : {
@@ -3752,6 +3950,12 @@
       "comment" : "VoiceOver label for the meal ribbon.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوقت منذ آخر وجبة"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3774,6 +3978,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Temps écoulé depuis le dernier repas"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後の食事からの経過時間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마지막 식사 이후 경과 시간"
           }
         },
         "pl" : {
@@ -3800,6 +4016,12 @@
       "comment" : "Clock caption under the meal readout, e.g. 'Today at 7:50 AM'.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اليوم في %@"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3822,6 +4044,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aujourd’hui à %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日 %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘 %@"
           }
         },
         "pl" : {
@@ -3848,6 +4082,12 @@
       "comment" : "Clock caption under the meal readout, e.g. 'Yesterday at 8:00 PM'. Replaces the older 'Yesterday %@'.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أمس في %@"
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3870,6 +4110,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hier à %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昨日 %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "어제 %@"
           }
         },
         "pl" : {
@@ -5914,6 +6166,58 @@
     "history.entry.a11yLastStreak" : {
       "comment" : "VoiceOver label of the streak pill on the main screen when the run has\nended and its number is still shown, drained of accent.",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سجل الصيام، آخر سلسلة %#@days@"
+          },
+          "substitutions" : {
+            "days" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "few" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld أيام"
+                    }
+                  },
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld يومًا"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "يوم واحد"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld يوم"
+                    }
+                  },
+                  "two" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "يومان"
+                    }
+                  },
+                  "zero" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld أيام"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6038,6 +6342,50 @@
             }
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "断食履歴、前回%#@days@連続"
+          },
+          "substitutions" : {
+            "days" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld日"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단식 기록, 이전 %#@days@ 연속"
+          },
+          "substitutions" : {
+            "days" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld일"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6145,6 +6493,58 @@
     "history.streak.ended" : {
       "comment" : "Sentence on the history summary card under the big number, in the state\nwhere the streak has just ended (shown for 7 days after the missed day).\nThe number is the run that was lost. Plural categories belong in the\ncatalog. Up to 3 lines at xxLarge in a 299pt slot. No blame, no call to\naction, no mention of the paid freeze.",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "توقفت تلك السلسلة عند %#@days@. تبدأ سلسلة جديدة بأول هدف تبلغه."
+          },
+          "substitutions" : {
+            "days" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "few" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld أيام"
+                    }
+                  },
+                  "many" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld يومًا"
+                    }
+                  },
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "يوم واحد"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld يوم"
+                    }
+                  },
+                  "two" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "يومين"
+                    }
+                  },
+                  "zero" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld أيام"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6269,6 +6669,50 @@
             }
           }
         },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%#@days@で連続記録が途切れました。次に目標を達成すると、新しい記録が始まります。"
+          },
+          "substitutions" : {
+            "days" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%lld日"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "연속 기록이 %#@days@에서 끊겼어요. 다음에 목표를 달성하면 새 연속 기록이 시작돼요."
+          },
+          "substitutions" : {
+            "days" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "needs_review",
+                      "value" : "%lld일"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6376,6 +6820,12 @@
     "history.streak.firstFast" : {
       "comment" : "Note on the summary card over the first fasts, under the streak counter.\nReplaces the old promise that tomorrow starts the streak. States the rule:\nonly a day whose goal was reached counts. Neutral, no blame, no exclamation.",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم تسجيل أول صيام. تحسب السلسلة الأيام التي تبلغ فيها هدفك."
+          }
+        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6398,6 +6848,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Premier jeûne enregistré. Une série compte les jours où vous atteignez votre objectif."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最初の断食を記録しました。連続記録に数えられるのは、目標を達成した日です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첫 단식을 기록했어요. 연속 기록에는 목표를 달성한 날만 들어가요."
           }
         },
         "pl" : {
@@ -6456,7 +6918,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "以前の連続日数"
+            "value" : "前回の連続日数"
           }
         },
         "ko" : {
