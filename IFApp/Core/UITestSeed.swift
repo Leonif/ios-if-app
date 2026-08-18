@@ -146,6 +146,24 @@ enum UITestSeed {
             defaults.set(gapMonth ?? Clock.monthKey(ofDay: today), forKey: "streak_freeze_spent_month")
         }
 
+        // "-seedHistoryDaysBack N": shifts every seeded history record N days further
+        // into the past. It exists because the seeded block is anchored to the host's
+        // wall clock, not to anything the flow controls: without a shift the newest
+        // record runs "yesterday 20:00 → today ~12:00", so a flow that also seeds an
+        // in-flight fast collides with it before ~14:00 local time and runs clean
+        // after. Such a flow is not testing what it says it tests — it is testing what
+        // time the machine was switched on, and it spends most of the day red, which
+        // is the state in which a real regression goes unnoticed.
+        //
+        // A shift rather than an absolute date: the records stay relative to "now", so
+        // the seven-day dots, the streak and the "days ago" labels keep meaning what
+        // they mean, and only the distance from today is pinned down.
+        //
+        // Not applied by default. `IF5_S4_refusal_overlap` is built on the collision
+        // on purpose, and a default that quietly removed it would break the one flow
+        // whose subject it is. The flow that wants determinism asks for it by name.
+        let daysBack = intArg("-seedHistoryDaysBack") ?? 0
+
         // History lives in a file, not in defaults — wipe it alongside the baseline
         // so a previous run's records can't leak into this one.
         //
@@ -171,20 +189,66 @@ enum UITestSeed {
             // dev-task-1.5.0-hardening TF-2 — not in the original seed-arg table.
             (history as? FastHistoryRepository)?.seedFutureSchemaFile()
         } else if args.contains("-seedHistoryEdge") {
-            history.replaceAll(edgeCaseRecords())
+            let records = edgeCaseRecords(daysBack: daysBack)
+            history.replaceAll(records)
+            warnIfSeededHistoryCollides(records, elapsed: intArg("-seedElapsed"))
         } else if let count = intArg("-seedHistory") {
-            history.replaceAll(dailyRecords(count: count))
+            let records = dailyRecords(count: count, daysBack: daysBack)
+            history.replaceAll(records)
+            warnIfSeededHistoryCollides(records, elapsed: intArg("-seedElapsed"))
         }
     }
 
+    /// Seeded history and a seeded in-flight fast can describe overlapping time, and
+    /// the app is right to refuse the end (IF-5 overlap guard) — but a flow that did
+    /// not mean to exercise that guard has no way to tell an overlap from a broken
+    /// screen: it just sees the refusal sheet where it expected a result. This costs a
+    /// morning of measuring, so the seeder says it out loud in the journal instead.
+    ///
+    /// A journal line, not a crash: a collision is legitimate when a flow wants it
+    /// (`IF5_S4_refusal_overlap` is built on exactly this), so the seeder reports and
+    /// gets out of the way rather than deciding for the flow.
+    ///
+    /// The overlap is asked of `FastRecord.firstOverlap` — the same function the guard
+    /// itself calls — so this warning cannot drift into disagreeing with the behaviour
+    /// it is warning about.
+    ///
+    /// Takes the records it just wrote rather than reading them back through
+    /// `loadAll()`, and is called only from the two branches that write records. Both
+    /// halves matter: `loadAll()` on the file left by "-seedHistoryCorrupt" would
+    /// quarantine it and fire `onLoadFailure` *inside the seeder*, so the flow that
+    /// exists to watch the app survive those bytes (`H11_history_corrupt_recovers`)
+    /// would find them already cleaned up and stay green without testing anything —
+    /// the exact failure this warning was added to prevent. Caught by `architect` on
+    /// review, 18.08.2026.
+    private static func warnIfSeededHistoryCollides(_ records: [FastRecord], elapsed: Int?) {
+        guard let elapsed else { return }
+        let now = Date().timeIntervalSince1970
+        guard let conflict = FastRecord.firstOverlap(in: records,
+                                                     start: now - Double(elapsed),
+                                                     end: now) else { return }
+        let log: DiagnosticsLogRepositoryProtocol = container.inject()
+        let stamp = ISO8601DateFormatter()
+        log.append("""
+            SEED WARNING: the seeded fast (-seedElapsed \(elapsed), \
+            \(stamp.string(from: Date(timeIntervalSince1970: now - Double(elapsed)))) → \
+            \(stamp.string(from: Date(timeIntervalSince1970: now)))) overlaps a seeded \
+            history record (\(stamp.string(from: Date(timeIntervalSince1970: conflict.startTimestamp))) → \
+            \(stamp.string(from: Date(timeIntervalSince1970: conflict.endTimestamp)))). \
+            Ending this fast will hit the IF-5 overlap refusal. If that is not what the \
+            flow is testing, push the seeded history back with "-seedHistoryDaysBack N".
+            """)
+    }
+
     /// `count` fasts, one a day back from yesterday, with a single skipped day so
-    /// the seven-day dots show a real gap.
-    private static func dailyRecords(count: Int) -> [FastRecord] {
+    /// the seven-day dots show a real gap. `daysBack` pushes the whole block further
+    /// into the past (see "-seedHistoryDaysBack").
+    private static func dailyRecords(count: Int, daysBack: Int = 0) -> [FastRecord] {
         let calendar = Calendar.current
         let plan = Plan(hours: 16)
         return (0..<max(0, count)).compactMap { index in
             // Skip four days back to leave one unfilled dot in the last week.
-            let daysAgo = index >= 4 ? index + 2 : index + 1
+            let daysAgo = (index >= 4 ? index + 2 : index + 1) + max(0, daysBack)
             guard let day = calendar.date(byAdding: .day, value: -daysAgo, to: Date()),
                   let start = calendar.date(bySettingHour: 20, minute: (index * 13) % 60, second: 0, of: day)
             else { return nil }
@@ -202,12 +266,14 @@ enum UITestSeed {
 
     /// The four data shapes the design has to survive: a fast across midnight, one
     /// past 40 hours, one that fell short of its goal, and two on the same day.
-    private static func edgeCaseRecords() -> [FastRecord] {
+    ///
+    /// `daysBack` shifts the whole set further into the past, same as `dailyRecords`.
+    private static func edgeCaseRecords(daysBack: Int = 0) -> [FastRecord] {
         let calendar = Calendar.current
         let now = Date()
 
         func record(daysAgo: Int, hour: Int, minute: Int, duration: TimeInterval, plan: Plan) -> FastRecord? {
-            guard let day = calendar.date(byAdding: .day, value: -daysAgo, to: now),
+            guard let day = calendar.date(byAdding: .day, value: -(daysAgo + max(0, daysBack)), to: now),
                   let start = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: day)
             else { return nil }
             return FastRecord(

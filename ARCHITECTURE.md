@@ -215,9 +215,11 @@ grep -rnE "UI(Impact|Notification|Selection)FeedbackGenerator|UIApplication\.sha
 
 **Следуют:** 8 мидлвар, 7 тханков, 3 бутстрап-точки. Регистрация одна — `Core/AppDependencies.swift`.
 
-- **Мидлвары** (`IFApp/Middleware/`): `PersistenceMiddleware.swift:13`, `StreakMiddleware.swift:15`, `NotificationMiddleware.swift:16`, `StoreMiddleware.swift:22`, `DiagnosticsMiddleware.swift:23`, `ReviewMiddleware.swift:25`, `AnalyticsMiddleware.swift:26`, `HistoryMiddleware.swift:27`
-- **Тханки**: `Features/timer/thunk/StartFastThunk.swift:18-19`, `Features/timer/thunk/ScheduleNotificationsThunk.swift:16`, `Features/ui/SyncPushStatusThunk.swift:19-20`, `Features/history/thunk/ExportHistoryThunk.swift:19`, `Features/pro/thunk/PurchaseProThunk.swift:15`, `Features/pro/thunk/RestorePurchasesThunk.swift:15`, `Features/pro/thunk/RefreshEntitlementThunk.swift:16`
-- **Бутстрап**: `Core/AppStoreFactory.swift:14,23,30`, `Core/UITestSeed.swift:109`
+Пересобрано грепом 18.08.2026 — 25 вызовов `container.inject` в 17 файлах (26-е совпадение — строка примера в шапке `Core/Container.swift`):
+
+- **Мидлвары** (`IFApp/Middleware/`, 9 вызовов в 8 файлах): `PersistenceMiddleware.swift:14,15`, `StreakMiddleware.swift:15`, `NotificationMiddleware.swift:16`, `StoreMiddleware.swift:22`, `DiagnosticsMiddleware.swift:23`, `ReviewMiddleware.swift:25`, `AnalyticsMiddleware.swift:26`, `HistoryMiddleware.swift:27`
+- **Тханки** (9 вызовов в 7 файлах): `Features/timer/thunk/StartFastThunk.swift:18,19`, `Features/timer/thunk/ScheduleNotificationsThunk.swift:16`, `Features/ui/SyncPushStatusThunk.swift:19,20`, `Features/history/thunk/ExportHistoryThunk.swift:19`, `Features/pro/thunk/PurchaseProThunk.swift:15`, `Features/pro/thunk/RestorePurchasesThunk.swift:15`, `Features/pro/thunk/RefreshEntitlementThunk.swift:16`
+- **Бутстрап** (7 вызовов в 3 файлах): `Core/AppStoreFactory.swift:14,23,38,39`, `Core/UITestSeed.swift:175,230`, `Core/AppDependencies.swift:29`
 
 **Список пересобран 07.08.2026 — устарел состав, не только номера.** Значилось 6 мидлвар и 2 тханка, фактически 8 и 7. Разошлось не сегодня: `StoreMiddleware` и четыре тханка (`StartFastThunk`, `ExportHistoryThunk`, `PurchaseProThunk`, `RestorePurchasesThunk`, `RefreshEntitlementThunk`) инжектят зависимости с дев-циклов 1.4.x-1.5.0, а `DiagnosticsMiddleware` добавлен сегодня. Все — в разрешённых местах, нарушений среди них нет; расходился учёт, а не код.
 
@@ -482,6 +484,7 @@ xcrun simctl get_app_container <UDID> simple-L.if-app.com data
 | `-uitestReset` | стирает таймер-дефолты и весь файл истории — чистый idle | `Core/AppStoreFactory.swift` |
 | `-seedElapsed` / `-seedEatingElapsed` / `-seedCount` / `-seedCelebrated` / `-seedPlanHours` / `-seedGoalHours` / `-seedPromptCount` / `-seedPendingGoal` / `-seedOfferShown` / `-seedStreak` / `-seedLastGoalDate` / `-seedFreezeSpent` | чистый baseline в `UserDefaults` + перечисленные значения | `Core/UITestSeed.swift` |
 | `-seedHistory N` / `-seedHistoryEdge` | N сгенерированных записей / четыре краевые формы | `Core/UITestSeed.swift` |
+| `-seedHistoryDaysBack N` | сдвигает **весь** засеянный блок истории на N суток дальше в прошлое; без него самая свежая запись всегда упирается в сегодняшний полдень | `Core/UITestSeed.swift` |
 | `-seedHistoryCorrupt` / `-seedHistoryFutureSchema` | кладёт в `Documents/fast-history.json` заведомо недекодируемые байты / конверт схемы, которой эта сборка не знает (ветка `readOnly` гарда TF-2) | `Core/UITestSeed.swift` + `Data/FastHistoryRepository.swift` |
 | `-seedStore` + семейство `-seedStore…` | подставляет `StubStoreRepository` вместо StoreKit — разбор ниже, в разделе «Локальный магазин» | `Core/AppDependencies.swift`, `Data/StubStoreRepository.swift` |
 | `-showReviewPrompt` | шторка отзыва сразу | `IFAppApp.init` |
@@ -490,6 +493,36 @@ xcrun simctl get_app_container <UDID> simple-L.if-app.com data
 **Почему `#if DEBUG`, а не «юзер всё равно не передаст».** `-uitestReset` до 07.08.2026 компилировался в релизный бинарник (TF-6). Реализованного пути эксплуатации у него нет, но это деструктивный хук — он стирает историю целиком, — и в сторовой сборке ему нечего делать по тому же признаку, по которому там нет `StubStoreRepository`. Гейт compile-time; гейтить по окружению нельзя по той же причине, что и диагностику: App Review гоняет приложение в sandbox.
 
 **`-seedHistoryCorrupt`.** Пишет 81 байт — конверт, обрезанный посреди первой записи (`{"schemaVersion":1,"records":[{"id":"6F1C…","start`), то есть форму, которую даёт прерванная запись, а не случайный мусор. Фикстура живёт одним определением — `FastHistoryRepository.corruptFixture` — чтобы флоу, юнит-тест и ручной прогон портили файл одинаково. Хук идёт мимо `FastHistoryRepositoryProtocol` (`history as? FastHistoryRepository`) сознательно: протокол говорит только записями, а запись, которая не декодится, им невыразима. Аргумент взаимоисключающий с `-seedHistory` / `-seedHistoryEdge` — ветка `if/else if`, corrupt первый.
+
+**`-seedHistoryDaysBack N`.** Заведён 18.08.2026 (IF-27). Сдвигает каждую запись, которую пишет `-seedHistory` или `-seedHistoryEdge`, на N суток дальше в прошлое. По умолчанию 0 — поведение сида без аргумента не изменилось.
+
+**Зачем.** Засеянная история привязана к часам хоста, а не к чему-либо, что контролирует флоу: `dailyRecords()` кладёт самую свежую запись на «вчера 20:00 → сегодня ~12:00» (ровно 16 часов, минутный разброс появляется только со второго индекса). Флоу, который вдобавок засевает пост в полёте (`-seedElapsed`), получает окно `[now-elapsed, now]`, и эти два интервала пересекаются **при любом запуске примерно до 14:00** местного времени и расходятся после. Гард пересечений (IF-5) в этом случае отказывает завершить пост — правильно, но флоу этого не проверяет и падает на шторке отказа.
+
+Цена не в самом падении, а в том, что такой флоу **красный бо́льшую часть суток** и потому не проверяет ничего: когда сломается то, ради чего он написан, никто не заметит — он и так красный. Замерено `qa` 18.08.2026 на `B7_resume_removes_record` и `D2_complete_skip_keeps_record`.
+
+**Сдвиг, а не абсолютная дата:** записи остаются относительными к «сейчас», поэтому семидневные точки, стрик и подписи «N дней назад» продолжают значить то же самое — фиксируется только расстояние до сегодня.
+
+**Не применяется по умолчанию.** `IF5_S4_refusal_overlap` построен на этом пересечении осознанно — это единственный флоу, для которого коллизия и есть предмет проверки. Дефолт, который её тихо убрал бы, сломал бы ровно тот флоу, ради которого она нужна. Кому нужна детерминированность — просит её по имени.
+
+**Предупреждение в журнале.** Когда `-seedElapsed` задан и засеянный пост всё-таки пересекается с засеянной записью, `UITestSeed` пишет в `Documents/diagnostics.log` строку `SEED WARNING: …` с обоими интервалами и подсказкой про `-seedHistoryDaysBack`. Пересечение спрашивается у `FastRecord.firstOverlap` — той же функции, которую зовёт сам гард, — чтобы предупреждение не могло разойтись с поведением, о котором предупреждает. Не падение: коллизия бывает законной (S4), поэтому сид сообщает и уходит с дороги. Смысл строки в том, чтобы следующий такой случай стоил одного `grep`, а не утра замеров.
+
+Проверка смотрит на записи, которые сид **только что положил**, и зовётся только из двух пишущих веток — не читает файл через `loadAll()`. Первая редакция читала, и `architect` на ревью 18.08.2026 показал, чем это кончается: `loadAll()` по байтам от `-seedHistoryCorrupt` уносит файл в карантин и дёргает `onLoadFailure` **внутри сида**, так что `H11_history_corrupt_recovers` находил бы файл уже вычищенным и оставался зелёным, ничего не проверяя. Тот же класс вреда, ради устранения которого заведён IF-27, — в правке, которая его устраняла.
+
+Проверено на симуляторе 18.08.2026 (`iPhone 17 Pro`, 07:11 — час, в который оба флоу были красными):
+
+```bash
+SIM=<UDID>
+xcrun simctl launch $SIM simple-L.if-app.com -seedHistory 3 -seedElapsed 7200
+# 07:11:22.432  SEED WARNING: the seeded fast (-seedElapsed 7200, 2026-08-18T02:11:22Z → 2026-08-18T04:11:22Z)
+#   overlaps a seeded history record (2026-08-17T17:00:00Z → 2026-08-18T09:00:00Z). …
+
+xcrun simctl launch $SIM simple-L.if-app.com -seedHistory 3 -seedHistoryDaysBack 3 -seedElapsed 7200
+# ни одной строки SEED WARNING; записи: 08-14 20:00→08-15 12:00, 08-13 20:13→08-14 12:50, 08-12 20:26→08-13 13:40
+```
+
+В UI на тех же аргументах: без сдвига «End fast → Confirm» приводит на шторку «That time is taken», со сдвигом — на `FAST COMPLETE`.
+
+**Регистрация журнала стала общим экземпляром.** `DiagnosticsLogRepository` держит открытый `FileHandle`, позиционированный в конец файла; фабрика в контейнере отдавала новый экземпляр на каждый `inject()`, и второй читатель протокола (это предупреждение) открыл бы второй хендл на том же смещении — две записи затирали бы строки друг друга. С 18.08.2026 `AppDependencies` регистрирует один заранее созданный экземпляр — единственная такая регистрация в файле, и она прокомментирована на месте.
 
 **`-seedFreezeSpent 1`.** Заведён 10.08.2026 под критерий приёмки «Freeze: доступна 1 на календарный месяц» (`dev-task-paywall.md:299`). Пишет `streak_freeze_spent_month` — месяц, чья защита уже израсходована. Без него вторая пропажа в одном месяце из флоу недостижима вообще: чтобы потратить заморозку по-настоящему, нужна цель, взятая в день, до которого флоу не доезжает, а один запуск не пересеивает сам себя. Ветка была покрыта только юнитами.
 
@@ -779,6 +812,8 @@ Logging event: origin, name, params: app, fast_stopped, {
 Развилка не рассасывается: с прошлого замера в каждую сторону добавилось по паре мест (`ResumeFastThunk` — сегодня, напрямую), а `HistoryMiddleware` из списка ушёл — он часов больше не читает. Ни один из двух способов не вытесняет другой, и выбор автора продолжает определяться соседним кодом.
 
 Развилка настоящая: `Clock.now()` сегодня — это буквально `Date()` в обёртке, никакой подмены он не даёт, так что дисциплина ради дисциплины ничего не купит. **Два разных решения:** либо `Clock` становится обязательным и получает смысл (точка подмены времени в тестах — тогда `UITestSeed` перестаёт быть единственным способом попасть в поздние состояния), либо шапку файла надо переписать, потому что она обещает несуществующее правило.
+
+Замер 18.08.2026 (IF-27), когда подмену `Clock.now` предложили как средство от флоу, зависящих от часов хоста: прямых `Date()` в `IFApp/` — **32 строки в 16 файлах** (без самой обёртки `Core/Clock.swift`; с ней греп даёт 35 строк в 17; после самой правки IF-27 — 33 в 16, у предупреждения свой `Date()`), и среди них те, что пишут timestamp'ы (`StartFastThunk`, `ResumeFastThunk`, `AdjustTimeThunk`, `ResetFastThunk`) и вью таймера. Подмена только `Clock.now()` дала бы сборку, где пост стартует по поддельному времени, а гард пересечений сравнивает с настоящим, — прибор, который врёт молча, а не отсутствие прибора. Так что первое решение — не «добавить override в `Clock`», а сперва свести к `Clock` все 32 места; пока этого нет, подмену заводить нельзя. Задача IF-27 закрыта на своём слое (сид получил явный якорь `-seedHistoryDaysBack`), развилка осталась открытой.
 
 ### B. Вью диспатчит сырой экшен vs тханк
 

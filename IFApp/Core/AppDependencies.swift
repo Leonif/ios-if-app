@@ -47,9 +47,13 @@ enum AppDependencies {
             return StoreRepository()
         }
         #if DEBUG || DEVELOPMENT
-        container.register(DiagnosticsLogRepositoryProtocol.self) {
-            DiagnosticsLogRepository()
-        }
+        // One shared instance, unlike every other registration here. The journal owns
+        // an open `FileHandle` positioned at the end of the file; a second instance
+        // would open its own handle at the same offset and the two would write over
+        // each other's lines. A second reader of this protocol appeared with the seed
+        // collision warning (UITestSeed), which is when that stopped being theoretical.
+        let diagnostics = DiagnosticsLogRepository()
+        container.register(DiagnosticsLogRepositoryProtocol.self) { diagnostics }
         #endif
     }
 }
