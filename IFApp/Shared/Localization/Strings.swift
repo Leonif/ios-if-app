@@ -619,6 +619,38 @@ enum strings {
         static var unverifiedBody: String { String(localized: "Restore first - if Pro is on this Apple\u{00A0}Account it comes straight back.") }
         static var restoredTitle: String { String(localized: "Purchases restored") }
         static var restoredBody: String { String(localized: "Pro is active on this device. Everything below is open now.") }
+        /// S6 after the money changed hands. Separate from `restoredTitle` because a
+        /// purchase and a restore are not the same event to the person in front of
+        /// the screen, and the paid one is the one that was silent until now.
+        static var purchasedTitle: String { String(localized: "IF24 Pro is yours") }
+        /// S6 after an Ask to Buy was approved. The app does not name who approved
+        /// it: several locales cannot do that without guessing their gender.
+        static var approvedTitle: String { String(localized: "Purchase approved") }
+        /// The body of the paid S6, with the amount in it — a money moment names its
+        /// sum. `%@` is `ProProductInfo.displayPrice`, the store's own string, and it
+        /// arrives here already isolated and already unbreakable (see `paidPrice`).
+        /// The sum deliberately does not end the clause: the Saudi riyal carries a
+        /// full stop inside the currency form itself, and two in a row would land in
+        /// the payment confirmation of the app's largest Arabic market.
+        static func purchasedBody(_ displayPrice: String) -> String {
+            String(format: String(localized: "Paid %@. One time - nothing renews, nothing to cancel."),
+                   paidPrice(displayPrice))
+        }
+        /// The same body when the store never answered with a price. Reachable only
+        /// through an Ask to Buy approved in a session that had no product: there is
+        /// no Buy button without a sum, so `.purchased` cannot get here.
+        static var purchasedBodyNoPrice: String {
+            String(localized: "The purchase went through. The amount is on your App\u{00A0}Store receipt.")
+        }
+        /// The amount as it goes into a sentence. Two things happen to it and both
+        /// are the app's job rather than the translator's: it is bidi-isolated, so
+        /// currency and digits do not fly to opposite ends of an Arabic line, and its
+        /// spaces become non-breaking, so "COP 29.900,00" cannot come apart across
+        /// two lines at accessibility sizes. The glyphs are untouched — the sum reads
+        /// character for character as it did in the price block.
+        private static func paidPrice(_ displayPrice: String) -> String {
+            BidiText.isolate(displayPrice.replacingOccurrences(of: " ", with: "\u{00A0}"))
+        }
         /// The primary of the restored panel — the same full-width slot that carries
         /// Buy and Restore in the other states, on a screen that still has its title,
         /// its badge and its check-marks. That is a result panel and not an alert, so

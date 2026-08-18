@@ -34,21 +34,22 @@ final class ProReducerTests: XCTestCase {
 
     // MARK: The right arrives
 
-    /// The defect itself. Ask to Buy is approved while the offer is still up: the
-    /// screen has to leave S4, and it must not land on the offer.
-    func testApprovedAskToBuyClosesTheOffer() {
+    /// Ask to Buy is approved while the offer is still up. The screen has to leave
+    /// S4, it must not land on the offer — and it must not vanish either: money was
+    /// taken, so the frame changes to the confirmation on its own, without a tap.
+    func testApprovedAskToBuyConfirmsInsteadOfClosing() {
         let state = openOffer(phase: .awaitingApproval)
 
         let next = proReducer(state: state, action: ProAction.entitlementChanged(.pro))
 
         XCTAssertEqual(next.entitlement, .pro)
-        XCTAssertEqual(next.phase, .idle)
-        XCTAssertFalse(next.isOfferOpen)
-        // What the defect looked like, spelled out: the six-state value is about the
-        // frame, not about whether the frame is up, so with the entry point still set
-        // this state renders S1 — the Buy button, in front of the owner. Closing is
-        // the whole fix, and `isOfferOpen` above is where it shows.
-        XCTAssertEqual(next.offerState, .offer)
+        XCTAssertEqual(next.phase, .granted(.approved))
+        XCTAssertTrue(next.isOfferOpen)
+        // The original defect, still guarded: the six-state value is about the frame,
+        // not about whether the frame is up, and with the entry point still set an
+        // idle phase would render S1 — the Buy button, in front of the owner. It
+        // renders S6 instead, which is the one frame an owner can be shown.
+        XCTAssertEqual(next.offerState, .granted(.approved))
     }
 
     /// The same right arriving from another device or a family member's purchase,
@@ -74,14 +75,29 @@ final class ProReducerTests: XCTestCase {
         XCTAssertFalse(next.isOfferOpen)
     }
 
-    /// The path that already worked, and has to keep working now that it leans on the
-    /// same rule instead of clearing the entry point itself.
-    func testPurchaseCompletedClosesTheOffer() {
+    /// The purchase that used to close the screen in silence. It now says so first:
+    /// the entitlement is in, the frame is the confirmation, and the screen waits to
+    /// be dismissed by hand — the guard below leaves it alone because `.granted` is
+    /// not `.idle`.
+    func testPurchaseCompletedConfirmsInsteadOfClosing() {
         let state = openOffer()
 
         let next = proReducer(state: state, action: ProAction.purchaseCompleted)
 
         XCTAssertEqual(next.entitlement, .pro)
+        XCTAssertEqual(next.phase, .granted(.purchased))
+        XCTAssertTrue(next.isOfferOpen)
+        XCTAssertEqual(next.offerState, .granted(.purchased))
+    }
+
+    /// The confirmation is the last thing the screen does: dismissing it hands the
+    /// offer back to the rule that refuses to stand open in front of an owner.
+    func testClosingTheConfirmationLeavesNothingBehind() {
+        var state = openOffer()
+        state = proReducer(state: state, action: ProAction.purchaseCompleted)
+
+        let next = proReducer(state: state, action: ProAction.offerClosed)
+
         XCTAssertEqual(next.phase, .idle)
         XCTAssertFalse(next.isOfferOpen)
     }
@@ -97,7 +113,7 @@ final class ProReducerTests: XCTestCase {
 
         XCTAssertEqual(next.entitlement, .pro)
         XCTAssertTrue(next.isOfferOpen)
-        XCTAssertEqual(next.offerState, .restored)
+        XCTAssertEqual(next.offerState, .granted(.restored))
     }
 
     /// A transaction that reports the entitlement before it reports itself finished:

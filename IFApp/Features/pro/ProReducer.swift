@@ -66,9 +66,12 @@ func proReducer(state: ProState, action: Action) -> ProState {
             newState.revocationPending = false
             newState.goalChangePending = false
             // An approved Ask to Buy arrives here: the wait is over, so the screen
-            // stops saying it is waiting. Nothing else about a change of entitlement
-            // is a statement about an attempt in progress.
-            if newState.phase == .awaitingApproval { newState.phase = .idle }
+            // stops saying it is waiting and says the purchase went through instead.
+            // The money was taken from someone who is not necessarily looking at this
+            // screen, so the confirmation waits on S6 to be dismissed by hand rather
+            // than flashing past. Nothing else about a change of entitlement is a
+            // statement about an attempt in progress.
+            if newState.phase == .awaitingApproval { newState.phase = .granted(.approved) }
         }
 
     case .purchaseStarted, .restoreStarted:
@@ -77,7 +80,9 @@ func proReducer(state: ProState, action: Action) -> ProState {
 
     case .purchaseCompleted:
         newState.entitlement = .pro
-        newState.phase = .idle
+        // The one place the app can say "your money arrived" in the second it
+        // arrives. It lands in the same S6 the free Restore has always had.
+        newState.phase = .granted(.purchased)
 
     case .purchasePending:
         newState.phase = .awaitingApproval
@@ -89,7 +94,7 @@ func proReducer(state: ProState, action: Action) -> ProState {
 
     case .restoreCompleted:
         newState.entitlement = .pro
-        newState.phase = .restored
+        newState.phase = .granted(.restored)
 
     case .restoreFoundNothing:
         // Nothing to restore is an answer, not an error: it also settles an
@@ -134,14 +139,17 @@ func proReducer(state: ProState, action: Action) -> ProState {
     // The condition is `idle` and not "the screen shows S1", because idle is exactly
     // "nothing in flight to be about": every other phase is feedback on an attempt and
     // has its own frame to finish in (S2 while it settles, S4 while approval is out,
-    // S6 for the restore confirmation, S3 for a failure worth reading). With the
-    // machinery idle, an open offer is only ever an invitation to buy — and the tap it
-    // invites does nothing at all, since `PurchaseProThunk` guards on `isPro`.
+    // S6 for the confirmation, whatever the right came by, S3 for a failure worth
+    // reading). With the machinery idle, an open offer is only ever an invitation to
+    // buy — and the tap it invites does nothing at all, since `PurchaseProThunk`
+    // guards on `isPro`.
     //
-    // Clearing the entry point is what closes the screen; there is no seventh "just
-    // purchased" state to land on. Analytics is unaffected: the middleware reads the
-    // trigger off its pre-reduce snapshot, so `purchase_completed` still carries the
-    // door the user came in through.
+    // Clearing the entry point is what closes the screen, and a purchase no longer
+    // reaches it in the same pass: it goes to `.granted`, which is not idle, so the
+    // screen stands on S6 until the user dismisses it — exactly as a restore already
+    // did. Analytics is unaffected: the middleware reads the trigger off its
+    // pre-reduce snapshot, so `purchase_completed` still carries the door the user
+    // came in through.
     //
     // Standing over the whole switch, it also refuses to *open* the offer for an
     // owner: `offerOpened` sets the entry point and this takes it straight back. That

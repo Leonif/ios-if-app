@@ -7398,6 +7398,71 @@
         }
       }
     },
+    "IF24 Pro is yours" : {
+      "comment" : "Title of the paywall's S6 confirmation frame when the user has just PAID (PaywallView, OfferState.granted(.purchased)). Same frame as the restore confirmation, different headline: this one is about money that just left the account. Title slot is 342pt and the sibling headline in this frame is 'Purchases restored' - keep it in that range. No full stop. 'IF24 Pro' is the product name and stays in Latin script in every locale.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أصبح IF24 Pro لك"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Pro gehört dir"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Pro is yours"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Pro es tuyo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Pro est à vous"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Proが使えます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Pro 구입 완료"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Pro jest twoje"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Pro тепер ваш"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 Pro 已归你所有"
+          }
+        }
+      }
+    },
     "Inactive" : {
       "localizations" : {
         "ar" : {
@@ -8747,6 +8812,71 @@
         }
       }
     },
+    "Paid %@. One time - nothing renews, nothing to cancel." : {
+      "comment" : "Body of the paywall's S6 confirmation frame after a paid purchase. %@ is the store's own formatted price ('$6.99', 'COP 29.900,00') - one token, never taken apart, and never placed last before the full stop: the Saudi riyal form carries a full stop of its own, and two in a row would land in the payment confirmation of the app's largest Arabic market. The app bidi-isolates the token and makes its spaces non-breaking, so translations do not have to.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "دفعت %@ مقابل شراء لمرة واحدة، لا يتجدد ولا يوجد ما تلغيه."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bezahlt: %@. Einmalig - nichts verlängert sich, nichts zu kündigen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paid %@. One time - nothing renews, nothing to cancel."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagado: %@. Compra única: nada se renueva, nada que cancelar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payé : %@. Achat unique : rien ne se renouvelle, rien à annuler."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@のお支払いが完了しました。買い切りなので、更新も解約もありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 결제됐어요. 한 번만 결제하면 끝이라 갱신도 해지도 없어요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapłacono: %@. Jednorazowo - nic się nie odnawia, nie ma czego anulować."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сплачено %@. Разова покупка - нічого не поновлюється, скасовувати нічого."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已支付 %@。一次性购买，不会续费，也无需取消。"
+          }
+        }
+      }
+    },
     "Pick how long a fast runs. The window starts when you end it." : {
       "localizations" : {
         "ar" : {
@@ -9286,6 +9416,71 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保护日"
+          }
+        }
+      }
+    },
+    "Purchase approved" : {
+      "comment" : "Title of the paywall's S6 confirmation frame when an Ask to Buy was approved while the offer screen was open (OfferState.granted(.approved)). The app must not name or gender whoever approved it - use an agentless form. Grammatically parallel to 'Purchases restored' in the same frame. No full stop.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تمت الموافقة على شرائك"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf genehmigt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase approved"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra aprobada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achat approuvé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入が承認されました"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구입 승인 완료"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakup zatwierdzony"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покупку схвалено"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买已批准"
           }
         }
       }
@@ -10803,6 +10998,71 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "购买没有送达 App Store。不会向你收取任何费用，联网后再试。"
+          }
+        }
+      }
+    },
+    "The purchase went through. The amount is on your App Store receipt." : {
+      "comment" : "Body of the paywall's S6 confirmation frame when the right arrived paid but the store never answered with a price - an Ask to Buy approved in a session that had no product. The space inside 'App Store' is a NON-BREAKING space (U+00A0) in every locale that writes the name with a space: without it the store's name breaks across two lines in the payment confirmation at large type sizes.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتمل الشراء. تجد المبلغ في إيصال App Store."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Kauf ist durch. Der Betrag steht auf deinem Beleg vom App Store."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The purchase went through. The amount is on your App Store receipt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La compra se completó. El importe está en tu recibo del App Store."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'achat est passé. Le montant figure sur votre reçu App Store."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入が完了しました。金額はApp Storeのレシートに記載されています。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구입이 완료됐어요. 금액은 App Store 영수증에서 확인할 수 있어요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakup doszedł do skutku. Kwota jest na potwierdzeniu z App Store."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Покупка пройшла. Суму вказано в чеку App Store."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买已完成。金额可在 App Store 收据中查看。"
           }
         }
       }

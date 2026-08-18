@@ -178,7 +178,7 @@ struct PaywallView: View {
     /// same width, so the list does not reflow when the state changes.
     @ViewBuilder
     private func marker(_ dot: Color) -> some View {
-        if state == .restored {
+        if isGranted {
             Image("pro-check")
                 .renderingMode(.template)
                 .foregroundColor(theme.deep)
@@ -199,7 +199,7 @@ struct PaywallView: View {
 
     private var bottomBlock: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if state == .restored {
+            if isGranted {
                 Text(strings.Pro.proActiveBadge)
                     .font(.hanken(13, .medium))
                     .foregroundColor(theme.deep)
@@ -256,7 +256,7 @@ struct PaywallView: View {
         case .unverified:
             OfferButton(title: strings.Pro.restoreFull, theme: theme, action: onRestore)
                 .accessibilityIdentifier("paywall.restore")
-        case .restored:
+        case .granted:
             OfferButton(title: strings.Pro.restoredDone, theme: theme, action: onClose)
                 .accessibilityIdentifier("paywall.done")
         }
@@ -336,10 +336,18 @@ struct PaywallView: View {
 
     private var isBusy: Bool { state == .purchasing }
 
+    /// S6, whichever of the three ways the right arrived. The frame is one frame:
+    /// the badge, the check-marks in place of the phase dots and the Done button do
+    /// not know what paid for them.
+    private var isGranted: Bool {
+        if case .granted = state { return true }
+        return false
+    }
+
     /// The offer keeps its own Restore link everywhere except the two states where
     /// Restore already owns a button of its own.
     private var showsRestoreLink: Bool {
-        state != .unverified && state != .restored
+        state != .unverified && !isGranted
     }
 
     private var title: String {
@@ -348,7 +356,15 @@ struct PaywallView: View {
         case .failed: return strings.Pro.failedTitle
         case .awaitingApproval: return strings.Pro.awaitingTitle
         case .unverified: return strings.Pro.unverifiedTitle
-        case .restored: return strings.Pro.restoredTitle
+        // One frame, three headlines. This is the whole of what the source changes
+        // on screen — and the reason a purchase no longer has to be inferred from a
+        // capsule that disappeared.
+        case let .granted(source):
+            switch source {
+            case .purchased: return strings.Pro.purchasedTitle
+            case .restored: return strings.Pro.restoredTitle
+            case .approved: return strings.Pro.approvedTitle
+            }
         }
     }
 
@@ -362,7 +378,12 @@ struct PaywallView: View {
             return reason == .network ? strings.Pro.failedBodyNetwork : strings.Pro.failedBodyGeneral
         case .awaitingApproval: return strings.Pro.awaitingBody
         case .unverified: return strings.Pro.unverifiedBody
-        case .restored: return strings.Pro.restoredBody
+        case let .granted(source):
+            // A restore has nothing to say about money — it moved none. The two paid
+            // sources name the sum, and fall back to naming where to find it rather
+            // than to an empty line or a live `%@`.
+            guard source != .restored else { return strings.Pro.restoredBody }
+            return price.map(strings.Pro.purchasedBody) ?? strings.Pro.purchasedBodyNoPrice
         }
     }
 

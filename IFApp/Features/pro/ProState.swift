@@ -119,7 +119,7 @@ struct ProState: Equatable, Sendable {
         case .purchasing: return .purchasing
         case .awaitingApproval: return .awaitingApproval
         case let .failed(reason): return .failed(reason)
-        case .restored: return .restored
+        case let .granted(source): return .granted(source)
         case .idle:
             if entitlement == .unknown { return .unverified }
             // No product means no price, and the offer is a frame built around one.

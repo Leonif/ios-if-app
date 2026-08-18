@@ -124,6 +124,16 @@ struct ProProductInfo: Equatable, Sendable {
     let displayPrice: String
 }
 
+/// How the right arrived. It never changes what the user owns or what the
+/// confirmation frame looks like — only the words on it, because "you just paid",
+/// "your purchase came back" and "someone approved it for you" are three different
+/// things to have happen to you and one thing to own.
+enum EntitlementSource: Equatable, Hashable, Sendable {
+    case purchased
+    case restored
+    case approved
+}
+
 /// What the purchase machinery is doing right now. Distinct from the entitlement:
 /// it is about the attempt in progress, not about what the user owns.
 enum PurchasePhase: Equatable, Sendable {
@@ -134,8 +144,10 @@ enum PurchasePhase: Equatable, Sendable {
     /// it resolves later through `Transaction.updates`, with no relaunch.
     case awaitingApproval
     case failed(PurchaseFailure)
-    /// Restore found the purchase. A confirmation, and then out.
-    case restored
+    /// The right is in hand and has not been confirmed to the user yet. Every way
+    /// of coming by it lands here: money changing hands is not allowed to be quieter
+    /// than a free Restore was.
+    case granted(EntitlementSource)
 
     /// Whether the phase describes something still happening off the offer screen,
     /// and so survives that screen being opened or closed. Ask to Buy is the only
@@ -177,6 +189,8 @@ enum OfferState: Equatable, Hashable, Sendable {
     /// S5 — the entitlement has not been checked yet. Restore is the primary action.
     /// A pre-check state, not a failure: most people who see it never bought anything.
     case unverified
-    /// S6 — restored.
-    case restored
+    /// S6 — the right is in hand. One frame for all three sources; the source picks
+    /// the title and the body and nothing else, which is why there is no seventh
+    /// state for a purchase to land on.
+    case granted(EntitlementSource)
 }
