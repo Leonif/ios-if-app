@@ -93,7 +93,7 @@ struct LastMealPickerSheet: View {
                 nowMinuteOfDay: nowMinuteOfDay,
                 theme: theme,
                 a11yLabel: strings.Meal.scaleA11yLabel,
-                a11yValue: "\(readout), \(absoluteLabel)",
+                a11yValue: strings.Meal.scaleA11yValue(readout, absoluteLabel),
                 onScrub: onScrub,
                 onFeedback: onFeedback
             )

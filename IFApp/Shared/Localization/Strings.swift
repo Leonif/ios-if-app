@@ -321,6 +321,16 @@ enum strings {
         static var windowClosedOverline: String { String(localized: "Eating window closed") }
         static var scaleA11yLabel: String { String(localized: "Time since last meal") }
 
+        /// "2h 40m ago, Yesterday at 8:00 PM" — VoiceOver value of the meal scale.
+        /// The pause between the halves is punctuation, and punctuation is per-script:
+        /// ja/zh speak `、`, not an ASCII comma. `ListFormatter` cannot supply it —
+        /// even its narrow width injects a conjunction outside en (de "und", ar "و",
+        /// zh "和", ko "및"), which is wrong for a two-part readout. So the pair is a
+        /// localized template, like every other joined string in this file.
+        static func scaleA11yValue(_ relative: String, _ absolute: String) -> String {
+            String(localized: "Meal.scaleA11yValue", defaultValue: "\(relative), \(absolute)")
+        }
+
         // The readout is a whole template per shape, never a duration glued to an
         // "ago": that word leads in de/es/fr/ar and trails in uk/pl/ja/ko.
 

@@ -37,7 +37,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "%@ %@"
           }
         },
@@ -1496,7 +1496,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "1時間前"
           }
         },
@@ -1562,7 +1562,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "3時間前"
           }
         },
@@ -3810,6 +3810,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完成"
+          }
+        }
+      }
+    },
+    "Meal.scaleA11yValue" : {
+      "comment" : "VoiceOver value of the meal scale ribbon (LastMealPickerSheet.swift): the relative readout and the absolute moment, spoken one after the other. %1$@ = \"2h 40m ago\", %2$@ = \"Yesterday at 8:00 PM\". Translate the SEPARATOR, not the halves — it is punctuation and punctuation is per-script: ja/zh read a full-width pause mark, not an ASCII comma. Do not add a conjunction.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@、%2$@"
           }
         }
       }
@@ -6672,7 +6690,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%#@days@で連続記録が途切れました。次に目標を達成すると、新しい記録が始まります。"
+            "value" : "連続記録は%#@days@で途切れました。次に目標を達成すると、新しい記録が始まります。"
           },
           "substitutions" : {
             "days" : {
@@ -6853,7 +6871,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最初の断食を記録しました。連続記録に数えられるのは、目標を達成した日です。"
+            "value" : "最初の断食を記録しました。連続日数に数えられるのは、目標を達成した日です。"
           }
         },
         "ko" : {
