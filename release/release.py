@@ -17,8 +17,11 @@ There is no submit step, and adding one is not an oversight to be corrected. The
 owner presses Submit for Review; the pipeline stops one step short of it on
 purpose.
 
-The keychain will ask for a password during `archive`. That prompt is the owner's
-to answer — nothing here tries to route around it, cache it, or script it.
+Signing needs no keychain password. The archive is signed with the development
+identity already in the keychain, and `-exportArchive` re-signs with the team's
+cloud-managed Apple Distribution certificate, whose private key lives on Apple's
+side — reached through `-allowProvisioningUpdates` and the ASC API key. Verified
+20.08.2026; see ARCHITECTURE.md, section "Конвейер релиза".
 """
 
 from __future__ import annotations
@@ -210,9 +213,30 @@ def _build_numbers(builds) -> list[int]:
     return out
 
 
-def next_build_number(client) -> str:
-    """The number the *next* archive should carry."""
-    nums = _build_numbers(client.builds(limit=200))
+def _train_numbers(client, version_string: str) -> list[int]:
+    """Build numbers already uploaded under one marketing version.
+
+    App Store Connect numbers builds per marketing version, not per account: the
+    1.5.0 train holds 1, 2, 3 and the 1.5.1 train starts again at 1. Both the next
+    free number and the last used one are read from this train and nowhere else.
+    """
+    return _build_numbers(client.get_all("/builds", **{
+        "filter[app]": ascmod.APP_ID,
+        "filter[preReleaseVersion.version]": version_string,
+        "fields[builds]": "version,processingState,uploadedDate",
+    }))
+
+
+def next_build_number(client, version_string: str) -> str:
+    """The number the *next* archive should carry, inside this version's train.
+
+    Counted over the train, not over the account. A global "highest plus one"
+    would have handed the first 1.5.1 archive a 7 where the owner's manual build
+    got a 2, leaving an unexplainable 2..6 hole in the train. Nothing would break
+    — `find_build` matches on the pair — but the next reader could not tell
+    whether five builds went missing.
+    """
+    nums = _train_numbers(client, version_string)
     return str((max(nums) if nums else 0) + 1)
 
 
@@ -240,11 +264,7 @@ def uploaded_build_number(client, version_string: str) -> str | None:
     a number nothing was ever uploaded under — which is how the documented
     "re-run attach later" recovery would have failed every time.
     """
-    nums = _build_numbers(client.get_all("/builds", **{
-        "filter[app]": ascmod.APP_ID,
-        "filter[preReleaseVersion.version]": version_string,
-        "fields[builds]": "version,processingState,uploadedDate",
-    }))
+    nums = _train_numbers(client, version_string)
     return str(max(nums)) if nums else None
 
 
@@ -270,7 +290,8 @@ def step_archive(args, build_number):
     if args.dry_run:
         say(f"[dry-run] would archive to {archive}")
         say(f"[dry-run] would export .ipa to {export_dir}")
-        say("[dry-run] the keychain password prompt happens here")
+        say("[dry-run] the export would be re-signed with the cloud-managed "
+            "Apple Distribution certificate")
         return export_dir / "IFApp.ipa"
 
     if archive.exists():
@@ -306,11 +327,14 @@ def step_archive(args, build_number):
              "-exportOptionsPlist", str(plist),
              *auth])
     if r.returncode != 0:
-        die("xcodebuild -exportArchive failed. If it complains about a signing "
-            "identity: both configurations pin CODE_SIGN_IDENTITY to "
-            "\"Apple Development\" (project.pbxproj:527 and :564). The owner "
-            "changes Release to Apple Distribution in Xcode — see ARCHITECTURE.md, "
-            "section \"Конвейер релиза\". Do not edit project.pbxproj by hand.")
+        die("xcodebuild -exportArchive failed. The distribution signature is not "
+            "taken from the archive and not from the local keychain: "
+            "-allowProvisioningUpdates plus the API key above ask Apple to sign "
+            "with the team's cloud-managed Apple Distribution certificate. So the "
+            "usual causes are the key losing its Certificates/Identifiers/Profiles "
+            "access, or no network — not a missing local identity, and not "
+            "CODE_SIGN_IDENTITY in project.pbxproj. See ARCHITECTURE.md, section "
+            "\"Конвейер релиза\". Do not edit project.pbxproj by hand.")
 
     ipas = list(export_dir.glob("*.ipa"))
     if not ipas:
@@ -426,8 +450,8 @@ def main():
     build_number = args.build
     if not build_number and args.step in ("all", "archive", "upload", "attach"):
         if args.step in ("all", "archive"):
-            build_number = next_build_number(client)
-            say(f"build number: {build_number} (next free)")
+            build_number = next_build_number(client, args.version)
+            say(f"build number: {build_number} (next free in the {args.version} train)")
         elif args.step == "upload":
             # The .ipa has not been uploaded yet, so App Store Connect cannot say
             # what number it carries — but the file itself can.

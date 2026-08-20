@@ -165,13 +165,6 @@ class ASC:
 
     # ---- builds -----------------------------------------------------------
 
-    def builds(self, limit: int = 20):
-        return self.get_all("/builds", **{
-            "filter[app]": APP_ID, "limit": limit,
-            "sort": "-uploadedDate",
-            "fields[builds]": "version,processingState,uploadedDate,expired",
-        })
-
     def find_build(self, version_string: str, build_number: str):
         """Match on both the marketing version and the build number. `filter[version]`
         alone matches the build number across every marketing version, and this app

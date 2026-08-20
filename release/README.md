@@ -1,8 +1,7 @@
 # Release pipeline
 
 Takes a release from a clean tree to a build sitting in App Store Connect with the
-version filled in. What is left for the owner is the keychain password during
-archiving, and the Submit for Review button.
+version filled in. What is left for the owner is the Submit for Review button.
 
 ```sh
 ./release/release.py all --version 1.5.1 --dry-run   # rehearse, writes nothing
@@ -21,9 +20,8 @@ not a gap. Do not add the call: the last look at a release belongs to a person.
 
 ## What the owner has to do
 
-1. **Answer the keychain prompt** during `archive`. It comes from codesign wanting
-   the private key. Nothing here caches it, stores it, or types it for you.
-2. **Press Submit for Review** in App Store Connect once the pipeline is done.
+**Press Submit for Review** in App Store Connect once the pipeline is done. That
+is the whole list. Signing needs no password prompt — see "Signing" below.
 
 ## Files
 
@@ -62,69 +60,65 @@ A new market means a new row in that table.
 ## Version numbers do not touch project.pbxproj
 
 `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` are passed to `xcodebuild` as
-build-setting overrides. The project file stays whatever Xcode last wrote. The
-build number defaults to the highest one App Store Connect has seen, plus one.
+build-setting overrides. The project file stays whatever Xcode last wrote.
 
-Verified: an override of `MARKETING_VERSION=1.5.1 CURRENT_PROJECT_VERSION=7`
-produces `CFBundleShortVersionString = 1.5.1`, `CFBundleVersion = 7` in the built
+Verified: an override of `MARKETING_VERSION=1.5.1 CURRENT_PROJECT_VERSION=2`
+produces `CFBundleShortVersionString = 1.5.1`, `CFBundleVersion = 2` in the built
 `Info.plist`, with the project file unmodified.
 
 The build number is resolved per step, not by one rule: `archive` takes the next
 free number, `upload` reads it out of the `.ipa`, and `attach` takes the one
 already uploaded. `--build` overrides all three. One rule for all of them would
 make `attach` chase a build that does not exist, and would make a second upload
-attempt send build 8 while waiting on build 7 — then attach 7, silently.
+attempt send build 3 while waiting on build 2 — then attach 2, silently.
 
-## First run only: the distribution certificate
+"Next free" is counted **inside the marketing version's train**, not across the
+account: App Store Connect numbers builds per version, so 1.5.0 holds 1, 2, 3 and
+1.5.1 starts again at 1. Counting globally left a hole in the train instead
+(fixed 20.08.2026, IF-40 — the case is written out in `ARCHITECTURE.md`).
 
-As of 19.08.2026 the account has one Development certificate and **no distribution
-certificate**, so the very first release has to create one. Two ways, and the
-recommended one is first.
+## Signing: Apple holds the key, and that is fine
 
-**Path A — Xcode (recommended).** Xcode → Settings → Accounts → pick the Apple ID →
-pick the team (`379294YDPQ`) → **Manage Certificates…** → the **+** in the bottom
-left → **Apple Distribution**. Xcode generates the key pair, files the request and
-installs the result in the login keychain in one step. The keychain may ask for the
-password; that prompt is yours.
+The distribution signature is **not** taken from the local keychain. It is not in
+the archive either — the archive comes out signed `Apple Development`, exactly as
+Xcode's does. `-exportArchive` re-signs, and the certificate it re-signs with is
+the team's **cloud-managed Apple Distribution certificate**, whose private key
+lives on Apple's side. `-allowProvisioningUpdates` plus the API key are what buy
+access to it.
 
-**Path B — the developer portal.** Keychain Access → Certificate Assistant →
-Request a Certificate From a Certificate Authority → save to disk; then
-developer.apple.com → Certificates → **+** → Apple Distribution → upload the CSR →
-download the `.cer` → double-click to install.
-
-Path A is recommended because it is one dialog and the private key is created
-directly in the keychain that will sign. Path B splits the key from the certificate
-across two applications and a file on disk, and a distribution certificate whose
-private key went missing cannot be recovered — only revoked and reissued.
-
-**Check it worked:**
+So there is nothing to create beforehand, and these three commands are all
+misleading — none of them can see a cloud-managed certificate:
 
 ```sh
-security find-identity -v -p codesigning | grep Distribution
+security find-identity -v -p codesigning   # two Apple Development, no Distribution
+GET /v1/certificates                       # one DEVELOPMENT
+GET /v1/profiles                           # empty
 ```
 
-One line naming *Apple Distribution* means the pipeline can archive. Nothing
-prints means it did not take, whatever the UI said.
+Reading them as "the account has no distribution certificate, a release cannot be
+built" is the wrong conclusion, and it has been reached three times. The owner's
+manual Xcode upload of 1.5.1 (1) happened with all three looking exactly like
+that.
 
-The pipeline also passes `-allowProvisioningUpdates`, so in principle the first
-`archive` could mint the certificate by itself. Doing it deliberately beforehand is
-still the better order: it turns the pipeline's largest unknown into a thirty-second
-step you can verify, instead of a surprise in the middle of a release.
+**Verified 20.08.2026.** A local `archive` run signed the exported `.ipa` with
+`Apple Distribution: LEONID NIFANTIJEV (379294YDPQ)`, SHA-1
+`9C:EE:E3:D8:…:BA:B0` — byte for byte the `certificateSHA1` the Xcode archive
+recorded for the owner's own upload. Entitlements came out `get-task-allow =
+false`, `beta-reports-active = true`; the embedded profile was `iOS Team Store
+Provisioning Profile`. No keychain password was asked for at any point.
 
-## Signing, and where it can fall over
+What can still break the export: the API key losing Certificates/Identifiers/
+Profiles access, or no network. Not a missing local identity.
 
-The full account of both — including the state of the account's certificates, the
-`CODE_SIGN_IDENTITY` situation and why the first real run is the risky one — lives
-in `ARCHITECTURE.md`, section **«Конвейер релиза»**. It is kept there rather than
-here so there is one copy to keep true.
+## Two more things that are not signing
 
-The short version, so nobody starts a release without knowing it:
-
-- **The first real `archive` has to mint a distribution certificate and a
-  provisioning profile**, because the account has neither. That is the single
-  largest unknown in the pipeline.
 - **Simulator builds are unaffected** — they stay unsigned, so no agent's build
   pops a keychain prompt. This pipeline signs only Release on
   `generic/platform=iOS`.
 - **Upload processing is Apple's, and takes minutes.** A timeout is not a lost
   build; re-run `attach` later.
+
+The long form of all of this — the state of the account's certificates, the
+`CODE_SIGN_IDENTITY` situation, every trap paid for so far — lives in
+`ARCHITECTURE.md`, section **«Конвейер релиза»**. What is here is the working
+summary; that is the record.
