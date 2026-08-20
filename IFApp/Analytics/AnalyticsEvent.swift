@@ -85,8 +85,10 @@ enum AnalyticsEvent {
     /// The event is expected to be silent forever — it exists to find out whether the
     /// TF-2 guard ever catches anything before a release changes `FastRecord`'s shape.
     case historyLoadFailed(reason: String)
-    /// The native `requestReview` was called. `trigger` = what caused it
-    /// ("streak_milestone" / "next_open"). Apple may or may not show the panel.
+    /// The native `requestReview` went out. `trigger` = what caused it
+    /// ("streak_milestone" / "next_open"). Apple may or may not show the panel — but
+    /// the call itself did happen on an active scene, so this counts attempts we
+    /// really made, not attempts we intended.
     case reviewPrompted(trigger: String)
     /// A streak milestone card was shown. `days` = the threshold (3/7/14/30).
     case streakMilestone(days: Int)

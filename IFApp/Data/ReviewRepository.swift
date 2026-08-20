@@ -15,8 +15,12 @@ protocol ReviewRepositoryProtocol {
     func canPrompt() -> Bool
     /// Records a requestReview call (once per day, and counts toward the cap).
     func markPromptShown()
-    /// Calls the native StoreKit review request. Apple decides whether to show it.
-    func requestReview()
+    /// Calls the native StoreKit review request and reports whether the call went out.
+    ///
+    /// `true` only when a `foregroundActive` scene was found and `AppStore.requestReview`
+    /// was actually called — Apple still decides whether the panel appears. `false` means
+    /// nothing was asked, and the caller must not spend an attempt on it.
+    func requestReview(completion: @escaping (Bool) -> Void)
     /// The moment of the 3rd completed goal, when the "next open" fallback is armed.
     func pendingGoalDate() -> Date?
     func setPendingGoal(_ date: Date)
@@ -48,13 +52,21 @@ struct ReviewRepository: ReviewRepositoryProtocol {
         defaults.set(defaults.integer(forKey: Key.promptCount) + 1, forKey: Key.promptCount)
     }
 
-    func requestReview() {
+    func requestReview(completion: @escaping (Bool) -> Void) {
         Task { @MainActor in
-            let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-            // Prefer the active scene; fall back to any (launch may still be settling).
-            guard let scene = scenes.first(where: { $0.activationState == .foregroundActive }) ?? scenes.first
-            else { return }
+            // Only a `foregroundActive` scene counts. A request made on a scene that is
+            // still `foregroundInactive` — which is exactly where a cold start sits when
+            // the "next open" fallback fires — is dropped by Apple without a trace, and
+            // falling back to `scenes.first` used to spend a lifetime attempt on it.
+            guard let scene = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first(where: { $0.activationState == .foregroundActive })
+            else {
+                completion(false)
+                return
+            }
             AppStore.requestReview(in: scene)
+            completion(true)
         }
     }
 

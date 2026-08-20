@@ -9,6 +9,10 @@
 //       flag, then request on the next app open ≥4h after that goal — so the
 //       prompt lands on a fresh session, not on top of the goal moment.
 //
+//  The gates are spent — and `review_prompted` is logged — only once the native
+//  call has actually gone out on an active scene. No active scene means nothing
+//  was asked: the attempt stays unspent and we try again another time.
+//
 
 import Foundation
 import Redux
@@ -21,6 +25,9 @@ final class ReviewMiddleware: Middleware {
     /// goal push itself never triggers the prompt.
     private let fallbackDelay: TimeInterval = 4 * 3600
     private var didRequestReviewThisLaunch = false
+    /// A native call is out and its result has not come back yet — the gates are
+    /// still unspent, so without this a second action would start a second call.
+    private var isRequestInFlight = false
 
     init(repo: ReviewRepositoryProtocol = container.inject()) {
         self.repo = repo
@@ -50,20 +57,38 @@ final class ReviewMiddleware: Middleware {
         if case AppLifecycleAction.appBecameActive = action {
             guard let goalAt = repo.pendingGoalDate(),
                   Date().timeIntervalSince(goalAt) >= fallbackDelay else { return }
-            if requestReview(trigger: .nextOpen, dispatch: dispatch) {
-                repo.clearPendingGoal()
+            requestReview(trigger: .nextOpen, dispatch: dispatch) { [repo] didAsk in
+                // The arming survives a launch that had no active scene to ask on.
+                if didAsk { repo.clearPendingGoal() }
             }
         }
     }
 
-    /// Applies the gates and, when they pass, calls the native request and logs it.
-    @discardableResult
-    private func requestReview(trigger: ReviewPromptTrigger, dispatch: DispatchFunction) -> Bool {
-        guard !didRequestReviewThisLaunch, repo.canPrompt() else { return false }
-        didRequestReviewThisLaunch = true
-        repo.markPromptShown()
-        repo.requestReview()
-        dispatch(AppLifecycleAction.reviewPrompted(trigger: trigger))
-        return true
+    /// Applies the gates and, when they pass, calls the native request.
+    ///
+    /// The lifetime attempt is spent and the event logged **after** the call reports
+    /// that it went out on an active scene, never before: there are three attempts in
+    /// a lifetime, and one burnt on a scene Apple ignores is a prompt the user never
+    /// saw counted as shown. `completion` gets what the call reported.
+    private func requestReview(trigger: ReviewPromptTrigger,
+                               dispatch: DispatchFunction,
+                               completion: ((Bool) -> Void)? = nil) {
+        guard !didRequestReviewThisLaunch, !isRequestInFlight, repo.canPrompt() else {
+            completion?(false)
+            return
+        }
+        isRequestInFlight = true
+        repo.requestReview { [weak self] didAsk in
+            guard let self else { return }
+            self.isRequestInFlight = false
+            guard didAsk else {
+                completion?(false)
+                return
+            }
+            self.didRequestReviewThisLaunch = true
+            self.repo.markPromptShown()
+            dispatch(AppLifecycleAction.reviewPrompted(trigger: trigger))
+            completion?(true)
+        }
     }
 }

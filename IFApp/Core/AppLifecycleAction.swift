@@ -38,7 +38,8 @@ enum AppLifecycleAction: Action {
     case sourcesOpened
     /// The fasting history screen was opened, and from where.
     case historyOpened(source: HistoryEntrySource)
-    /// The native `requestReview` was called (Apple may or may not show the panel).
+    /// The native `requestReview` went out on an active scene (Apple may or may not
+    /// show the panel). Never dispatched when there was no scene to ask on.
     case reviewPrompted(trigger: ReviewPromptTrigger)
     /// A streak milestone (3/7/14/30 days) was reached and its card shown.
     case streakMilestone(days: Int)
