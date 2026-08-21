@@ -48,6 +48,11 @@ struct PhaseRingMini: View {
             }
         }
         .frame(width: diameter, height: diameter)
+        // The line above this comment used to be the whole of "never mirrored in RTL":
+        // the header said it and nothing enforced it. RTL negates `rotationEffect`,
+        // so the -90° start rotated to +90° and every arc in the Arabic history list
+        // began at six o'clock instead of twelve.
+        .environment(\.layoutDirection, .leftToRight)
         .accessibilityHidden(true)
     }
 }

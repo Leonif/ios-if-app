@@ -46,6 +46,18 @@ struct PhaseRing: View {
             }
         }
         .frame(width: diameter, height: diameter)
+        // Pinned left-to-right, like the paywall's spinner. Progress runs clockwise
+        // from twelve o'clock in every locale — the handoff says rings do not mirror
+        // — but "not mirrored" is not what RTL gives a view that says nothing: the
+        // arc and the head dot are drawn by two different mechanisms, and RTL turns
+        // them the two different ways. `rotationEffect` has its angle negated, so the
+        // -90° that puts the start of the arc at twelve o'clock becomes +90° and puts
+        // it at six; `offset(x:)` is mirrored, so the dot lands where a mirrored ring
+        // would put it. The two disagreed by half a turn, and Arabic drew a filled arc
+        // in the bottom-left with the marker at ten o'clock and a dead sector between
+        // them — the main graphic of the main screen giving two answers to "how far
+        // along am I".
+        .environment(\.layoutDirection, .leftToRight)
         .animation(.easeOut(duration: 0.3), value: progress)
     }
 

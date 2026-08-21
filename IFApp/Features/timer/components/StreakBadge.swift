@@ -80,6 +80,11 @@ struct StreakBadge: View {
                     // circle, so the ring reads 20.2pt across, as in the mockups.
                     .padding(2)
                     .frame(width: 22, height: 22)
+                    // Pinned to the ring alone, not to the row: the counter beside it
+                    // still follows the reading direction. RTL negates the `-90°` that
+                    // starts the arc at twelve o'clock, which started the Arabic
+                    // streak arc at six.
+                    .environment(\.layoutDirection, .leftToRight)
 
                     // `Text("\(days)")` would take the LocalizedStringKey path and let
                     // the locale format the integer — Arabic-Indic "١" in the badge

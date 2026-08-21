@@ -28,6 +28,11 @@ struct GoalMomentView: View {
             seal.scaleEffect(sealScale).offset(y: -diameter / 2)
         }
         .frame(width: diameter, height: diameter)
+        // Same pin as `PhaseRing` underneath, and for the same reason: the sweep is
+        // placed by `rotationEffect`, whose angle RTL negates. Unpinned, the arc that
+        // is meant to travel once around the ring from twelve o'clock started half a
+        // turn away from the ring it is celebrating.
+        .environment(\.layoutDirection, .leftToRight)
         .allowsHitTesting(false)
     }
 
