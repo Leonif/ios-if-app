@@ -328,7 +328,7 @@ struct TimerFlowView: View {
                                 valueText: mealValue(nowMinute: nowMinute),
                                 subline: mealSubline(nowMinute: nowMinute),
                                 theme: theme,
-                                onTap: { store.dispatch(UIAction.mealPickerOpened) }
+                                onTap: openMealPicker
                             )
                         }
                     } else {
@@ -361,7 +361,7 @@ struct TimerFlowView: View {
                                     valueText: mealValue(nowMinute: nowMinute),
                                     subline: mealSubline(nowMinute: nowMinute),
                                     theme: theme,
-                                    onTap: { store.dispatch(UIAction.mealPickerOpened) }
+                                    onTap: openMealPicker
                                 )
                             }
 
@@ -702,7 +702,16 @@ struct TimerFlowView: View {
                 onFeedback: { store.dispatch(MealFeedbackThunk($0)) },
                 onExactTime: { store.dispatch(SetExactMealTimeThunk($0)) },
                 onConfirm: { store.dispatch(ConfirmLastMealThunk()) },
-                onClose: { store.dispatch(UIAction.mealPickerClosed) }
+                // Dismissing is a cancel, not a quiet confirm. Without the first
+                // dispatch the sheet leaves its edits applied: tapping the scrim
+                // after picking "Last night" left the pill promising a fast
+                // back-dated a full day, and the next tap on the primary started
+                // one — the sheet's acceptance criterion "Dismiss = cancel" read
+                // back the other way round.
+                onClose: {
+                    store.dispatch(MealAction.pickerDismissed)
+                    store.dispatch(UIAction.mealPickerClosed)
+                }
             )
             .zIndex(1)
         }
@@ -843,6 +852,15 @@ struct TimerFlowView: View {
             guard props.currentScreenState() == .goalReached else { return }
             store.dispatch(AppLifecycleAction.goalScreenSettled)
         }
+    }
+
+    /// Opening the picker is two facts, not one: the sheet is up, and this is the
+    /// answer to come back to if it is dismissed. Kept in one place because both
+    /// entries to the sheet — idle and window-closed — have to take the restore
+    /// point, and an entry that forgets it is the bug again.
+    private func openMealPicker() {
+        store.dispatch(MealAction.pickerOpened)
+        store.dispatch(UIAction.mealPickerOpened)
     }
 
     private func mealValue(nowMinute: Int) -> String {

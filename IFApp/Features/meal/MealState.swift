@@ -38,6 +38,28 @@ struct MealState: Equatable, Sendable {
     /// scale can be retuned against how people actually answer.
     private(set) var inputMethod: MealInputMethod = .untouched
 
+    /// What the three fields above held at the instant the picker was opened.
+    ///
+    /// The sheet has no draft of its own: the ribbon, the readout and the pill
+    /// behind the scrim all read this one value, which is what lets the pill stay
+    /// truthful while the sheet is up. The cost is that an edit is applied the
+    /// moment it is made — so "dismiss = cancel" needs somewhere to put the previous
+    /// answer back from, and this is it.
+    ///
+    /// Optional on purpose. A dismiss with nothing to restore is a no-op rather than
+    /// a revert to whatever was last seen, so the one path that reads this
+    /// (`MealAction.pickerDismissed`) cannot resurrect a stale answer if it is ever
+    /// dispatched without an open sheet before it.
+    private var restorePoint: Snapshot?
+
+    /// The answer as one value, so the three fields that make it up cannot be put
+    /// back one at a time and drift apart in between.
+    private struct Snapshot: Equatable, Sendable {
+        let minutesAgo: Int
+        let chipIdx: Int
+        let inputMethod: MealInputMethod
+    }
+
     var isFresh: Bool { minutesAgo == 0 }
 
     /// The one place the value changes. All four ways of answering the question go
@@ -49,6 +71,29 @@ struct MealState: Equatable, Sendable {
         // a back-date — so it reports as untouched rather than as a ribbon answer.
         self.inputMethod = self.minutesAgo == 0 && method == .ribbon ? .untouched : method
         chipIdx = chip
+    }
+
+    /// Take the restore point. Called when the picker opens, and it overwrites
+    /// unconditionally: the answer to put back is the one that was on screen this
+    /// time, never the one from a session two sheets ago.
+    mutating func markPickerOpened() {
+        restorePoint = Snapshot(minutesAgo: minutesAgo, chipIdx: chipIdx, inputMethod: inputMethod)
+    }
+
+    /// Put the answer back as it stood when the picker opened, and spend the restore
+    /// point. Confirming does not come through here — it keeps what was chosen.
+    mutating func revertToRestorePoint() {
+        guard let restorePoint else { return }
+        minutesAgo = restorePoint.minutesAgo
+        chipIdx = restorePoint.chipIdx
+        inputMethod = restorePoint.inputMethod
+        self.restorePoint = nil
+    }
+
+    /// Drop the restore point without using it — the answer it described no longer
+    /// exists to go back to.
+    mutating func forgetRestorePoint() {
+        restorePoint = nil
     }
 }
 

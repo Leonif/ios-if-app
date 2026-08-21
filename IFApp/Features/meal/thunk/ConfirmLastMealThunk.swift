@@ -35,6 +35,9 @@ struct ConfirmLastMealThunk: Thunk {
         }
         dispatch(TimerAction.started(startTimestamp: fastStart,
                                      goalHours: app.planState.plan.fastHours))
+        // Spends the way back to the value the sheet was opened on: this answer is
+        // committed, and there is no longer anything to revert to.
+        dispatch(MealAction.pickerConfirmed)
         dispatch(UIAction.mealPickerClosed)
     }
 }

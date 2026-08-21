@@ -217,6 +217,88 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.inputMethod, .untouched)
     }
 
+    // MARK: Dismiss = cancel
+
+    /// The blocker itself. Open the sheet over an untouched picker, tap a chip, then
+    /// dismiss instead of confirming: nothing may survive the dismiss. Before the fix
+    /// the chip's value stayed applied, the pill read "Fast counts from Yesterday at
+    /// 9:01 PM", and the next tap on the primary started a fast a day back — already
+    /// in overtime, with a goal that could no longer be reached.
+    func testDismissingThePickerPutsTheAnswerBack() {
+        var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
+        state = mealReducer(state: state, action: MealAction.chipPicked(idx: MealChip.lastNight.rawValue,
+                                                                       minutesAgo: 1369))
+        XCTAssertEqual(state.minutesAgo, 1369, "the sheet applies as it is edited — that part is by design")
+
+        state = mealReducer(state: state, action: MealAction.pickerDismissed)
+        XCTAssertTrue(state.isFresh)
+        XCTAssertEqual(state.chipIdx, MealChip.justNow.rawValue)
+        XCTAssertEqual(state.inputMethod, .untouched)
+    }
+
+    /// A dismiss must not be a `cleared` in disguise. Opened over the seeded
+    /// window-close time, dismissing keeps the seed — the value the app put there
+    /// was not the user's to lose by tapping the scrim.
+    func testDismissingOverASeededValueKeepsTheSeed() {
+        var state = mealReducer(state: MealState(), action: MealAction.initialized(minutesAgo: 240))
+        state = mealReducer(state: state, action: MealAction.pickerOpened)
+        state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 900))
+        state = mealReducer(state: state, action: MealAction.pickerDismissed)
+
+        XCTAssertEqual(state.minutesAgo, 240)
+        XCTAssertEqual(state.inputMethod, .seeded)
+        XCTAssertEqual(state.chipIdx, -1)
+    }
+
+    /// Confirming is the other door out, and it keeps what was chosen: the restore
+    /// point exists for the dismiss path and must never be applied behind a confirm.
+    func testConfirmingKeepsTheAnswerTheSheetWasClosedOn() {
+        var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
+        state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 315))
+        state = mealReducer(state: state, action: MealAction.pickerConfirmed)
+
+        XCTAssertEqual(state.minutesAgo, 315)
+        XCTAssertEqual(state.inputMethod, .ribbon)
+    }
+
+    /// A confirm spends the way back, so a dismiss that arrives after it cannot undo
+    /// a committed answer. Nothing dispatches that pair today; the next way of closing
+    /// this sheet somebody adds would, and it would silently revert a started fast —
+    /// which is the bug this whole pair of cases exists to stop, one door further on.
+    func testADismissAfterAConfirmCannotUndoTheCommittedAnswer() {
+        var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
+        state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 315))
+        state = mealReducer(state: state, action: MealAction.pickerConfirmed)
+        state = mealReducer(state: state, action: MealAction.pickerDismissed)
+
+        XCTAssertEqual(state.minutesAgo, 315, "the confirmed answer stands")
+    }
+
+    /// Two sessions in a row: the second dismiss goes back to what the *second* open
+    /// saw, not to the state before the first one.
+    func testASecondOpenTakesAFreshRestorePoint() {
+        var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
+        state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 120))
+        state = mealReducer(state: state, action: MealAction.pickerOpened)
+        state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 900))
+        state = mealReducer(state: state, action: MealAction.pickerDismissed)
+
+        XCTAssertEqual(state.minutesAgo, 120)
+    }
+
+    /// A dismiss with no open before it changes nothing — the restore point is spent
+    /// when it is used, so a stray dispatch cannot resurrect an old answer.
+    func testASpentRestorePointIsNotReused() {
+        var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
+        state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 120))
+        state = mealReducer(state: state, action: MealAction.pickerDismissed)
+        XCTAssertTrue(state.isFresh)
+
+        state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 300))
+        state = mealReducer(state: state, action: MealAction.pickerDismissed)
+        XCTAssertEqual(state.minutesAgo, 300, "no restore point, so nothing to put back")
+    }
+
     // MARK: "Last night"
 
     /// One rule for all twenty-four hours: the most recent 9 PM that has passed.

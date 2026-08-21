@@ -26,6 +26,16 @@ func mealReducer(state: MealState, action: Action) -> MealState {
 
     case .cleared:
         newState.set(minutesAgo: 0, chip: MealChip.justNow.rawValue, via: .untouched)
+        newState.forgetRestorePoint()
+
+    case .pickerOpened:
+        newState.markPickerOpened()
+
+    case .pickerDismissed:
+        newState.revertToRestorePoint()
+
+    case .pickerConfirmed:
+        newState.forgetRestorePoint()
 
     case .none:
         break
