@@ -29,8 +29,13 @@ struct OpenEndFastThunk: Thunk {
         let entry: EndFastEntry
         let defaultEnd: Double
         if secondsLeft > 0 {
-            // The threshold rule lives in `EndFastMath` — the result footer asks the
-            // same question about the same fast when it picks its consequence line.
+            // The threshold rule lives in `EndFastMath`, and this sheet is now its only
+            // reader. The result footer used to ask the same question here; it does not
+            // any more, and the split is deliberate. This one runs *before* an
+            // irreversible tap, where "you are nearly there" is the warning. The
+            // footer's runs *after*, over a fast already written, where the only
+            // question left is whether the day counted — and there fifteen minutes
+            // short and eight hours short are the same answer.
             let minutesLeft = Int(ceil(secondsLeft / 60))
             entry = EndFastMath.isNearGoal(secondsLeft: secondsLeft)
                 ? .nearGoal(minutesLeft: max(1, minutesLeft))

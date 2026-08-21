@@ -50,6 +50,13 @@ struct EndFastState: Equatable, Sendable {
     /// offers the correction instead. One constant, changed without re-laying out
     /// anything: the editorial copy on the main screen and this sheet's S3 both read
     /// it here.
+    ///
+    /// The sentence above was written as an intention and stood for a while as a
+    /// falsehood: only S3 read the constant, and the main screen went on saying
+    /// "every minute now is deeper autophagy" at hour 41 — the two surfaces of one
+    /// fast disagreeing, with the sheet telling the truth and the screen behind it
+    /// not. `TimerFlowView.editorial(state:progress:elapsed:)` reads it now, which is
+    /// what makes the sentence true rather than aspirational.
     static let overtimeNeutralThreshold: TimeInterval = 24 * 3600
 
     /// The nearest a chosen end may come to the start of the fast. Below a minute

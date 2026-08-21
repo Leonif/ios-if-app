@@ -346,7 +346,8 @@ struct TimerFlowView: View {
                             }
                             .padding(.vertical, 6)
 
-                            EditorialSentence(text: editorial(state: state, progress: progress), theme: theme)
+                            EditorialSentence(text: editorial(state: state, progress: progress, elapsed: elapsed),
+                                              theme: theme)
 
                             if state == .active, let next = progress.nextPhase {
                                 NextPhaseChip(next: next, secondsToNext: progress.secondsToNext, theme: theme)
@@ -531,16 +532,32 @@ struct TimerFlowView: View {
     ///
     /// Muting was the alternative on the table: say nothing after the near-goal guard
     /// so the genre does not warn twice. But the footer sentence *is* the loss the
-    /// guard was warning about, and muting it means the fast that fell 10 minutes short
-    /// is exactly the one where nothing on screen ever says the day was not counted —
-    /// the unsaid consequence this component exists to say.
+    /// guard was warning about, and muting it means the fast that fell short is exactly
+    /// the one where nothing on screen ever says the day was not counted — the unsaid
+    /// consequence this component exists to say.
     ///
-    /// Derived from the fast on screen, not stored: the near-goal path is a fact about
-    /// how long the fast ran against its goal, and a third copy of that fact is how a
+    /// **The question is "was the day counted", not "was it close".** It used to be the
+    /// second one, gated on the 15-minute near-goal threshold, and that read the guard's
+    /// job as the sentence's job. They are different jobs: the threshold exists to warn
+    /// *before* an irreversible tap, where "you are nearly there" is the whole point.
+    /// This line speaks *after*, about a fast already written, and a fast that fell
+    /// eight hours short is no less uncounted than one that fell eight minutes short —
+    /// it only got the sentence about leaving the screen instead, which says nothing
+    /// about the day at all. The threshold stays exactly where it is, in the sheet.
+    ///
+    /// The condition is asked of `PhaseProgress`, which is where "the goal is reached"
+    /// is already defined, rather than spelled out here as `elapsed >= goal`. Writing
+    /// the comparison out would have been shorter and would have made this the fourth
+    /// copy of that predicate in the tree — and a fourth copy is precisely the
+    /// mechanism by which the footer and the history row came to disagree about one
+    /// fast in the first place. The whole point of the change is that they answer the
+    /// same question; they have to answer it out of the same definition to keep doing
+    /// so when the definition next moves.
+    ///
+    /// Derived from the fast on screen, not stored: a stored copy of that fact is how a
     /// screen ends up disagreeing with the sheet that preceded it.
     private func consequenceLine(elapsed: TimeInterval) -> String {
-        let secondsLeft = props.goalHours * 3600 - elapsed
-        guard EndFastMath.isNearGoal(secondsLeft: secondsLeft) else {
+        guard !PhaseProgress.compute(elapsed: elapsed, goalHours: props.goalHours).isComplete else {
             return strings.Footer.consequenceDefault
         }
         return strings.Footer.consequenceNearGoal(hoursMinutes(elapsed))
@@ -765,12 +782,29 @@ struct TimerFlowView: View {
 
     // MARK: Copy / formatting
 
-    private func editorial(state: ScreenState, progress: PhaseProgress) -> String {
+    /// Takes `elapsed` and not just `progress` because `PhaseProgress.fraction` is
+    /// clamped at 1: past the goal it stops carrying the one number the goal-reached
+    /// branch now needs, which is how far past.
+    private func editorial(state: ScreenState, progress: PhaseProgress,
+                           elapsed: TimeInterval) -> String {
         switch state {
         case .idle: return PhaseCopy.idle
         case .complete: return PhaseCopy.complete
         case .active: return PhaseCopy.editorial(for: progress.phase)
-        case .goalReached: return strings.Editorial.goalReached(Int(props.goalHours))
+        case .goalReached:
+            // Encouragement has a ceiling, and it is the same one the end-of-fast
+            // sheet already uses to stop encouraging: past a day of overtime the app
+            // assumes the timer was left running rather than that the fast is going
+            // wonderfully. Below it, nothing changes. Above it, "every minute now is
+            // deeper autophagy" on hour 41 was the main screen cheering a fast the
+            // sheet under the same button was already offering to correct — one app
+            // saying two things about one fast.
+            let over = elapsed - props.goalHours * 3600
+            guard over >= EndFastState.overtimeNeutralThreshold else {
+                return strings.Editorial.goalReached(Int(props.goalHours))
+            }
+            let total = max(0, Int(over))
+            return strings.EndFast.timerRanPast(strings.Duration.hm(total / 3600, (total / 60) % 60))
         case .eating: return strings.Editorial.windowOpen   // eating renders its own editorial in screen()
         case .eatingOver: return strings.Editorial.windowClosed
         }

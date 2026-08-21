@@ -148,15 +148,25 @@ enum strings {
         // The consequence slot of the `.complete` footer — mode C of the genre. It
         // carries exactly one sentence, never none and never two, and which one is
         // decided by the path the fast ended on, not by muting either of them: a fast
-        // ended inside the near-goal guard is the one case where the loss would
-        // otherwise be named nowhere at all.
+        // ended short of its goal is the one case where the loss would otherwise be
+        // named nowhere at all.
 
-        /// The near-goal path: the fast was ended short of the goal, so the day is not
-        /// counted. Named through the streak, because that is what the person visibly
-        /// loses and the term is already fixed in all ten locales. It deliberately does
-        /// *not* say the streak broke — whether it did is the streak's business, and
-        /// this line stays quiet about it. `%@` is the fast's length, the existing
-        /// `%dh %02dm` token (ja renders it 15時間50分).
+        /// The missed-goal path: the fast was ended short of the goal, so the day is
+        /// not counted. Named through the streak, because that is what the person
+        /// visibly loses and the term is already fixed in all ten locales. It
+        /// deliberately does *not* say the streak broke — whether it did is the
+        /// streak's business, and this line stays quiet about it. `%@` is the fast's
+        /// length, the existing `%dh %02dm` token (ja renders it 15時間50分).
+        ///
+        /// **The name is wrong and stays wrong on purpose.** `consequenceNearGoal` is
+        /// left over from when the line was gated on the 15-minute near-goal threshold;
+        /// it now shows for every fast that fell short, by any margin. The honest name
+        /// is `consequenceMissedGoal`, and renaming it would touch the key in ten
+        /// locales for a string whose text does not change — a rename is only free
+        /// while it is exact, and this catalogue is edited by a build step that has
+        /// twice rewritten it unasked. The wrong name costs a reader this paragraph;
+        /// a botched rename costs ten translations and a locale gate before submit.
+        /// Rename it in a release that is not six days from one.
         static func consequenceNearGoal(_ duration: String) -> String {
             String(format: String(localized: "Footer.consequenceNearGoal",
                                   defaultValue: "You fasted %@ — today doesn't count toward your streak."),
