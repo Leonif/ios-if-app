@@ -123,12 +123,29 @@ final class MealPickerTests: XCTestCase {
     func testSnapResolutionByBand() {
         XCTAssertEqual(MealScale.step(at: 0), 5)
         XCTAssertEqual(MealScale.step(at: 179), 5)
-        XCTAssertEqual(MealScale.step(at: 180), 15)
-        XCTAssertEqual(MealScale.step(at: 719), 15)
+        XCTAssertEqual(MealScale.step(at: 180), 30)
+        XCTAssertEqual(MealScale.step(at: 719), 30)
         XCTAssertEqual(MealScale.step(at: 720), 30)
         XCTAssertEqual(MealScale.step(at: 1439), 30)
         XCTAssertEqual(MealScale.step(at: 1440), 60)
         XCTAssertEqual(MealScale.step(at: MealScale.maxMinutes), 60)
+    }
+
+    /// The acceptance criterion the scale is tuned against, as a number rather than a
+    /// sentence: twelve hours has to be reachable in one unbroken sweep. ~300pt is
+    /// what a thumb covers comfortably on the narrowest phone the app supports; at
+    /// the old 15-minute step this measured 432pt and the criterion was unmeetable by
+    /// dragging.
+    func testTwelveHoursFitsInOneSweep() {
+        XCTAssertEqual(MealScale.position(ofMinutes: 720), 324)
+        XCTAssertLessThanOrEqual(MealScale.position(ofMinutes: 720), 330)
+    }
+
+    /// The near band is untouched: five-minute precision is the whole reason the
+    /// ribbon beats a stepper for "I ate forty minutes ago".
+    func testTheNearBandKeepsItsPrecision() {
+        XCTAssertEqual(MealScale.position(ofMinutes: 180), 216)
+        XCTAssertEqual(MealScale.snap(42), 40)
     }
 
     /// Position and snapping are inverses on the grid, in every band — otherwise the

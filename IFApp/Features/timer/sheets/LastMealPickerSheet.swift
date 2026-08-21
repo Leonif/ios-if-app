@@ -41,6 +41,18 @@ struct LastMealPickerSheet: View {
 
     private var atLimit: Bool { minutesAgo >= MealScale.maxMinutes }
 
+    // The card's vertical rhythm, in two values instead of the five it grew into
+    // (14/18/19/9/6). Five gaps inside one card is not a rhythm, it is five
+    // decisions nobody can hold in their head — and the density the owner called
+    // "heavy" is read off this stack, not off the ribbon.
+    //
+    // `section` separates the things that answer different questions: the heading,
+    // the shortcuts, the value, the strip. `tight` binds what belongs to the strip
+    // and the two buttons under it. Gaps are measured to the *boxes*, so the 44pt
+    // collar around "Set exact time" counts as its edge, not the text inside it.
+    private let sectionGap: CGFloat = 16
+    private let tightGap: CGFloat = 8
+
     var body: some View {
         ZStack(alignment: .bottom) {
             Color(.sRGB, red: 24/255, green: 20/255, blue: 14/255, opacity: 0.22)
@@ -64,29 +76,27 @@ struct LastMealPickerSheet: View {
             RoundedRectangle(cornerRadius: 2)
                 .fill(theme.surfaceLine)
                 .frame(width: 38, height: 4)
-                .padding(.bottom, 15)
+                .padding(.bottom, sectionGap)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(strings.Sheet.whenDidYouEat)
-                    .font(.bricolage(20))
-                    .foregroundColor(theme.ink)
-                Text(strings.Sheet.backdateHint)
-                    .font(.hanken(13, .medium))
-                    // line-height 1.45 from the handoff. SwiftUI's own line box is
-                    // tighter than a CSS one, so the leading is added back explicitly —
-                    // between lines (German wraps to two) and under the last one.
-                    .lineSpacing(13 * 1.45 - 15.6)
-                    .padding(.bottom, 3)
-                    .foregroundColor(theme.mut)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            // The explanatory subtitle used to stand here ("We'll back-date your fast
+            // so the timer stays accurate"). It said in prose what the readout below
+            // says in the value itself, cost a text block and ~25pt of a card the
+            // owner called heavy, and wrapped to two lines in German — so the sheet
+            // was tallest exactly where the words were most redundant.
+            //
+            // `Sheet.backdateHint` stays in the catalogue with its ten translations.
+            // It is not the string that was wrong, only its place on this card, and a
+            // key deleted here is ten translations to buy back if it returns.
+            Text(strings.Sheet.whenDidYouEat)
+                .font(.bricolage(20))
+                .foregroundColor(theme.ink)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             chips
-                .padding(.top, 14)
+                .padding(.top, sectionGap)
 
             readoutBlock
-                .padding(.top, 18)
+                .padding(.top, sectionGap)
 
             MealScaleRibbon(
                 minutesAgo: minutesAgo,
@@ -97,14 +107,14 @@ struct LastMealPickerSheet: View {
                 onScrub: onScrub,
                 onFeedback: onFeedback
             )
-            .padding(.top, 19)
+            .padding(.top, sectionGap)
 
             if atLimit {
                 Text(strings.Meal.scaleLimitNote)
                     .font(.hanken(12.5, .semibold))
                     .foregroundColor(theme.mut)
                     .multilineTextAlignment(.center)
-                    .padding(.top, 9)
+                    .padding(.top, tightGap)
                     .accessibilityIdentifier("meal.limitNote")
             }
 
@@ -124,11 +134,11 @@ struct LastMealPickerSheet: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.pressable)
-            .padding(.top, 9)
+            .padding(.top, tightGap)
 
             PrimaryButton(title: strings.Sheet.confirm, theme: theme,
                           cornerRadius: 16, height: 54, action: onConfirm)
-                .padding(.top, 6)
+                .padding(.top, tightGap)
                 .accessibilityIdentifier("meal.confirm")
         }
         .padding(18)

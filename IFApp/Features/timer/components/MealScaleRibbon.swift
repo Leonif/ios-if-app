@@ -48,6 +48,18 @@ struct MealScaleRibbon: View {
     /// higher, which is what keeps the labels clear of the tick line.
     private let labelRowTop: CGFloat = 40
     private let fadeWidth: CGFloat = 28
+    /// How far above and below the drawn block the strip still answers to a finger.
+    /// The ticks are 60pt tall and the gesture used to live on exactly that box, so a
+    /// thumb that landed ten points high did nothing at all — no movement, no
+    /// feedback, nothing to say it had missed.
+    ///
+    /// Uneven because the room is uneven, not as a preference. Above the strip is the
+    /// readout's gap, which nothing else claims. Below it is the sheet's tight gap and
+    /// then the 44pt collar of "Set exact time" — and a grab zone reaching into that
+    /// collar would swallow taps meant for the button, trading one dead area for
+    /// another.
+    private let grabSlackTop: CGFloat = 10
+    private let grabSlackBottom: CGFloat = 6
 
     private var blockHeight: CGFloat { dynamicTypeSize.isAccessibilitySize ? 68 : 60 }
     /// +1 when the past runs left (LTR), -1 when it runs right (Arabic): the ribbon
@@ -63,8 +75,19 @@ struct MealScaleRibbon: View {
             .frame(width: width, height: blockHeight)
             .overlay(marker)
             .overlay(edgeFade)
-            .contentShape(Rectangle())
-            .gesture(drag)
+            // The grab zone is an overlay rather than a taller frame on purpose: an
+            // overlay is laid out against its parent and may overflow it, so the
+            // strip answers to a finger outside its own box without any of the
+            // measured spacing around it moving.
+            .overlay(
+                Color.clear
+                    .frame(height: blockHeight + grabSlackTop + grabSlackBottom)
+                    // An overlay is centred on its parent, so an uneven reach needs
+                    // the half-difference put back by hand.
+                    .offset(y: (grabSlackBottom - grabSlackTop) / 2)
+                    .contentShape(Rectangle())
+                    .gesture(drag(width: width))
+            )
         }
         .frame(height: blockHeight)
         // The tick labels are markings, not prose: at large text sizes they would
@@ -99,7 +122,7 @@ struct MealScaleRibbon: View {
 
     // MARK: Gesture
 
-    private var drag: some Gesture {
+    private func drag(width: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 1)
             .onChanged { value in
                 let anchor = dragAnchor ?? offset
@@ -116,9 +139,21 @@ struct MealScaleRibbon: View {
             .onEnded { value in
                 let anchor = dragAnchor ?? offset
                 dragAnchor = nil
+                // The throw is capped at one ribbon-width past where the finger
+                // actually stopped. Uncapped, `predictedEndTranslation` projects as
+                // far as the flick implies — half a day off a flick of the thumb —
+                // and the value lands somewhere the person never saw, which is why
+                // the strip could not be aimed by flinging either. One screen of
+                // ribbon is the ceiling because it is the distance a person can
+                // still account for: whatever they land on was on screen, or one
+                // screen away from it, when they let go.
+                let throwCeiling = width
+                let inertia = min(throwCeiling,
+                                  max(-throwCeiling,
+                                      value.predictedEndTranslation.width - value.translation.width))
                 let projected = reduceMotion
                     ? offset
-                    : anchor + dirSign * value.predictedEndTranslation.width
+                    : anchor + dirSign * (value.translation.width + inertia)
                 let settled = MealScale.position(
                     ofMinutes: MealScale.snappedMinutes(atPosition: hardStop(projected))
                 )

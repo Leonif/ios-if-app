@@ -262,6 +262,10 @@ enum strings {
         static var customLength: String { String(localized: "Custom length") }
         static var customCaption: String { String(localized: "From 1 to 23 hours") }
         static var whenDidYouEat: String { String(localized: "When did you last eat?") }
+        /// No longer drawn: the last-meal card said this in prose above a readout
+        /// that says it in the value. Kept, and kept reaching the extractor, so the
+        /// key holds its place in the catalogue with its ten translations — deleting
+        /// it costs nothing today and ten translations the day the line comes back.
         static var backdateHint: String { String(localized: "We’ll back-date your fast so the timer stays accurate.") }
         static var confirm: String { String(localized: "Confirm") }
         /// The rule label above the exact-time control of the end-of-fast sheet.

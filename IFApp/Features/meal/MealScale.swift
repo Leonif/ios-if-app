@@ -16,13 +16,28 @@ import Foundation
 enum MealScale {
     /// Snap resolution by distance: (upper bound in minutes ago, step in minutes).
     ///
-    /// PLACEHOLDER DISTRIBUTION — the real band edges land once GA4 has a sample of
-    /// `minutes_ago`. Retuning the scale is editing these four pairs and nothing
-    /// else: pitch, tick heights, label thinning and the ribbon length all derive
-    /// from this table.
+    /// Retuning the scale is editing these four pairs and nothing else: pitch, tick
+    /// heights, label thinning and the ribbon length all derive from this table.
+    ///
+    /// No longer a placeholder in its busiest band. The card's own acceptance
+    /// criterion is that any moment inside twelve hours is reachable in one
+    /// unbroken gesture, and at a 15-minute step twelve hours measured 432pt against
+    /// the ~300pt a thumb sweeps comfortably — so the criterion could not be met by
+    /// dragging, only by flinging, and a fling could not be aimed. At 30 minutes
+    /// twelve hours is 324pt and the criterion holds.
+    ///
+    /// The band that was coarsened is the one that carries the traffic: the first
+    /// `minutes_ago` sample (GA4, 19-21.08.2026, n=22) puts 12 of 22 answers between
+    /// three and twelve hours, median 4.5h. Precision is what that band needs least —
+    /// someone who ate "about five hours ago" does not distinguish 4:45 from 5:00 —
+    /// and reach is what it needs most.
+    ///
+    /// The 12-24h band keeps its own row even though its step now equals the one
+    /// above it. Collapsing them would draw the same ribbon and lose the four bands
+    /// the design speaks in, which is the surface the next retune edits.
     static let bands: [(upper: Int, step: Int)] = [
         (180, 5),       // 0-3h    — 5 minutes
-        (720, 15),      // 3-12h   — 15 minutes
+        (720, 30),      // 3-12h   — 30 minutes
         (1440, 30),     // 12-24h  — 30 minutes
         (10080, 60),    // 1-7d    — 1 hour
     ]
