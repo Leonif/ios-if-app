@@ -2992,65 +2992,6 @@
         }
       }
     },
-    "Eating window" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نافذة الأكل"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Essensfenster"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ventana de comida"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenêtre alimentaire"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "食事の時間帯"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "식사 시간"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Okno żywieniowe"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вікно харчування"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "进食窗口"
-          }
-        }
-      }
-    },
     "EATING WINDOW" : {
       "localizations" : {
         "ar" : {
@@ -7488,6 +7429,7 @@
       }
     },
     "Inactive" : {
+      "comment" : "Status 1 of the Pro row. Japanese is deliberately empty and stays empty: every attested ja candidate for \"you do not have this\" is a suspension, a voidance, or a picker value, and the right column of a ja settings row reads as the option currently chosen. The empty value hides the slot (AboutIF24View.swift, statusText renders only when the label is non-empty), so a Japanese reader without Pro sees the label and its chevron rather than a hole. Do not fill it, and do not read the empty value as a missing translation.",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -10859,65 +10801,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "血糖"
-          }
-        }
-      }
-    },
-    "Tap to change" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "انقر للتغيير"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zum Ändern tippen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toca para cambiar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toucher pour modifier"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タップして変更"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "탭하여 변경"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dotknij, aby zmienić"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Торкніться, щоб змінити"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "点按以更改"
           }
         }
       }
