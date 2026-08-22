@@ -798,7 +798,8 @@ struct TimerFlowView: View {
             // wonderfully. Below it, nothing changes. Above it, "every minute now is
             // deeper autophagy" on hour 41 was the main screen cheering a fast the
             // sheet under the same button was already offering to correct — one app
-            // saying two things about one fast.
+            // saying two things about one fast. (That wording is pre-1.5.1 and is gone
+            // from the catalog; the gate below is what the story is about, not it.)
             let over = elapsed - props.goalHours * 3600
             guard over >= EndFastState.overtimeNeutralThreshold else {
                 return strings.Editorial.goalReached(Int(props.goalHours))

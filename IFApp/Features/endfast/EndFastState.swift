@@ -57,6 +57,10 @@ struct EndFastState: Equatable, Sendable {
     /// fast disagreeing, with the sheet telling the truth and the screen behind it
     /// not. `TimerFlowView.editorial(state:progress:elapsed:)` reads it now, which is
     /// what makes the sentence true rather than aspirational.
+    ///
+    /// The quoted sentence is the pre-1.5.1 wording of `Editorial.goalReached` and is
+    /// no longer in the catalog — grepping for it finds nothing. It is kept here as
+    /// the shape of the bug, not as a string that exists.
     static let overtimeNeutralThreshold: TimeInterval = 24 * 3600
 
     /// The nearest a chosen end may come to the start of the fast. Below a minute

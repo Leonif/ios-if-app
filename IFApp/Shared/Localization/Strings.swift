@@ -2,10 +2,17 @@
 //  strings.swift
 //  IFApp
 //
-//  Type-safe access to the Localizable.xcstrings String Catalog. Keys are the
-//  English source text (the catalog's source language); each accessor resolves the
-//  current locale via String(localized:). Add a case here, then add the matching
-//  key + translations in Localizable.xcstrings.
+//  Type-safe access to the Localizable.xcstrings String Catalog. Each accessor
+//  resolves the current locale via String(localized:). Add a case here, then add
+//  the matching key + translations in Localizable.xcstrings.
+//
+//  Two key styles live here. Most strings are keyed by their English text, which
+//  is the catalog's source language. Strings whose English wording is expected to
+//  keep moving are keyed symbolically instead - "Editorial.fed",
+//  "Footer.startEating" - with the English in defaultValue.
+//  The reason is not tidiness: rewriting a text key does not edit a string, it
+//  creates a new one, and the ten translations stay behind on the old key looking
+//  merely unfinished. Prefer a symbolic key for anything editorial or legal.
 //
 
 import Foundation
@@ -43,16 +50,33 @@ enum strings {
         static var idle: String { String(localized: "Start whenever you’re ready, or log your last meal to pick up a fast already in progress.") }
         static var complete: String { String(localized: "Fast complete. Your eating window is ready. Refuel gently.") }
         static var windowOpen: String { String(localized: "Fast complete. Your eating window is open. Refuel gently.") }
-        static var fed: String { String(localized: "Still digesting. Insulin is up and your body is storing the energy from your last meal.") }
-        static var sugar: String { String(localized: "Glucose is easing down. Your body is leaning on its glycogen stores for fuel.") }
-        static var fat: String { String(localized: "Glycogen is running low. Fat is becoming your main source of energy.") }
-        static var ketosis: String { String(localized: "Ketones are climbing. You’re well into fat-burning now.") }
-        static var autophagy: String { String(localized: "Deep in the fast. Autophagy is recycling what your cells no longer need.") }
+        static var fed: String {
+            String(localized: "Editorial.fed",
+                   defaultValue: "Still digesting. Insulin typically runs high now, storing energy from your last meal.")
+        }
+        static var sugar: String {
+            String(localized: "Editorial.sugar",
+                   defaultValue: "Glucose typically eases down now. Glycogen stores carry the fuel.")
+        }
+        static var fat: String {
+            String(localized: "Editorial.fat",
+                   defaultValue: "Glycogen typically runs low by now. Fat takes over as the main fuel.")
+        }
+        static var ketosis: String {
+            String(localized: "Editorial.ketosis",
+                   defaultValue: "Ketones typically climb around this hour. They fuel brain and muscles.")
+        }
+        static var autophagy: String {
+            String(localized: "Editorial.autophagy",
+                   defaultValue: "Deep in the fast. Autophagy typically recycles what cells no longer need.")
+        }
         static var windowClosed: String { String(localized: "Your eating window has closed. Every minute since already counts - continue your fast whenever you’re ready.") }
 
         /// Editorial shown once the goal is reached (overtime). `hours` = plan goal in hours.
         static func goalReached(_ hours: Int) -> String {
-            String(format: String(localized: "You’ve reached your %d-hour goal. Every minute now is deeper autophagy."), hours)
+            String(format: String(localized: "Editorial.goalReached",
+                                  defaultValue: "You’ve reached your %d-hour goal. From here the fast is typically at its deepest."),
+                   hours)
         }
 
         /// "Autophagy begins in 2h 36m"
@@ -89,7 +113,9 @@ enum strings {
         }
 
         /// Static phase chip shown in the overtime state.
-        static var deepAutophagy: String { String(localized: "Deep autophagy - cellular repair") }
+        static var deepAutophagy: String {
+            String(localized: "Timer.deepAutophagy", defaultValue: "Deep autophagy")
+        }
     }
 
     enum Footer {

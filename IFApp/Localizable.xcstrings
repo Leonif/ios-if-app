@@ -2723,7 +2723,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "일일 단식"
+            "value" : "매일 단식"
           }
         },
         "pl" : {
@@ -2746,118 +2746,130 @@
         }
       }
     },
-    "Deep autophagy - cellular repair" : {
+    "Timer.deepAutophagy" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "التهام ذاتي عميق، إصلاح خلوي"
+            "state" : "translated",
+            "value" : "التهام ذاتي عميق"
           }
         },
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Tiefe Autophagie - Zellreparatur"
+            "state" : "translated",
+            "value" : "Tiefe Autophagie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deep autophagy"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Autofagia profunda - reparación celular"
+            "state" : "translated",
+            "value" : "Autofagia profunda"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Autophagie profonde - réparation cellulaire"
+            "state" : "translated",
+            "value" : "Autophagie profonde"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "深いオートファジー・細胞の修復"
+            "value" : "深いオートファジー"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "깊은 자가포식 · 세포 복구"
+            "value" : "깊은 자가포식"
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Głęboka autofagia - naprawa komórkowa"
+            "state" : "translated",
+            "value" : "Głęboka autofagia"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Глибока автофагія - клітинний ремонт"
+            "state" : "translated",
+            "value" : "Глибока автофагія"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "深度自噬 · 细胞修复"
+            "state" : "translated",
+            "value" : "深度自噬"
           }
         }
       }
     },
-    "Deep in the fast. Autophagy is recycling what your cells no longer need." : {
+    "Editorial.autophagy" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "أنت في عمق الصيام. الالتهام الذاتي يعيد تدوير ما لم تعد خلاياك بحاجة إليه."
+            "state" : "needs_review",
+            "value" : "أنت في عمق الصيام. الالتهام الذاتي يعيد تدوير ما لم تعد الخلايا بحاجة إليه."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tief im Fasten. Die Autophagie recycelt, was deine Zellen nicht mehr brauchen."
+            "value" : "Tief im Fasten. Um diese Zeit recycelt die Autophagie meist, was Zellen nicht mehr brauchen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deep in the fast. Autophagy typically recycles what cells no longer need."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En pleno ayuno. La autofagia recicla lo que tus células ya no necesitan."
+            "value" : "En pleno ayuno. A estas alturas la autofagia suele reciclar lo que las células ya no necesitan."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En plein jeûne. L’autophagie recycle ce dont vos cellules n’ont plus besoin."
+            "value" : "En plein jeûne. À ce stade, l’autophagie recycle en général ce dont les cellules n’ont plus besoin."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "断食の深いフェーズ。オートファジーが細胞に不要になったものを再利用しています。"
+            "value" : "断食の深いフェーズ。オートファジーが細胞の不要なものを再利用する頃です。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "단식의 깊은 단계예요. 자가포식이 세포에 더 이상 필요 없는 것을 재활용하고 있어요."
+            "value" : "단식의 깊은 단계예요. 보통 자가포식이 세포에 필요 없어진 것을 재활용해요."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Głęboko w poście. Autofagia przetwarza to, czego komórki już nie potrzebują."
+            "value" : "Głęboko w poście. Na tym etapie autofagia zwykle przetwarza to, czego komórki już nie potrzebują."
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Глибока фаза посту. Автофагія переробляє те, що клітинам більше не потрібне."
+            "state" : "translated",
+            "value" : "Глибока фаза посту. Зазвичай саме тут автофагія переробляє те, що клітинам більше не потрібне."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已进入断食深层阶段。自噬正在回收细胞不再需要的物质。"
+            "value" : "已进入断食深层阶段。这个时段自噬会回收细胞不再需要的物质。"
           }
         }
       }
@@ -5228,13 +5240,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "摂食"
+            "value" : "食後"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "포만"
+            "value" : "식후"
           }
         },
         "pl" : {
@@ -5705,60 +5717,66 @@
         }
       }
     },
-    "Glucose is easing down. Your body is leaning on its glycogen stores for fuel." : {
+    "Editorial.sugar" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "مستوى الجلوكوز ينخفض. يعتمد جسمك على مخزون الجليكوجين للحصول على الطاقة."
+            "state" : "needs_review",
+            "value" : "مستوى الجلوكوز ينخفض. ومخزون الجليكوجين هو مصدر الطاقة في هذه الفترة."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Glukosespiegel sinkt. Dein Körper greift auf seine Glykogenspeicher zurück."
+            "value" : "Um diese Zeit sinkt der Glukosespiegel meist, und die Glykogenspeicher liefern den Treibstoff."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glucose typically eases down now. Glycogen stores carry the fuel."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La glucosa está bajando. Tu cuerpo recurre a sus reservas de glucógeno."
+            "value" : "A esta hora la glucosa suele bajar y las reservas de glucógeno aportan el combustible."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La glycémie diminue. Votre corps puise dans ses réserves de glycogène."
+            "value" : "À cette heure, la glycémie diminue en général et les réserves de glycogène prennent le relais."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "血糖値が下がっています。体はグリコーゲンの蓄えをエネルギーにし始めています。"
+            "state" : "needs_review",
+            "value" : "血糖値が下がる頃です。グリコーゲンの蓄えがエネルギーになります。"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "혈당이 낮아지고 있어요. 몸이 글리코겐 저장분을 연료로 사용하기 시작해요."
+            "state" : "needs_review",
+            "value" : "보통 이때쯤 혈당이 낮아지고, 글리코겐 저장분이 연료를 맡아요."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Poziom glukozy spada. Ciało sięga po zapasy glikogenu."
+            "value" : "O tej porze poziom glukozy zwykle spada, a paliwem stają się zapasy glikogenu."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Рівень глюкози знижується. Тіло переходить на запаси глікогену."
+            "value" : "Зазвичай у цей час глюкоза знижується, а паливом стають запаси глікогену."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "血糖正在下降。身体开始动用糖原储备来供能。"
+            "value" : "这个时段血糖通常回落，由糖原储备供能。"
           }
         }
       }
@@ -5821,60 +5839,66 @@
         }
       }
     },
-    "Glycogen is running low. Fat is becoming your main source of energy." : {
+    "Editorial.fat" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "مخزون الجليكوجين يقترب من النفاد. تصبح الدهون مصدر طاقتك الأساسي."
+            "state" : "needs_review",
+            "value" : "مخزون الجليكوجين يقترب من النفاد. تصبح الدهون مصدر الطاقة الأساسي."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Glykogenspeicher werden knapp. Fett wird zu deiner Hauptenergiequelle."
+            "value" : "Um diese Zeit werden die Glykogenspeicher meist knapp, und Fett übernimmt als Hauptenergiequelle."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glycogen typically runs low by now. Fat takes over as the main fuel."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El glucógeno se está agotando. La grasa se convierte en tu principal fuente de energía."
+            "value" : "A esta hora el glucógeno suele agotarse y la grasa pasa a ser el combustible principal."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les réserves de glycogène s’épuisent. Les graisses deviennent votre principale source d’énergie."
+            "value" : "À cette heure, les réserves de glycogène s’épuisent en général et les graisses deviennent le carburant principal."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "グリコーゲンが少なくなっています。脂肪が主なエネルギー源になりつつあります。"
+            "state" : "needs_review",
+            "value" : "グリコーゲンが少なくなる頃です。脂肪が主なエネルギー源になっていきます。"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "글리코겐이 부족해지고 있어요. 지방이 주요 에너지원이 되고 있어요."
+            "state" : "needs_review",
+            "value" : "보통 이쯤이면 글리코겐이 줄고, 지방이 주요 연료가 돼요."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zapasy glikogenu się kończą. Tłuszcz staje się głównym źródłem energii."
+            "value" : "O tej porze zapasy glikogenu zwykle się kończą, a głównym paliwem staje się tłuszcz."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Глікоген майже вичерпано. Жир стає основним джерелом енергії."
+            "value" : "Зазвичай на цьому етапі глікоген вичерпується, а основним паливом стає жир."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "糖原即将耗尽。脂肪正成为你的主要能量来源。"
+            "value" : "这个时段糖原逐渐见底，脂肪成为主要能量来源。"
           }
         }
       }
@@ -7814,60 +7838,66 @@
         }
       }
     },
-    "Ketones are climbing. You’re well into fat-burning now." : {
+    "Editorial.ketosis" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "مستوى الكيتونات يرتفع. أنت الآن في ذروة حرق الدهون."
+            "state" : "needs_review",
+            "value" : "مستوى الكيتونات يرتفع. وهي وقود للدماغ والعضلات."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Ketonwerte steigen. Du verbrennst jetzt kräftig Fett."
+            "value" : "Um diese Zeit steigen die Ketonwerte meist - Treibstoff für Gehirn und Muskeln."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ketones typically climb around this hour. They fuel brain and muscles."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Las cetonas están subiendo. Ya estás quemando grasa de lleno."
+            "value" : "A esta hora las cetonas suelen subir: combustible para el cerebro y los músculos."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les cétones augmentent. Vous brûlez pleinement les graisses maintenant."
+            "value" : "À cette heure, les cétones augmentent en général : un carburant pour le cerveau et les muscles."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "ケトン体が増えています。脂肪燃焼が本格的に進んでいます。"
+            "value" : "ケトン体が増える頃です。脳と筋肉のエネルギー源になります。"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "케톤 수치가 오르고 있어요. 지금 본격적으로 지방을 태우고 있어요."
+            "state" : "needs_review",
+            "value" : "보통 이 무렵 케톤 수치가 올라요. 뇌와 근육의 연료가 돼요."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Poziom ketonów rośnie. Jesteś już w pełni w fazie spalania tłuszczu."
+            "value" : "O tej porze poziom ketonów zwykle rośnie - to paliwo dla mózgu i mięśni."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Рівень кетонів зростає. Ви активно спалюєте жир."
+            "value" : "Зазвичай у цей час зростають кетони - паливо для мозку і мʼязів."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "酮体正在上升。你现在正充分燃烧脂肪。"
+            "value" : "这个时段酮体通常上升，为大脑和肌肉供能。"
           }
         }
       }
@@ -7926,7 +7956,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "酮症"
+            "value" : "生酮"
           }
         }
       }
@@ -10710,60 +10740,66 @@
         }
       }
     },
-    "Still digesting. Insulin is up and your body is storing the energy from your last meal." : {
+    "Editorial.fed" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "لا يزال الهضم جاريًا. مستوى الإنسولين مرتفع وجسمك يخزّن طاقة وجبتك الأخيرة."
+            "state" : "needs_review",
+            "value" : "لا يزال الهضم جاريًا. مستوى الإنسولين مرتفع ويجري تخزين طاقة الوجبة الأخيرة."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Noch in der Verdauung. Der Insulinspiegel ist hoch und dein Körper speichert die Energie deiner letzten Mahlzeit."
+            "value" : "Noch in der Verdauung. Um diese Zeit ist der Insulinspiegel meist hoch, die letzte Mahlzeit wird eingelagert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Still digesting. Insulin typically runs high now, storing energy from your last meal."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aún digiriendo. La insulina está alta y tu cuerpo almacena la energía de tu última comida."
+            "value" : "Aún digiriendo. A esta hora la insulina suele estar alta y la energía de la última comida se almacena."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Digestion en cours. L’insuline est élevée et votre corps stocke l’énergie de votre dernier repas."
+            "value" : "Digestion en cours. À cette heure, l’insuline est en général élevée et l’énergie du repas est mise en réserve."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "まだ消化中です。インスリン値が高く、体は最後の食事のエネルギーを蓄えています。"
+            "state" : "needs_review",
+            "value" : "まだ消化が続く頃です。インスリン値が高く、食事のエネルギーが蓄えられます。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "아직 소화 중이에요. 인슐린이 높아 몸이 마지막 식사의 에너지를 저장하고 있어요."
+            "value" : "아직 소화 중이에요. 보통 인슐린이 높아 마지막 식사의 에너지가 저장돼요."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trwa trawienie. Poziom insuliny jest wysoki, a ciało magazynuje energię z ostatniego posiłku."
+            "value" : "Trwa trawienie. O tej porze poziom insuliny jest zwykle wysoki, a energia z ostatniego posiłku idzie do magazynu."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Триває травлення. Інсулін підвищений, тіло запасає енергію з останнього прийому їжі."
+            "value" : "Триває травлення. У цей час інсулін зазвичай високий, а енергія останньої їжі йде в запас."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "仍在消化。胰岛素升高，身体正在储存上一餐的能量。"
+            "value" : "仍在消化。这个时段胰岛素通常较高，上一餐的能量被储存起来。"
           }
         }
       }
@@ -11826,7 +11862,7 @@
         }
       }
     },
-    "You’ve reached your %d-hour goal. Every minute now is deeper autophagy." : {
+    "Editorial.goalReached" : {
       "localizations" : {
         "ar" : {
           "variations" : {
@@ -11834,37 +11870,37 @@
               "few" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ %d ساعات. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                  "value" : "لقد أتممت هدفك البالغ %d ساعات. ومن هنا يبلغ الصيام أعمق مراحله."
                 }
               },
               "many" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ %d ساعةً. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                  "value" : "لقد أتممت هدفك البالغ %d ساعةً. ومن هنا يبلغ الصيام أعمق مراحله."
                 }
               },
               "one" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ ساعة واحدة. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                  "value" : "لقد أتممت هدفك البالغ ساعة واحدة. ومن هنا يبلغ الصيام أعمق مراحله."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ %d ساعة. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                  "value" : "لقد أتممت هدفك البالغ %d ساعة. ومن هنا يبلغ الصيام أعمق مراحله."
                 }
               },
               "two" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ ساعتين. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                  "value" : "لقد أتممت هدفك البالغ ساعتين. ومن هنا يبلغ الصيام أعمق مراحله."
                 }
               },
               "zero" : {
                 "stringUnit" : {
                   "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ %d ساعة. كل دقيقة الآن تعني التهامًا ذاتيًا أعمق."
+                  "value" : "لقد أتممت هدفك البالغ %d ساعة. ومن هنا يبلغ الصيام أعمق مراحله."
                 }
               }
             }
@@ -11872,50 +11908,56 @@
         },
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Du hast dein %d-Stunden-Ziel erreicht. Jede Minute ist jetzt tiefere Autophagie."
+            "state" : "translated",
+            "value" : "Du hast dein %d-Stunden-Ziel erreicht. Ab hier liegt meist die tiefste Phase des Fastens."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You’ve reached your %d-hour goal. From here the fast is typically at its deepest."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Has alcanzado tu objetivo de %d horas. Cada minuto ahora es autofagia más profunda."
+            "state" : "translated",
+            "value" : "Has alcanzado tu objetivo de %d horas. A partir de aquí suele estar la fase más profunda del ayuno."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous avez atteint votre objectif de %d heures. Chaque minute est désormais une autophagie plus profonde."
+            "value" : "Vous avez atteint votre objectif de %d heures. C’est en général la phase la plus profonde du jeûne."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%d時間の目標を達成しました。ここからの一分一分がより深いオートファジーです。"
+            "value" : "%d時間の目標を達成しました。ここからが断食のもっとも深い時間帯です。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "%d시간 목표를 달성했어요. 지금부터 매 순간이 더 깊은 자가포식이에요."
+            "value" : "%d시간 목표를 달성했어요. 보통 여기서부터 단식이 가장 깊어져요."
           }
         },
         "pl" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Cel %d godzin osiągnięty. Każda minuta to teraz głębsza autofagia."
+            "state" : "translated",
+            "value" : "Cel %d godzin osiągnięty. Dalej zwykle zaczyna się najgłębsza część postu."
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ви досягли своєї %d-годинної цілі. Кожна хвилина тепер - глибша автофагія."
+            "state" : "translated",
+            "value" : "Ви досягли своєї %d-годинної цілі. Далі зазвичай найглибша частина посту."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "你已达成%d小时目标。此刻每一分钟都是更深层的自噬。"
+            "value" : "你已达成%d小时目标。接下来通常是断食最深的时段。"
           }
         }
       }
