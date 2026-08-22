@@ -8843,12 +8843,12 @@
       }
     },
     "Paid %@. One time - nothing renews, nothing to cancel." : {
-      "comment" : "Body of the paywall's S6 confirmation frame after a paid purchase. %@ is the store's own formatted price ('$6.99', 'COP 29.900,00') - one token, never taken apart, and never placed last before the full stop: the Saudi riyal form carries a full stop of its own, and two in a row would land in the payment confirmation of the app's largest Arabic market. The app bidi-isolates the token and makes its spaces non-breaking, so translations do not have to.",
+      "comment" : "Body of the paywall's S6 confirmation frame after a paid purchase. %@ is the store's own formatted price ('$6.99', 'COP 29.900,00') - one token, never taken apart, and never placed last before the full stop: the Saudi riyal form carries a full stop of its own, and two in a row would land in the payment confirmation of the app's largest Arabic market. The app bidi-isolates the token and makes its spaces non-breaking, so translations do not have to. The same body is shown when an Ask to Buy is approved (OfferState.granted(.approved)), so the reader may be the person who did NOT pay: no locale may put the buyer in the second person here. Arabic said دفعت ('you paid') until 1.5.1 and now matches the agentless تم + masdar of its own frame title.",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "دفعت %@ مقابل شراء لمرة واحدة، لا يتجدد ولا يوجد ما تلغيه."
+            "value" : "تم دفع %@ مقابل شراء لمرة واحدة، لا يتجدد ولا يوجد ما يلغى."
           }
         },
         "de" : {
