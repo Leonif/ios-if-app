@@ -9,7 +9,7 @@
 //  Two key styles live here. Most strings are keyed by their English text, which
 //  is the catalog's source language. Strings whose English wording is expected to
 //  keep moving are keyed symbolically instead - "Editorial.fed",
-//  "Footer.startEating" - with the English in defaultValue.
+//  "About.medicalNote", "Footer.startEating" - with the English in defaultValue.
 //  The reason is not tidiness: rewriting a text key does not edit a string, it
 //  creates a new one, and the ten translations stay behind on the old key looking
 //  merely unfinished. Prefer a symbolic key for anything editorial or legal.
@@ -737,7 +737,17 @@ enum strings {
         static var title: String { String(localized: "About IF24") }
         static var privacyFooter: String { String(localized: "No IF24 account, no sign-in - IF24 never asks who you are. Your history is kept on this device; how long your fasts run is sent as usage data.") }
         /// Closes the science section rather than sitting under a commercial row.
-        static var medicalNote: String { String(localized: "The fasting phases IF24 shows are estimates based on typical timing, not a measurement of your body. IF24 is not a medical device and does not give medical advice. If you are pregnant, managing diabetes, or taking medication with food, talk to a clinician before changing how you eat.") }
+        ///
+        /// On a symbolic key rather than its English text, and deliberately: this is
+        /// the legally heaviest line in the catalog and the most often rewritten, and
+        /// every rewrite of a text key silently detaches the nine translations that
+        /// hang off it. The advice to see a clinician stands BEFORE the examples, and
+        /// the list of who is at risk is open ("especially if…"), not closed - a
+        /// closed list reads as "everyone else is fine".
+        static var medicalNote: String {
+            String(localized: "About.medicalNote",
+                   defaultValue: "The fasting phases IF24 shows are estimates based on typical timing, not a measurement of your body. IF24 is not a medical device and does not give medical advice. Talk to a clinician before changing how you eat - especially if you are pregnant, managing diabetes, taking medication with food, have a history of disordered eating, or are under 18.")
+        }
     }
 
     enum Sources {

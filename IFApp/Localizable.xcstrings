@@ -10922,60 +10922,66 @@
         }
       }
     },
-    "The fasting phases IF24 shows are estimates based on typical timing, not a measurement of your body. IF24 is not a medical device and does not give medical advice. If you are pregnant, managing diabetes, or taking medication with food, talk to a clinician before changing how you eat." : {
+    "About.medicalNote" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "مراحل الصيام التي يعرضها تطبيق IF24 هي تقديرات مبنية على التوقيت المعتاد، لا قياس لجسمك. تطبيق IF24 لا يُصنَّف ضمن الأجهزة الطبية ولا يقدم مشورة طبية. في حالات الحمل أو السكري أو تناول دواء مع الطعام، يجب استشارة طبيبك قبل تغيير نمط طعامك."
+            "value" : "مراحل الصيام التي يعرضها تطبيق IF24 هي تقديرات مبنية على التوقيت المعتاد، لا قياس لجسمك. تطبيق IF24 لا يُصنَّف ضمن الأجهزة الطبية ولا يقدم مشورة طبية. يجب استشارة الطبيب قبل تغيير نمط طعامك، خصوصًا في حالات الحمل أو السكري أو تناول دواء مع الطعام أو اضطراب في الأكل، أو لمن هم دون 18 عامًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Fastenphasen, die IF24 anzeigt, sind Schätzwerte auf Basis typischer Zeitverläufe, keine Messung deines Körpers. IF24 ist kein Medizinprodukt und gibt keine medizinischen Ratschläge. Wenn du schwanger bist, Diabetes hast oder Medikamente zu den Mahlzeiten einnimmst, hol ärztlichen Rat ein, bevor du deine Ernährung umstellst."
+            "value" : "Die Fastenphasen, die IF24 anzeigt, sind Schätzwerte auf Basis typischer Zeitverläufe, keine Messung deines Körpers. IF24 ist kein Medizinprodukt und gibt keine medizinischen Ratschläge. Hol ärztlichen Rat ein, bevor du deine Ernährung umstellst - besonders wenn du schwanger bist, Diabetes hast, Medikamente zu den Mahlzeiten einnimmst, Erfahrungen mit gestörtem Essverhalten hast oder unter 18 bist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The fasting phases IF24 shows are estimates based on typical timing, not a measurement of your body. IF24 is not a medical device and does not give medical advice. Talk to a clinician before changing how you eat - especially if you are pregnant, managing diabetes, taking medication with food, have a history of disordered eating, or are under 18."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Las fases de ayuno que muestra IF24 son estimaciones basadas en tiempos típicos, no una medición de tu cuerpo. IF24 no es un producto sanitario y no ofrece consejo médico. Si estás embarazada, tienes diabetes o tomas medicación con las comidas, consulta a un profesional sanitario antes de cambiar tu forma de comer."
+            "value" : "Las fases de ayuno que muestra IF24 son estimaciones basadas en tiempos típicos, no una medición de tu cuerpo. IF24 no es un producto sanitario y no ofrece consejo médico. Consulta a un profesional sanitario antes de cambiar tu forma de comer, sobre todo si estás embarazada, tienes diabetes, tomas medicación con las comidas, has tenido problemas con la alimentación o tienes menos de 18 años."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les phases de jeûne affichées par IF24 sont des estimations fondées sur des durées typiques, et non le résultat d’une mesure de votre corps. IF24 n’est pas un dispositif médical et ne donne pas de conseils médicaux. Si vous êtes enceinte, diabétique ou si vous prenez des médicaments au cours des repas, consultez un professionnel de santé avant de modifier votre alimentation."
+            "value" : "Les phases de jeûne affichées par IF24 sont des estimations fondées sur des durées typiques, et non le résultat d’une mesure de votre corps. IF24 n’est pas un dispositif médical et ne donne pas de conseils médicaux. Consultez un professionnel de santé avant de modifier votre alimentation, en particulier si vous êtes enceinte ou diabétique, si vous prenez des médicaments au cours des repas, si vous avez déjà eu des difficultés avec l’alimentation ou si vous avez moins de 18 ans."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24が表示する断食フェーズは、一般的な経過時間に基づく目安であり、体を測定した結果ではありません。IF24は医療機器ではなく、医学的な助言を行うものではありません。妊娠中の方、糖尿病のある方、食事と一緒に薬を服用している方は、食生活を変える前に医師などの医療従事者にご相談ください。"
+            "value" : "IF24が表示する断食フェーズは、一般的な経過時間に基づく目安であり、体を測定した結果ではありません。IF24は医療機器ではなく、医学的な助言を行うものではありません。食生活を変える前に、医師などの医療従事者にご相談ください。特に、妊娠中の方、糖尿病のある方、食事と一緒に薬を服用している方、これまでに食行動の乱れがあった方、18歳未満の方は、ご相談が大切です。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24가 보여주는 단식 단계는 일반적인 경과 시간을 바탕으로 추정한 것이고, 몸을 측정한 것이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 임신 중이거나, 당뇨병을 관리 중이거나, 식사와 함께 약을 복용 중이라면 식습관을 바꾸기 전에 의사와 상의하십시오."
+            "value" : "IF24가 보여주는 단식 단계는 일반적인 경과 시간을 바탕으로 추정한 것이고, 몸을 측정한 것이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 식습관을 바꾸기 전에 의사와 상의하십시오. 특히 임신 중이거나, 당뇨병을 관리 중이거나, 식사와 함께 약을 복용 중이거나, 섭식 문제를 겪은 적이 있거나, 18세 미만이라면 반드시 상의하십시오."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fazy postu pokazywane przez IF24 to szacunki oparte na typowym czasie, a nie pomiar twojego ciała. IF24 nie jest wyrobem medycznym i nie udziela porad medycznych. Jeśli jesteś w ciąży, masz cukrzycę albo przyjmujesz leki do posiłków, skonsultuj się z lekarzem, zanim zmienisz sposób odżywiania."
+            "value" : "Fazy postu pokazywane przez IF24 to szacunki oparte na typowym czasie, a nie pomiar twojego ciała. IF24 nie jest wyrobem medycznym i nie udziela porad medycznych. Zanim zmienisz sposób odżywiania, skonsultuj się z lekarzem - zwłaszcza jeśli jesteś w ciąży, masz cukrzycę, przyjmujesz leki do posiłków, masz za sobą problemy z odżywianiem lub nie masz jeszcze 18 lat."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фази посту, які показує IF24, - це оцінки на основі типового часу, а не вимірювання вашого тіла. IF24 не є медичним виробом і не дає медичних порад. Якщо ви вагітні, маєте діабет або приймаєте ліки разом із їжею, порадьтеся з лікарем, перш ніж змінювати режим харчування."
+            "value" : "Фази посту, які показує IF24, - це оцінки на основі типового часу, а не вимірювання вашого тіла. IF24 не є медичним виробом і не дає медичних порад. Перш ніж змінювати режим харчування, порадьтеся з лікарем - особливо якщо ви вагітні, маєте діабет, приймаєте ліки разом із їжею, стикалися з розладами харчової поведінки або вам менше 18 років."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24 显示的断食阶段是基于典型时间的估算，不是对你身体的测量。IF24 不是医疗器械，也不提供医疗建议。如果你正在怀孕、患有糖尿病，或需要随餐服药，请在改变饮食方式前咨询医生。"
+            "value" : "IF24 显示的断食阶段是基于典型时间的估算，不是对你身体的测量。IF24 不是医疗器械，也不提供医疗建议。请在改变饮食方式前咨询医生，尤其是当你正在怀孕、患有糖尿病、需要随餐服药、曾有饮食失调的经历，或未满 18 岁时。"
           }
         }
       }
