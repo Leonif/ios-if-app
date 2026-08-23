@@ -99,7 +99,9 @@ struct AboutIF24View: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 24)
-            .padding(.top, 10)
+            // Clears the sheet's grabber: at 10pt the title read as pinned to the top
+            // edge, under the handle rather than below it (#67).
+            .padding(.top, 28)
             .padding(.bottom, 28)
         }
         .background(theme.sheetBg.ignoresSafeArea())
