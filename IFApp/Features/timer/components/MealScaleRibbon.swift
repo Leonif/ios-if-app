@@ -31,6 +31,10 @@ struct MealScaleRibbon: View {
     /// strip slides under the finger while the *value* clicks from tick to tick.
     @State private var offset: CGFloat = 0
     @State private var dragAnchor: CGFloat? = nil
+    /// Finger travel already consumed this drag, so each frame adds only its own delta
+    /// — the strip is moved incrementally because the gain applied to that delta
+    /// changes with finger speed and an absolute anchor+translation cannot carry it.
+    @State private var lastTranslation: CGFloat = 0
     @State private var reported: Int = -1
     @State private var lastHaptic: TimeInterval = 0
     @State private var wasAtEdge = false
@@ -125,35 +129,43 @@ struct MealScaleRibbon: View {
     private func drag(width: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 1)
             .onChanged { value in
-                let anchor = dragAnchor ?? offset
                 if dragAnchor == nil {
-                    dragAnchor = anchor
+                    dragAnchor = offset
+                    lastTranslation = 0
                     // Warm the taptic engine before the first step passes, otherwise
                     // that click arrives late and the track starts ragged.
                     onFeedback(.begin)
                 }
-                let raw = anchor + dirSign * value.translation.width
+                // Velocity-adaptive gain. A slow, aiming finger moves the strip less
+                // than 1:1 so a value can be landed on; a fast sweep runs at full gain
+                // so twelve hours is still one gesture. Flat sensitivity cannot do both
+                // — reach and precision pull opposite ways on a linear strip, and at 30
+                // minutes to 6pt the aiming end read as twitchy (owner, 23.08).
+                let delta = value.translation.width - lastTranslation
+                lastTranslation = value.translation.width
+                let raw = offset + dirSign * delta * scrubGain(speed: abs(value.velocity.width))
                 offset = reduceMotion ? hardStop(raw) : rubberBand(raw)
                 report(fast: abs(value.velocity.width) > 900)
             }
             .onEnded { value in
-                let anchor = dragAnchor ?? offset
                 dragAnchor = nil
-                // The throw is capped at one ribbon-width past where the finger
-                // actually stopped. Uncapped, `predictedEndTranslation` projects as
-                // far as the flick implies — half a day off a flick of the thumb —
-                // and the value lands somewhere the person never saw, which is why
-                // the strip could not be aimed by flinging either. One screen of
-                // ribbon is the ceiling because it is the distance a person can
-                // still account for: whatever they land on was on screen, or one
-                // screen away from it, when they let go.
+                // Inertia continues from where the gained drag left the strip. It is
+                // gained by the same curve as the drag — a slow release barely coasts,
+                // a fling still carries — and capped at one ribbon-width past where the
+                // finger stopped. Uncapped, `predictedEndTranslation` projects as far
+                // as the flick implies — half a day off a flick of the thumb — and the
+                // value lands somewhere the person never saw. One screen of ribbon is
+                // the ceiling because it is the distance a person can still account
+                // for: whatever they land on was on screen, or one screen away, when
+                // they let go.
                 let throwCeiling = width
+                let rawInertia = value.predictedEndTranslation.width - value.translation.width
                 let inertia = min(throwCeiling,
                                   max(-throwCeiling,
-                                      value.predictedEndTranslation.width - value.translation.width))
+                                      rawInertia * scrubGain(speed: abs(value.velocity.width))))
                 let projected = reduceMotion
                     ? offset
-                    : anchor + dirSign * (value.translation.width + inertia)
+                    : offset + dirSign * inertia
                 let settled = MealScale.position(
                     ofMinutes: MealScale.snappedMinutes(atPosition: hardStop(projected))
                 )
@@ -167,6 +179,17 @@ struct MealScaleRibbon: View {
     }
 
     private func hardStop(_ p: CGFloat) -> CGFloat { max(0, min(MealScale.length, p)) }
+
+    /// Drag-to-strip gain as a function of finger speed (pt/s). A careful, slow finger
+    /// gets 0.45 — the strip trails it, so a 30-minute tick takes real travel to cross
+    /// and the value can be aimed. A committed sweep or fling gets the full 1.0, so
+    /// reach is untouched and twelve hours stays one gesture. Between the two it eases
+    /// linearly, so there is no gear-change to feel mid-drag.
+    private func scrubGain(speed: CGFloat) -> CGFloat {
+        let lo: CGFloat = 250, hi: CGFloat = 1400
+        let t = min(1, max(0, (speed - lo) / (hi - lo)))
+        return 0.45 + t * (1.0 - 0.45)
+    }
 
     /// Resistance past either end, capped at 40pt of give — enough to feel the wall
     /// without letting it read as a broken scroll.
