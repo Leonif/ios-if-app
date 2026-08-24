@@ -86,6 +86,11 @@ struct EndFastState: Equatable, Sendable {
     /// refusal state — there is no separate flag to disagree with it.
     var conflict: FastRecord?
 
+    /// True when the collision is on the fast's own start: no end can clear it, so the
+    /// refusal drops "pick another time" (which would only loop) and leaves removing
+    /// the old record as the one real way out.
+    var conflictUnavoidable = false
+
     var stage: EndFastStage {
         if conflict != nil { return .refusal }
         switch entry {

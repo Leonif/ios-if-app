@@ -276,9 +276,16 @@ enum strings {
         static var refusalTitle: String { String(localized: "That time is taken") }
 
         /// The refusal names the fast in the way — a refusal that does not say what
-        /// is blocking it is the silent "no" this state replaces.
+        /// is blocking it is the silent "no" this state replaces. Used when a different
+        /// end time could still clear the clash, so offering to pick one is honest.
         static func refusalReason(_ span: String) -> String {
             String(format: String(localized: "This overlaps a fast you already saved (%@). Pick another time, or open that fast and delete it."), span)
+        }
+
+        /// Used when the clash is on this fast's own start: no end clears it, so the
+        /// copy points only at the one real way out instead of promising a re-pick.
+        static func refusalReasonUnavoidable(_ span: String) -> String {
+            String(format: String(localized: "This fast overlaps one you already saved (%@). To end it, open that fast and delete it."), span)
         }
 
         static var pickAnotherTime: String { String(localized: "Pick another time") }
