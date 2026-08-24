@@ -118,34 +118,26 @@ final class MealPickerTests: XCTestCase {
 
     // MARK: The scale
 
-    /// The precision the card asks for: five minutes inside the first three hours,
-    /// an hour at the far end.
-    func testSnapResolutionByBand() {
-        XCTAssertEqual(MealScale.step(at: 0), 5)
-        XCTAssertEqual(MealScale.step(at: 179), 5)
-        XCTAssertEqual(MealScale.step(at: 180), 30)
-        XCTAssertEqual(MealScale.step(at: 719), 30)
-        XCTAssertEqual(MealScale.step(at: 720), 30)
-        XCTAssertEqual(MealScale.step(at: 1439), 30)
-        XCTAssertEqual(MealScale.step(at: 1440), 60)
-        XCTAssertEqual(MealScale.step(at: MealScale.maxMinutes), 60)
+    /// One minute everywhere: the drum snaps to any minute across the whole domain, so
+    /// a round clock time like 20:50 is reachable instead of falling between two coarse
+    /// ticks — the miss the banded scale had far from now (owner, 24.08).
+    func testSnapIsOneMinuteAcrossTheWholeDomain() {
+        for m in [1, 42, 137, 730, 731, 4319, 6000, MealScale.maxMinutes - 1] {
+            XCTAssertEqual(MealScale.snap(m), m, "minute \(m) should land on itself")
+        }
+        // The VoiceOver adjustment stays coarse — a minute at a time would be thousands
+        // of swipes — and is uniform now that there are no bands.
+        XCTAssertEqual(MealScale.step(at: 0), 15)
+        XCTAssertEqual(MealScale.step(at: MealScale.maxMinutes), 15)
     }
 
-    /// The acceptance criterion the scale is tuned against, as a number rather than a
-    /// sentence: twelve hours has to be reachable in one unbroken sweep. ~300pt is
-    /// what a thumb covers comfortably on the narrowest phone the app supports; at
-    /// the old 15-minute step this measured 432pt and the criterion was unmeetable by
-    /// dragging.
-    func testTwelveHoursFitsInOneSweep() {
-        XCTAssertEqual(MealScale.position(ofMinutes: 720), 324)
-        XCTAssertLessThanOrEqual(MealScale.position(ofMinutes: 720), 330)
-    }
-
-    /// The near band is untouched: five-minute precision is the whole reason the
-    /// ribbon beats a stepper for "I ate forty minutes ago".
-    func testTheNearBandKeepsItsPrecision() {
-        XCTAssertEqual(MealScale.position(ofMinutes: 180), 216)
-        XCTAssertEqual(MealScale.snap(42), 40)
+    /// Position is a straight pitch mapping: one minute is `pitch` points everywhere,
+    /// which is what lets fling momentum carry reach without the step coarsening.
+    func testPositionIsLinearInMinutes() {
+        XCTAssertEqual(MealScale.position(ofMinutes: 0), 0)
+        XCTAssertEqual(MealScale.position(ofMinutes: 1), MealScale.pitch)
+        XCTAssertEqual(MealScale.position(ofMinutes: 720), 720 * MealScale.pitch)
+        XCTAssertEqual(MealScale.position(ofMinutes: MealScale.maxMinutes), MealScale.length)
     }
 
     /// Position and snapping are inverses on the grid, in every band — otherwise the

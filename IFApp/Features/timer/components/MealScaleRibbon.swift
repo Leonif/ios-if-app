@@ -149,20 +149,19 @@ struct MealScaleRibbon: View {
             }
             .onEnded { value in
                 dragAnchor = nil
-                // Inertia continues from where the gained drag left the strip. It is
-                // gained by the same curve as the drag — a slow release barely coasts,
-                // a fling still carries — and capped at one ribbon-width past where the
-                // finger stopped. Uncapped, `predictedEndTranslation` projects as far
-                // as the flick implies — half a day off a flick of the thumb — and the
-                // value lands somewhere the person never saw. One screen of ribbon is
-                // the ceiling because it is the distance a person can still account
-                // for: whatever they land on was on screen, or one screen away, when
-                // they let go.
-                let throwCeiling = width
+                // Drum momentum: a hard flick coasts as far as the system's own throw
+                // projection implies and decelerates into the settle — that is what
+                // "spin harder, get there faster" needs across a one-minute scale, and
+                // the landing is clamped to the strip anyway, so there is no ceiling to
+                // impose. Below a deliberate-placement speed the lift carries NO inertia
+                // at all: a careful set stays on the minute the finger left, instead of
+                // being nudged one over by the projection (owner, 24.08 — "micro change
+                // on lifting the finger").
+                let releaseSpeed = abs(value.velocity.width)
                 let rawInertia = value.predictedEndTranslation.width - value.translation.width
-                let inertia = min(throwCeiling,
-                                  max(-throwCeiling,
-                                      rawInertia * scrubGain(speed: abs(value.velocity.width))))
+                let inertia = releaseSpeed < 90
+                    ? 0
+                    : rawInertia * scrubGain(speed: releaseSpeed)
                 let projected = reduceMotion
                     ? offset
                     : offset + dirSign * inertia
@@ -172,7 +171,11 @@ struct MealScaleRibbon: View {
                 if reduceMotion {
                     offset = settled
                 } else {
-                    withAnimation(.easeOut(duration: 0.28)) { offset = settled }
+                    // Longer coast, longer settle: a hard fling decelerates like a wheel
+                    // instead of teleporting, while a small nudge stays crisp.
+                    let travel = abs(settled - offset)
+                    let dur = min(0.7, max(0.22, Double(travel) / 2600))
+                    withAnimation(.easeOut(duration: dur)) { offset = settled }
                 }
                 report(fast: false)
             }
@@ -282,8 +285,12 @@ struct MealScaleRibbon: View {
 
         for idx in lowIdx...highIdx {
             let minutes = MealScale.stepMinutes[idx]
-            let x = screenX(CGFloat(idx) * MealScale.pitch)
             let kind = MealScale.tick(at: minutes)
+            // The strip snaps every minute, but drawing a mark on every one would be a
+            // grey smear at this pitch — minor marks are thinned to every fifth minute,
+            // which the eye reads as a ruler while the value still lands on any minute.
+            if kind == .minor && minutes % 5 != 0 { continue }
+            let x = screenX(CGFloat(idx) * MealScale.pitch)
             let height: CGFloat
             let width: CGFloat
             let color: Color
