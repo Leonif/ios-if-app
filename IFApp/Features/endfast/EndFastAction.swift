@@ -23,8 +23,10 @@ enum EndFastAction: Action {
     case timeStepped(byMinutes: Int, latest: Double)
     /// The chosen end overlaps a fast already saved. Carries the record itself so
     /// the reason can name it — a refusal that does not say what is in the way is
-    /// the silent "no" this state exists to replace.
-    case refused(conflict: FastRecord)
+    /// the silent "no" this state exists to replace. `unavoidable` is true when the
+    /// clash is on the fast's own start, so no choice of end can clear it and "pick
+    /// another time" would only loop the person back to the same wall.
+    case refused(conflict: FastRecord, unavoidable: Bool)
     /// "Pick another time": back to the picker with the previous choice intact.
     case refusalWithdrawn
     /// The sheet closed without ending the fast — the scrim, or `Keep this fast`.

@@ -293,7 +293,9 @@ struct EndFastSheet: View {
             // Budgeted for four German lines by minimum height, never a fixed one: a
             // fifth line grows the block instead of running under the actions.
             HStack(spacing: 0) {
-                Text(strings.EndFast.refusalReason(conflictSpan))
+                Text(state.conflictUnavoidable
+                     ? strings.EndFast.refusalReasonUnavoidable(conflictSpan)
+                     : strings.EndFast.refusalReason(conflictSpan))
                     .font(.hanken(14, .medium))
                     .lineSpacing(14 * 0.42)
                     .foregroundColor(theme.ink)
@@ -306,16 +308,26 @@ struct EndFastSheet: View {
             .frame(maxWidth: .infinity, minHeight: 124, alignment: .leading)
             .background(RoundedRectangle(cornerRadius: 12).fill(theme.surfaceQuiet))
 
-            // Two live exits. Nothing here is dimmed or disabled: a silently inactive
-            // control is the unsaid refusal this state exists to replace.
+            // Live exits, nothing dimmed or disabled: a silently inactive control is
+            // the unsaid refusal this state exists to replace. When the clash is on the
+            // start, "pick another time" is dropped entirely — it could only loop the
+            // person back here — and removing the old record leads as the one real way
+            // out. When a re-pick could still clear it, both stand, the re-pick first.
             VStack(spacing: 10) {
-                SheetPrimaryButton(title: strings.EndFast.pickAnotherTime,
-                                   theme: theme, action: onPickAnotherTime)
-                    .accessibilityIdentifier("endFast.pickAnother")
-                QuietActionButton(title: strings.EndFast.openThatFast, theme: theme) {
-                    if let conflict = state.conflict { onOpenConflict(conflict) }
+                if state.conflictUnavoidable {
+                    SheetPrimaryButton(title: strings.EndFast.openThatFast, theme: theme) {
+                        if let conflict = state.conflict { onOpenConflict(conflict) }
+                    }
+                    .accessibilityIdentifier("endFast.openConflict")
+                } else {
+                    SheetPrimaryButton(title: strings.EndFast.pickAnotherTime,
+                                       theme: theme, action: onPickAnotherTime)
+                        .accessibilityIdentifier("endFast.pickAnother")
+                    QuietActionButton(title: strings.EndFast.openThatFast, theme: theme) {
+                        if let conflict = state.conflict { onOpenConflict(conflict) }
+                    }
+                    .accessibilityIdentifier("endFast.openConflict")
                 }
-                .accessibilityIdentifier("endFast.openConflict")
             }
             .padding(.top, 2)
         }

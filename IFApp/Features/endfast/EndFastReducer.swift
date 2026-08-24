@@ -32,14 +32,16 @@ func endFastReducer(state: EndFastState, action: Action) -> EndFastState {
         newState.endTimestamp = clamp(state.endTimestamp + Double(byMinutes) * 60,
                                       state.earliest, latest)
 
-    case let .refused(conflict):
+    case let .refused(conflict, unavoidable):
         newState.conflict = conflict
+        newState.conflictUnavoidable = unavoidable
 
     case .refusalWithdrawn:
         // The choice survives on purpose: the person is being sent back to change
         // one thing, and handing them a reset picker would make them re-enter the
         // part that was fine.
         newState.conflict = nil
+        newState.conflictUnavoidable = false
 
     case .closed:
         newState = EndFastState()

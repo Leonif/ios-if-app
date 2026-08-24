@@ -30,7 +30,14 @@ struct ConfirmEndFastThunk: Thunk {
         let end = min(max(sheet.endTimestamp, start + EndFastState.minimumFastDuration), now)
 
         if let conflict = FastRecord.firstOverlap(in: app.historyState.records, start: start, end: end) {
-            dispatch(EndFastAction.refused(conflict: conflict))
+            // If even the shortest allowed fast — ending the instant it is old enough —
+            // still overlaps, the clash is on the start, and no end the person could
+            // pick would clear it. Say so, so the refusal can drop "pick another time"
+            // instead of looping them back to the same wall.
+            let earliestEnd = min(start + EndFastState.minimumFastDuration, now)
+            let unavoidable = FastRecord.firstOverlap(in: app.historyState.records,
+                                                      start: start, end: earliestEnd) != nil
+            dispatch(EndFastAction.refused(conflict: conflict, unavoidable: unavoidable))
             return
         }
 
