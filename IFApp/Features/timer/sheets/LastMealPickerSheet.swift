@@ -122,16 +122,30 @@ struct LastMealPickerSheet: View {
             // target, and that target is part of the layout — the handoff measures the
             // 12pt above and the 6pt below to the edges of the 44pt box, not to the
             // text.
+            // The ribbon snaps to 5-minute steps counted from now, so a round clock
+            // time like 19:50 falls between two ticks and cannot be landed on the
+            // strip — the exact wheel is the only path to it. As a faint text link it
+            // read as fine print and got missed (owner, 23.08); a bordered capsule
+            // with a clock glyph makes it the second, deliberate way in.
             Button {
                 exactDate = Date().addingTimeInterval(-Double(minutesAgo) * 60)
                 showExactPicker = true
             } label: {
-                Text(strings.Meal.setExactTime)
-                    .font(.hanken(13.5, .semibold))
-                    .foregroundColor(theme.deep)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 13)
-                    .contentShape(Rectangle())
+                HStack(spacing: 6) {
+                    Image(systemName: "clock")
+                        .font(.system(size: 13, weight: .semibold))
+                    Text(strings.Meal.setExactTime)
+                        .font(.hanken(14, .semibold))
+                }
+                .foregroundColor(theme.deep)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    Capsule()
+                        .fill(theme.secBg)
+                        .overlay(Capsule().strokeBorder(theme.secLine, lineWidth: 1))
+                )
+                .contentShape(Capsule())
             }
             .buttonStyle(.pressable)
             .padding(.top, tightGap)
@@ -217,7 +231,11 @@ struct LastMealPickerSheet: View {
                     .foregroundColor(theme.mut)
                     .padding(.bottom, 6)
             }
-            Text(readout)
+            // The question is "when did you eat", so the clock time is the answer and
+            // leads (owner, 23.08): a person who "started at 19:50" thinks in the time,
+            // not in a "20m ago" duration. The duration drops to the caption — still
+            // there for whoever reads the strip that way, no longer the headline.
+            Text(absoluteLabel)
                 .font(.bricolage(34))
                 .monospacedDigit()
                 // The system's own numeric roll: each digit that actually changed
@@ -225,15 +243,15 @@ struct LastMealPickerSheet: View {
                 // 45ms haptic throttle, so a fast scrub still lands on the value
                 // instead of queueing a backlog of animations.
                 .contentTransition(.numericText())
-                .animation(reduceMotion ? nil : .snappy(duration: 0.12), value: readout)
+                .animation(reduceMotion ? nil : .snappy(duration: 0.12), value: absoluteLabel)
                 .foregroundColor(theme.ink)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
-            Text(absoluteLabel)
+            Text(readout)
                 .font(.hanken(14.5, .semibold))
                 .monospacedDigit()
                 .contentTransition(.numericText())
-                .animation(reduceMotion ? nil : .snappy(duration: 0.12), value: absoluteLabel)
+                .animation(reduceMotion ? nil : .snappy(duration: 0.12), value: readout)
                 .foregroundColor(theme.sec)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
