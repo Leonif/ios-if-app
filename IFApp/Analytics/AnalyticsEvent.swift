@@ -60,6 +60,11 @@ enum AnalyticsEvent {
     case fastChained
     /// User nudged the elapsed time (manual ± correction).
     case timeAdjusted
+    /// The end-fast sheet refused the chosen end because it overlaps a fast already
+    /// saved. `unavoidable` = the clash is on the fast's own start, so no end could
+    /// clear it — the case that used to loop. The split tells us how often a real user
+    /// hits this, and how often it is the dead-end kind, so we know if it needs more.
+    case endFastRefused(unavoidable: Bool)
     /// User confirmed the Last-meal picker. `backdated` = started in the past
     /// (logged a real meal time) vs fresh "now"; `minutesAgo` = how far back;
     /// `inputMethod` = which control produced the answer (`MealInputMethod`).
@@ -135,6 +140,7 @@ enum AnalyticsEvent {
         case .eatingWindowStarted: return "eating_window_started"
         case .fastChained: return "fast_chained"
         case .timeAdjusted: return "time_adjusted"
+        case .endFastRefused: return "end_fast_refused"
         case .lastMealLogged: return "last_meal_logged"
         case .sourcesOpened: return "sources_opened"
         case .historyOpened: return "history_opened"
@@ -197,6 +203,8 @@ enum AnalyticsEvent {
             ]
         case let .themeActive(dark):
             return ["theme": dark ? "dark" : "light"]
+        case let .endFastRefused(unavoidable):
+            return ["unavoidable": unavoidable ? "1" : "0"]
         case let .reviewPrompted(trigger):
             return ["trigger": trigger]
         case let .streakMilestone(days):

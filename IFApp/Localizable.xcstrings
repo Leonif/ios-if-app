@@ -1,6 +1,69 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
+    "%@ · goal end" : {
+      "comment" : "Caption under the exact-time value (S3). %@ = a day name (Today / Yesterday / n days ago).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ · بلوغ الهدف"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · Zielende"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ · objetivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ · objectif"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ · 目標到達"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · 목표 시각"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ · cel"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ · ціль"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · 目标结束"
+          }
+        }
+      }
+    },
     "%@ at %@" : {
       "comment" : "Clock caption past yesterday, e.g. 'Sat 18 Jul at 10:30 AM'.",
       "extractionState" : "manual",
@@ -1460,6 +1523,396 @@
         }
       }
     },
+    "%lld min ago" : {
+      "comment" : "Preset chip in the end-fast sheet (EndFast.chipMinutesAgo). The text slot is 83.7pt and does not grow with text size - keep it short. Only the 30-minute substitution is reachable (quickOffsetsMinutes = [0, 30, 60]). The relative-time preposition stays in every locale. Plural categories belong in the catalog and only where CLDR has them: ja, ko and zh-Hans have `other` alone, so they carry one flat form.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل %lld دقائق"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل %lld دقيقةً"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل دقيقة"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل %lld دقيقة"
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل دقيقتين"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "قبل %lld دقيقة"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vor %lld Min"
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld min ago"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld min ago"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hace %lld min"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il y a %lld min"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld分前"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld분 전"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min temu"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld хв тому"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld分钟前"
+          }
+        }
+      }
+    },
+    "%lld minutes left to your goal" : {
+      "comment" : "Near-goal consequence line (S2). WHOLE MINUTES ONLY, never a duration format. No encouragement in any locale: the subject is the time, not the person. No terminal period - this and the overtime line are two states of one status slot and must agree. Plural categories belong in the catalog and only where CLDR has them: ja, ko and zh-Hans have `other` alone - a `one` branch there would never render.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "تتبقى %lld دقائق حتى الهدف"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "تتبقى %lld دقيقةً حتى الهدف"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "تتبقى دقيقة واحدة حتى الهدف"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "تتبقى %lld دقيقة حتى الهدف"
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "تتبقى دقيقتان حتى الهدف"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "تتبقى %lld دقائق حتى الهدف"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch 1 Minute bis zum Ziel"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Minuten bis zum Ziel"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 minute left to your goal"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld minutes left to your goal"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Queda 1 minuto para tu objetivo"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Quedan %lld minutos para tu objetivo"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Encore 1 minute avant l’objectif"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Encore %lld minutes avant l’objectif"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "目標まであと%lld分です"
+                }
+              }
+            }
+          }
+        },
+        "ko" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "목표까지 %lld분 남았어요"
+                }
+              }
+            }
+          }
+        },
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Do celu zostały %lld minuty"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Do celu zostało %lld minut"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Do celu została 1 minuta"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Do celu zostało %lld minuty"
+                }
+              }
+            }
+          }
+        },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "До цілі лишилося %lld хвилини"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "До цілі лишилося %lld хвилин"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "До цілі лишилася 1 хвилина"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "До цілі лишилося %lld хвилин"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "距离目标还有%lld分钟"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "1 h ago" : {
+      "comment" : "Preset chip in the end-fast sheet (EndFast.chip1Hour). The text slot is 83.7pt and does not grow with text size. The relative-time preposition stays in every locale: no language of the ten drops it, only the English source looks bare.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قبل ساعة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vor 1 Std"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hace 1 h"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il y a 1 h"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1時間前"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1시간 전"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 godz temu"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 год тому"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1小时前"
+          }
+        }
+      }
+    },
     "1h" : {
       "comment" : "Meal picker chip: one hour ago. Keep it as short as the English.",
       "extractionState" : "manual",
@@ -1704,6 +2157,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "关于 IF24"
+          }
+        }
+      }
+    },
+    "About.medicalNote" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مراحل الصيام التي يعرضها تطبيق IF24 هي تقديرات مبنية على التوقيت المعتاد، لا قياس لجسمك. تطبيق IF24 لا يُصنَّف ضمن الأجهزة الطبية ولا يقدم مشورة طبية. يجب استشارة الطبيب قبل تغيير نمط طعامك، خصوصًا في حالات الحمل أو السكري أو تناول دواء مع الطعام أو اضطراب في الأكل، أو لمن هم دون 18 عامًا."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Fastenphasen, die IF24 anzeigt, sind Schätzwerte auf Basis typischer Zeitverläufe, keine Messung deines Körpers. IF24 ist kein Medizinprodukt und gibt keine medizinischen Ratschläge. Hol ärztlichen Rat ein, bevor du deine Ernährung umstellst - besonders wenn du schwanger bist, Diabetes hast, Medikamente zu den Mahlzeiten einnimmst, Erfahrungen mit gestörtem Essverhalten hast oder unter 18 bist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The fasting phases IF24 shows are estimates based on typical timing, not a measurement of your body. IF24 is not a medical device and does not give medical advice. Talk to a clinician before changing how you eat - especially if you are pregnant, managing diabetes, taking medication with food, have a history of disordered eating, or are under 18."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las fases de ayuno que muestra IF24 son estimaciones basadas en tiempos típicos, no una medición de tu cuerpo. IF24 no es un producto sanitario y no ofrece consejo médico. Consulta a un profesional sanitario antes de cambiar tu forma de comer, sobre todo si estás embarazada, tienes diabetes, tomas medicación con las comidas, has tenido problemas con la alimentación o tienes menos de 18 años."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les phases de jeûne affichées par IF24 sont des estimations fondées sur des durées typiques, et non le résultat d’une mesure de votre corps. IF24 n’est pas un dispositif médical et ne donne pas de conseils médicaux. Consultez un professionnel de santé avant de modifier votre alimentation, en particulier si vous êtes enceinte ou diabétique, si vous prenez des médicaments au cours des repas, si vous avez déjà eu des difficultés avec l’alimentation ou si vous avez moins de 18 ans."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24が表示する断食フェーズは、一般的な経過時間に基づく目安であり、体を測定した結果ではありません。IF24は医療機器ではなく、医学的な助言を行うものではありません。食生活を変える前に、医師などの医療従事者にご相談ください。特に、妊娠中の方、糖尿病のある方、食事と一緒に薬を服用している方、これまでに食行動の乱れがあった方、18歳未満の方は、ご相談が大切です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24가 보여주는 단식 단계는 일반적인 경과 시간을 바탕으로 추정한 것이고, 몸을 측정한 것이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 식습관을 바꾸기 전에 의사와 상의하십시오. 특히 임신 중이거나, 당뇨병을 관리 중이거나, 식사와 함께 약을 복용 중이거나, 섭식 문제를 겪은 적이 있거나, 18세 미만이라면 반드시 상의하십시오."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fazy postu pokazywane przez IF24 to szacunki oparte na typowym czasie, a nie pomiar twojego ciała. IF24 nie jest wyrobem medycznym i nie udziela porad medycznych. Zanim zmienisz sposób odżywiania, skonsultuj się z lekarzem - zwłaszcza jeśli jesteś w ciąży, masz cukrzycę, przyjmujesz leki do posiłków, masz za sobą problemy z odżywianiem lub nie masz jeszcze 18 lat."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фази посту, які показує IF24, - це оцінки на основі типового часу, а не вимірювання вашого тіла. IF24 не є медичним виробом і не дає медичних порад. Перш ніж змінювати режим харчування, порадьтеся з лікарем - особливо якщо ви вагітні, маєте діабет, приймаєте ліки разом із їжею, стикалися з розладами харчової поведінки або вам менше 18 років."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IF24 显示的断食阶段是基于典型时间的估算，不是对你身体的测量。IF24 不是医疗器械，也不提供医疗建议。请在改变饮食方式前咨询医生，尤其是当你正在怀孕、患有糖尿病、需要随餐服药、曾有饮食失调的经历，或未满 18 岁时。"
           }
         }
       }
@@ -2746,134 +3263,6 @@
         }
       }
     },
-    "Timer.deepAutophagy" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "التهام ذاتي عميق"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tiefe Autophagie"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deep autophagy"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autofagia profunda"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autophagie profonde"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "深いオートファジー"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "깊은 자가포식"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Głęboka autofagia"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Глибока автофагія"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "深度自噬"
-          }
-        }
-      }
-    },
-    "Editorial.autophagy" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "أنت في عمق الصيام. الالتهام الذاتي يعيد تدوير ما لم تعد الخلايا بحاجة إليه."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tief im Fasten. Um diese Zeit recycelt die Autophagie meist, was Zellen nicht mehr brauchen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deep in the fast. Autophagy typically recycles what cells no longer need."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En pleno ayuno. A estas alturas la autofagia suele reciclar lo que las células ya no necesitan."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En plein jeûne. À ce stade, l’autophagie recycle en général ce dont les cellules n’ont plus besoin."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "断食の深いフェーズ。オートファジーが細胞の不要なものを再利用する頃です。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "단식의 깊은 단계예요. 보통 자가포식이 세포에 필요 없어진 것을 재활용해요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Głęboko w poście. Na tym etapie autofagia zwykle przetwarza to, czego komórki już nie potrzebują."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Глибока фаза посту. Зазвичай саме тут автофагія переробляє те, що клітинам більше не потрібне."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已进入断食深层阶段。这个时段自噬会回收细胞不再需要的物质。"
-          }
-        }
-      }
-    },
     "Delete" : {
       "comment" : "Swipe action and confirmation button on a history record",
       "localizations" : {
@@ -3109,6 +3498,426 @@
         }
       }
     },
+    "Editorial.autophagy" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "أنت في عمق الصيام. الالتهام الذاتي يعيد تدوير ما لم تعد الخلايا بحاجة إليه."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tief im Fasten. Um diese Zeit recycelt die Autophagie meist, was Zellen nicht mehr brauchen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deep in the fast. Autophagy typically recycles what cells no longer need."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En pleno ayuno. A estas alturas la autofagia suele reciclar lo que las células ya no necesitan."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En plein jeûne. À ce stade, l’autophagie recycle en général ce dont les cellules n’ont plus besoin."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "断食の深いフェーズ。オートファジーが細胞の不要なものを再利用する頃です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "단식의 깊은 단계예요. 보통 자가포식이 세포에 필요 없어진 것을 재활용해요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Głęboko w poście. Na tym etapie autofagia zwykle przetwarza to, czego komórki już nie potrzebują."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Глибока фаза посту. Зазвичай саме тут автофагія переробляє те, що клітинам більше не потрібне."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已进入断食深层阶段。这个时段自噬会回收细胞不再需要的物质。"
+          }
+        }
+      }
+    },
+    "Editorial.fat" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "مخزون الجليكوجين يقترب من النفاد. تصبح الدهون مصدر الطاقة الأساسي."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um diese Zeit werden die Glykogenspeicher meist knapp, und Fett übernimmt als Hauptenergiequelle."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glycogen typically runs low by now. Fat takes over as the main fuel."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A esta hora el glucógeno suele agotarse y la grasa pasa a ser el combustible principal."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À cette heure, les réserves de glycogène s’épuisent en général et les graisses deviennent le carburant principal."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "グリコーゲンが少なくなる頃です。脂肪が主なエネルギー源になっていきます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "보통 이쯤이면 글리코겐이 줄고, 지방이 주요 연료가 돼요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O tej porze zapasy glikogenu zwykle się kończą, a głównym paliwem staje się tłuszcz."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зазвичай на цьому етапі глікоген вичерпується, а основним паливом стає жир."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个时段糖原逐渐见底，脂肪成为主要能量来源。"
+          }
+        }
+      }
+    },
+    "Editorial.fed" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "لا يزال الهضم جاريًا. مستوى الإنسولين مرتفع ويجري تخزين طاقة الوجبة الأخيرة."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch in der Verdauung. Um diese Zeit ist der Insulinspiegel meist hoch, die letzte Mahlzeit wird eingelagert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Still digesting. Insulin typically runs high now, storing energy from your last meal."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún digiriendo. A esta hora la insulina suele estar alta y la energía de la última comida se almacena."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digestion en cours. À cette heure, l’insuline est en général élevée et l’énergie du repas est mise en réserve."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "まだ消化が続く頃です。インスリン値が高く、食事のエネルギーが蓄えられます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "아직 소화 중이에요. 보통 인슐린이 높아 마지막 식사의 에너지가 저장돼요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trwa trawienie. O tej porze poziom insuliny jest zwykle wysoki, a energia z ostatniego posiłku idzie do magazynu."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Триває травлення. У цей час інсулін зазвичай високий, а енергія останньої їжі йде в запас."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仍在消化。这个时段胰岛素通常较高，上一餐的能量被储存起来。"
+          }
+        }
+      }
+    },
+    "Editorial.goalReached" : {
+      "localizations" : {
+        "ar" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ %d ساعات. ومن هنا يبلغ الصيام أعمق مراحله."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ %d ساعةً. ومن هنا يبلغ الصيام أعمق مراحله."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ ساعة واحدة. ومن هنا يبلغ الصيام أعمق مراحله."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ %d ساعة. ومن هنا يبلغ الصيام أعمق مراحله."
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ ساعتين. ومن هنا يبلغ الصيام أعمق مراحله."
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "لقد أتممت هدفك البالغ %d ساعة. ومن هنا يبلغ الصيام أعمق مراحله."
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast dein %d-Stunden-Ziel erreicht. Ab hier liegt meist die tiefste Phase des Fastens."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You’ve reached your %d-hour goal. From here the fast is typically at its deepest."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has alcanzado tu objetivo de %d horas. A partir de aquí suele estar la fase más profunda del ayuno."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez atteint votre objectif de %d heures. C’est en général la phase la plus profonde du jeûne."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%d時間の目標を達成しました。ここからが断食のもっとも深い時間帯です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%d시간 목표를 달성했어요. 보통 여기서부터 단식이 가장 깊어져요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cel %d godzin osiągnięty. Dalej zwykle zaczyna się najgłębsza część postu."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви досягли своєї %d-годинної цілі. Далі зазвичай найглибша частина посту."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你已达成%d小时目标。接下来通常是断食最深的时段。"
+          }
+        }
+      }
+    },
+    "Editorial.ketosis" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "مستوى الكيتونات يرتفع. وهي وقود للدماغ والعضلات."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um diese Zeit steigen die Ketonwerte meist - Treibstoff für Gehirn und Muskeln."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ketones typically climb around this hour. They fuel brain and muscles."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A esta hora las cetonas suelen subir: combustible para el cerebro y los músculos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À cette heure, les cétones augmentent en général : un carburant pour le cerveau et les muscles."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ケトン体が増える頃です。脳と筋肉のエネルギー源になります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "보통 이 무렵 케톤 수치가 올라요. 뇌와 근육의 연료가 돼요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O tej porze poziom ketonów zwykle rośnie - to paliwo dla mózgu i mięśni."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зазвичай у цей час зростають кетони - паливо для мозку і мʼязів."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个时段酮体通常上升，为大脑和肌肉供能。"
+          }
+        }
+      }
+    },
+    "Editorial.sugar" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "مستوى الجلوكوز ينخفض. ومخزون الجليكوجين هو مصدر الطاقة في هذه الفترة."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um diese Zeit sinkt der Glukosespiegel meist, und die Glykogenspeicher liefern den Treibstoff."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glucose typically eases down now. Glycogen stores carry the fuel."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A esta hora la glucosa suele bajar y las reservas de glucógeno aportan el combustible."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À cette heure, la glycémie diminue en général et les réserves de glycogène prennent le relais."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "血糖値が下がる頃です。グリコーゲンの蓄えがエネルギーになります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "보통 이때쯤 혈당이 낮아지고, 글리코겐 저장분이 연료를 맡아요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O tej porze poziom glukozy zwykle spada, a paliwem stają się zapasy glikogenu."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зазвичай у цей час глюкоза знижується, а паливом стають запаси глікогену."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个时段血糖通常回落，由糖原储备供能。"
+          }
+        }
+      }
+    },
     "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial" : {
       "localizations" : {
         "ar" : {
@@ -3338,6 +4147,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "结束断食"
+          }
+        }
+      }
+    },
+    "End now" : {
+      "comment" : "Primary action, near-goal state (S2) of the end-fast sheet. 275pt, one line.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنهاء الآن"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt beenden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminar ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminer maintenant"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今すぐ終了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 종료"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończ teraz"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершити зараз"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即结束"
+          }
+        }
+      }
+    },
+    "End this fast?" : {
+      "comment" : "End-fast sheet header, near-goal state (S2).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنهاء الصيام؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fasten beenden?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Terminar este ayuno?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminer ce jeûne ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この断食を終了しますか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "이 단식을 종료할까요?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończyć ten post?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершити цей піст?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "结束这次断食？"
           }
         }
       }
@@ -3631,534 +4560,6 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "延长"
-          }
-        }
-      }
-    },
-    "Last night" : {
-      "comment" : "Meal picker chip: yesterday evening. The longest chip - pl/de need ~17 chars.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مساء أمس"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gestern Abend"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Last night"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anoche"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hier soir"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "昨夜"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "어젯밤"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wczoraj wieczorem"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вчора ввечері"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "昨晚"
-          }
-        }
-      }
-    },
-    "Meal.exactTimeDone" : {
-      "comment" : "Toolbar button of the exact-time wheel in the last-meal picker (LastMealPickerSheet.swift): commits the moment the wheel is standing on. This CONFIRMS A CHOICE — take the locale's Done lexeme, never its OK/acknowledgement one and never a close/dismiss one, same as PlanEditor.confirm. Split off the shared literal key 'Done' for the same reason that one was.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fertig"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Done"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hecho"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminé"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完了"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "완료"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gotowe"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Готово"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完成"
-          }
-        }
-      }
-    },
-    "Meal.scaleA11yValue" : {
-      "comment" : "VoiceOver value of the meal scale ribbon (LastMealPickerSheet.swift): the relative readout and the absolute moment, spoken one after the other. %1$@ = \"2h 40m ago\", %2$@ = \"Yesterday at 8:00 PM\". Translate the SEPARATOR, not the halves — it is punctuation and punctuation is per-script: ja/zh read a full-width pause mark, not an ASCII comma. Do not add a conjunction.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@، %2$@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@, %2$@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@, %2$@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@, %2$@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@, %2$@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@、%2$@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@, %2$@"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@, %2$@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@, %2$@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@，%2$@"
-          }
-        }
-      }
-    },
-    "Set exact time" : {
-      "comment" : "Text link under the meal ribbon; opens the system date picker.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحديد الوقت بدقة"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Genaue Zeit"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Set exact time"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hora exacta"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Heure exacte"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "時刻を指定"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "정확한 시간 설정"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dokładny czas"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Точний час"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设置具体时间"
-          }
-        }
-      }
-    },
-    "That’s as far back as we go." : {
-      "comment" : "Under the meal ribbon, only when it hits the 7-day limit.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "هذا أبعد وقت يمكن اختياره."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weiter zurück geht es nicht."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "That's as far back as we go."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No podemos ir más atrás."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Impossible de remonter plus loin."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "さかのぼれるのはここまでです。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "여기까지만 거슬러 올라갈 수 있어요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dalej wstecz nie sięgamy."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Це найдавніший момент, який можна вказати."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最多只能回溯到这里。"
-          }
-        }
-      }
-    },
-    "Time since last meal" : {
-      "comment" : "VoiceOver label for the meal ribbon.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الوقت منذ آخر وجبة"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zeit seit der letzten Mahlzeit"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Time since last meal"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tiempo desde la última comida"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Temps écoulé depuis le dernier repas"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最後の食事からの経過時間"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "마지막 식사 이후 경과 시간"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Czas od ostatniego posiłku"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Час від останнього прийому їжі"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "距离上一餐的时间"
-          }
-        }
-      }
-    },
-    "Today at %@" : {
-      "comment" : "Clock caption under the meal readout, e.g. 'Today at 7:50 AM'.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اليوم في %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Heute um %@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Today at %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hoy a las %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aujourd’hui à %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今日 %@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "오늘 %@"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dziś o %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сьогодні о %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今天 %@"
-          }
-        }
-      }
-    },
-    "Yesterday at %@" : {
-      "comment" : "Clock caption under the meal readout, e.g. 'Yesterday at 8:00 PM'. Replaces the older 'Yesterday %@'.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أمس في %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gestern um %@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Yesterday at %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ayer a las %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hier à %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "昨日 %@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "어제 %@"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wczoraj o %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вчора о %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "昨天 %@"
           }
         }
       }
@@ -4510,6 +4911,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "断食从 %1$@ 开始计 · %2$@"
+          }
+        }
+      }
+    },
+    "Fast ends" : {
+      "comment" : "Preview row label in the end-fast sheet. Pairs with a clock + duration value; NO YEAR in the value.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نهاية الصيام"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fasten endet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin del ayuno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin du jeûne"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "断食終了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단식 종료 시각"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koniec postu"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кінець посту"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "断食结束"
           }
         }
       }
@@ -5658,70 +6119,6 @@
         }
       }
     },
-    "Editorial.sugar" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "مستوى الجلوكوز ينخفض. ومخزون الجليكوجين هو مصدر الطاقة في هذه الفترة."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um diese Zeit sinkt der Glukosespiegel meist, und die Glykogenspeicher liefern den Treibstoff."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Glucose typically eases down now. Glycogen stores carry the fuel."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A esta hora la glucosa suele bajar y las reservas de glucógeno aportan el combustible."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "À cette heure, la glycémie diminue en général et les réserves de glycogène prennent le relais."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "血糖値が下がる頃です。グリコーゲンの蓄えがエネルギーになります。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "보통 이때쯤 혈당이 낮아지고, 글리코겐 저장분이 연료를 맡아요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O tej porze poziom glukozy zwykle spada, a paliwem stają się zapasy glikogenu."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зазвичай у цей час глюкоза знижується, а паливом стають запаси глікогену."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这个时段血糖通常回落，由糖原储备供能。"
-          }
-        }
-      }
-    },
     "Glycogen and its metabolism: some new developments and old themes" : {
       "localizations" : {
         "ar" : {
@@ -5776,70 +6173,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "糖原及其代谢：若干新进展与旧课题"
-          }
-        }
-      }
-    },
-    "Editorial.fat" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "مخزون الجليكوجين يقترب من النفاد. تصبح الدهون مصدر الطاقة الأساسي."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um diese Zeit werden die Glykogenspeicher meist knapp, und Fett übernimmt als Hauptenergiequelle."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Glycogen typically runs low by now. Fat takes over as the main fuel."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A esta hora el glucógeno suele agotarse y la grasa pasa a ser el combustible principal."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "À cette heure, les réserves de glycogène s’épuisent en général et les graisses deviennent le carburant principal."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "グリコーゲンが少なくなる頃です。脂肪が主なエネルギー源になっていきます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "보통 이쯤이면 글리코겐이 줄고, 지방이 주요 연료가 돼요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O tej porze zapasy glikogenu zwykle się kończą, a głównym paliwem staje się tłuszcz."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зазвичай на цьому етапі глікоген вичерпується, а основним паливом стає жир."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这个时段糖原逐渐见底，脂肪成为主要能量来源。"
           }
         }
       }
@@ -7780,70 +8113,6 @@
         }
       }
     },
-    "Editorial.ketosis" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "مستوى الكيتونات يرتفع. وهي وقود للدماغ والعضلات."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um diese Zeit steigen die Ketonwerte meist - Treibstoff für Gehirn und Muskeln."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ketones typically climb around this hour. They fuel brain and muscles."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A esta hora las cetonas suelen subir: combustible para el cerebro y los músculos."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "À cette heure, les cétones augmentent en général : un carburant pour le cerveau et les muscles."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ケトン体が増える頃です。脳と筋肉のエネルギー源になります。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "보통 이 무렵 케톤 수치가 올라요. 뇌와 근육의 연료가 돼요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O tej porze poziom ketonów zwykle rośnie - to paliwo dla mózgu i mięśni."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зазвичай у цей час зростають кетони - паливо для мозку і мʼязів."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这个时段酮体通常上升，为大脑和肌肉供能。"
-          }
-        }
-      }
-    },
     "Ketosis" : {
       "comment" : "Phase label",
       "localizations" : {
@@ -8079,6 +8348,72 @@
         }
       }
     },
+    "Last night" : {
+      "comment" : "Meal picker chip: yesterday evening. The longest chip - pl/de need ~17 chars.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مساء أمس"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestern Abend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Last night"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anoche"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier soir"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昨夜"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "어젯밤"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wczoraj wieczorem"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вчора ввечері"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昨晚"
+          }
+        }
+      }
+    },
     "Longest" : {
       "comment" : "Summary stat: longest single fast",
       "localizations" : {
@@ -8134,6 +8469,138 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "最长"
+          }
+        }
+      }
+    },
+    "Meal.exactTimeDone" : {
+      "comment" : "Toolbar button of the exact-time wheel in the last-meal picker (LastMealPickerSheet.swift): commits the moment the wheel is standing on. This CONFIRMS A CHOICE — take the locale's Done lexeme, never its OK/acknowledgement one and never a close/dismiss one, same as PlanEditor.confirm. Split off the shared literal key 'Done' for the same reason that one was.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Done"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hecho"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gotowe"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        }
+      }
+    },
+    "Meal.scaleA11yValue" : {
+      "comment" : "VoiceOver value of the meal scale ribbon (LastMealPickerSheet.swift): the relative readout and the absolute moment, spoken one after the other. %1$@ = \"2h 40m ago\", %2$@ = \"Yesterday at 8:00 PM\". Translate the SEPARATOR, not the halves — it is punctuation and punctuation is per-script: ja/zh read a full-width pause mark, not an ASCII comma. Do not add a conjunction.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@، %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@、%2$@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@，%2$@"
           }
         }
       }
@@ -8668,6 +9135,66 @@
         }
       }
     },
+    "Open that fast" : {
+      "comment" : "Second action of the refusal state (S4): opens the blocking record in History so it can be deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فتح ذلك الصيام"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fasten öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ese ayuno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir ce jeûne"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その断食を開く"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "그 단식 열기"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ten post"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити той піст"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开那次断食"
+          }
+        }
+      }
+    },
     "OR SET EXACT" : {
       "localizations" : {
         "ar" : {
@@ -8845,6 +9372,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已支付 %@。一次性购买，不会续费，也无需取消。"
+          }
+        }
+      }
+    },
+    "Pick another time" : {
+      "comment" : "Primary action of the refusal state (S4): back to the picker, previous choice kept.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديد وقت آخر"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anderen Zeitpunkt wählen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir otra hora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir un autre horaire"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "別の時刻を選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다른 시각 선택"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wybierz inną godzinę"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обрати інший час"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择其他时间"
           }
         }
       }
@@ -10272,6 +10859,132 @@
         }
       }
     },
+    "Set exact time" : {
+      "comment" : "Text link under the meal ribbon; opens the system date picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديد الوقت بدقة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genaue Zeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Set exact time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora exacta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heure exacte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時刻を指定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정확한 시간 설정"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokładny czas"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Точний час"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置具体时间"
+          }
+        }
+      }
+    },
+    "Set the time" : {
+      "comment" : "Primary action, overtime state (S3) of the end-fast sheet. 275pt, one line.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديد الوقت"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitpunkt angeben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indicar la hora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indiquer l’heure"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時刻を設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "시각 지정"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustaw godzinę"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вказати час"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置时间"
+          }
+        }
+      }
+    },
     "Something interrupted it before the payment went through. Nothing will be charged." : {
       "localizations" : {
         "ar" : {
@@ -10682,70 +11395,6 @@
         }
       }
     },
-    "Editorial.fed" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "لا يزال الهضم جاريًا. مستوى الإنسولين مرتفع ويجري تخزين طاقة الوجبة الأخيرة."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch in der Verdauung. Um diese Zeit ist der Insulinspiegel meist hoch, die letzte Mahlzeit wird eingelagert."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Still digesting. Insulin typically runs high now, storing energy from your last meal."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aún digiriendo. A esta hora la insulina suele estar alta y la energía de la última comida se almacena."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Digestion en cours. À cette heure, l’insuline est en général élevée et l’énergie du repas est mise en réserve."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "まだ消化が続く頃です。インスリン値が高く、食事のエネルギーが蓄えられます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "아직 소화 중이에요. 보통 인슐린이 높아 마지막 식사의 에너지가 저장돼요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trwa trawienie. O tej porze poziom insuliny jest zwykle wysoki, a energia z ostatniego posiłku idzie do magazynu."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Триває травлення. У цей час інсулін зазвичай високий, а енергія останньої їжі йде в запас."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "仍在消化。这个时段胰岛素通常较高，上一餐的能量被储存起来。"
-          }
-        }
-      }
-    },
     "Sugar" : {
       "comment" : "Phase label",
       "localizations" : {
@@ -10805,66 +11454,128 @@
         }
       }
     },
-    "About.medicalNote" : {
+    "That time is taken" : {
+      "comment" : "Header of the refusal state (S4) of the end-fast sheet. Its own header on purpose.",
+      "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "مراحل الصيام التي يعرضها تطبيق IF24 هي تقديرات مبنية على التوقيت المعتاد، لا قياس لجسمك. تطبيق IF24 لا يُصنَّف ضمن الأجهزة الطبية ولا يقدم مشورة طبية. يجب استشارة الطبيب قبل تغيير نمط طعامك، خصوصًا في حالات الحمل أو السكري أو تناول دواء مع الطعام أو اضطراب في الأكل، أو لمن هم دون 18 عامًا."
+            "state" : "needs_review",
+            "value" : "هذا الوقت غير متاح"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Fastenphasen, die IF24 anzeigt, sind Schätzwerte auf Basis typischer Zeitverläufe, keine Messung deines Körpers. IF24 ist kein Medizinprodukt und gibt keine medizinischen Ratschläge. Hol ärztlichen Rat ein, bevor du deine Ernährung umstellst - besonders wenn du schwanger bist, Diabetes hast, Medikamente zu den Mahlzeiten einnimmst, Erfahrungen mit gestörtem Essverhalten hast oder unter 18 bist."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The fasting phases IF24 shows are estimates based on typical timing, not a measurement of your body. IF24 is not a medical device and does not give medical advice. Talk to a clinician before changing how you eat - especially if you are pregnant, managing diabetes, taking medication with food, have a history of disordered eating, or are under 18."
+            "value" : "Zeitpunkt belegt"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Las fases de ayuno que muestra IF24 son estimaciones basadas en tiempos típicos, no una medición de tu cuerpo. IF24 no es un producto sanitario y no ofrece consejo médico. Consulta a un profesional sanitario antes de cambiar tu forma de comer, sobre todo si estás embarazada, tienes diabetes, tomas medicación con las comidas, has tenido problemas con la alimentación o tienes menos de 18 años."
+            "value" : "Esa hora está ocupada"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les phases de jeûne affichées par IF24 sont des estimations fondées sur des durées typiques, et non le résultat d’une mesure de votre corps. IF24 n’est pas un dispositif médical et ne donne pas de conseils médicaux. Consultez un professionnel de santé avant de modifier votre alimentation, en particulier si vous êtes enceinte ou diabétique, si vous prenez des médicaments au cours des repas, si vous avez déjà eu des difficultés avec l’alimentation ou si vous avez moins de 18 ans."
+            "value" : "Cet horaire est déjà pris"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24が表示する断食フェーズは、一般的な経過時間に基づく目安であり、体を測定した結果ではありません。IF24は医療機器ではなく、医学的な助言を行うものではありません。食生活を変える前に、医師などの医療従事者にご相談ください。特に、妊娠中の方、糖尿病のある方、食事と一緒に薬を服用している方、これまでに食行動の乱れがあった方、18歳未満の方は、ご相談が大切です。"
+            "value" : "その時刻は使えません"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "IF24가 보여주는 단식 단계는 일반적인 경과 시간을 바탕으로 추정한 것이고, 몸을 측정한 것이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 식습관을 바꾸기 전에 의사와 상의하십시오. 특히 임신 중이거나, 당뇨병을 관리 중이거나, 식사와 함께 약을 복용 중이거나, 섭식 문제를 겪은 적이 있거나, 18세 미만이라면 반드시 상의하십시오."
+            "state" : "needs_review",
+            "value" : "이미 기록된 시각이에요."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fazy postu pokazywane przez IF24 to szacunki oparte na typowym czasie, a nie pomiar twojego ciała. IF24 nie jest wyrobem medycznym i nie udziela porad medycznych. Zanim zmienisz sposób odżywiania, skonsultuj się z lekarzem - zwłaszcza jeśli jesteś w ciąży, masz cukrzycę, przyjmujesz leki do posiłków, masz za sobą problemy z odżywianiem lub nie masz jeszcze 18 lat."
+            "value" : "Ta godzina jest zajęta"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фази посту, які показує IF24, - це оцінки на основі типового часу, а не вимірювання вашого тіла. IF24 не є медичним виробом і не дає медичних порад. Перш ніж змінювати режим харчування, порадьтеся з лікарем - особливо якщо ви вагітні, маєте діабет, приймаєте ліки разом із їжею, стикалися з розладами харчової поведінки або вам менше 18 років."
+            "value" : "Цей час зайнятий"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24 显示的断食阶段是基于典型时间的估算，不是对你身体的测量。IF24 不是医疗器械，也不提供医疗建议。请在改变饮食方式前咨询医生，尤其是当你正在怀孕、患有糖尿病、需要随餐服药、曾有饮食失调的经历，或未满 18 岁时。"
+            "value" : "该时间已被占用"
+          }
+        }
+      }
+    },
+    "That’s as far back as we go." : {
+      "comment" : "Under the meal ribbon, only when it hits the 7-day limit.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذا أبعد وقت يمكن اختياره."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter zurück geht es nicht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "That's as far back as we go."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No podemos ir más atrás."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de remonter plus loin."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "さかのぼれるのはここまでです。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여기까지만 거슬러 올라갈 수 있어요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dalej wstecz nie sięgamy."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Це найдавніший момент, який можна вказати."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最多只能回溯到这里。"
           }
         }
       }
@@ -11050,6 +11761,66 @@
         }
       }
     },
+    "The timer has run %@ past your goal" : {
+      "comment" : "Overtime line (S3). %@ = duration. The subject must stay the time or the app's timer, never the person, their fast or their body; a locale may satisfy that by dropping the subject altogether (ja) or by naming the goal time (ko). No terminal period - pairs with the near-goal line above.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "تجاوز المؤقّت هدفك بمقدار %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Timer läuft seit %@ über dein Ziel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El temporizador superó tu objetivo por %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le minuteur a dépassé votre objectif de %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "目標を%@超えています"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "목표 시각이 %@ 지났어요"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licznik przekroczył cel o %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Таймер відлічив %@ понад ціль"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "计时器已超出目标%@"
+          }
+        }
+      }
+    },
     "This discards the current fast and returns to the start." : {
       "localizations" : {
         "ar" : {
@@ -11104,6 +11875,135 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这将放弃当前断食并返回起点。"
+          }
+        }
+      }
+    },
+    "This fast overlaps one you already saved (%@). To end it, open that fast and delete it." : {
+
+    },
+    "This overlaps a fast you already saved (%@). Pick another time, or open that fast and delete it." : {
+      "comment" : "Refusal reason (S4). %@ = the saved fast's span. Budgeted at 4 German lines. ar: do not use bare السجل for a single record - it also names the History screen.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "يتداخل هذا الوقت مع صيام محفوظ (%@). اختر وقتًا آخر، أو احذفه من سجلك."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überschneidet sich mit einem gespeicherten Fasten (%@). Wähle einen anderen Zeitpunkt oder lösche dieses Fasten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se solapa con un ayuno que ya guardaste (%@). Elige otra hora, o abre ese ayuno y bórralo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chevauche un jeûne déjà enregistré (%@). Choisissez un autre horaire, ou ouvrez ce jeûne pour le supprimer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存済みの断食（%@）と重なっています。別の時刻を選択するか、その断食を開いて削除してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 저장된 단식과 겹쳐요 (%@). 다른 시각을 선택하거나 그 단식을 열어 삭제하세요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To nachodzi na zapisany post (%@). Wybierz inną godzinę albo otwórz ten post i usuń go."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перетинається зі збереженим постом (%@). Оберіть інший час або відкрийте той піст і видаліть його."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "该时间与已保存的断食（%@）重叠。请选择其他时间，或打开那次断食并删除。"
+          }
+        }
+      }
+    },
+    "Time since last meal" : {
+      "comment" : "VoiceOver label for the meal ribbon.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوقت منذ آخر وجبة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit seit der letzten Mahlzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Time since last meal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo desde la última comida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps écoulé depuis le dernier repas"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後の食事からの経過時間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마지막 식사 이후 경과 시간"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czas od ostatniego posiłku"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Час від останнього прийому їжі"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "距离上一餐的时间"
           }
         }
       }
@@ -11167,6 +12067,70 @@
         }
       }
     },
+    "Timer.deepAutophagy" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التهام ذاتي عميق"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiefe Autophagie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deep autophagy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autofagia profunda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autophagie profonde"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "深いオートファジー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "깊은 자가포식"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Głęboka autofagia"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Глибока автофагія"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "深度自噬"
+          }
+        }
+      }
+    },
     "Today" : {
       "localizations" : {
         "ar" : {
@@ -11221,6 +12185,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今天"
+          }
+        }
+      }
+    },
+    "Today at %@" : {
+      "comment" : "Clock caption under the meal readout, e.g. 'Today at 7:50 AM'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اليوم في %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute um %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Today at %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy a las %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aujourd’hui à %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日 %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘 %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dziś o %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сьогодні о %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天 %@"
           }
         }
       }
@@ -11396,6 +12426,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "我们会把你的断食时间回溯，让计时保持准确。"
+          }
+        }
+      }
+    },
+    "When did you eat?" : {
+      "comment" : "End-fast sheet header (S1/S3). Distinct from 'When did you last eat?' - that one asks about the meal BEFORE the fast, this one about the meal that ENDED it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متى أكلت؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wann hast du gegessen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cuándo comiste?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand avez-vous mangé ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "いつ食事をとりましたか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "언제 드셨나요?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiedy był posiłek?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Коли ви поїли?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你是什么时候进食的？"
           }
         }
       }
@@ -11633,6 +12723,72 @@
         }
       }
     },
+    "Yesterday at %@" : {
+      "comment" : "Clock caption under the meal readout, e.g. 'Yesterday at 8:00 PM'. Replaces the older 'Yesterday %@'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أمس في %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestern um %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Yesterday at %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayer a las %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier à %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昨日 %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "어제 %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wczoraj o %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вчора о %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昨天 %@"
+          }
+        }
+      }
+    },
     "You reached your goal. Your eating window is open." : {
       "comment" : "Goal-reached notification body",
       "localizations" : {
@@ -11751,106 +12907,6 @@
         }
       }
     },
-    "Editorial.goalReached" : {
-      "localizations" : {
-        "ar" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ %d ساعات. ومن هنا يبلغ الصيام أعمق مراحله."
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ %d ساعةً. ومن هنا يبلغ الصيام أعمق مراحله."
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ ساعة واحدة. ومن هنا يبلغ الصيام أعمق مراحله."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ %d ساعة. ومن هنا يبلغ الصيام أعمق مراحله."
-                }
-              },
-              "two" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ ساعتين. ومن هنا يبلغ الصيام أعمق مراحله."
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "لقد أتممت هدفك البالغ %d ساعة. ومن هنا يبلغ الصيام أعمق مراحله."
-                }
-              }
-            }
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du hast dein %d-Stunden-Ziel erreicht. Ab hier liegt meist die tiefste Phase des Fastens."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You’ve reached your %d-hour goal. From here the fast is typically at its deepest."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Has alcanzado tu objetivo de %d horas. A partir de aquí suele estar la fase más profunda del ayuno."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous avez atteint votre objectif de %d heures. C’est en général la phase la plus profonde du jeûne."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%d時間の目標を達成しました。ここからが断食のもっとも深い時間帯です。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%d시간 목표를 달성했어요. 보통 여기서부터 단식이 가장 깊어져요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cel %d godzin osiągnięty. Dalej zwykle zaczyna się najgłębsza część postu."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ви досягли своєї %d-годинної цілі. Далі зазвичай найглибша частина посту."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你已达成%d小时目标。接下来通常是断食最深的时段。"
-          }
-        }
-      }
-    },
     "Your eating window has closed. Every minute since already counts - continue your fast whenever you’re ready." : {
       "localizations" : {
         "ar" : {
@@ -11905,6 +12961,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "进食窗口已结束。此后的每一分钟都已计入，准备好后继续断食吧。"
+          }
+        }
+      }
+    },
+    "Your eating window starts from this moment." : {
+      "comment" : "End-fast sheet hint (S1). Replaced by the consequence line in S2/S3.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تبدأ نافذة الأكل من هذه اللحظة."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Essensfenster beginnt ab diesem Zeitpunkt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu ventana de comida empieza en ese momento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre fenêtre alimentaire commence à ce moment-là."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この時刻から食事の時間帯が始まります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 시각부터 식사 시간이 시작돼요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje okno żywieniowe zacznie się od tej chwili."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вікно харчування почнеться з цього моменту."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的进食窗口从这一刻开始。"
           }
         }
       }
@@ -12138,1116 +13254,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "你的计划，你的数字，从一小时到二十三小时。"
-          }
-        }
-      }
-    },
-    "When did you eat?" : {
-      "comment" : "End-fast sheet header (S1/S3). Distinct from 'When did you last eat?' - that one asks about the meal BEFORE the fast, this one about the meal that ENDED it.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "متى أكلت؟"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wann hast du gegessen?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Cuándo comiste?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quand avez-vous mangé ?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "いつ食事をとりましたか？"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "언제 드셨나요?"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kiedy był posiłek?"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Коли ви поїли?"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你是什么时候进食的？"
-          }
-        }
-      }
-    },
-    "Your eating window starts from this moment." : {
-      "comment" : "End-fast sheet hint (S1). Replaced by the consequence line in S2/S3.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تبدأ نافذة الأكل من هذه اللحظة."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dein Essensfenster beginnt ab diesem Zeitpunkt."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu ventana de comida empieza en ese momento."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre fenêtre alimentaire commence à ce moment-là."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この時刻から食事の時間帯が始まります。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 시각부터 식사 시간이 시작돼요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Twoje okno żywieniowe zacznie się od tej chwili."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вікно харчування почнеться з цього моменту."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你的进食窗口从这一刻开始。"
-          }
-        }
-      }
-    },
-    "End this fast?" : {
-      "comment" : "End-fast sheet header, near-goal state (S2).",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إنهاء الصيام؟"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fasten beenden?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Terminar este ayuno?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminer ce jeûne ?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この断食を終了しますか？"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "이 단식을 종료할까요?"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zakończyć ten post?"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Завершити цей піст?"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "结束这次断食？"
-          }
-        }
-      }
-    },
-    "%lld minutes left to your goal" : {
-      "comment" : "Near-goal consequence line (S2). WHOLE MINUTES ONLY, never a duration format. No encouragement in any locale: the subject is the time, not the person. No terminal period - this and the overtime line are two states of one status slot and must agree. Plural categories belong in the catalog and only where CLDR has them: ja, ko and zh-Hans have `other` alone - a `one` branch there would never render.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "تتبقى %lld دقائق حتى الهدف"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "تتبقى %lld دقيقةً حتى الهدف"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "تتبقى دقيقة واحدة حتى الهدف"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "تتبقى %lld دقيقة حتى الهدف"
-                }
-              },
-              "two" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "تتبقى دقيقتان حتى الهدف"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "تتبقى %lld دقائق حتى الهدف"
-                }
-              }
-            }
-          }
-        },
-        "de" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Noch 1 Minute bis zum Ziel"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Noch %lld Minuten bis zum Ziel"
-                }
-              }
-            }
-          }
-        },
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "1 minute left to your goal"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld minutes left to your goal"
-                }
-              }
-            }
-          }
-        },
-        "es" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Queda 1 minuto para tu objetivo"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Quedan %lld minutos para tu objetivo"
-                }
-              }
-            }
-          }
-        },
-        "fr" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Encore 1 minute avant l’objectif"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Encore %lld minutes avant l’objectif"
-                }
-              }
-            }
-          }
-        },
-        "ja" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "目標まであと%lld分です"
-                }
-              }
-            }
-          }
-        },
-        "ko" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "목표까지 %lld분 남았어요"
-                }
-              }
-            }
-          }
-        },
-        "pl" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Do celu zostały %lld minuty"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Do celu zostało %lld minut"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Do celu została 1 minuta"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Do celu zostało %lld minuty"
-                }
-              }
-            }
-          }
-        },
-        "uk" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "До цілі лишилося %lld хвилини"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "До цілі лишилося %lld хвилин"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "До цілі лишилася 1 хвилина"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "До цілі лишилося %lld хвилин"
-                }
-              }
-            }
-          }
-        },
-        "zh-Hans" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "距离目标还有%lld分钟"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "The timer has run %@ past your goal" : {
-      "comment" : "Overtime line (S3). %@ = duration. The subject must stay the time or the app's timer, never the person, their fast or their body; a locale may satisfy that by dropping the subject altogether (ja) or by naming the goal time (ko). No terminal period - pairs with the near-goal line above.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "تجاوز المؤقّت هدفك بمقدار %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Timer läuft seit %@ über dein Ziel"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El temporizador superó tu objetivo por %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le minuteur a dépassé votre objectif de %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "目標を%@超えています"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "목표 시각이 %@ 지났어요"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Licznik przekroczył cel o %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Таймер відлічив %@ понад ціль"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "计时器已超出目标%@"
-          }
-        }
-      }
-    },
-    "Fast ends" : {
-      "comment" : "Preview row label in the end-fast sheet. Pairs with a clock + duration value; NO YEAR in the value.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "نهاية الصيام"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fasten endet"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fin del ayuno"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fin du jeûne"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "断食終了"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "단식 종료 시각"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Koniec postu"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Кінець посту"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "断食结束"
-          }
-        }
-      }
-    },
-    "End now" : {
-      "comment" : "Primary action, near-goal state (S2) of the end-fast sheet. 275pt, one line.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إنهاء الآن"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jetzt beenden"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminar ahora"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminer maintenant"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今すぐ終了"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "지금 종료"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zakończ teraz"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Завершити зараз"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "立即结束"
-          }
-        }
-      }
-    },
-    "Set the time" : {
-      "comment" : "Primary action, overtime state (S3) of the end-fast sheet. 275pt, one line.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحديد الوقت"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zeitpunkt angeben"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Indicar la hora"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Indiquer l’heure"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "時刻を設定"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "시각 지정"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ustaw godzinę"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вказати час"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设置时间"
-          }
-        }
-      }
-    },
-    "1 h ago" : {
-      "comment" : "Preset chip in the end-fast sheet (EndFast.chip1Hour). The text slot is 83.7pt and does not grow with text size. The relative-time preposition stays in every locale: no language of the ten drops it, only the English source looks bare.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "قبل ساعة"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vor 1 Std"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hace 1 h"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il y a 1 h"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1時間前"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1시간 전"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 godz temu"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 год тому"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1小时前"
-          }
-        }
-      }
-    },
-    "%lld min ago" : {
-      "comment" : "Preset chip in the end-fast sheet (EndFast.chipMinutesAgo). The text slot is 83.7pt and does not grow with text size - keep it short. Only the 30-minute substitution is reachable (quickOffsetsMinutes = [0, 30, 60]). The relative-time preposition stays in every locale. Plural categories belong in the catalog and only where CLDR has them: ja, ko and zh-Hans have `other` alone, so they carry one flat form.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "قبل %lld دقائق"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "قبل %lld دقيقةً"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "قبل دقيقة"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "قبل %lld دقيقة"
-                }
-              },
-              "two" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "قبل دقيقتين"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "needs_review",
-                  "value" : "قبل %lld دقيقة"
-                }
-              }
-            }
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vor %lld Min"
-          }
-        },
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld min ago"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld min ago"
-                }
-              }
-            }
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hace %lld min"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il y a %lld min"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld分前"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld분 전"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld min temu"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld хв тому"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld分钟前"
-          }
-        }
-      }
-    },
-    "%@ · goal end" : {
-      "comment" : "Caption under the exact-time value (S3). %@ = a day name (Today / Yesterday / n days ago).",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ · بلوغ الهدف"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ · Zielende"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ · objetivo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ · objectif"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ · 目標到達"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ · 목표 시각"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ · cel"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ · ціль"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ · 目标结束"
-          }
-        }
-      }
-    },
-    "That time is taken" : {
-      "comment" : "Header of the refusal state (S4) of the end-fast sheet. Its own header on purpose.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "هذا الوقت غير متاح"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zeitpunkt belegt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esa hora está ocupada"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cet horaire est déjà pris"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "その時刻は使えません"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "이미 기록된 시각이에요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ta godzina jest zajęta"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Цей час зайнятий"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "该时间已被占用"
-          }
-        }
-      }
-    },
-    "This overlaps a fast you already saved (%@). Pick another time, or open that fast and delete it." : {
-      "comment" : "Refusal reason (S4). %@ = the saved fast's span. Budgeted at 4 German lines. ar: do not use bare السجل for a single record - it also names the History screen.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "يتداخل هذا الوقت مع صيام محفوظ (%@). اختر وقتًا آخر، أو احذفه من سجلك."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Überschneidet sich mit einem gespeicherten Fasten (%@). Wähle einen anderen Zeitpunkt oder lösche dieses Fasten."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se solapa con un ayuno que ya guardaste (%@). Elige otra hora, o abre ese ayuno y bórralo."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chevauche un jeûne déjà enregistré (%@). Choisissez un autre horaire, ou ouvrez ce jeûne pour le supprimer."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存済みの断食（%@）と重なっています。別の時刻を選択するか、その断食を開いて削除してください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이미 저장된 단식과 겹쳐요 (%@). 다른 시각을 선택하거나 그 단식을 열어 삭제하세요."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To nachodzi na zapisany post (%@). Wybierz inną godzinę albo otwórz ten post i usuń go."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Перетинається зі збереженим постом (%@). Оберіть інший час або відкрийте той піст і видаліть його."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "该时间与已保存的断食（%@）重叠。请选择其他时间，或打开那次断食并删除。"
-          }
-        }
-      }
-    },
-    "Pick another time" : {
-      "comment" : "Primary action of the refusal state (S4): back to the picker, previous choice kept.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحديد وقت آخر"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anderen Zeitpunkt wählen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elegir otra hora"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisir un autre horaire"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "別の時刻を選択"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "다른 시각 선택"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wybierz inną godzinę"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обрати інший час"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择其他时间"
-          }
-        }
-      }
-    },
-    "Open that fast" : {
-      "comment" : "Second action of the refusal state (S4): opens the blocking record in History so it can be deleted.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "فتح ذلك الصيام"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fasten öffnen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir ese ayuno"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir ce jeûne"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "その断食を開く"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "그 단식 열기"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Otwórz ten post"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Відкрити той піст"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "打开那次断食"
           }
         }
       }
