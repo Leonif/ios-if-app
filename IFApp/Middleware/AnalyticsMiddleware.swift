@@ -51,8 +51,18 @@ final class AnalyticsMiddleware: Middleware {
         case let pro as ProAction:
             handle(pro, trigger: trigger(after: app))
             if let app { reportProStatus(app.proState.entitlement) }
+        case let endFast as EndFastAction:
+            handle(endFast)
         default:
             break
+        }
+    }
+
+    private func handle(_ action: EndFastAction) {
+        // Only the refusal is worth a line — how often a real end runs into a saved
+        // fast, and how often it is the start-clash kind that has no re-pick out of it.
+        if case let .refused(_, unavoidable) = action {
+            repo.log(.endFastRefused(unavoidable: unavoidable))
         }
     }
 
