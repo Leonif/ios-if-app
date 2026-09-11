@@ -79,4 +79,33 @@ final class AnalyticsTriggerTests: XCTestCase {
 
         XCTAssertEqual(repo.lastTrigger, PaywallTrigger.manual.rawValue)
     }
+
+    /// The export lock used to report `manual` too, and that cost more than a column:
+    /// the offer chooses its lead benefit off the trigger, so a padlock on "History as
+    /// CSV" opened an offer introduced by a sentence about the length of a plan. The
+    /// door now has a value of its own — and it has to keep it, because the raw string
+    /// is a GA4 dimension and a rename compiles in silence.
+    func testTheLockedExportReportsItsOwnDoor() {
+        let repo = RepoSpy()
+        let middleware = AnalyticsMiddleware(repo: repo)
+
+        var state = AppState()
+        state.proState.trigger = .historyExport
+
+        send(ProAction.offerOpened(trigger: .historyExport), state: state, to: middleware)
+
+        XCTAssertEqual(repo.lastTrigger, "history_export")
+        XCTAssertNotEqual(repo.lastTrigger, PaywallTrigger.manual.rawValue)
+    }
+
+    /// Every value on the parameter, spelled out once. The set is what the release is
+    /// read by; a case added without a value here is a column nobody defined.
+    func testTriggerVocabularyIsFixed() {
+        XCTAssertEqual(
+            Set([PaywallTrigger.fastFinished, .planCustom, .streakBreak, .manual,
+                 .home, .historyExport, .unknown].map(\.rawValue)),
+            ["fast_finished", "plan_custom", "streak_break", "manual",
+             "home", "history_export", "unknown"]
+        )
+    }
 }

@@ -81,8 +81,15 @@ enum PaywallTrigger: String, Equatable, Sendable {
     /// T2: a broken streak, offering the freeze.
     case streakBreak = "streak_break"
     /// T4: a permanent entry the user had to go looking for — the Pro row in the
-    /// About IF24 sheet, and the locked export in History.
+    /// About IF24 sheet.
     case manual
+    /// The locked export row in History. Split out of `manual` because it is the one
+    /// permanent entry whose door names a single benefit: a person who taps a padlock
+    /// on "History as CSV" has already said which of the three they came for, and the
+    /// offer leads with it. Folded into `manual` neither half could be read — the
+    /// distribution over triggers would mix "went looking for the offer" with "asked
+    /// for the export", and the offer would go on opening on the wrong benefit.
+    case historyExport = "history_export"
     /// The `Pro` control in the timer header. Kept apart from `manual` on purpose:
     /// that value means "the user went looking for the offer", this one means "the
     /// door was on screen and got tapped", and the whole point of putting a door on

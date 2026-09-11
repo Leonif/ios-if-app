@@ -171,16 +171,19 @@ struct HistoryFlowView: View {
     /// A labelled export row makes the Pro gate visible before the tap.
     private func exportButton(theme: ThemeTokens) -> some View {
         Button(action: {
-            // Locked, the control is a door rather than a statement (decision 93).
-            // The trigger is the existing `manual` — by its own definition that value
-            // means "the offer was opened from a permanent entry", and a lock that
-            // sits on the history screen for as long as Pro is not owned is exactly
-            // that. A trigger of its own would split 20-35 monthly impressions into
-            // two columns of noise instead of a distribution.
+            // Locked, the control is a door rather than a statement (decision 93) —
+            // and a door that names one benefit, so it reports itself rather than
+            // borrowing `manual`. That value means "the user went looking for the
+            // offer"; this one means "the user asked for the export and found a
+            // padlock", and the offer opens on the export because of it. The reason
+            // `manual` was chosen when this shipped — that two columns of 20-35
+            // monthly impressions read as noise — argued the wrong way round: the
+            // column this one splits off is the only one whose entry says what the
+            // person wanted.
             if props.isPro {
                 store.dispatch(ExportHistoryThunk())
             } else {
-                store.dispatch(ProAction.offerOpened(trigger: .manual))
+                store.dispatch(ProAction.offerOpened(trigger: .historyExport))
             }
         }) {
             LabeledActionRow(title: strings.History.exportTitle,

@@ -387,9 +387,17 @@ struct PaywallView: View {
         }
     }
 
-    /// The framing line introduces the lead benefit, so it moves with it.
+    /// The framing line introduces the lead benefit, so it moves with it. One line per
+    /// lead, decided by the same expression that orders the list below — two
+    /// expressions would let the sentence introduce a benefit the list no longer
+    /// starts with, which is what the export lock did: a padlock on "History as CSV"
+    /// opened an offer whose first sentence was about the length of a plan.
     private var framingLine: String {
-        trigger == .streakBreak ? strings.Pro.framingProtectedDay : strings.Pro.framingCustom
+        switch trigger {
+        case .streakBreak: return strings.Pro.framingProtectedDay
+        case .historyExport: return strings.Pro.framingExport
+        default: return strings.Pro.framingCustom
+        }
     }
 
     private var benefits: [Benefit] {
@@ -400,9 +408,16 @@ struct PaywallView: View {
         let freeze = Benefit(id: 2, title: strings.Pro.benefitFreezeTitle,
                              body: strings.Pro.benefitFreezeBody, dot: Phase.autophagy.color)
         // Arriving from a broken streak, the protected day leads: it is the thing
-        // that just failed. Everywhere else a person has never seen a streak badge,
-        // and a freeze would be insurance against an event they do not know exists.
-        return trigger == .streakBreak ? [freeze, custom, export] : [custom, export, freeze]
+        // that just failed. From the locked export the export leads, for the stronger
+        // version of the same reason — the person did not merely see that benefit
+        // fail, they asked for it by name. Everywhere else a person has never seen a
+        // streak badge, and a freeze would be insurance against an event they do not
+        // know exists.
+        switch trigger {
+        case .streakBreak: return [freeze, custom, export]
+        case .historyExport: return [export, custom, freeze]
+        default: return [custom, export, freeze]
+        }
     }
 
     private var listOpacity: Double {

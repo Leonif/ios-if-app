@@ -647,6 +647,22 @@ enum strings {
         static var headline: String { String(localized: "One purchase, for good") }
         static var framingCustom: String { String(localized: "Your plan, your number - any length you want, from one hour to twenty-three.") }
         static var framingProtectedDay: String { String(localized: "A missed day stays a missed day - your streak keeps counting from where it was.") }
+        /// The framing for the one door that names a benefit: the locked export row in
+        /// History. It has to say the same thing as the export benefit under it without
+        /// repeating its words — the line above a list is a frame, not its first item.
+        static var framingExport: String {
+            String(localized: "Pro.framingExport",
+                   defaultValue: "Your record is yours - take the whole history out as a file whenever you want it.",
+                   comment: """
+                   The framing line under the offer's headline, shown only when the offer was
+                   opened from the locked CSV export in History. Sits directly above the
+                   benefit list, whose first item is "History as CSV" / "Export every fast you
+                   have logged, whenever you like." — so this line must not repeat that
+                   wording. Same register and length class as the other two framing lines
+                   (Pro.framingCustom, Pro.framingProtectedDay); it wraps freely, no hard
+                   budget.
+                   """)
+        }
 
         // Offer — the three benefits.
         static var benefitCustomTitle: String { String(localized: "Custom length") }
