@@ -94,11 +94,11 @@ struct GoalReachedFooterCard: View {
                 divider
                 Stat(overline: strings.Footer.over, value: over, valueColor: theme.deep, theme: theme)
             }
-            HStack(spacing: 12) {
-                SecondaryButton(title: strings.Footer.reset, theme: theme, minWidth: 110, action: onReset)
-                    .accessibilityIdentifier("timer.reset")
+            VStack(spacing: 12) {
                 PrimaryButton(title: strings.Footer.endFast, theme: theme, action: onEndFast)
                     .accessibilityIdentifier("timer.endFast")
+                SecondaryButton(title: strings.Footer.reset, theme: theme, action: onReset)
+                    .accessibilityIdentifier("timer.reset")
             }
         }
         .modifier(CardBackground(theme: theme))
@@ -129,11 +129,11 @@ struct EatingFooterCard: View {
                 HistoryLink(title: strings.History.lastFast(lastFast), theme: theme,
                             identifier: "eating.lastFast", action: onHistory)
             }
-            HStack(spacing: 12) {
-                SecondaryButton(title: strings.Footer.doneEating, theme: theme, minWidth: 110, action: onSkip)
-                    .accessibilityIdentifier("eating.skip")
+            VStack(spacing: 12) {
                 PrimaryButton(title: strings.Footer.startFast, theme: theme, action: onStartFast)
                     .accessibilityIdentifier("eating.startFast")
+                SecondaryButton(title: strings.Footer.doneEating, theme: theme, action: onSkip)
+                    .accessibilityIdentifier("eating.skip")
             }
         }
         .modifier(CardBackground(theme: theme))
@@ -148,11 +148,11 @@ struct EatingOverFooterCard: View {
     let onContinue: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
-            SecondaryButton(title: strings.Footer.notNowFast, theme: theme, minWidth: 110, action: onSkip)
-                .accessibilityIdentifier("eatingOver.skip")
+        VStack(spacing: 12) {
             PrimaryButton(title: strings.Footer.continueFasting, theme: theme, action: onContinue)
                 .accessibilityIdentifier("eatingOver.continueFasting")
+            SecondaryButton(title: strings.Footer.notNowFast, theme: theme, action: onSkip)
+                .accessibilityIdentifier("eatingOver.skip")
         }
         .modifier(CardBackground(theme: theme))
     }
@@ -205,14 +205,11 @@ struct CompleteFooterCard: View {
             QuietActionButton(title: strings.Complete.resumeFast, theme: theme, action: onResume)
                 .accessibilityIdentifier("complete.resumeFast")
 
-            HStack(spacing: 12) {
-                SecondaryButton(title: strings.Footer.declineWindow, theme: theme, minWidth: 110, action: onSkip)
-                    // The id stays `timer.reset` while the label no longer does: the
-                    // existing flows address it by this name, and renaming it is a
-                    // separate change from fixing what the button says.
-                    .accessibilityIdentifier("timer.reset")
+            VStack(spacing: 12) {
                 PrimaryButton(title: strings.Footer.startEating, theme: theme, action: onStartEating)
                     .accessibilityIdentifier("timer.startEatingWindow")
+                SecondaryButton(title: strings.Footer.declineWindow, theme: theme, action: onSkip)
+                    .accessibilityIdentifier("timer.reset")
             }
         }
         .modifier(CardBackground(theme: theme))

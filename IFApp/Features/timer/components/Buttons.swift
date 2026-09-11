@@ -31,7 +31,7 @@ struct PrimaryButton: View {
                 .minimumScaleFactor(0.7)
                 .padding(.horizontal, labelInset)
                 .frame(maxWidth: .infinity)
-                .frame(height: height)
+                .frame(minHeight: height)
                 .background(RoundedRectangle(cornerRadius: cornerRadius).fill(theme.primaryButtonBg))
                 .shadow(color: theme.buttonShadow, radius: 14, x: 0, y: 8)
         }
@@ -64,7 +64,7 @@ struct SecondaryButton: View {
                 .padding(.horizontal, labelInset)
                 .frame(minWidth: minWidth,
                        maxWidth: minWidth.map { _ in Self.maxContentWidth } ?? .infinity)
-                .frame(height: 52)
+                .frame(minHeight: 52)
                 .background(
                     RoundedRectangle(cornerRadius: cornerRadius)
                         .fill(theme.secBg)
