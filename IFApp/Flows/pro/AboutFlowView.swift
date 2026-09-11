@@ -50,7 +50,8 @@ struct AboutFlowView: View {
             // opens in — the value names the door, not the frame behind it.
             onOpenOffer: { store.dispatch(ProAction.offerOpened(trigger: .manual)) },
             onRestore: { store.dispatch(RestorePurchasesThunk()) },
-            onPrivacy: { openURL(SiteLinks.privacyPolicy) }
+            onPrivacy: { openURL(SiteLinks.privacyPolicy) },
+            onOpenSource: { store.dispatch(OpenExternalLinkThunk(url: $0)) }
         )
         .animation(.easeInOut(duration: 0.18), value: props.showsNothingToRestore)
         .connect(to: store, mapState: { AboutProps(state: $0) }, onPropsChange: { props = $0 })

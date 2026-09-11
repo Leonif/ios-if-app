@@ -1,6 +1,1306 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "SourceReader.kicker": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Research, in context"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Дослідження в контексті"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Forschung im Kontext"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Investigación en contexto"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "La recherche en contexte"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Badania w kontekście"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "研究を読み解く"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "연구를 이해하다"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "读懂研究"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الأبحاث في سياقها"
+        }
+      }
+    }
+  },
+  "SourceReader.findings": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The main finding"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Головний висновок"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das wichtigste Ergebnis"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "El hallazgo principal"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Le résultat principal"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Główny wynik"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "主な知見"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "주요 결과"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "主要发现"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "النتيجة الرئيسية"
+        }
+      }
+    }
+  },
+  "SourceReader.limits": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "What this means for IF24"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Що це означає для IF24"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Was das für IF24 bedeutet"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Qué significa para IF24"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ce que cela signifie pour IF24"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Co to oznacza dla IF24"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "IF24での読み方"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "IF24에서의 의미"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "这对 IF24 意味着什么"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "ماذا يعني هذا في IF24"
+        }
+      }
+    }
+  },
+  "SourceReader.original": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Read the original"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Читати оригінал"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Original lesen"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Leer el original"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Lire l’original"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Czytaj oryginał"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "原文を読む"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "원문 읽기"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "阅读原文"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "اقرأ الأصل"
+        }
+      }
+    }
+  },
+  "SourceReader.editorial": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "An IF24 summary, not a translation of the full paper."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Виклад IF24, а не переклад повної статті."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eine Zusammenfassung von IF24, keine Übersetzung der gesamten Arbeit."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Un resumen de IF24, no una traducción del artículo completo."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Un résumé IF24, pas une traduction de l’article intégral."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Podsumowanie IF24, a nie tłumaczenie całego artykułu."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "IF24による要約であり、論文全文の翻訳ではありません。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "IF24의 요약이며 논문 전문의 번역이 아닙니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "这是 IF24 编写的摘要，并非论文全文的翻译。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "ملخص أعدّه IF24، وليس ترجمة للورقة كاملة."
+        }
+      }
+    }
+  },
+  "SourceReader.review": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Review"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Огляд"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Übersichtsarbeit"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Revisión"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Revue de littérature"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Przegląd badań"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "総説"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "종설"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "综述"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "مراجعة علمية"
+        }
+      }
+    }
+  },
+  "SourceReader.clinical": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Randomized trial · adults"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Рандомізоване випробування · дорослі"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Randomisierte Studie · Erwachsene"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ensayo aleatorizado · adultos"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Essai randomisé · adultes"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Badanie randomizowane · dorośli"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "無作為化試験 · 成人"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "무작위 시험 · 성인"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "随机试验 · 成人"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "تجربة عشوائية · بالغون"
+        }
+      }
+    }
+  },
+  "SourceReader.lab": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mechanistic study · mainly mice"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Дослідження механізму · переважно миші"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mechanistische Studie · überwiegend Mäuse"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Estudio de mecanismos · principalmente ratones"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Étude mécanistique · surtout chez la souris"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Badanie mechanizmów · głównie myszy"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "機序の研究 · 主にマウス"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "기전 연구 · 주로 생쥐"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "机制研究 · 主要基于小鼠"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "دراسة آليات · على الفئران أساسًا"
+        }
+      }
+    }
+  },
+  "SourceReader.1.title": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "How the body stores fuel"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Як організм зберігає енергію"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Wie der Körper Energie speichert"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cómo almacena energía el cuerpo"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Comment le corps stocke l’énergie"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Jak organizm magazynuje energię"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "体がエネルギーを蓄える仕組み"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "몸이 에너지를 저장하는 방식"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "身体如何储存能量"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "كيف يخزّن الجسم الطاقة"
+        }
+      }
+    }
+  },
+  "SourceReader.1.body": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Glycogen stores glucose. This review explains the enzymes and hormones that regulate its storage and use."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Глікоген зберігає глюкозу. Огляд пояснює, як ферменти та гормони регулюють його накопичення й використання."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Glykogen speichert Glukose. Der Überblick erklärt, wie Enzyme und Hormone seine Speicherung und Nutzung steuern."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "El glucógeno almacena glucosa. Esta revisión explica las enzimas y hormonas que regulan su almacenamiento y uso."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Le glycogène stocke le glucose. Cette revue explique les enzymes et hormones qui régulent son stockage et son utilisation."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Glikogen magazynuje glukozę. Przegląd wyjaśnia, jak enzymy i hormony regulują jego gromadzenie i wykorzystanie."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "グリコーゲンはグルコースを蓄えます。この総説は、その貯蔵と利用を調節する酵素やホルモンを解説しています。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "글리코겐은 포도당을 저장합니다. 이 종설은 저장과 사용을 조절하는 효소와 호르몬을 설명합니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "糖原储存葡萄糖。这篇综述介绍了调节糖原储存和利用的酶与激素。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "يخزّن الغليكوجين الغلوكوز. تشرح هذه المراجعة الإنزيمات والهرمونات التي تنظّم تخزينه واستخدامه."
+        }
+      }
+    }
+  },
+  "SourceReader.1.limit": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Useful background for the fuel story. IF24 does not measure glycogen, so its timer cannot tell when your stores are empty."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Це контекст для пояснення джерел енергії. IF24 не вимірює глікоген, тож таймер не визначає, коли саме ваші запаси вичерпалися."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hintergrundwissen zu Energiequellen. IF24 misst kein Glykogen; der Timer kann daher nicht bestimmen, wann deine Speicher leer sind."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sirve de contexto sobre la energía. IF24 no mide el glucógeno: el temporizador no indica cuándo se agotan tus reservas."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Un éclairage sur les sources d’énergie. IF24 ne mesure pas le glycogène : le minuteur ne peut pas déterminer quand vos réserves sont épuisées."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "To kontekst dla opisu źródeł energii. IF24 nie mierzy glikogenu, więc timer nie określi, kiedy twoje zapasy się wyczerpią."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "エネルギー源を理解するための背景情報です。IF24はグリコーゲンを測定しないため、タイマーで貯蔵量が尽きる時刻は分かりません。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "에너지원에 대한 배경지식입니다. IF24는 글리코겐을 측정하지 않으므로 타이머로 저장량이 소진되는 시점을 알 수 없습니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "这有助于理解能量来源。IF24 不测量糖原，因此计时器无法判断你的糖原储备何时耗尽。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "خلفية لفهم مصادر الطاقة. لا يقيس IF24 الغليكوجين، لذا لا يستطيع المؤقّت تحديد وقت نفاد مخزونك."
+        }
+      }
+    }
+  },
+  "SourceReader.2.title": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Does fasting every other day work better?"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Чи краще працює голодування через день?"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ist Fasten jeden zweiten Tag wirksamer?"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "¿Es mejor ayunar en días alternos?"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Jeûner un jour sur deux est-il plus efficace ?"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Czy post co drugi dzień jest skuteczniejszy?"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "隔日断食はより効果的？"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "격일 단식이 더 효과적일까요?"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "隔日禁食效果更好吗？"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "هل الصيام يومًا بعد يوم أكثر فعالية؟"
+        }
+      }
+    }
+  },
+  "SourceReader.2.body": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Over one year, alternate-day fasting did not outperform daily calorie restriction for weight loss in this trial."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "У цьому річному випробуванні голодування через день не перевершило щоденне обмеження калорій за зниженням ваги."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "In dieser einjährigen Studie führte alternierendes Fasten nicht zu mehr Gewichtsverlust als tägliche Kalorienreduktion."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "En este ensayo de un año, ayunar en días alternos no superó la restricción calórica diaria para perder peso."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dans cet essai d’un an, le jeûne alterné n’a pas surpassé la restriction calorique quotidienne pour la perte de poids."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "W tym rocznym badaniu post co drugi dzień nie dawał większego spadku masy ciała niż codzienne ograniczenie kalorii."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "この1年間の試験では、隔日断食による減量効果は毎日のカロリー制限を上回りませんでした。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "이 1년간의 시험에서 격일 단식은 체중 감량 면에서 매일 칼로리를 제한하는 방식보다 우수하지 않았습니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "在这项为期一年的试验中，隔日禁食的减重效果并未优于每日限制热量。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "في هذه التجربة التي استمرت عامًا، لم يتفوّق الصيام يومًا بعد يوم على تقليل السعرات يوميًا في خفض الوزن."
+        }
+      }
+    }
+  },
+  "SourceReader.2.limit": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This studied a different schedule from a daily 16:8 window. It is not a test of IF24 and does not promise weight loss from using a timer."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Тут вивчали інший розклад, ніж щоденне вікно 16:8. Це не перевірка IF24 і не обіцянка схуднення від користування таймером."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Untersucht wurde ein anderer Rhythmus als das tägliche 16:8-Fenster. Die Studie testet IF24 nicht und verspricht keinen Gewichtsverlust durch einen Timer."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "El horario estudiado difiere de una ventana diaria 16:8. No es una prueba de IF24 ni promete perder peso por usar un temporizador."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Le rythme étudié diffère d’une fenêtre quotidienne 16:8. Cet essai ne teste pas IF24 et ne promet pas de perte de poids grâce à un minuteur."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Badano inny harmonogram niż codzienne okno 16:8. To nie jest test IF24 ani obietnica schudnięcia dzięki timerowi."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "毎日の16:8とは異なるスケジュールの研究です。IF24を検証した試験ではなく、タイマーによる減量を約束するものでもありません。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "매일 16:8을 따르는 것과 다른 일정의 연구입니다. IF24를 시험한 것이 아니며 타이머 사용에 따른 체중 감량을 보장하지 않습니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "研究采用的安排不同于每日 16:8。这并非对 IF24 的测试，也不代表使用计时器就能减重。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الجدول المدروس يختلف عن نافذة 16:8 اليومية. هذه ليست تجربة على IF24، ولا وعدًا بخفض الوزن باستخدام مؤقّت."
+        }
+      }
+    }
+  },
+  "SourceReader.3.title": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Autophagy: understanding a mechanism"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Аутофагія: як працює механізм"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Autophagie: einen Mechanismus verstehen"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Autofagia: entender un mecanismo"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Autophagie : comprendre un mécanisme"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Autofagia: zrozumieć mechanizm"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "オートファジーの仕組みを知る"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "오토파지의 기전 이해하기"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "理解自噬机制"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الالتهام الذاتي: فهم الآلية"
+        }
+      }
+    }
+  },
+  "SourceReader.3.body": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Experiments mainly in mice linked FGF21–JMJD3 signaling to liver autophagy and lipid breakdown."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Експерименти переважно на мишах пов’язали сигналізацію FGF21–JMJD3 з аутофагією печінки та розщепленням жирів."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Experimente überwiegend an Mäusen verknüpften FGF21–JMJD3-Signale mit Autophagie und Fettabbau in der Leber."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Experimentos principalmente en ratones vincularon la señalización FGF21–JMJD3 con la autofagia hepática y la degradación de lípidos."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Des expériences surtout chez la souris ont relié la signalisation FGF21–JMJD3 à l’autophagie hépatique et à la dégradation des lipides."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Eksperymenty głównie na myszach powiązały sygnalizację FGF21–JMJD3 z autofagią w wątrobie i rozkładem tłuszczów."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "主にマウスを用いた実験で、FGF21–JMJD3シグナルが肝臓のオートファジーと脂質分解に関わることが示されました。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "주로 생쥐를 대상으로 한 실험에서 FGF21–JMJD3 신호가 간의 오토파지 및 지질 분해와 연결되었습니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "主要基于小鼠的实验将 FGF21–JMJD3 信号与肝脏自噬及脂质分解联系起来。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "ربطت تجارب على الفئران أساسًا إشارات FGF21–JMJD3 بالالتهام الذاتي في الكبد وتفكيك الدهون."
+        }
+      }
+    }
+  },
+  "SourceReader.3.limit": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "A mechanism is not a personal timetable. IF24 cannot detect autophagy or establish that it starts at a particular fasting hour in a person."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Механізм — не особистий розклад. IF24 не може виявити аутофагію чи встановити, що вона починається в певну годину голодування людини."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ein Mechanismus ist kein persönlicher Zeitplan. IF24 kann Autophagie weder erkennen noch ihren Beginn zu einer bestimmten Fastenstunde beim Menschen feststellen."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Un mecanismo no es un horario personal. IF24 no detecta la autofagia ni determina que empiece a una hora concreta del ayuno de una persona."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Un mécanisme n’est pas un calendrier individuel. IF24 ne peut ni détecter l’autophagie ni établir qu’elle commence à une heure précise de jeûne chez une personne."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mechanizm nie jest osobistym harmonogramem. IF24 nie wykrywa autofagii ani nie ustala, że zaczyna się ona w określonej godzinie postu u człowieka."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "仕組みの解明は個人の時間表ではありません。IF24はオートファジーを検出したり、人の断食何時間目に始まるかを確定したりできません。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "기전은 개인별 시간표가 아닙니다. IF24는 오토파지를 감지하거나 사람에게서 단식 몇 시간째에 시작되는지 확인할 수 없습니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "机制并不是个人时间表。IF24 无法检测自噬，也无法确定它会在个人禁食的某个小时开始。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الآلية ليست جدولًا شخصيًا. لا يستطيع IF24 رصد الالتهام الذاتي أو إثبات أنه يبدأ في ساعة معيّنة من صيام الإنسان."
+        }
+      }
+    }
+  },
+  "SourceReader.4.title": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fasting and metabolic health"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Голодування та метаболічне здоров’я"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Fasten und Stoffwechselgesundheit"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ayuno y salud metabólica"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Jeûne et santé métabolique"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Post a zdrowie metaboliczne"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "断食と代謝の健康"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "단식과 대사 건강"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "禁食与代谢健康"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الصيام وصحة الأيض"
+        }
+      }
+    }
+  },
+  "SourceReader.4.body": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This review discusses fasting schedules and metabolic outcomes, while highlighting the need for longer-term evidence."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Огляд розглядає режими голодування та метаболічні результати й наголошує на потребі довгострокових доказів."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dieser Überblick bespricht Fastenrhythmen und Stoffwechselergebnisse und betont den Bedarf an längerfristigen Daten."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Esta revisión aborda horarios de ayuno y resultados metabólicos, y destaca la necesidad de evidencia a largo plazo."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Cette revue examine les rythmes de jeûne et leurs résultats métaboliques, en soulignant le besoin de données à plus long terme."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Przegląd omawia harmonogramy postu i wyniki metaboliczne, podkreślając potrzebę danych długoterminowych."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "この総説は断食のスケジュールと代謝への影響を検討し、長期的な研究の必要性を指摘しています。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "이 종설은 단식 일정과 대사 결과를 논의하며 장기적 근거의 필요성을 강조합니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "这篇综述讨论了禁食安排及代谢结果，并强调需要更长期的证据。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "تناقش هذه المراجعة جداول الصيام والنتائج الأيضية، مع التأكيد على الحاجة إلى أدلة أطول أمدًا."
+        }
+      }
+    }
+  },
+  "SourceReader.4.limit": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This is context, not an individual treatment plan. IF24 records time; it does not measure metabolic health or decide whether fasting is suitable for you."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Це контекст, а не індивідуальний план лікування. IF24 записує час, але не вимірює метаболічне здоров’я й не визначає, чи підходить вам голодування."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Das ist Hintergrundwissen, kein individueller Behandlungsplan. IF24 erfasst Zeit, misst aber keine Stoffwechselgesundheit und entscheidet nicht, ob Fasten für dich geeignet ist."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Es contexto, no un tratamiento individual. IF24 registra tiempo; no mide la salud metabólica ni decide si ayunar es adecuado para ti."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Un éclairage, pas un traitement individuel. IF24 enregistre le temps ; il ne mesure pas la santé métabolique et ne décide pas si le jeûne vous convient."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "To kontekst, nie indywidualny plan leczenia. IF24 rejestruje czas; nie mierzy zdrowia metabolicznego ani nie określa, czy post jest dla ciebie odpowiedni."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "背景情報であり、個人の治療計画ではありません。IF24は時間を記録するもので、代謝の健康を測定したり、断食が適しているかを判断したりしません。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "배경정보이며 개인별 치료 계획이 아닙니다. IF24는 시간을 기록할 뿐, 대사 건강을 측정하거나 단식의 적합성을 판단하지 않습니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "这是背景知识，而非个人治疗方案。IF24 记录时间，不测量代谢健康，也不判断禁食是否适合你。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "هذا سياق معرفي، وليس خطة علاج فردية. يسجّل IF24 الوقت، ولا يقيس صحة الأيض أو يحدّد إن كان الصيام مناسبًا لك."
+        }
+      }
+    }
+  },
     "History.exportCaption": {
       "localizations": {
         "ar": {

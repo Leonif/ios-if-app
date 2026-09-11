@@ -48,26 +48,14 @@ struct AboutIF24View: View {
     let onPrivacy: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.openURL) private var openURL
+    let onOpenSource: (URL) -> Void
     /// The sheet is presented, so it starts a fresh environment and does not inherit
     /// the root's `dynamicTypeSize` ceiling — the accessibility sizes reach this view
     /// for real, and one slot has to know it.
     @Environment(\.dynamicTypeSize) private var typeSize
 
-    private struct Source: Identifiable {
-        let id: Int
-        let title: String
-        let url: String
-    }
-
-    private var sources: [Source] {
-        [
-            Source(id: 0, title: strings.Sources.source1, url: "https://pubmed.ncbi.nlm.nih.gov/22248338/"),
-            Source(id: 1, title: strings.Sources.source2, url: "https://pubmed.ncbi.nlm.nih.gov/28459931/"),
-            Source(id: 2, title: strings.Sources.source3, url: "https://www.nature.com/articles/s41467-020-14384-z"),
-            Source(id: 3, title: strings.Sources.source4, url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8839325/"),
-        ]
-    }
+    @State private var selectedSource: SourceArticle?
+    private var sources: [SourceArticle] { SourceArticle.all }
 
     var body: some View {
         let theme = ThemeTokens.resolve(colorScheme)
@@ -105,6 +93,9 @@ struct AboutIF24View: View {
             .padding(.bottom, 28)
         }
         .background(theme.sheetBg.ignoresSafeArea())
+        .sheet(item: $selectedSource) { article in
+            SourceArticleView(article: article, onOpenOriginal: onOpenSource)
+        }
     }
 
     // MARK: Sections
@@ -288,18 +279,17 @@ struct AboutIF24View: View {
         groupCard(theme) {
             ForEach(sources) { source in
                 Button {
-                    if let url = URL(string: source.url) { openURL(url) }
+                    selectedSource = source
                 } label: {
                     HStack(spacing: 12) {
-                        // Paper titles are English citations and stay left-to-right
-                        // even in a mirrored sheet; only their alignment flips.
+                        // Localized editorial titles lead to an offline reader.
                         Text(source.title)
                             .font(.hanken(15))
                             .lineSpacing(15 * 0.15)
                             .foregroundColor(theme.ink)
                             .fixedSize(horizontal: false, vertical: true)
                         Spacer(minLength: 8)
-                        ExternalLinkArrow(color: theme.mut)
+                        chevron(theme)
                     }
                     .frame(minHeight: 56)
                     .padding(.vertical, 10)
@@ -307,6 +297,7 @@ struct AboutIF24View: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("about.source.\(source.id)")
                 if source.id < sources.count - 1 { divider(theme) }
             }
         }

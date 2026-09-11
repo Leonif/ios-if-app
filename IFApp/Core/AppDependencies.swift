@@ -8,6 +8,9 @@
 
 enum AppDependencies {
     static func register() {
+        container.register(ExternalLinkRepositoryProtocol.self) {
+            ExternalLinkRepository()
+        }
         container.register(TimerPersistenceRepositoryProtocol.self) {
             TimerPersistenceRepository()
         }
