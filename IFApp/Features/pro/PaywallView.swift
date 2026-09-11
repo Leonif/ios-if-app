@@ -10,7 +10,8 @@
 //
 //  Every vertical slot is a `minHeight`. A `frame(height:)` on any slot that carries
 //  text would clip Japanese and Korean at the default type size, straight out of the
-//  box.
+//  box. The floors themselves are English measurements, so on a column with no room
+//  to spare they step aside for what the text actually took — see `Metrics`.
 //
 
 import SwiftUI
@@ -33,28 +34,30 @@ struct PaywallView: View {
 
     /// Content only — the opaque surface it sits on is `PaywallBackdrop`, drawn by the
     /// flow outside the part that switches. See that type for why.
+    ///
+    /// Three candidates of the same column, first that fits wins.
+    ///
+    /// The offer was drawn at 390 × 844 (`IF24 Pro Offer.dc.html`). A 375 × 667
+    /// screen is 177pt shorter, and in the text-heavier locales the reading matter
+    /// outgrows it: at default type size the third benefit — the one the framing
+    /// line does not introduce — ended up under the bottom fade in en, de, ja, uk
+    /// and fr, its caption off-screen. In Japanese the fade reached the row's title
+    /// too, and a dimmed dot over a dimmed title reads as a disabled benefit rather
+    /// than a cut one — which is how it was reported.
+    ///
+    /// `.roomy` is the handoff's default frame, unchanged — every screen that fits
+    /// it still gets exactly the layout the reference frames were verified against.
+    /// `.tight` is the handoff's *own* answer to a column that has run out of room:
+    /// the overflow frame (group E, "S1 · xxLarge") tightens the same three gaps
+    /// and nothing else. The scrolling candidate is the floor under both: at xxLarge
+    /// — the ceiling the app pins Dynamic Type to, `AppFlowView.swift:69` — no set of
+    /// gaps fits the longer locales, and the fade over a scrolling region is what
+    /// that frame draws.
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            closeRow
-            // Close above, price and button below, the reading matter between them
-            // in a scroll view. The three parts are what the flexible column was
-            // already doing — the list top-aligned, the price block bottom-pinned —
-            // except the slack now belongs to the scroll view instead of a
-            // `Spacer`, so it can go negative without anything overlapping.
-            //
-            // Why the two controls stay outside it: at xxLarge in German the title
-            // takes two lines and the S4 body four, and a single scroll view over
-            // the whole column would carry Close off the top and Buy off the bottom
-            // at the same moment. Both have to be reachable in one gesture at any
-            // size, and pinning them costs nothing at the sizes the screen was
-            // drawn for — the layout below xxLarge is pixel-identical to the
-            // `Spacer` version.
-            readingBlock
-            bottomBlock
-                // The old `Spacer(minLength: 26)`, now a gap that cannot collapse:
-                // it sits outside the scroll view, so a clipped last benefit still
-                // clears the price by 26pt instead of touching it.
-                .padding(.top, 26)
+        ViewThatFits(in: .vertical) {
+            column(.roomy, scrolls: false)
+            column(.tight, scrolls: false)
+            column(.tight, scrolls: true)
         }
         .padding(.horizontal, 24)
         .padding(.top, 16)
@@ -62,31 +65,85 @@ struct PaywallView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    /// Title, body and the benefit list. Scrolls only when it has to: the bounce is
-    /// tied to the content size, so at the sizes that fit the screen still reads as
-    /// the fixed surface it is drawn as, with nothing to rubber-band.
+    /// The vertical numbers of the column, and the only thing that separates a
+    /// screen with room from one without.
     ///
-    /// The bottom edge dissolves over `Self.fadeHeight` instead of being cut: the
-    /// handoff's overflow frame (`IF24 Pro Offer.dc.html`, group E — "Dynamic Type
-    /// xxLarge · S1") draws a 36pt gradient to the background over the scrolling
-    /// region, and the scroll view shipped without it. On a 375×667 screen the
-    /// English S1 needs about 150pt more than it gets, so what a guillotined edge
-    /// reads as there is a rendering fault, not "there is more below".
-    private var readingBlock: some View {
-        ScrollView(.vertical) {
-            VStack(alignment: .leading, spacing: 0) {
-                titleSlot
-                bodySlot
-                benefitList
+    /// The two slot floors are English measurements — `spec.md` gives them as
+    /// "Title slot height 40" and "Body slot min-height 56" — and the same spec
+    /// says in as many words that its pt values "come from Hanken metrics and do
+    /// not transfer" to ar/ja/ko/zh/uk. They hold the grid steady across the six
+    /// states while there is room to hold it; when there is not, a one-line
+    /// Japanese framing line reserving two English lines of empty space is 25pt
+    /// taken from the benefit list directly below it.
+    private struct Metrics {
+        /// Close control to title.
+        let closeGap: CGFloat
+        /// Body slot to the first benefit.
+        let listGap: CGFloat
+        /// Reading matter to the price block — a gap that cannot collapse, so a
+        /// clipped last benefit never touches the price.
+        let priceGap: CGFloat
+        let titleFloor: CGFloat
+        let bodyFloor: CGFloat
+
+        /// Group A, "S1": close margin-bottom 10, list margin-top 26, price block
+        /// `margin-top: auto` (the 26 is this app's floor under an elastic gap).
+        static let roomy = Metrics(closeGap: 10, listGap: 26, priceGap: 26,
+                                   titleFloor: 40, bodyFloor: 56)
+        /// Group E, "S1 · xxLarge": close margin-bottom 6, list margin-top 20,
+        /// price block padding-top 12.
+        static let tight = Metrics(closeGap: 6, listGap: 20, priceGap: 12,
+                                   titleFloor: 0, bodyFloor: 0)
+    }
+
+    /// Close above, price and button below, the reading matter between them. The
+    /// two controls are never what goes off-screen: at xxLarge in German the title
+    /// takes two lines and the S4 body four, and a single scroll
+    /// view over the whole column would carry Close off the top and Buy off the
+    /// bottom at the same moment. Both have to be reachable in one gesture at any
+    /// size.
+    private func column(_ metrics: Metrics, scrolls: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            closeRow
+                .padding(.bottom, metrics.closeGap)
+            if scrolls {
+                scrollingReading(metrics)
+                bottomBlock
+                    .padding(.top, metrics.priceGap)
+            } else {
+                reading(metrics)
+                // Outside any scrolling region, so the gap is a floor and the slack
+                // above the price block belongs to the reading matter, not to a
+                // fixed offset.
+                Spacer(minLength: metrics.priceGap)
+                bottomBlock
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    /// Title, body and the benefit list.
+    private func reading(_ metrics: Metrics) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            titleSlot(metrics)
+            bodySlot(metrics)
+            benefitList(metrics)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// The same reading matter when no set of gaps can fit it — the accessibility
+    /// type sizes. Scrolls, and its bottom edge dissolves over `Self.fadeHeight`
+    /// instead of being cut: the handoff's overflow frame draws a 36pt gradient to
+    /// the background over the scrolling region.
+    private func scrollingReading(_ metrics: Metrics) -> some View {
+        ScrollView(.vertical) {
+            reading(metrics)
         }
         .scrollBounceBehavior(.basedOnSize)
         // The fade is drawn over the viewport, so the last line has to be able to
         // travel out from under it — otherwise scrolling to the end leaves the very
         // words the fade exists to promise half-transparent. The inset is exactly the
-        // fade's height and only ever adds scrollable slack: content that fits still
-        // sits at the top with the gradient over empty space.
+        // fade's height and only ever adds scrollable slack.
         .contentMargins(.bottom, Self.fadeHeight, for: .scrollContent)
         // As a mask rather than the handoff's opaque `--bg` overlay: the offer's
         // surface carries the phase tint (`PaywallBackdrop`), and a flat rectangle of
@@ -128,31 +185,30 @@ struct PaywallView: View {
         // The 44pt tap target overhangs the gutter by 10 so the glyph itself, not
         // its target, lines up with the content edge.
         .padding(.trailing, -10)
-        .padding(.bottom, 10)
     }
 
-    private var titleSlot: some View {
+    private func titleSlot(_ metrics: Metrics) -> some View {
         Text(title)
             .font(.bricolage(25, .semibold))
             .displayTracking(25, -0.015)
             .foregroundColor(theme.ink)
             .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: metrics.titleFloor, alignment: .leading)
     }
 
-    private var bodySlot: some View {
+    private func bodySlot(_ metrics: Metrics) -> some View {
         Text(bodyText)
             .font(.hanken(17))
             .lineSpacing(17 * 0.3)
             .foregroundColor(theme.sec)
             .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, minHeight: 56, alignment: .topLeading)
+            .frame(maxWidth: .infinity, minHeight: metrics.bodyFloor, alignment: .topLeading)
             .padding(.top, 6)
     }
 
     // MARK: Benefits
 
-    private var benefitList: some View {
+    private func benefitList(_ metrics: Metrics) -> some View {
         VStack(alignment: .leading, spacing: 20) {
             ForEach(benefits) { benefit in
                 HStack(alignment: .top, spacing: 14) {
@@ -170,7 +226,7 @@ struct PaywallView: View {
                 }
             }
         }
-        .padding(.top, 26)
+        .padding(.top, metrics.listGap)
         .opacity(listOpacity)
     }
 

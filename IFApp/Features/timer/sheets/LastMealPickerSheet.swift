@@ -271,7 +271,11 @@ struct LastMealPickerSheet: View {
     private var exactTimeSheet: some View {
         NavigationStack {
             DatePicker(
-                "",
+                // `String()`, not `""` — see the same call in `PlanEditorSheet`: a bare
+                // literal here is a `LocalizedStringKey` and the extractor writes it
+                // into the catalog as a key made of nothing. `.labelsHidden()` below
+                // takes care of the label itself; this takes care of the catalog.
+                String(),
                 selection: $exactDate,
                 in: Date().addingTimeInterval(-Double(MealScale.maxMinutes) * 60)...Date(),
                 displayedComponents: [.date, .hourAndMinute]

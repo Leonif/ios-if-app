@@ -228,7 +228,14 @@ struct PlanEditorSheet: View {
 
     private var hourPicker: some View {
         VStack(spacing: 0) {
-            Picker("", selection: Binding(get: { shown.hours }, set: { draftHours = $0 })) {
+            // `String()`, not `""`: a bare literal in this position is a
+            // `LocalizedStringKey`, and the extractor turns it into a catalog key made
+            // of nothing — ten empty locales nobody can fill or retire. That key has
+            // been deleted by hand three times now (last two: `9c5aab0`, Queue-14) and
+            // came back with the next build each time, because the two places that
+            // emit it were never the ones edited. The `StringProtocol` overload takes
+            // the same empty label and is not extracted. The wheel hides it either way.
+            Picker(String(), selection: Binding(get: { shown.hours }, set: { draftHours = $0 })) {
                 ForEach(Array(Plan.range), id: \.self) { hours in
                     Text(strings.Duration.hoursSpelled(hours)).tag(hours)
                 }

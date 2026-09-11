@@ -2408,9 +2408,6 @@
       "extractionState": "manual",
       "comment": "History export row; independent copy of the approved offer translation."
     },
-    "" : {
-
-    },
     "%@ · goal end" : {
       "comment" : "Caption under the exact-time value (S3). %@ = a day name (Today / Yesterday / n days ago).",
       "extractionState" : "manual",
@@ -11970,10 +11967,64 @@
       "comment" : "The framing line under the offer's headline, shown only when the offer was opened from the locked CSV export in History. Sits directly above the benefit list, whose first item is \"History as CSV\" / \"Export every fast you have logged, whenever you like.\" — so this line must not repeat that wording. Same register and length class as the other two framing lines (Pro.framingCustom, Pro.framingProtectedDay); it wraps freely, no hard budget.",
       "extractionState" : "manual",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "بياناتك لك، خذها كاملةً كملف متى شئت."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Daten gehören dir - du bekommst sie jederzeit komplett als Datei."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your record is yours - take the whole history out as a file whenever you want it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus datos son tuyos: puedes exportarlos por completo en cualquier momento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos données vous appartiennent - vous pouvez tout récupérer en fichier, à tout moment."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "履歴は自分のもの、まるごと持ち出せます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "기록은 온전히 내 것이에요. 원할 때마다 파일로 통째로 꺼내 가요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje dane należą do ciebie - możesz zabrać całą historię jako plik, w dowolnej chwili."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваші дані належать вам - ви можете забрати їх файлом у будь-який момент."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这些数据属于你，随时可以把完整历史导出成文件。"
           }
         }
       }
