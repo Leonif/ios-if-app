@@ -166,6 +166,14 @@ struct TimerFlowView: View {
     @State private var goalHaloOpacity: Double = 0
     @State private var goalSweepAngle: Double = 0
     @State private var goalSweepOpacity: Double = 0
+    /// Whether the goal moment has already been played for the `.goalReached` frame
+    /// currently on screen. It exists because the moment now has two entries — the
+    /// state edge and the view appearing already in `.goalReached` — and a single
+    /// crossing can arrive through both. The reducer is idempotent, but the haptic
+    /// and the `goal_reached` event are not. Cleared by the first sync that sees a
+    /// state other than `.goalReached`: leaving the frame makes the next entry a new
+    /// moment.
+    @State private var goalMomentPlayed = false
 
     init(store: Store<AppState>) {
         self.store = store
@@ -454,6 +462,20 @@ struct TimerFlowView: View {
         .onChange(of: state) { _, newState in
             syncGoalMoment(to: newState)
             reconcileEating(newState)
+        }
+        // ...and the same two on appearance, because an edge is not the only way into
+        // a state. `body` switches between the untimed branch and the `TimelineView`
+        // one on `isRunning`/`isEating`, which rebuilds this subtree wholesale — the
+        // same rebuild T1' had to be lifted out of the screen to survive. Confirming a
+        // back-dated last meal past the goal starts the fast and flips the branch in
+        // one step, so the screen is *born* in `.goalReached` and an `onChange` on a
+        // view that has just been created never sees its first value. The outer
+        // `.onAppear` cannot stand in for this one: it ran once, on the idle screen,
+        // before the branch flipped. `goalMomentPlayed` keeps the two entries from
+        // playing the same crossing twice.
+        .onAppear {
+            syncGoalMoment(to: state)
+            reconcileEating(state)
         }
     }
 
@@ -855,12 +877,21 @@ struct TimerFlowView: View {
     /// moment (+ haptic + analytics) only on a genuine first crossing; a relaunch
     /// mid-overtime (`hasCelebrated` already set) restores the settled end-state.
     private func syncGoalMoment(to state: ScreenState) {
-        guard state == .goalReached else { return }
+        guard state == .goalReached else {
+            // Out of the goal frame: whatever comes back into it is a new moment.
+            goalMomentPlayed = false
+            return
+        }
         // iOS renders backgrounded apps (app-switcher snapshots), so a plain state
         // check would burn the one-shot moment — haptic and all — with nobody
         // watching, leaving a settled seal for whoever taps the push later.
         // onChange(scenePhase) above replays this the moment we're visible again.
         guard scenePhase == .active else { return }
+        // Played once per entry, no matter how many callers report the same entry:
+        // the state edge, this screen appearing already in `.goalReached`, and the
+        // scene coming back to the foreground can all name one crossing.
+        guard !goalMomentPlayed else { return }
+        goalMomentPlayed = true
         let haloTarget = colorScheme == .dark ? 0.95 : 0.6
 
         if props.hasCelebrated {
