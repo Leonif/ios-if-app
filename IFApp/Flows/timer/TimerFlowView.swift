@@ -296,8 +296,7 @@ struct TimerFlowView: View {
         // up it slides *under* the floating plan pill / notes icon and stays visible
         // around them. The footer stays pinned above the home indicator. The middle
         // (ring/editorial/timeline) scrolls between them so a short screen (SE) can
-        // reach the timeline. The completed screen uses a smaller ring on short
-        // viewports to keep the whole result visible above its taller footer.
+        // reach the timeline while the full 280pt ring holds its resting spot.
         GeometryReader { proxy in
             let insets = proxy.safeAreaInsets
             // Header geometry. `headerTop` matches the old .padding(.top, 14); the
@@ -306,11 +305,7 @@ struct TimerFlowView: View {
             // rests below the header exactly where it did before, yet can scroll under it.
             let headerTop: CGFloat = 14
             let headerHeight: CGFloat = 34
-            // The completed screen has the tallest footer. On short viewports,
-            // reserve its space by reducing the decorative ring, not action/text sizes.
-            let compactComplete = state == .complete && proxy.size.height < 700
-            let ringDiameter: CGFloat = compactComplete ? 210 : 280
-            let headerGap: CGFloat = compactComplete ? 12 : 24
+            let headerGap: CGFloat = 24
 
             ScrollView(.vertical, showsIndicators: false) {
                 Group {
@@ -349,7 +344,7 @@ struct TimerFlowView: View {
                                 // the centre, instead of healing shut behind it.
                                 PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
                                           isComplete: state == .complete || state == .goalReached, theme: theme,
-                                          diameter: ringDiameter,
+                                          diameter: 280,
                                           sealDiameter: state == .complete || state == .goalReached
                                               ? GoalMomentView.sealDiameter : 0)
                                 if state == .goalReached {
