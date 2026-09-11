@@ -4472,7 +4472,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un jour manqué reste un jour manqué : votre série continue de compter là où elle en était."
+            "value" : "Un jour manqué reste un jour manqué : votre série reprend là où elle était."
           }
         },
         "ja" : {
@@ -11994,7 +11994,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vos données vous appartiennent - vous pouvez tout récupérer en fichier, à tout moment."
+            "value" : "Vos données vous appartiennent - vous les récupérez en fichier, à tout moment."
           }
         },
         "ja" : {
@@ -14118,7 +14118,68 @@
       }
     },
     "This fast overlaps one you already saved (%@). To end it, open that fast and delete it." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يتداخل هذا الصيام مع صيام محفوظ (%@). لإنهائه، يجب فتح ذلك الصيام وحذفه."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Fasten überschneidet sich mit einem gespeicherten (%@). Um es zu beenden, öffne das gespeicherte Fasten und lösche es."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This fast overlaps one you already saved (%@). To end it, open that fast and delete it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este ayuno se solapa con uno que ya guardaste (%@). Para terminarlo, abre ese ayuno y bórralo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chevauche un jeûne déjà enregistré (%@). Pour y mettre fin, ouvrez ce jeûne et supprimez-le."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存済みの断食（%@）と重なっています。終了するには、その断食を開いて削除してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 저장된 단식과 겹쳐요 (%@). 종료하려면 그 단식을 열어 삭제하세요."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To nachodzi na zapisany post (%@). Aby go zakończyć, otwórz ten post i usuń go."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цей піст перетинається зі збереженим (%@). Щоб завершити поточний піст, відкрийте той і видаліть його."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此次断食与已保存的断食（%@）重叠。若要结束，请打开那次断食并删除。"
+          }
+        }
+      }
     },
     "This overlaps a fast you already saved (%@). Pick another time, or open that fast and delete it." : {
       "comment" : "Refusal reason (S4). %@ = the saved fast's span. Budgeted at 4 German lines. ar: do not use bare السجل for a single record - it also names the History screen.",
