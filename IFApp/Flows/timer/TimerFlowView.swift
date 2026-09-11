@@ -339,13 +339,12 @@ struct TimerFlowView: View {
                     } else {
                         VStack(spacing: 20) {
                             ZStack {
-                                // Same break in `.complete` as in `.goalReached`: the ring
-                                // keeps its shape when the seal hands over to the check in
-                                // the centre, instead of healing shut behind it.
+                                // Reserve a gap only while the goal seal sits on the arc.
+                                // Once the check moves to the centre, close the completed ring.
                                 PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
                                           isComplete: state == .complete || state == .goalReached, theme: theme,
                                           diameter: 280,
-                                          sealDiameter: state == .complete || state == .goalReached
+                                          sealDiameter: state == .goalReached
                                               ? GoalMomentView.sealDiameter : 0)
                                 if state == .goalReached {
                                     GoalMomentView(sealScale: goalSealScale, haloOpacity: goalHaloOpacity,
