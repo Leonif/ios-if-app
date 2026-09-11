@@ -30,6 +30,8 @@ final class AnalyticsEventTests: XCTestCase {
         .timeAdjusted,
         .lastMealLogged(backdated: true, minutesAgo: 7, inputMethod: "ribbon"),
         .sourcesOpened,
+        .sunnahOpened(source: "about"),
+        .sunnahEnabled(mode: "white_days", pushAllowed: false),
         .historyOpened(source: "streak_badge"),
         .historyRecordDeleted,
         .historyExported,
@@ -110,7 +112,7 @@ final class AnalyticsEventTests: XCTestCase {
         let names = Self.catalog.map(\.name)
         XCTAssertEqual(Set(names).count, names.count, "duplicate sample in the catalog")
         XCTAssertEqual(
-            names.count, 26,
+            names.count, 28,
             "AnalyticsEvent gained or lost a case — add its sample to `catalog` and "
             + "update this count"
         )

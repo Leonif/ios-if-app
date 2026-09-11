@@ -46,6 +46,10 @@ struct AboutIF24View: View {
     let onOpenOffer: () -> Void
     let onRestore: () -> Void
     let onPrivacy: () -> Void
+    /// The second door into the Sunnah reminders screen. Until it existed the
+    /// release's one free headline feature was reachable only by tapping the pencil
+    /// inside the plan pill — a control whose whole promise is that it edits the plan.
+    let onSunnah: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme
     let onOpenSource: (URL) -> Void
@@ -70,6 +74,13 @@ struct AboutIF24View: View {
                 overline(strings.Pro.productName, theme)
                 proSection(theme)
                 caption(strings.Pro.sectionFooter, theme)
+
+                // No overline of its own: the row's own label is the name of the
+                // thing, and a heading above it would only repeat that name. It sits
+                // above Privacy rather than below the research because this sheet is
+                // ordered by what a person came here to do, and the science is the
+                // reading matter at the end.
+                sunnahSection(theme)
 
                 overline(strings.Pro.privacyShort, theme)
                 privacySection(theme)
@@ -255,6 +266,29 @@ struct AboutIF24View: View {
                 .multilineTextAlignment(alignment)
                 .accessibilityIdentifier("about.pro.status")
         }
+    }
+
+    private func sunnahSection(_ theme: ThemeTokens) -> some View {
+        groupCard(theme) {
+            Button(action: onSunnah) {
+                HStack(spacing: 12) {
+                    Text(SunnahStrings.title)
+                        .font(.hanken(16, .medium))
+                        .foregroundColor(theme.ink)
+                        // The longest of the free rows in German and Ukrainian: it
+                        // wraps rather than shrinking, and the row grows with it.
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                    chevron(theme)
+                }
+                .frame(minHeight: 52)
+                .padding(.horizontal, 16)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("about.sunnah")
+        }
+        .padding(.bottom, 26)
     }
 
     private func privacySection(_ theme: ThemeTokens) -> some View {

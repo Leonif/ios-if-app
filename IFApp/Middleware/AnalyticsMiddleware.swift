@@ -22,6 +22,23 @@ final class AnalyticsMiddleware: Middleware {
     /// trigger the reducer has just cleared; this snapshot is where it still exists.
     /// Same device as `HistoryMiddleware.previousTimer`, for the same reason.
     private var previousPro: ProState?
+    /// Sunnah substate as of the previous action, for the same reason and by the same
+    /// device as `previousPro`: the one fact `sunnah_enabled` hangs off — that nothing
+    /// was scheduled until this write — exists only *before* the write, and middleware
+    /// is handed the state after it.
+    private var previousSunnah: SunnahState?
+    /// A `settingsChanged` armed a schedule that was not armed before, and the answer
+    /// that says whether it can be delivered has not arrived yet.
+    ///
+    /// It exists because "the reminders were switched on" is an *edge*, and every
+    /// control on that screen writes through the same action: the two switches and the
+    /// reminder time all emit `settingsChanged`, and the time control is a wheel that
+    /// emits one per detent. Read as "a write landed on an enabled schedule", the
+    /// event would count a schedule armed once and then nudged by an hour as a dozen
+    /// armings — and, worse, would count switching *off* one of two schedules as
+    /// arming the other. The edge lives in `previousSunnah`, which is the settings as
+    /// they stood before the write, and nowhere else.
+    private var armingAwaitingAnswer = false
 
     init(repo: AnalyticsRepositoryProtocol = container.inject()) {
         self.repo = repo
@@ -31,7 +48,12 @@ final class AnalyticsMiddleware: Middleware {
 
     func handle<State: Equatable>(action: Action, state: State, dispatch: DispatchFunction) {
         let app = state as? AppState
-        defer { if let app { previousPro = app.proState } }
+        defer {
+            if let app {
+                previousPro = app.proState
+                previousSunnah = app.sunnahState
+            }
+        }
         switch action {
         case let lifecycle as AppLifecycleAction:
             if case .appOpened = lifecycle, let app { reportCurrentPlan(app.planState.plan) }
@@ -53,7 +75,57 @@ final class AnalyticsMiddleware: Middleware {
             if let app { reportProStatus(app.proState.entitlement) }
         case let endFast as EndFastAction:
             handle(endFast)
+        case let sunnah as SunnahAction:
+            if let app { handle(sunnah, settings: app.sunnahState.settings) }
         default:
+            break
+        }
+    }
+
+    /// The Sunnah opt-in. One event per switching-on, split across the two actions it
+    /// takes to know both halves of it: which schedule was armed, and whether a
+    /// reminder can be delivered at all.
+    ///
+    /// The subject is an edge, and the screen offers no action that states it. Both
+    /// switches and the reminder time write through `settingsChanged`, and the reducer
+    /// answers every one of them with `.checking` while the middleware goes and asks —
+    /// so "a write landed on an enabled schedule" is true of a time nudged by an hour
+    /// and of one of two switches being turned *off*, neither of which is anybody
+    /// switching anything on. The edge is read from `previousSunnah` instead, and the
+    /// note it leaves is spent by the delivery answer that follows.
+    private func handle(_ action: SunnahAction, settings: SunnahSettings) {
+        switch action {
+        case .settingsChanged:
+            if !settings.enabled {
+                // Switched off before the answer came back: there is no longer a
+                // schedule for the note to describe.
+                armingAwaitingAnswer = false
+            } else if previousSunnah?.settings.enabled == false {
+                // The edge, and the only place it is visible: nothing was scheduled
+                // before this write and something is scheduled after it.
+                armingAwaitingAnswer = true
+            }
+            // A write on a schedule that was already armed — a time moved, a second
+            // schedule added, one of two switched off — is left alone deliberately,
+            // rather than assigned `false`. Assignment looked equivalent and was not:
+            // flipping the second switch before the first one's answer arrives is one
+            // switching-on, and the second write would have swallowed the note the
+            // first one left. The window is the length of a scheduling round trip,
+            // and the length of the permission dialog when that is up.
+        case let .deliveryUpdated(delivery, _):
+            // Raised on the answer rather than on the tap: half of what the event
+            // reports is whether a reminder can be delivered at all, and the
+            // permission is only known once it has been read. A `deliveryUpdated` from
+            // a refresh, a cold start, a day change or a time-zone change finds no
+            // note here and is silent.
+            guard armingAwaitingAnswer else { return }
+            armingAwaitingAnswer = false
+            // Denied is the one delivery state that means nothing was written.
+            // `.failed` is a permission that exists and a schedule that did not take —
+            // a different fact, and not this parameter's.
+            repo.log(.sunnahEnabled(mode: settings.analyticsMode,
+                                    pushAllowed: delivery != .denied))
+        case .refresh:
             break
         }
     }
@@ -144,6 +216,7 @@ final class AnalyticsMiddleware: Middleware {
         switch action {
         case .appOpened: repo.log(.appOpened)
         case .sourcesOpened: repo.log(.sourcesOpened)
+        case let .sunnahOpened(source): repo.log(.sunnahOpened(source: source.rawValue))
         case let .historyOpened(source): repo.log(.historyOpened(source: source.rawValue))
         case let .reviewPrompted(trigger): repo.log(.reviewPrompted(trigger: trigger.rawValue))
         case let .streakMilestone(days): repo.log(.streakMilestone(days: days))

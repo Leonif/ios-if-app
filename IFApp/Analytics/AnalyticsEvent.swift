@@ -71,6 +71,20 @@ enum AnalyticsEvent {
     case lastMealLogged(backdated: Bool, minutesAgo: Int, inputMethod: String)
     /// User opened the scientific Sources screen.
     case sourcesOpened
+    /// User opened the Sunnah reminders screen. `source` = which door
+    /// ("plan_editor" / "about"). The release's one free headline feature had a
+    /// single door until now, and how many people ever find it is the question the
+    /// second door was added to answer — which needs the two counted apart.
+    case sunnahOpened(source: String)
+    /// User armed the Sunnah reminders, and whether they can actually be delivered.
+    /// `mode` = which schedule ("weekly" / "white_days" / "both"); `push_allowed` =
+    /// the notification permission was in place when the schedule was written.
+    ///
+    /// The second parameter is not a diagnostic. It measures the cohort who turned
+    /// the feature on and will never hear from it, which is a product fact about the
+    /// permission ask and not a bug report. Raised once per arming, on the answer
+    /// rather than on the tap — the permission is only known after it has been read.
+    case sunnahEnabled(mode: String, pushAllowed: Bool)
     /// User opened the fasting history screen. `source` = which entry point
     /// ("streak_badge" / "complete_card" / "eating_window").
     case historyOpened(source: String)
@@ -143,6 +157,8 @@ enum AnalyticsEvent {
         case .endFastRefused: return "end_fast_refused"
         case .lastMealLogged: return "last_meal_logged"
         case .sourcesOpened: return "sources_opened"
+        case .sunnahOpened: return "sunnah_opened"
+        case .sunnahEnabled: return "sunnah_enabled"
         case .historyOpened: return "history_opened"
         case .historyRecordDeleted: return "history_record_deleted"
         case .historyExported: return "history_exported"
@@ -211,6 +227,15 @@ enum AnalyticsEvent {
             return ["days": code(days, width: 2)]
         case let .historyOpened(source):
             return ["source": source]
+        case let .sunnahOpened(source):
+            return ["source": source]
+        case let .sunnahEnabled(mode, pushAllowed):
+            return [
+                "mode": mode,
+                // Text, like every other flag in this catalog: a `Bool` bridges to
+                // `NSNumber` and the dimension comes back `(not set)`.
+                "push_allowed": pushAllowed ? "true" : "false",
+            ]
         case let .historyLoadFailed(reason):
             return ["reason": reason]
         case let .planSelected(plan, goalHours),

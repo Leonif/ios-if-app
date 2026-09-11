@@ -161,6 +161,10 @@ struct TimerFlowView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var props: TimerScreenProps
     @State private var showSunnah = false
+    /// The About sheet's Sunnah row was tapped and the sheet is on its way out. It is
+    /// a note between two updates, not state: the reminders screen opens on the far
+    /// side of the dismissal and the flag is spent there.
+    @State private var sunnahRequestedFromAbout = false
     @State private var showSources = false
     @State private var showHistory = false
     /// The record History should open on — the fast a refusal named, so the person
@@ -222,13 +226,25 @@ struct TimerFlowView: View {
         // history's export lock became a second door into it: the history is pushed
         // on this screen, so an overlay hosted here renders *under* it.
         .sheet(isPresented: $showSunnah) { SunnahFlowView(store: store) }
-        .sheet(isPresented: $showSources) {
-            AboutFlowView(store: store).presentationDragIndicator(.visible)
+        // The reminders screen's second door lives inside this sheet, and one sheet
+        // cannot be swapped for another in a single update — SwiftUI drops the second
+        // presentation and nothing appears. So the row only asks: it dismisses the
+        // About sheet and leaves a note, and the note is spent here, once the
+        // dismissal has actually finished. The screen stays presented from this one
+        // host, which is what decision 05.08.2026 requires of a screen with two
+        // entries, and both doors now land in the same place on close — the timer,
+        // not the surface the person came from.
+        .sheet(isPresented: $showSources, onDismiss: openSunnahIfRequested) {
+            AboutFlowView(store: store, onSunnah: requestSunnahFromAbout)
+                .presentationDragIndicator(.visible)
         }
         // The About sheet is one of the doors into the offer, and the offer is behind
-        // it. Opening one closes the other.
+        // it. Opening one closes the other. The Sunnah request is dropped with it: the
+        // person asked for the offer, and a reminders screen rising behind it on the
+        // way down is not what they asked for.
         .onChange(of: props.offerOpen) { _, isOpen in
             if isOpen {
+                sunnahRequestedFromAbout = false
                 showSources = false
                 showSunnah = false
             }
@@ -703,6 +719,28 @@ struct TimerFlowView: View {
         showSources = true
     }
 
+    /// The About sheet's Sunnah row was tapped: dismiss the sheet and leave a note for
+    /// the far side of the dismissal.
+    private func requestSunnahFromAbout() {
+        sunnahRequestedFromAbout = true
+        showSources = false
+    }
+
+    /// Spends the note left by the row above, once the dismissal has finished.
+    ///
+    /// The event goes out here rather than on the tap, and the difference is the whole
+    /// reason the two doors can be compared at all. The request can be dropped on the
+    /// way down — the offer rising over the sheet cancels it — and logged at the tap
+    /// that would be an opening GA4 counts and the user never saw. The plan editor's
+    /// door is an overlay and opens in the same update as its tap, so there it is one
+    /// moment; here it is two, and this is the one that means "the screen opened".
+    private func openSunnahIfRequested() {
+        guard sunnahRequestedFromAbout else { return }
+        sunnahRequestedFromAbout = false
+        store.dispatch(AppLifecycleAction.sunnahOpened(source: .about))
+        showSunnah = true
+    }
+
     /// The delay from the eating window card arriving to the offer starting to rise.
     /// From the handoff (`design-handoff/paywall/brief.md`). The card has no animated
     /// transition of its own, so the state change is the moment it is rendered and
@@ -780,6 +818,7 @@ struct TimerFlowView: View {
                 onClose: { store.dispatch(UIAction.planEditorClosed) },
                 onSunnah: {
                     store.dispatch(UIAction.planEditorClosed)
+                    store.dispatch(AppLifecycleAction.sunnahOpened(source: .planEditor))
                     showSunnah = true
                 }
             )

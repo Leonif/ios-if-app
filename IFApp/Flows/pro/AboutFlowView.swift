@@ -36,9 +36,17 @@ struct AboutFlowView: View {
     private let store: Store<AppState>
     @State private var props: AboutProps
     @Environment(\.openURL) private var openURL
+    /// The Sunnah door, handed up rather than presented here. The reminders screen has
+    /// two entries — the plan editor's row and this one — and an screen with more than
+    /// one entry is presented from the nearest common ancestor of its entries
+    /// (decision 05.08.2026), which is the timer: it already hosts this sheet and that
+    /// one. Presented here it would have had a second host and a second flag, and the
+    /// two doors would have disagreed about where closing the reminders screen lands.
+    private let onSunnah: () -> Void
 
-    init(store: Store<AppState>) {
+    init(store: Store<AppState>, onSunnah: @escaping () -> Void) {
         self.store = store
+        self.onSunnah = onSunnah
         _props = State(initialValue: AboutProps(state: store.getCurrentState()))
     }
 
@@ -51,6 +59,7 @@ struct AboutFlowView: View {
             onOpenOffer: { store.dispatch(ProAction.offerOpened(trigger: .manual)) },
             onRestore: { store.dispatch(RestorePurchasesThunk()) },
             onPrivacy: { openURL(SiteLinks.privacyPolicy) },
+            onSunnah: onSunnah,
             onOpenSource: { store.dispatch(OpenExternalLinkThunk(url: $0)) }
         )
         .animation(.easeInOut(duration: 0.18), value: props.showsNothingToRestore)

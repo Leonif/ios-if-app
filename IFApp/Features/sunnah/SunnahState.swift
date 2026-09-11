@@ -7,6 +7,18 @@ struct SunnahSettings: Codable, Equatable, Sendable {
     var minuteOfDay = 20 * 60
     var enabled: Bool { weekly || whiteDays }
 
+    /// Which schedule is armed, as the GA4 `mode` dimension. A fixed ASCII list, never
+    /// a displayed label: the switches are localized in ten languages and a dimension
+    /// carrying their text could not be grouped.
+    var analyticsMode: String {
+        switch (weekly, whiteDays) {
+        case (true, true): return "both"
+        case (true, false): return "weekly"
+        case (false, true): return "white_days"
+        case (false, false): return "off"
+        }
+    }
+
     /// The domain clamp, and the only one: a reminder time is a minute of a civil day.
     /// Both roads a value enters by - the picker (via the reducer) and the stored
     /// blob (via the repository) - pass through here.

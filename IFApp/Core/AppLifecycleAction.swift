@@ -30,12 +30,24 @@ enum HistoryEntrySource: String {
     case endFastOverlap = "end_fast_overlap"
 }
 
+/// Which door led into the Sunnah reminders screen. The raw value is the GA4
+/// `source` param, same fixed-list rule as `HistoryEntrySource`: with the screen
+/// reachable two ways, the event alone cannot say which one carries it.
+enum SunnahEntrySource: String {
+    /// The "Sunnah reminders" row in the plan editor — the pencil in the plan pill.
+    case planEditor = "plan_editor"
+    /// The row in the About IF24 sheet.
+    case about
+}
+
 enum AppLifecycleAction: Action {
     case appOpened
     /// The scene became active — cold start or return from background.
     /// Drives the pending "next open" review fallback; not a funnel event.
     case appBecameActive
     case sourcesOpened
+    /// The Sunnah reminders screen was opened, and from where.
+    case sunnahOpened(source: SunnahEntrySource)
     /// The fasting history screen was opened, and from where.
     case historyOpened(source: HistoryEntrySource)
     /// The native `requestReview` went out on an active scene (Apple may or may not
