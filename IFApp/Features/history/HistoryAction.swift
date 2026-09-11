@@ -13,8 +13,10 @@ enum HistoryAction: Action {
     /// The user deleted a record from the history screen.
     case deleted(id: UUID)
 
-    /// The CSV has been written and the share sheet can open on it (dispatched by
-    /// `ExportHistoryThunk`, which owns the write).
+    /// Transient write lifecycle; failure releases the control for a retry.
+    case exportStarted
+    case exportFailed
+    /// The CSV is ready for the system share sheet.
     case exportPrepared(file: URL)
     /// The share sheet closed. `shared` is false when the user backed out of it,
     /// and only a true here is an export that happened — cancelling is not an event.

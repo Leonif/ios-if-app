@@ -147,24 +147,11 @@ struct PlanEditorSheet: View {
             Button {
                 pickerOpen.toggle()
             } label: {
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(strings.Sheet.customLength)
-                            .font(.hanken(16, pickerOpen ? .semibold : .medium))
-                            .foregroundColor(pickerOpen ? theme.deep : theme.ink)
-                        Text(strings.Sheet.customCaption)
-                            .font(.hanken(13))
-                            .lineSpacing(13 * 0.2)
-                            .foregroundColor(theme.mut)
-                    }
-                    .fixedSize(horizontal: false, vertical: true)
-                    Spacer(minLength: 12)
+                LabeledActionRow(title: strings.Sheet.customLength,
+                                 caption: strings.Sheet.customCaption,
+                                 theme: theme, isEmphasized: pickerOpen) {
                     trailing
                 }
-                .frame(minHeight: 56)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("plan.custom")

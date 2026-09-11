@@ -23,10 +23,16 @@ struct ExportHistoryThunk: Thunk {
     func execute<State: Equatable>(state: State, dispatch: @escaping (Action) -> Void) async {
         guard let app = state as? AppState else { return }
         let records = app.historyState.records
-        guard !records.isEmpty else { return }
+        guard !records.isEmpty, !app.historyState.isExporting,
+              app.historyState.exportFile == nil else { return }
+
+        dispatch(HistoryAction.exportStarted)
 
         let name = HistoryExport.fileName(dayKey: Clock.dayKey())
-        guard let file = files.write(csv: HistoryExport.csv(records: records), fileName: name) else { return }
+        guard let file = files.write(csv: HistoryExport.csv(records: records), fileName: name) else {
+            dispatch(HistoryAction.exportFailed)
+            return
+        }
 
         dispatch(HistoryAction.exportPrepared(file: file))
     }

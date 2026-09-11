@@ -25,6 +25,7 @@ struct HistoryProps: Equatable {
     let isPro: Bool
     /// The written CSV waiting to be shared; the share sheet is up while it exists.
     let exportFile: URL?
+    let isExporting: Bool
 
     init(state: AppState) {
         records = state.historyState.records
@@ -32,6 +33,7 @@ struct HistoryProps: Equatable {
         isRunning = state.timerState.isRunning
         isPro = state.proState.isPro
         exportFile = state.historyState.exportFile
+        isExporting = state.historyState.isExporting
     }
 }
 
@@ -158,21 +160,12 @@ struct HistoryFlowView: View {
                 .foregroundColor(theme.ink)
 
             Spacer()
-
-            // No records, no export: the empty branch below already says what this
-            // screen is for, and a control that can only produce an empty file would
-            // be a dead end needing its own explanation.
-            if !props.records.isEmpty {
-                exportButton(theme: theme)
-            }
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 10)
     }
 
-    /// The system share affordance, in the same 34pt circle the back button uses —
-    /// the screen's own pattern for a nav control, since the offer handoff draws no
-    /// mockup for this one. Locked, it carries the lock glyph from that handoff.
+    /// A labelled export row makes the Pro gate visible before the tap.
     private func exportButton(theme: ThemeTokens) -> some View {
         Button(action: {
             // Locked, the control is a door rather than a statement (decision 93).
@@ -187,31 +180,46 @@ struct HistoryFlowView: View {
                 store.dispatch(ProAction.offerOpened(trigger: .manual))
             }
         }) {
-            Image(systemName: "square.and.arrow.up")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(props.isPro ? theme.ink : theme.mut)
-                // The glyph's own baseline sits low inside its box; the nudge puts
-                // the arrow, not the box, in the middle of the circle.
-                .offset(y: -1)
-                .frame(width: 34, height: 34)
-                .background(
-                    Circle().fill(theme.secBg)
-                        .overlay(Circle().stroke(theme.secLine, lineWidth: 1))
-                )
-                .overlay(alignment: .bottomTrailing) {
-                    if !props.isPro {
-                        Image("pro-lock")
-                            .renderingMode(.template)
-                            .foregroundColor(theme.deep)
-                            .padding(3)
+            LabeledActionRow(title: strings.History.exportTitle,
+                             caption: strings.History.exportCaption,
+                             theme: theme) {
+                Group {
+                    if props.isExporting {
+                        ProgressView().tint(theme.deep)
+                    } else if props.isPro {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(theme.ink)
+                            .offset(y: -1)
+                            .frame(width: 34, height: 34)
                             .background(
-                                Circle().fill(theme.accent.opacity(0.14))
-                                    .overlay(Circle().stroke(theme.accent.opacity(0.34), lineWidth: 1))
+                                Circle().fill(theme.secBg)
+                                    .overlay(Circle().stroke(theme.secLine, lineWidth: 1))
                             )
-                            .background(Circle().fill(theme.historyBackground))
-                            .offset(x: 2, y: 2)
+                    } else {
+                        HStack(spacing: 6) {
+                            Image("pro-lock").renderingMode(.template)
+                            Text(verbatim: "PRO")
+                                .font(.hanken(12, .semibold))
+                                .tracking(0.48)
+                                .environment(\.layoutDirection, .leftToRight)
+                        }
+                        .foregroundColor(theme.deep)
+                        .padding(.leading, 9)
+                        .padding(.trailing, 11)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule().fill(theme.accent.opacity(0.14))
+                                .overlay(Capsule().stroke(theme.accent.opacity(0.34), lineWidth: 1))
+                        )
                     }
                 }
+                .frame(width: 76)
+                .accessibilityHidden(true)
+            }
+            .background(RoundedRectangle(cornerRadius: 16).fill(theme.surface))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(theme.surfaceLine, lineWidth: 1))
+            .contentShape(Rectangle())
         }
         .buttonStyle(.pressable)
         .accessibilityLabel(strings.History.export)
@@ -223,6 +231,7 @@ struct HistoryFlowView: View {
         .accessibilityValue(props.isPro ? "" : strings.Pro.productName)
         .accessibilityHint(props.isPro ? "" : strings.Pro.lockedDestinationHint)
         .accessibilityIdentifier("history.export")
+        .disabled(props.isExporting || props.exportFile != nil)
     }
 
     // MARK: List
@@ -242,6 +251,8 @@ struct HistoryFlowView: View {
                     theme: theme
                 )
                 .padding(.bottom, 2)
+
+                exportButton(theme: theme)
 
                 // Charts land here in a later release — between the totals and the
                 // first group, so adding them shifts nothing above or below.

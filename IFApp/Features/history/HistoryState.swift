@@ -17,4 +17,6 @@ struct HistoryState: Equatable, Sendable {
     /// longer exists. Not persisted: the file lives in the temporary directory and
     /// an export is finished the moment the sheet closes.
     var exportFile: URL? = nil
+    /// Transient; never persisted with the user’s history.
+    var isExporting = false
 }

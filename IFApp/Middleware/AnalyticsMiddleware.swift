@@ -75,7 +75,7 @@ final class AnalyticsMiddleware: Middleware {
             // not an export, and counting it would inflate the one number the
             // import decision will be read off.
             if shared { repo.log(.historyExported) }
-        case .recorded, .exportPrepared:
+        case .recorded, .exportStarted, .exportFailed, .exportPrepared:
             // Saving a fast is already covered by `fast_stopped`; writing the file is
             // a step on the way, not the act.
             break

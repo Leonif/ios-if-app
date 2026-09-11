@@ -503,11 +503,13 @@ enum strings {
                    """)
         }
         static var savedToHistory: String { String(localized: "Saved to your history") }
-        /// The export affordance in the history nav row. The control is the system
+        /// The export affordance in the history list. The control is the system
         /// share glyph and carries no caption, so this is its VoiceOver label — and
         /// the word is `Export`, without the `CSV` token: the format is named once,
         /// in the offer's benefit title.
         static var export: String { String(localized: "Export") }
+        static var exportTitle: String { String(localized: "History.exportTitle") }
+        static var exportCaption: String { String(localized: "History.exportCaption") }
 
         /// Streak unit beside the big number. The number is drawn separately (display
         /// type), so the catalog's plural variants carry the word alone — the CLDR
