@@ -68,6 +68,11 @@ struct ActiveFooterCard: View {
     let goalLabel: String       // "16h"
     let goalAt: String          // "12:00 PM"
     let theme: ThemeTokens
+    /// False while the correction sheet this button opens is already up. The button
+    /// stays on screen under the sheet's scrim, and left live it read as the way to
+    /// confirm the ending — while a tap there is a tap outside the card, which closes
+    /// the sheet. One control appearing to do the opposite of what it says.
+    var isEndFastEnabled: Bool = true
     let onEndFast: () -> Void
 
     var body: some View {
@@ -81,6 +86,7 @@ struct ActiveFooterCard: View {
             }
             PrimaryButton(title: strings.Footer.endFast, theme: theme, action: onEndFast)
                 .accessibilityIdentifier("timer.endFast")
+                .endFastAvailability(isEndFastEnabled)
         }
         .modifier(CardBackground(theme: theme))
     }
@@ -97,6 +103,8 @@ struct GoalReachedFooterCard: View {
     let goal: String            // "16h 00m"
     let over: String            // "+0:24"
     let theme: ThemeTokens
+    /// See `ActiveFooterCard.isEndFastEnabled` — the same button, the same sheet.
+    var isEndFastEnabled: Bool = true
     let onReset: () -> Void
     let onEndFast: () -> Void
 
@@ -112,6 +120,7 @@ struct GoalReachedFooterCard: View {
             VStack(spacing: 12) {
                 PrimaryButton(title: strings.Footer.endFast, theme: theme, action: onEndFast)
                     .accessibilityIdentifier("timer.endFast")
+                    .endFastAvailability(isEndFastEnabled)
                 SecondaryButton(title: strings.Footer.reset, theme: theme, action: onReset)
                     .accessibilityIdentifier("timer.reset")
             }
@@ -228,5 +237,17 @@ struct CompleteFooterCard: View {
             }
         }
         .modifier(CardBackground(theme: theme))
+    }
+}
+
+private extension View {
+    /// The one place the unavailable look of `End fast` is spelled out, so the two
+    /// footers that carry the button cannot drift apart on it. `.disabled` alone is
+    /// invisible here: the button paints its own filled background, which no system
+    /// style dims for it.
+    func endFastAvailability(_ isEnabled: Bool) -> some View {
+        disabled(!isEnabled)
+            .opacity(isEnabled ? 1 : 0.4)
+            .animation(.easeOut(duration: 0.18), value: isEnabled)
     }
 }

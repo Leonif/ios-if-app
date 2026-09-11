@@ -566,6 +566,7 @@ struct TimerFlowView: View {
                 goalLabel: strings.Duration.goalHours(Int(props.goalHours)),
                 goalAt: clockTime(props.fastStartTimestamp + props.goalHours * 3600),
                 theme: theme,
+                isEndFastEnabled: !props.endFast.isOpen,
                 onEndFast: { store.dispatch(OpenEndFastThunk()) }
             )
         case .goalReached:
@@ -574,6 +575,7 @@ struct TimerFlowView: View {
                 goal: hoursMinutes(props.goalHours * 3600),
                 over: "+" + overtimeShort(elapsed - props.goalHours * 3600),
                 theme: theme,
+                isEndFastEnabled: !props.endFast.isOpen,
                 onReset: { store.dispatch(UIAction.resetConfirmOpened) },
                 onEndFast: { store.dispatch(OpenEndFastThunk()) }
             )
