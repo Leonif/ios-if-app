@@ -4,7 +4,10 @@
 //
 //  The signature element: a 280pt ring whose progress arc is a smooth gradient of
 //  every phase already passed, tipped by a head dot in the current phase color.
-//  When complete, the gradient loops seamlessly through all five phases.
+//  When complete, the gradient loops seamlessly through all five phases, and the
+//  ring holds at 100% for the whole overtime — no growth, no head dot. The seal
+//  at twelve o'clock gets its place by a genuine break in the arc, not by a disc
+//  painted over it.
 //
 
 import SwiftUI
@@ -15,22 +18,41 @@ struct PhaseRing: View {
     let isComplete: Bool
     let theme: ThemeTokens
     var diameter: CGFloat = 280
+    /// Diameter of the seal that sits on the ring at twelve o'clock (0 = no seal).
+    /// The track and the looped arc are trimmed open around it, 2pt clear of its
+    /// edge, so nothing is drawn behind it — an opaque disc over the spectrum
+    /// never matched the screen's gradient backdrop, and on the 12h geometry the
+    /// arc read as running straight through the check.
+    var sealDiameter: CGFloat = 0
 
     private let lineWidth: CGFloat = 10
+    private let sealClearance: CGFloat = 2
 
     // The stroked Circle's path radius is diameter/2, so the head dot must ride at
     // that radius to sit centered on the ring line (not inset by half the stroke).
     private var centerRadius: CGFloat { diameter / 2 }
 
+    /// Fraction of the circle cut out on each side of twelve o'clock for the seal.
+    /// Measured on the ring's centreline: half the seal, the clearance, and half
+    /// the stroke, because the round caps reach that far past the trim point.
+    private var sealGap: Double {
+        guard sealDiameter > 0 else { return 0 }
+        let halfExtent = sealDiameter / 2 + sealClearance + lineWidth / 2
+        return asin(min(1, halfExtent / centerRadius)) / (2 * .pi)
+    }
+
     var body: some View {
         ZStack {
-            // Track
+            // Track — opened around the seal too, so no sliver peeks out beside it.
             Circle()
-                .stroke(theme.ringTrack, style: StrokeStyle(lineWidth: lineWidth))
+                .trim(from: sealGap, to: 1 - sealGap)
+                .stroke(theme.ringTrack, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                .rotationEffect(.degrees(-90))
 
             // Progress arc
             if isComplete {
                 Circle()
+                    .trim(from: sealGap, to: 1 - sealGap)
                     .stroke(loopedGradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                     .rotationEffect(.degrees(-90))
             } else {

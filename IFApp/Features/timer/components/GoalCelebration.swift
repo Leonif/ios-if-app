@@ -19,7 +19,8 @@ struct GoalMomentView: View {
     var diameter: CGFloat = 280
 
     private let lineWidth: CGFloat = 10
-    private let sealDiameter: CGFloat = 44
+    /// Shared with `PhaseRing`, which opens its arc around a seal this size.
+    static let sealDiameter: CGFloat = 44
 
     var body: some View {
         ZStack {
@@ -64,21 +65,17 @@ struct GoalMomentView: View {
             .rotationEffect(.degrees(-90 + sweepAngle))
     }
 
-    // Green check seal at 12 o'clock, cut out from the spectrum by a background disc.
+    // Green check seal at 12 o'clock. Its place in the spectrum is a real break in
+    // the ring (`PhaseRing.sealDiameter`), not a disc painted over it.
     private var seal: some View {
-        ZStack {
-            Circle()
-                .fill(theme.backgroundBase)
-                .frame(width: sealDiameter + 10, height: sealDiameter + 10)
-            Circle()
-                .fill(theme.primaryButtonBg)
-                .frame(width: sealDiameter, height: sealDiameter)
-                .overlay(
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(theme.primaryButtonText)
-                )
-                .shadow(color: Phase.autophagy.color.opacity(0.5), radius: 9, x: 0, y: 6)
-        }
+        Circle()
+            .fill(theme.primaryButtonBg)
+            .frame(width: Self.sealDiameter, height: Self.sealDiameter)
+            .overlay(
+                Image(systemName: "checkmark")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(theme.primaryButtonText)
+            )
+            .shadow(color: Phase.autophagy.color.opacity(0.5), radius: 9, x: 0, y: 6)
     }
 }
