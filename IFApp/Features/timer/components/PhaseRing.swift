@@ -24,6 +24,10 @@ struct PhaseRing: View {
     /// never matched the screen's gradient backdrop, and on the 12h geometry the
     /// arc read as running straight through the check.
     var sealDiameter: CGFloat = 0
+    /// Whether the arc still has a moving leading edge. A fast in flight does; a fast
+    /// that has been ended does not, and on the result screen the breathing dot read
+    /// as a timer still running over a card that says the fast is over.
+    var showsHeadDot: Bool = true
 
     private let lineWidth: CGFloat = 10
     private let sealClearance: CGFloat = 2
@@ -64,7 +68,7 @@ struct PhaseRing: View {
                     .stroke(progressGradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .butt))
                     .rotationEffect(.degrees(-90))
 
-                headDot
+                if showsHeadDot { headDot }
             }
         }
         .frame(width: diameter, height: diameter)

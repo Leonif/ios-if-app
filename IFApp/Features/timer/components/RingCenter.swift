@@ -164,20 +164,32 @@ struct RingCenterGoalReached: View {
     }
 }
 
+/// The result centre. The check is the app's only picture of "the goal was taken",
+/// so it is drawn for a fast that took it and for no other — a fast ended on its
+/// fifth minute used to close the ring and collect the same mark as a sixteen-hour
+/// one, which is the single claim the release's What's New sells. The fast that fell
+/// short keeps the label and the numerals; what it was is already said in words on
+/// the card below ("today doesn't count toward your streak"), so nothing is added
+/// here to say it a second time.
 struct RingCenterComplete: View {
     let elapsed: TimeInterval
+    /// Whether the fast reached its goal. Asked of `PhaseProgress`, which is where
+    /// that predicate lives, rather than recomputed from `elapsed` here.
+    let goalReached: Bool
     let theme: ThemeTokens
 
     var body: some View {
         VStack(spacing: 8) {
-            Circle()
-                .fill(theme.primaryButtonBg)
-                .frame(width: 54, height: 54)
-                .overlay(
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(theme.primaryButtonText)
-                )
+            if goalReached {
+                Circle()
+                    .fill(theme.primaryButtonBg)
+                    .frame(width: 54, height: 54)
+                    .overlay(
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(theme.primaryButtonText)
+                    )
+            }
 
             Text(strings.Timer.fastComplete)
                 .font(.hanken(12, .semibold))

@@ -363,11 +363,22 @@ struct TimerFlowView: View {
                             ZStack {
                                 // Reserve a gap only while the goal seal sits on the arc.
                                 // Once the check moves to the centre, close the completed ring.
+                                // The closed ring is the picture of a goal taken, so
+                                // it is asked of `PhaseProgress` — the one definition
+                                // of that — and not of the screen state. Being on the
+                                // result screen is not the same fact: a fast ended at
+                                // five minutes lands there too, and used to close the
+                                // ring around a check it had not earned. `.goalReached`
+                                // is only ever entered past the goal, so this reads the
+                                // same for it as the old condition did.
                                 PhaseRing(progress: progress.fraction, currentPhase: progress.phase,
-                                          isComplete: state == .complete || state == .goalReached, theme: theme,
+                                          isComplete: progress.isComplete, theme: theme,
                                           diameter: 280,
                                           sealDiameter: state == .goalReached
-                                              ? GoalMomentView.sealDiameter : 0)
+                                              ? GoalMomentView.sealDiameter : 0,
+                                          // A fast that is over has no moving leading
+                                          // edge for the dot to mark.
+                                          showsHeadDot: state != .complete)
                                 if state == .goalReached {
                                     GoalMomentView(sealScale: goalSealScale, haloOpacity: goalHaloOpacity,
                                                    sweepAngle: goalSweepAngle, sweepOpacity: goalSweepOpacity,
@@ -399,7 +410,7 @@ struct TimerFlowView: View {
 
                             PhaseTimeline(currentPhase: progress.phase,
                                           currentFill: progress.fraction * 4 - Double(progress.phase.rawValue),
-                                          isComplete: state == .complete || state == .goalReached,
+                                          isComplete: progress.isComplete,
                                           theme: theme)
                                 .padding(.top, 2)
 
@@ -533,7 +544,7 @@ struct TimerFlowView: View {
         case .goalReached:
             RingCenterGoalReached(elapsed: elapsed, goalSeconds: props.goalHours * 3600, theme: theme)
         case .complete:
-            RingCenterComplete(elapsed: elapsed, theme: theme)
+            RingCenterComplete(elapsed: elapsed, goalReached: progress.isComplete, theme: theme)
         case .eating, .eatingOver:
             // The eating window / window-closed states render their own ring-free
             // cards (see screen()).
