@@ -44,17 +44,28 @@ struct SunnahSettingsView: View {
                         .accessibilityIdentifier("sunnah.whiteDays")
                 } footer: { Text(SunnahStrings.note) }
                     .tint(isDenied ? Color.secondary : nil)
-                Section(SunnahStrings.eve) {
-                    Picker(SunnahStrings.hour, selection: Binding(
-                        get: { state.settings.minuteOfDay / 60 },
-                        set: { value in updateTime(value * 60 + state.settings.minuteOfDay % 60) })) {
-                        ForEach(0..<24) { Text(String(format: "%02d", $0)).tag($0) }
-                    }.accessibilityIdentifier("sunnah.hour")
-                    Picker(SunnahStrings.minute, selection: Binding(
-                        get: { state.settings.minuteOfDay % 60 },
-                        set: { value in updateTime(state.settings.minuteOfDay / 60 * 60 + value) })) {
-                        ForEach(0..<60) { Text(String(format: "%02d", $0)).tag($0) }
-                    }.accessibilityIdentifier("sunnah.minute")
+                // One control for one fact. Two wheels — an hour and a minute picked
+                // apart — asked the user to assemble a time the system already knows
+                // how to ask for, in their own clock convention (12h/24h) and their own
+                // digits, which the pair of number lists did not honour. It also cost
+                // two strings of its own for labels the system picker does not need.
+                //
+                // Disabled while both switches are off: with nothing scheduled there is
+                // no reminder for a time to belong to, and a live control there invited
+                // someone to set an hour for a schedule that does not exist.
+                Section {
+                    DatePicker(SunnahStrings.eve, selection: reminderTime,
+                               displayedComponents: .hourAndMinute)
+                        // Latin digits, like every other number the app draws — and
+                        // this control had to be told, because it formats its own. The
+                        // language is untouched, so the clock convention is still the
+                        // locale's own (24h in de, 12h in en). Without it Arabic read
+                        // "٨:٠٠ م" above an upcoming-dates list pinned to Latin, which
+                        // is the exact pair of numbering systems on one screen that
+                        // `Locale.latinDigits` exists to prevent.
+                        .environment(\.locale, .latinDigits)
+                        .accessibilityIdentifier("sunnah.time")
+                        .disabled(!state.settings.enabled)
                 }
                 if !isDenied {
                     Section {
@@ -102,6 +113,32 @@ struct SunnahSettingsView: View {
         case .failed: return SunnahStrings.failed
         }
     }
+    /// The stored minute of a civil day, as the clock value the system picker takes.
+    /// The date carried is today's — only the time components are read back — so the
+    /// value stays a minute of a day and never becomes a calendar moment.
+    private var reminderTime: Binding<Date> {
+        Binding(
+            get: {
+                let calendar = Calendar.current
+                let minute = SunnahSettings.clamped(minuteOfDay: state.settings.minuteOfDay)
+                let day = calendar.startOfDay(for: Clock.now())
+                // `bySettingHour` first because it is the one that survives a clock
+                // change: on a spring-forward day, adding 20 hours to midnight lands
+                // at 21:00. The fallback adds them anyway rather than handing back the
+                // current time — a control that cannot resolve the stored setting must
+                // not answer with "now", which is a different value stated as if it
+                // were the one saved.
+                return calendar.date(bySettingHour: minute / 60, minute: minute % 60,
+                                     second: 0, of: day)
+                    ?? day.addingTimeInterval(TimeInterval(minute * 60))
+            },
+            set: { date in
+                let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
+                updateTime((parts.hour ?? 0) * 60 + (parts.minute ?? 0))
+            }
+        )
+    }
+
     private func binding(_ key: WritableKeyPath<SunnahSettings, Bool>) -> Binding<Bool> {
         Binding(get: { state.settings[keyPath: key] }, set: { value in
             var settings = state.settings

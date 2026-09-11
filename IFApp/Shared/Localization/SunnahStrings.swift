@@ -5,8 +5,6 @@ enum SunnahStrings {
     static var weekly: String { String(localized: "Sunnah.weekly", defaultValue: "Mondays and Thursdays") }
     static var whiteDays: String { String(localized: "Sunnah.whiteDays", defaultValue: "White days · 13–15") }
     static var eve: String { String(localized: "Sunnah.eve", defaultValue: "Remind me the day before") }
-    static var hour: String { String(localized: "Sunnah.hour", defaultValue: "Hour") }
-    static var minute: String { String(localized: "Sunnah.minute", defaultValue: "Minute") }
     static var upcoming: String { String(localized: "Sunnah.upcoming", defaultValue: "Upcoming fasting dates") }
     static var note: String { String(localized: "Sunnah.note", defaultValue: "Free, optional reminders. They do not start a fast or change your plan. IF24 does not calculate dawn or sunset.") }
     static var calendar: String { String(localized: "Sunnah.calendar", defaultValue: "Dates use Umm al-Qura and may differ from local moon sightings. Confirm locally. No voluntary reminders during Ramadan, on Eid, or on 11–13 Dhu al-Hijjah.") }
