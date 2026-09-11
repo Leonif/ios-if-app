@@ -150,6 +150,7 @@ struct TimerFlowView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
     @State private var props: TimerScreenProps
+    @State private var showSunnah = false
     @State private var showSources = false
     @State private var showHistory = false
     /// The record History should open on — the fast a refusal named, so the person
@@ -198,13 +199,17 @@ struct TimerFlowView: View {
         // The offer used to be presented here. It moved to `AppFlowView` when the
         // history's export lock became a second door into it: the history is pushed
         // on this screen, so an overlay hosted here renders *under* it.
+        .sheet(isPresented: $showSunnah) { SunnahFlowView(store: store) }
         .sheet(isPresented: $showSources) {
             AboutFlowView(store: store).presentationDragIndicator(.visible)
         }
         // The About sheet is one of the doors into the offer, and the offer is behind
         // it. Opening one closes the other.
         .onChange(of: props.offerOpen) { _, isOpen in
-            if isOpen { showSources = false }
+            if isOpen {
+                showSources = false
+                showSunnah = false
+            }
         }
         // Edge 6. The nearest neutral moment: not over a running fast, not on the
         // complete state, not over the goal animation. Nothing is lost by waiting —
@@ -580,6 +585,7 @@ struct TimerFlowView: View {
             && !props.offerOpen
             // The About sheet is the likeliest cover: it is where a refund is noticed.
             && !showSources
+            && !showSunnah
             && !showHistory
             && !props.planEditorOpen
             && !props.mealPickerOpen
@@ -695,7 +701,11 @@ struct TimerFlowView: View {
                 theme: theme,
                 onSelect: { store.dispatch(PlanAction.selected(hours: $0)) },
                 onDone: confirmPlan,
-                onClose: { store.dispatch(UIAction.planEditorClosed) }
+                onClose: { store.dispatch(UIAction.planEditorClosed) },
+                onSunnah: {
+                    store.dispatch(UIAction.planEditorClosed)
+                    showSunnah = true
+                }
             )
             .zIndex(1)
         }

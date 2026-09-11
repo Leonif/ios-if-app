@@ -13,6 +13,7 @@ struct AppState: Equatable, Sendable {
     var uiState = UIState()
     var historyState = HistoryState()
     var proState = ProState()
+    var sunnahState = SunnahState()
 
     /// The plan the fast/window cycle currently in flight is running to — the goal
     /// pinned at its start, falling back to the selected plan when nothing is pinned.

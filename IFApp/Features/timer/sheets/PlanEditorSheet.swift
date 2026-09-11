@@ -33,6 +33,7 @@ struct PlanEditorSheet: View {
     /// through it is not in the store.
     let onDone: (Int) -> Void
     let onClose: () -> Void
+    let onSunnah: () -> Void
 
     @State private var pickerOpen = false
 
@@ -81,6 +82,20 @@ struct PlanEditorSheet: View {
                 .foregroundColor(theme.sec)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.bottom, 20)
+
+            Button(action: onSunnah) {
+                HStack {
+                    Text(SunnahStrings.title).font(.hanken(15, .medium))
+                    Spacer(minLength: 10)
+                    Image(systemName: "chevron.forward")
+                }
+                .foregroundStyle(theme.deep)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("plan.sunnah")
+            .padding(.bottom, 12)
 
             SegmentedControl(
                 options: Plan.presets.map(\.ratioLabel),

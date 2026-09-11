@@ -19,6 +19,8 @@ enum AppStoreFactory {
         #if DEBUG
         // UI tests launch with "-uitestReset" to start from a clean idle state.
         if ProcessInfo.processInfo.arguments.contains("-uitestReset") {
+            let sunnah: SunnahRepositoryProtocol = container.inject()
+            sunnah.save(SunnahSettings())
             persistence.save(fastStartTimestamp: 0, goalHours: 0, isRunning: false, completedSessions: 0, hasCelebrated: false, eatingStartTimestamp: 0, isEating: false, streakCount: 0, lastGoalDate: nil, freezeSpentMonth: nil)
             let history: FastHistoryRepositoryProtocol = container.inject()
             // Not `replaceAll([])`: it is bound by the TF-2 write guard, and this is
@@ -38,6 +40,7 @@ enum AppStoreFactory {
         let history: FastHistoryRepositoryProtocol = container.inject()
         let offer: ProOfferRepositoryProtocol = container.inject()
 
+        let sunnah: SunnahRepositoryProtocol = container.inject()
         let initialState = AppState(
             timerState: TimerState(
                 fastStartTimestamp: loaded.fastStartTimestamp,
@@ -56,7 +59,8 @@ enum AppStoreFactory {
             historyState: HistoryState(records: history.loadAll().sorted { $0.startTimestamp > $1.startTimestamp }),
             // The only part of the offer that survives a launch. Everything else the
             // automatic trigger needs is session state and starts empty by design.
-            proState: ProState(autoOfferShown: offer.wasOfferShown())
+            proState: ProState(autoOfferShown: offer.wasOfferShown()),
+            sunnahState: SunnahState(settings: sunnah.load())
         )
 
         var middlewares: [Middleware] = [
@@ -66,6 +70,7 @@ enum AppStoreFactory {
             ReviewMiddleware(),
             AnalyticsMiddleware(),
             NotificationMiddleware(),
+            SunnahMiddleware(),
             StoreMiddleware(),
         ]
         // First in the list on purpose: an action that wedges a later middleware is

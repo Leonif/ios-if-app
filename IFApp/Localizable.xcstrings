@@ -1,6 +1,1111 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "Sunnah.title": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sunnah reminders"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Нагадування Sunnah"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Sunnah-Erinnerungen"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recordatorios Sunnah"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rappels Sunnah"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Przypomnienia Sunnah"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "スンナのリマインダー"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "순나 알림"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "圣行斋戒提醒"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "تذكيرات صيام السنّة"
+        }
+      }
+    }
+  },
+  "Sunnah.weekly": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mondays and Thursdays"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Понеділок і четвер"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Montag und Donnerstag"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Lunes y jueves"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Lundis et jeudis"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Poniedziałki i czwartki"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "月曜日と木曜日"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "월요일과 목요일"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "周一和周四"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الاثنين والخميس"
+        }
+      }
+    }
+  },
+  "Sunnah.whiteDays": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "White days · 13–15"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Білі дні · 13–15"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Weiße Tage · 13–15"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Días blancos · 13–15"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Jours blancs · 13–15"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Białe dni · 13–15"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "白い日 · 13〜15日"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "이슬람력 13~15일"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "白月日 · 13–15日"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الأيام البيض · 13–15"
+        }
+      }
+    }
+  },
+  "Sunnah.eve": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remind me the day before"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Нагадати напередодні"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Am Vortag erinnern"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recordarme la víspera"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Me rappeler la veille"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Przypomnij w przeddzień"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "前日に通知"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "전날 알림"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "提前一天提醒"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "ذكّرني في اليوم السابق"
+        }
+      }
+    }
+  },
+  "Sunnah.hour": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hour"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Година"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Stunde"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Hora"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Heure"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Godzina"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "時"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "시"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "时"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الساعة"
+        }
+      }
+    }
+  },
+  "Sunnah.minute": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Minute"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Хвилина"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Minute"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Minuto"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Minute"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Minuta"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "分"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "분"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "分"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الدقيقة"
+        }
+      }
+    }
+  },
+  "Sunnah.upcoming": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Upcoming fasting dates"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Найближчі дні посту"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nächste Fastentage"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Próximos días de ayuno"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Prochains jours de jeûne"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Najbliższe dni postu"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "次の断食日"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "다가오는 단식일"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "即将到来的斋戒日"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "أيام الصيام القادمة"
+        }
+      }
+    }
+  },
+  "Sunnah.note": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Free, optional reminders. They do not start a fast or change your plan. IF24 does not calculate dawn or sunset."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Безкоштовні нагадування за бажанням. Вони не запускають піст і не змінюють план. IF24 не розраховує світанок чи захід сонця."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Kostenlose, freiwillige Erinnerungen. Sie starten kein Fasten und ändern deinen Plan nicht. IF24 berechnet weder Morgendämmerung noch Sonnenuntergang."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recordatorios gratuitos y opcionales. No inician un ayuno ni cambian tu plan. IF24 no calcula el alba ni la puesta de sol."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rappels gratuits et facultatifs. Ils ne lancent pas de jeûne et ne modifient pas votre programme. IF24 ne calcule ni l’aube ni le coucher du soleil."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Bezpłatne, opcjonalne przypomnienia. Nie rozpoczynają postu ani nie zmieniają planu. IF24 nie oblicza świtu ani zachodu słońca."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "無料の任意リマインダーです。断食の開始やプランの変更は行いません。IF24は暁や日没を計算しません。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "무료 선택 알림입니다. 단식을 시작하거나 계획을 변경하지 않습니다. IF24는 새벽이나 일몰을 계산하지 않습니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "免费且可选的提醒。不会开始斋戒或更改你的计划。IF24 不计算黎明或日落时间。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "تذكيرات مجانية واختيارية. لا تبدأ صيامًا ولا تغيّر خطتك. لا يحسب IF24 وقت الفجر أو الغروب."
+        }
+      }
+    }
+  },
+  "Sunnah.calendar": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Dates use Umm al-Qura and may differ from local moon sightings. Confirm locally. No voluntary reminders during Ramadan, on Eid, or on 11–13 Dhu al-Hijjah."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Дати за Умм аль-Кура можуть відрізнятися від місцевого спостереження місяця. Звіряйте на місці. Без добровільних нагадувань у Рамадан, на Ід і 11–13 Зуль-хіджі."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Die Daten folgen Umm al-Qura und können von örtlichen Mondsichtungen abweichen. Bitte vor Ort prüfen. Keine freiwilligen Erinnerungen im Ramadan, an Eid oder am 11.–13. Dhu l-Hiddscha."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Las fechas usan Umm al-Qura y pueden diferir del avistamiento lunar local. Confírmalas localmente. Sin recordatorios voluntarios en Ramadán, Eid ni del 11 al 13 de Dhu al-Hijjah."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Les dates suivent Umm al-Qura et peuvent différer de l’observation locale de la lune. Vérifiez localement. Aucun rappel volontaire pendant le Ramadan, l’Aïd ou du 11 au 13 Dhou al-hijja."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Daty według Umm al-Qura mogą różnić się od lokalnych obserwacji księżyca. Sprawdź je lokalnie. Bez dobrowolnych przypomnień w ramadanie, w Eid i 11–13 Zu al-hidżdża."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "日付はウンム・アルクラー暦に基づき、現地の月の観測と異なる場合があります。現地で確認してください。ラマダーン、イード、ズルヒッジャ月11〜13日は任意の断食通知を送りません。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "날짜는 움 알쿠라 달력을 따르며 현지 달 관측과 다를 수 있습니다. 현지에서 확인하세요. 라마단, 이드, 둘힛자월 11~13일에는 자발적 단식 알림을 보내지 않습니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "日期采用乌姆古拉历，可能与当地观月结果不同，请在当地确认。斋月、开斋节、宰牲节及伊历十二月11–13日不发送自愿斋戒提醒。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "التواريخ وفق تقويم أم القرى وقد تختلف عن رؤية الهلال محليًا؛ تحقّق منها محليًا. لا تُرسل تذكيرات صيام التطوّع في رمضان أو العيدين أو أيام 11–13 من ذي الحجة."
+        }
+      }
+    }
+  },
+  "Sunnah.off": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reminders are off"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Нагадування вимкнено"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erinnerungen sind aus"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recordatorios desactivados"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rappels désactivés"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Przypomnienia wyłączone"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "リマインダーはオフです"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "알림이 꺼져 있습니다"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "提醒已关闭"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "التذكيرات متوقفة"
+        }
+      }
+    }
+  },
+  "Sunnah.checking": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Updating reminders…"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Оновлення нагадувань…"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erinnerungen werden aktualisiert…"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Actualizando recordatorios…"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mise à jour des rappels…"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Aktualizowanie przypomnień…"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "リマインダーを更新中…"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "알림 업데이트 중…"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "正在更新提醒…"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "جارٍ تحديث التذكيرات…"
+        }
+      }
+    }
+  },
+  "Sunnah.scheduled": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reminders scheduled. Reopen IF24 regularly to refresh upcoming dates."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Нагадування заплановано. Регулярно відкривайте IF24 для оновлення дат."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erinnerungen geplant. Öffne IF24 regelmäßig, um kommende Termine zu aktualisieren."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Recordatorios programados. Abre IF24 regularmente para actualizar las próximas fechas."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Rappels programmés. Rouvrez régulièrement IF24 pour actualiser les prochaines dates."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Przypomnienia zaplanowane. Otwieraj IF24 regularnie, aby odświeżać kolejne daty."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "リマインダーを設定しました。今後の日付を更新するため、定期的にIF24を開いてください。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "알림이 예약되었습니다. 예정 날짜를 갱신하려면 IF24를 정기적으로 열어 주세요."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "提醒已安排。请定期打开 IF24 以更新后续日期。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "تمت جدولة التذكيرات. افتح IF24 بانتظام لتحديث المواعيد القادمة."
+        }
+      }
+    }
+  },
+  "Sunnah.denied": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Notifications are disabled in iOS Settings."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Сповіщення вимкнено в налаштуваннях iOS."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mitteilungen sind in den iOS-Einstellungen deaktiviert."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Las notificaciones están desactivadas en Ajustes de iOS."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Les notifications sont désactivées dans les réglages iOS."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Powiadomienia są wyłączone w ustawieniach iOS."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "iOSの設定で通知が無効になっています。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "iOS 설정에서 알림이 꺼져 있습니다."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "通知已在 iOS 设置中关闭。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "الإشعارات معطّلة في إعدادات iOS."
+        }
+      }
+    }
+  },
+  "Sunnah.failed": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Could not schedule reminders. Try again."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Не вдалося запланувати нагадування. Спробуйте ще раз."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erinnerungen konnten nicht geplant werden. Versuche es erneut."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "No se pudieron programar los recordatorios. Inténtalo de nuevo."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Impossible de programmer les rappels. Réessayez."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Nie udało się zaplanować przypomnień. Spróbuj ponownie."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "リマインダーを設定できませんでした。もう一度お試しください。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "알림을 예약하지 못했습니다. 다시 시도해 주세요."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "无法安排提醒，请重试。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "تعذّرت جدولة التذكيرات. حاول مجددًا."
+        }
+      }
+    }
+  },
+  "Sunnah.settings": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Open Settings"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Відкрити налаштування"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Einstellungen öffnen"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Abrir Ajustes"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Ouvrir les réglages"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Otwórz ustawienia"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "設定を開く"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "설정 열기"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "打开设置"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "افتح الإعدادات"
+        }
+      }
+    }
+  },
+  "Sunnah.retry": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Try again"
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Спробувати ще раз"
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Erneut versuchen"
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Reintentar"
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Réessayer"
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Spróbuj ponownie"
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "再試行"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "다시 시도"
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "重试"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "حاول مجددًا"
+        }
+      }
+    }
+  },
+  "Sunnah.notification": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "A Sunnah fasting day is coming tomorrow. Confirm the date and dawn/sunset times locally."
+        }
+      },
+      "uk": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Завтра день посту Sunnah. Звірте дату й час світанку та заходу сонця на місці."
+        }
+      },
+      "de": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Morgen ist ein Sunnah-Fastentag. Prüfe Datum, Morgendämmerung und Sonnenuntergang vor Ort."
+        }
+      },
+      "es": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Mañana es un día de ayuno Sunnah. Confirma localmente la fecha y las horas del alba y del ocaso."
+        }
+      },
+      "fr": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Demain est un jour de jeûne Sunnah. Vérifiez localement la date et les heures de l’aube et du coucher du soleil."
+        }
+      },
+      "pl": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Jutro dzień postu Sunnah. Sprawdź lokalnie datę oraz godziny świtu i zachodu słońca."
+        }
+      },
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "明日はスンナの断食日です。日付と暁・日没の時刻を現地で確認してください。"
+        }
+      },
+      "ko": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "내일은 순나 단식일입니다. 현지 날짜와 새벽·일몰 시간을 확인하세요."
+        }
+      },
+      "zh-Hans": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "明天是圣行斋戒日。请在当地确认日期及黎明、日落时间。"
+        }
+      },
+      "ar": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "غدًا يوم لصيام السنّة. تحقّق من التاريخ ووقتي الفجر والغروب محليًا."
+        }
+      }
+    }
+  },
   "SourceReader.kicker": {
     "extractionState": "manual",
     "localizations": {

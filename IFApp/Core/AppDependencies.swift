@@ -8,6 +8,7 @@
 
 enum AppDependencies {
     static func register() {
+        container.register(SunnahRepositoryProtocol.self) { SunnahRepository() }
         container.register(ExternalLinkRepositoryProtocol.self) {
             ExternalLinkRepository()
         }

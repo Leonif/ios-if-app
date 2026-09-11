@@ -16,5 +16,6 @@ func rootReducer(state: AppState, action: Action) -> AppState {
     newState.uiState = uiReducer(state: state.uiState, action: action)
     newState.historyState = historyReducer(state: state.historyState, action: action)
     newState.proState = proReducer(state: state.proState, action: action)
+    newState.sunnahState = sunnahReducer(state: state.sunnahState, action: action)
     return newState
 }
