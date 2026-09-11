@@ -40,7 +40,7 @@ struct SunnahSettingsView: View {
                 if state.settings.enabled && !state.upcoming.isEmpty {
                     Section(SunnahStrings.upcoming) {
                         ForEach(state.upcoming, id: \.self) { date in
-                            Text(date.formatted(Date.FormatStyle(locale: .latinDigits).day().month().year()))
+                            Text(date.formatted(Date.FormatStyle.latinDigits.day().month().year()))
                         }
                     }
                 }

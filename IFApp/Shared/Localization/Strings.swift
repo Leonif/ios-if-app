@@ -37,6 +37,24 @@ extension Locale {
     }
 }
 
+extension Date.FormatStyle {
+    /// `Date.FormatStyle` on `Locale.latinDigits`, with the calendar pinned as well.
+    ///
+    /// `DateFormatter` takes its calendar from the locale it is given, so setting
+    /// `f.locale = .latinDigits` is enough there. `Date.FormatStyle` does not: its
+    /// calendar is a separate initialiser argument defaulting to
+    /// `.autoupdatingCurrent`, so passing only `locale:` pins the digits and leaves
+    /// the calendar on whatever the device is set to. On an Arabic device that is
+    /// the Islamic calendar, and the Sunnah settings listed "3 ربيع الآخر، 1448 هـ"
+    /// where the fasts it was scheduling are counted in Gregorian days.
+    ///
+    /// Use this rather than `Date.FormatStyle(locale: .latinDigits)`.
+    static var latinDigits: Date.FormatStyle {
+        let locale = Locale.latinDigits
+        return Date.FormatStyle(locale: locale, calendar: locale.calendar)
+    }
+}
+
 enum strings {
     enum Phase {
         static var fed: String { String(localized: "Fed") }

@@ -21,12 +21,27 @@ private struct Stat: View {
                 .font(.hanken(10.5, .semibold))
                 .overlineTracking(1.4)
                 .foregroundColor(theme.mut)
-                .lineLimit(1)
+                .lineLimit(2)
                 .minimumScaleFactor(0.7)
             Text(value)
                 .font(.hanken(15, .bold))
                 .foregroundColor(valueColor)
-                .lineLimit(1)
+                // Wrapping, not a single clipped line. A column is an equal fraction of
+                // the card width, and SwiftUI does not clip an overflowing `Text`: on one
+                // line with a scale floor, a value too long for its fraction simply draws
+                // across the hairline divider and into its neighbour. That is how de, ja
+                // and ko rendered the overtime footer at the largest text size the app
+                // allows as "16 Std 30 Min16 Std 00 Min" — two values, no gap, divider
+                // buried underneath. pl and ar escaped it only by being shorter, which is
+                // not a property to rely on: the next translation to grow brings it back.
+                //
+                // Lowering `minimumScaleFactor` instead would buy the fit by shrinking the
+                // value below the size the reader asked for, which is the one thing a
+                // raised text size is a request not to do. Wrapping costs nothing at the
+                // sizes and lengths that already fit — the line count only changes where
+                // the old layout was overflowing anyway.
+                .lineLimit(3)
+                .multilineTextAlignment(.center)
                 .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity)

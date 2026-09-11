@@ -388,23 +388,6 @@ struct TimerFlowView: View {
                                           isComplete: state == .complete || state == .goalReached,
                                           theme: theme)
                                 .padding(.top, 2)
-
-                            // The door into the history, landed here rather than in the
-                            // footer. In the pinned zone it stood last in the stack —
-                            // the strongest position after the primary — so a
-                            // zero-consequence navigation outranked the only reversible
-                            // control on the card, and it cost the unmeasured surface
-                            // height it could not spare. Down here the footer edge, the
-                            // strongest divider on the screen, separates it from the
-                            // actions; it keeps its label, its chevron and a 44pt target,
-                            // and takes `mut` because it is a signpost, not a choice
-                            // being weighed.
-                            if state == .complete {
-                                HistoryLink(title: strings.History.savedToHistory, theme: theme,
-                                            identifier: "timer.savedToHistory",
-                                            tint: theme.mut, minHeight: 44,
-                                            action: { openHistory(from: .completeCard) })
-                            }
                         }
                     }
                 }
@@ -442,20 +425,59 @@ struct TimerFlowView: View {
             // Footer pinned above the scroll: it lifts off the bottom edge by the
             // home-indicator inset, or a fixed minimum on home-button devices (inset 0)
             // so it isn't jammed against the edge. The primary action stays visible; the
-            // scroll content reserves room for it. The colored background fills under it.
+            // scroll content reserves room for it.
+            //
+            // The inset must NOT be wrapped in `.ignoresSafeArea(.container, .bottom)`:
+            // a `safeAreaInset` contributes to the *container* region, so ignoring that
+            // region at this edge cancels the reservation it just made, and the scroll
+            // content runs under the footer with no way to scroll it out — the tail of
+            // the middle becomes unreachable, not merely covered. It survived only while
+            // the footer was short enough to leave the tail peeking above it; the stacked
+            // full-width actions (Queue-5) pushed the `.complete` history link fully under
+            // the card, with its accessibility bounds still reporting the old rectangle.
+            // What that wrapper bought — the backdrop reaching the screen edge — is paid
+            // for by `backgroundLayer`, which already ignores the safe area and has fully
+            // resolved to `backgroundBase` by this height.
+            //
+            // Because the inset now sits inside the safe area, the lift off the bottom
+            // edge is only what the home indicator does not already provide: 32pt on a
+            // home-button device (inset 0), nothing where the indicator is taller.
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                footer(state: state, elapsed: elapsed, theme: theme)
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, max(insets.bottom, 32))
-                    .frame(maxWidth: .infinity)
-                    // Opaque backdrop so the translucent footer card doesn't let the
-                    // scrolling middle (chip/timeline) show through on a short screen.
-                    // The phase background is a radial gradient centered near the top; by
-                    // the footer it has fully resolved to backgroundBase, so this matches
-                    // seamlessly and fills into the bottom safe area to the screen edge.
-                    .background(theme.backgroundBase)
+                VStack(spacing: 12) {
+                    // The door into the history: above the card, not inside it. The rank
+                    // argument that took it out of the action stack still holds — last in
+                    // the stack it outranked the only reversible control on the card — and
+                    // it is answered by placing it beyond the card's top edge, the
+                    // strongest divider on the screen. It keeps its label, its chevron, a
+                    // 44pt target and `mut`, because it is a signpost, not a choice being
+                    // weighed.
+                    //
+                    // What it may not do is live in the scrolling middle. That middle is
+                    // ~577pt of content (280pt ring, editorial, phase scale) against ~300pt
+                    // of room on a 375pt screen, and less again at xxLarge: a row at the
+                    // tail of it is below the fold on every device and every text size, so
+                    // the only exit to the history from this screen was one the user had to
+                    // scroll to find and, while the footer covered it, could not reach at
+                    // all. Pinned, it costs the middle 56pt that the middle was already
+                    // scrolling anyway.
+                    if state == .complete {
+                        HistoryLink(title: strings.History.savedToHistory, theme: theme,
+                                    identifier: "timer.savedToHistory",
+                                    tint: theme.mut, minHeight: 44,
+                                    action: { openHistory(from: .completeCard) })
+                    }
+                    footer(state: state, elapsed: elapsed, theme: theme)
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, max(0, 32 - insets.bottom))
+                .frame(maxWidth: .infinity)
+                // Opaque backdrop so the translucent footer card doesn't let the
+                // scrolling middle (chip/timeline) show through on a short screen.
+                // The phase background is a radial gradient centered near the top; by
+                // the footer it has fully resolved to backgroundBase, so this matches
+                // seamlessly.
+                .background(theme.backgroundBase)
             }
-            .ignoresSafeArea(.container, edges: .bottom)
         }
         // Detect the goal crossing here (inside the per-second tick) — it is
         // time-driven, so the outer body wouldn't re-evaluate to catch it.
