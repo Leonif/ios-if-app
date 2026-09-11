@@ -6455,64 +6455,6 @@
         }
       }
     },
-    "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تأثير الصيام بالتناوب اليومي على فقدان الوزن والحفاظ عليه وحماية القلب لدى البالغين المصابين بالسمنة الأصحاء أيضيًا: تجربة سريرية عشوائية"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wirkung des Fastens jeden zweiten Tag auf Gewichtsverlust, Gewichtserhaltung und Kardioprotektion bei metabolisch gesunden adipösen Erwachsenen: eine randomisierte klinische Studie"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Efecto del ayuno en días alternos sobre la pérdida de peso, el mantenimiento del peso y la cardioprotección en adultos obesos metabólicamente sanos: un ensayo clínico aleatorizado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Effet du jeûne un jour sur deux sur la perte de poids, le maintien du poids et la cardioprotection chez des adultes obèses métaboliquement sains : un essai clinique randomisé"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隔日断食が代謝的に健康な肥満成人の減量・体重維持・心保護に及ぼす影響：ランダム化比較試験"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "격일 단식이 대사적으로 건강한 비만 성인의 체중 감소, 체중 유지 및 심장 보호에 미치는 영향: 무작위 대조 임상시험"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wpływ postu co drugi dzień na utratę masy ciała, jej utrzymanie i kardioprotekcję u metabolicznie zdrowych otyłych dorosłych: randomizowane badanie kliniczne"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вплив чергування днів голодування на втрату ваги, підтримку ваги та кардіопротекцію серед метаболічно здорових дорослих з ожирінням: рандомізоване клінічне дослідження"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隔日断食对代谢健康的肥胖成年人减重、体重维持及心脏保护的影响：一项随机临床试验"
-          }
-        }
-      }
-    },
     "Elapsed" : {
       "comment" : "Footer stat overline",
       "localizations" : {
@@ -7973,64 +7915,6 @@
         }
       }
     },
-    "Fasting-induced FGF21 signaling activates hepatic autophagy and lipid degradation via JMJD3 histone demethylase" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إشارات FGF21 المُحفَّزة بالصيام تُنشِّط الالتهام الذاتي الكبدي وتحلّل الدهون عبر إنزيم نزع ميثيل الهيستون JMJD3"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fasten-induzierte FGF21-Signalgebung aktiviert hepatische Autophagie und Lipidabbau über die Histon-Demethylase JMJD3"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La señalización de FGF21 inducida por el ayuno activa la autofagia hepática y la degradación de lípidos a través de la histona desmetilasa JMJD3"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La signalisation FGF21 induite par le jeûne active l’autophagie hépatique et la dégradation des lipides via l’histone déméthylase JMJD3"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "断食により誘導されるFGF21シグナルは、ヒストン脱メチル化酵素JMJD3を介して肝臓のオートファジーと脂質分解を活性化する"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "단식으로 유도된 FGF21 신호전달은 히스톤 탈메틸화효소 JMJD3를 통해 간 자가포식과 지질 분해를 활성화한다"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Indukowana postem sygnalizacja FGF21 aktywuje autofagię wątrobową i degradację lipidów poprzez demetylazę histonową JMJD3"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сигналізація FGF21, індукована голодуванням, активує гепатичну аутофагію та деградацію ліпідів через JMJD3 гістонову деметилазу"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "断食诱导的 FGF21 信号通过组蛋白去甲基化酶 JMJD3 激活肝脏自噬和脂质降解"
-          }
-        }
-      }
-    },
     "Fasts" : {
       "comment" : "Summary stat: how many fasts are recorded",
       "localizations" : {
@@ -8652,64 +8536,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 至 23 小时"
-          }
-        }
-      }
-    },
-    "Glycogen and its metabolism: some new developments and old themes" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الجليكوجين وأيضه: بعض التطورات الجديدة والمواضيع القديمة"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Glykogen und sein Stoffwechsel: einige neue Entwicklungen und alte Themen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El glucógeno y su metabolismo: algunos avances nuevos y temas antiguos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le glycogène et son métabolisme : quelques nouveautés et thèmes anciens"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "グリコーゲンとその代謝：新たな展開と古くからの話題"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "글리코겐과 그 대사: 새로운 발전과 오래된 주제들"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Glikogen i jego metabolizm: nowe odkrycia i stare tematy"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Глікоген та його метаболізм: нові розробки та старі теми"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "糖原及其代谢：若干新进展与旧课题"
           }
         }
       }
@@ -10353,64 +10179,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "不活跃"
-          }
-        }
-      }
-    },
-    "Intermittent Fasting and Metabolic Health" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "الصيام المتقطع والصحة الأيضية"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Intervallfasten und metabolische Gesundheit"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ayuno intermitente y salud metabólica"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le jeûne intermittent et la santé métabolique"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "間欠的断食と代謝の健康"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "간헐적 단식과 대사 건강"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Post przerywany a zdrowie metaboliczne"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Інтервальне голодування та метаболічне здоров’я"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "间歇性断食与代谢健康"
           }
         }
       }

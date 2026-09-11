@@ -19,4 +19,9 @@ struct HistoryState: Equatable, Sendable {
     var exportFile: URL? = nil
     /// Transient; never persisted with the user’s history.
     var isExporting = false
+
+    /// Whether another export may start: not while one is being written, and not
+    /// while the last one is still up in the share sheet. The button disables on
+    /// this and the thunk refuses on it - the same predicate, defined here once.
+    var isExportBusy: Bool { isExporting || exportFile != nil }
 }

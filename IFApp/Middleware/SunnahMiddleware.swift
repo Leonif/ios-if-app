@@ -7,13 +7,16 @@ import UIKit
 final class SunnahMiddleware: Middleware {
     private let repository: SunnahRepositoryProtocol
     private let notifications: NotificationRepositoryProtocol
+    private let analytics: AnalyticsRepositoryProtocol
     private var task: Task<Void, Never>?
     private var observers: [NSObjectProtocol] = []
 
     init(repository: SunnahRepositoryProtocol = container.inject(),
-         notifications: NotificationRepositoryProtocol = container.inject()) {
+         notifications: NotificationRepositoryProtocol = container.inject(),
+         analytics: AnalyticsRepositoryProtocol = container.inject()) {
         self.repository = repository
         self.notifications = notifications
+        self.analytics = analytics
     }
     deinit {
         task?.cancel()
@@ -43,14 +46,13 @@ final class SunnahMiddleware: Middleware {
         let settings = app.sunnahState.settings
         let previous = task
         previous?.cancel()
-        task = Task { [repository, notifications] in
+        task = Task { [repository, notifications, analytics] in
             await previous?.value
             guard !Task.isCancelled else { return }
-            let before = await notifications.authorizationStatus()
-            if requestPermission && before == .notDetermined {
-                await notifications.requestAuthorization()
-                // The existing goal/eating push may have been rejected before this grant.
-                dispatch(AppLifecycleAction.pushAuthorizationResolved)
+            // One ask for the whole app (see `requestIfUndetermined`). The resolved
+            // action comes back through this middleware and schedules on the answer.
+            if requestPermission, await SyncPushStatusThunk.requestIfUndetermined(
+                notifications: notifications, analytics: analytics, dispatch: { dispatch($0) }) {
                 return
             }
             let status = await notifications.authorizationStatus()
@@ -59,8 +61,8 @@ final class SunnahMiddleware: Middleware {
             let reminders = SunnahSchedule.reminders(settings: settings, now: Clock.now(), timeZone: .current)
             let success = await repository.replace(allowed ? reminders : [])
             guard !Task.isCancelled else { return }
-            let delivery: SunnahState.Delivery = !settings.enabled ? .off :
-                (!allowed ? .denied : (success ? .scheduled : .failed))
+            let delivery = SunnahState.Delivery.resolve(
+                enabled: settings.enabled, otherwise: !allowed ? .denied : (success ? .scheduled : .failed))
             dispatch(SunnahAction.deliveryUpdated(delivery, dates: reminders.prefix(3).map(\.fastDate)))
         }
     }

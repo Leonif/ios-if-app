@@ -9,6 +9,7 @@
 //  and picks up permission changes made in iOS Settings between sessions.
 //
 
+import Foundation
 import Redux
 import UserNotifications
 
@@ -27,8 +28,42 @@ struct SyncPushStatusThunk: Thunk {
         analytics.setUserProperty(Self.label(for: status), forName: "push_status")
     }
 
-    /// The `push_status` value for a status. Shared with `StartFastThunk`, which
-    /// rewrites the property right after the user answers the dialog.
+    /// The one place a permission ask happens. Asks only while the status is
+    /// `notDetermined`: the system shot is one-time, and on `denied` a repeat call
+    /// shows nothing anyway. `push_status` is written from the status read back
+    /// *after* the answer, so it reflects what the user actually chose (which may be
+    /// partial), not what we asked for; then `pushAuthorizationResolved` lets the
+    /// goal/eating pushes that were refused before the grant reschedule. Shared by
+    /// `StartFastThunk` and `SunnahMiddleware` so both entry points leave the
+    /// property in the same state — while the Sunnah path had its own copy, a grant
+    /// through it left `push_status` at `notDetermined` until the next cold start.
+    /// Returns whether the dialog was shown.
+    @discardableResult
+    static func requestIfUndetermined(notifications: NotificationRepositoryProtocol,
+                                      analytics: AnalyticsRepositoryProtocol,
+                                      dispatch: @escaping (Action) -> Void) async -> Bool {
+        guard !promptSuppressed else { return false }
+        guard await notifications.authorizationStatus() == .notDetermined else { return false }
+
+        await notifications.requestAuthorization()
+
+        let status = await notifications.authorizationStatus()
+        analytics.setUserProperty(label(for: status), forName: "push_status")
+        dispatch(AppLifecycleAction.pushAuthorizationResolved)
+        return true
+    }
+
+    /// UI tests drive Start fast, and the system dialog covers the screen and breaks
+    /// the flow. `-suppressPushPrompt` skips the ask; DEBUG-only, like `UITestSeed`.
+    private static var promptSuppressed: Bool {
+        #if DEBUG
+        return ProcessInfo.processInfo.arguments.contains("-suppressPushPrompt")
+        #else
+        return false
+        #endif
+    }
+
+    /// The `push_status` value for a status.
     static func label(for status: UNAuthorizationStatus) -> String {
         switch status {
         case .authorized: return "authorized"

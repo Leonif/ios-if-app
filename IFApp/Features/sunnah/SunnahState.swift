@@ -6,10 +6,22 @@ struct SunnahSettings: Codable, Equatable, Sendable {
     var whiteDays = false
     var minuteOfDay = 20 * 60
     var enabled: Bool { weekly || whiteDays }
+
+    /// The domain clamp, and the only one: a reminder time is a minute of a civil day.
+    /// Both roads a value enters by - the picker (via the reducer) and the stored
+    /// blob (via the repository) - pass through here.
+    static func clamped(minuteOfDay: Int) -> Int { min(1439, max(0, minuteOfDay)) }
 }
 
 struct SunnahState: Equatable, Sendable {
-    enum Delivery: Equatable, Sendable { case off, checking, scheduled, denied, failed }
+    enum Delivery: Equatable, Sendable {
+        case off, checking, scheduled, denied, failed
+
+        /// Disabled reminders are `.off` and nothing else, whether the schedule has
+        /// run or not - one definition for the reducer's provisional value and the
+        /// middleware's settled one.
+        static func resolve(enabled: Bool, otherwise: Delivery) -> Delivery { enabled ? otherwise : .off }
+    }
     var settings = SunnahSettings()
     var delivery: Delivery = .off
     var upcoming: [Date] = []
@@ -26,9 +38,9 @@ func sunnahReducer(state: SunnahState, action: Action) -> SunnahState {
     var next = state
     switch action {
     case .settingsChanged(var settings):
-        settings.minuteOfDay = min(1439, max(0, settings.minuteOfDay))
+        settings.minuteOfDay = SunnahSettings.clamped(minuteOfDay: settings.minuteOfDay)
         next.settings = settings
-        next.delivery = settings.enabled ? .checking : .off
+        next.delivery = .resolve(enabled: settings.enabled, otherwise: .checking)
     case .refresh: break
     case .deliveryUpdated(let delivery, let dates):
         next.delivery = delivery
@@ -41,8 +53,12 @@ func sunnahReducer(state: SunnahState, action: Action) -> SunnahState {
 enum SunnahSchedule {
     struct Reminder: Equatable, Sendable { let fastDate: Date; let fireDate: Date }
 
+    /// How many reminders are ever scheduled at once; the repository reserves the
+    /// same room in the pending-notification budget.
+    static let maxReminders = 48
+
     static func reminders(settings: SunnahSettings, now: Date, timeZone: TimeZone,
-                          limit: Int = 48) -> [Reminder] {
+                          limit: Int = maxReminders) -> [Reminder] {
         guard settings.enabled, limit > 0 else { return [] }
         var civil = Calendar(identifier: .gregorian)
         civil.timeZone = timeZone

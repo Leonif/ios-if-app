@@ -761,9 +761,5 @@ enum strings {
 
     enum Sources {
         static var title: String { String(localized: "Scientific Sources") }
-        static var source1: String { String(localized: "Glycogen and its metabolism: some new developments and old themes") }
-        static var source2: String { String(localized: "Effect of Alternate-Day Fasting on Weight Loss, Weight Maintenance, and Cardioprotection Among Metabolically Healthy Obese Adults: A Randomized Clinical Trial") }
-        static var source3: String { String(localized: "Fasting-induced FGF21 signaling activates hepatic autophagy and lipid degradation via JMJD3 histone demethylase") }
-        static var source4: String { String(localized: "Intermittent Fasting and Metabolic Health") }
     }
 }

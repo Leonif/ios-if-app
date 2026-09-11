@@ -23,8 +23,7 @@ struct ExportHistoryThunk: Thunk {
     func execute<State: Equatable>(state: State, dispatch: @escaping (Action) -> Void) async {
         guard let app = state as? AppState else { return }
         let records = app.historyState.records
-        guard !records.isEmpty, !app.historyState.isExporting,
-              app.historyState.exportFile == nil else { return }
+        guard !records.isEmpty, !app.historyState.isExportBusy else { return }
 
         dispatch(HistoryAction.exportStarted)
 

@@ -16,7 +16,7 @@ struct SunnahRepository: SunnahRepositoryProtocol {
               var settings = try? JSONDecoder().decode(SunnahSettings.self, from: data) else {
             return SunnahSettings()
         }
-        settings.minuteOfDay = min(1439, max(0, settings.minuteOfDay))
+        settings.minuteOfDay = SunnahSettings.clamped(minuteOfDay: settings.minuteOfDay)
         return settings
     }
     func save(_ settings: SunnahSettings) {
@@ -29,7 +29,7 @@ struct SunnahRepository: SunnahRepositoryProtocol {
         center.removePendingNotificationRequests(withIdentifiers: ours)
         // Leave room for unrelated notifications and the timer's two replaceable pushes.
         let others = pending.count - ours.count
-        let capacity = max(0, min(48, 60 - others))
+        let capacity = max(0, min(SunnahSchedule.maxReminders, 60 - others))
         guard reminders.count <= capacity else { return false }
         for (index, reminder) in reminders.enumerated() {
             if Task.isCancelled { return false }

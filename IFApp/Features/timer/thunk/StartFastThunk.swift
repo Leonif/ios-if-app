@@ -45,31 +45,10 @@ struct StartFastThunk: Thunk {
         dispatch(TimerAction.started(startTimestamp: startTimestamp,
                                      goalHours: plan.fastHours))
 
-        await requestPushAuthorizationIfNeeded(dispatch: dispatch)
-    }
-
-    /// Asks only while the status is `notDetermined`: the system shot is one-time,
-    /// and on `denied` a repeat call shows nothing anyway. `push_status` is written
-    /// from the status read back *after* the answer, so it reflects what the user
-    /// actually chose (which may be partial), not what we asked for.
-    private func requestPushAuthorizationIfNeeded(dispatch: @escaping (Action) -> Void) async {
-        guard !Self.promptSuppressed else { return }
-        guard await notifications.authorizationStatus() == .notDetermined else { return }
-
-        await notifications.requestAuthorization()
-
-        let status = await notifications.authorizationStatus()
-        analytics.setUserProperty(SyncPushStatusThunk.label(for: status), forName: "push_status")
-        dispatch(AppLifecycleAction.pushAuthorizationResolved)
-    }
-
-    /// UI tests drive Start fast, and the system dialog covers the screen and breaks
-    /// the flow. `-suppressPushPrompt` skips the ask; DEBUG-only, like `UITestSeed`.
-    private static var promptSuppressed: Bool {
-        #if DEBUG
-        return ProcessInfo.processInfo.arguments.contains("-suppressPushPrompt")
-        #else
-        return false
-        #endif
+        // The ask is `SyncPushStatusThunk.requestIfUndetermined`, shared with the
+        // Sunnah opt-in, so both roads write `push_status` the same way.
+        await SyncPushStatusThunk.requestIfUndetermined(notifications: notifications,
+                                                        analytics: analytics,
+                                                        dispatch: dispatch)
     }
 }

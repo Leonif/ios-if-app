@@ -26,6 +26,8 @@ struct HistoryProps: Equatable {
     /// The written CSV waiting to be shared; the share sheet is up while it exists.
     let exportFile: URL?
     let isExporting: Bool
+    /// `HistoryState.isExportBusy` - gates the button the same way the thunk gates itself.
+    let isExportBusy: Bool
 
     init(state: AppState) {
         records = state.historyState.records
@@ -34,6 +36,7 @@ struct HistoryProps: Equatable {
         isPro = state.proState.isPro
         exportFile = state.historyState.exportFile
         isExporting = state.historyState.isExporting
+        isExportBusy = state.historyState.isExportBusy
     }
 }
 
@@ -231,7 +234,7 @@ struct HistoryFlowView: View {
         .accessibilityValue(props.isPro ? "" : strings.Pro.productName)
         .accessibilityHint(props.isPro ? "" : strings.Pro.lockedDestinationHint)
         .accessibilityIdentifier("history.export")
-        .disabled(props.isExporting || props.exportFile != nil)
+        .disabled(props.isExportBusy)
     }
 
     // MARK: List
