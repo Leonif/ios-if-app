@@ -12,6 +12,16 @@ import SwiftUI
 import UIKit
 import Redux
 
+/// Carries the pinned footer's measured height up to the scroll content that has to
+/// reserve it. A preference rather than a second `GeometryReader` because the two live
+/// in different branches of the same `safeAreaInset` composition.
+private struct FooterHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 struct TimerScreenProps: Equatable {
     let isRunning: Bool
     let fastStartTimestamp: Double
@@ -174,6 +184,10 @@ struct TimerFlowView: View {
     /// state other than `.goalReached`: leaving the frame makes the next entry a new
     /// moment.
     @State private var goalMomentPlayed = false
+    /// The pinned footer's height on screen, measured rather than assumed: it moves with
+    /// the state, the locale and the text size, and the scrolling middle reserves exactly
+    /// this much at its bottom so its tail can be scrolled clear of the card.
+    @State private var footerHeight: CGFloat = 0
 
     init(store: Store<AppState>) {
         self.store = store
@@ -388,6 +402,23 @@ struct TimerFlowView: View {
                                           isComplete: state == .complete || state == .goalReached,
                                           theme: theme)
                                 .padding(.top, 2)
+
+                            // The door into the history, landed here rather than in the
+                            // footer. In the pinned zone it stood last in the stack —
+                            // the strongest position after the primary — so a
+                            // zero-consequence navigation outranked the only reversible
+                            // control on the card, and it cost the unmeasured surface
+                            // height it could not spare. Down here the footer edge, the
+                            // strongest divider on the screen, separates it from the
+                            // actions; it keeps its label, its chevron and a 44pt target,
+                            // and takes `mut` because it is a signpost, not a choice
+                            // being weighed.
+                            if state == .complete {
+                                HistoryLink(title: strings.History.savedToHistory, theme: theme,
+                                            identifier: "timer.savedToHistory",
+                                            tint: theme.mut, minHeight: 44,
+                                            action: { openHistory(from: .completeCard) })
+                            }
                         }
                     }
                 }
@@ -397,8 +428,17 @@ struct TimerFlowView: View {
                 // scrolls up under the transparent plaques when the user drags.
                 .padding(.top, headerTop + headerHeight + headerGap)
                 // Breathing room so the timeline doesn't butt against the pinned
-                // footer when the middle scrolls on a short screen.
-                .padding(.bottom, 12)
+                // footer when the middle scrolls on a short screen, plus the footer's own
+                // measured height.
+                //
+                // The card is drawn over this content, not beside it: without the
+                // reservation the middle ends where the screen does, the tail of it sits
+                // under the card, and the scroll has nowhere left to travel — so the row
+                // down there is not merely covered, it cannot be brought out. That is how
+                // the `.complete` history link became unreachable when the footer grew
+                // (Queue-5), while its accessibility bounds went on reporting a rectangle
+                // that was no longer on screen.
+                .padding(.bottom, 12 + footerHeight)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             // Transparent floating header: no backdrop, just the plan pill and notes
@@ -425,59 +465,39 @@ struct TimerFlowView: View {
             // Footer pinned above the scroll: it lifts off the bottom edge by the
             // home-indicator inset, or a fixed minimum on home-button devices (inset 0)
             // so it isn't jammed against the edge. The primary action stays visible; the
-            // scroll content reserves room for it.
+            // scroll content reserves room for it — see `footerHeight`.
             //
-            // The inset must NOT be wrapped in `.ignoresSafeArea(.container, .bottom)`:
-            // a `safeAreaInset` contributes to the *container* region, so ignoring that
-            // region at this edge cancels the reservation it just made, and the scroll
-            // content runs under the footer with no way to scroll it out — the tail of
-            // the middle becomes unreachable, not merely covered. It survived only while
-            // the footer was short enough to leave the tail peeking above it; the stacked
-            // full-width actions (Queue-5) pushed the `.complete` history link fully under
-            // the card, with its accessibility bounds still reporting the old rectangle.
-            // What that wrapper bought — the backdrop reaching the screen edge — is paid
-            // for by `backgroundLayer`, which already ignores the safe area and has fully
-            // resolved to `backgroundBase` by this height.
-            //
-            // Because the inset now sits inside the safe area, the lift off the bottom
-            // edge is only what the home indicator does not already provide: 32pt on a
-            // home-button device (inset 0), nothing where the indicator is taller.
+            // `.ignoresSafeArea(.container, edges: .bottom)` stays. It is what lets the
+            // ring keep its full 280pt and run *behind* the card instead of being cut off
+            // at the card's top edge, which is the composition the owner chose on
+            // 11.09.2026 over a compact ring. The price is that it also cancels the
+            // reservation `safeAreaInset` would otherwise make — a `safeAreaInset`
+            // contributes to the *container* region — so the reservation is made by hand
+            // below, out of the measured height, and the two are not interchangeable:
+            // the inset's own reservation shortens the scroll viewport and clips the ring
+            // at the boundary; a bottom padding on the content does not.
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                VStack(spacing: 12) {
-                    // The door into the history: above the card, not inside it. The rank
-                    // argument that took it out of the action stack still holds — last in
-                    // the stack it outranked the only reversible control on the card — and
-                    // it is answered by placing it beyond the card's top edge, the
-                    // strongest divider on the screen. It keeps its label, its chevron, a
-                    // 44pt target and `mut`, because it is a signpost, not a choice being
-                    // weighed.
-                    //
-                    // What it may not do is live in the scrolling middle. That middle is
-                    // ~577pt of content (280pt ring, editorial, phase scale) against ~300pt
-                    // of room on a 375pt screen, and less again at xxLarge: a row at the
-                    // tail of it is below the fold on every device and every text size, so
-                    // the only exit to the history from this screen was one the user had to
-                    // scroll to find and, while the footer covered it, could not reach at
-                    // all. Pinned, it costs the middle 56pt that the middle was already
-                    // scrolling anyway.
-                    if state == .complete {
-                        HistoryLink(title: strings.History.savedToHistory, theme: theme,
-                                    identifier: "timer.savedToHistory",
-                                    tint: theme.mut, minHeight: 44,
-                                    action: { openHistory(from: .completeCard) })
-                    }
-                    footer(state: state, elapsed: elapsed, theme: theme)
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, max(0, 32 - insets.bottom))
-                .frame(maxWidth: .infinity)
-                // Opaque backdrop so the translucent footer card doesn't let the
-                // scrolling middle (chip/timeline) show through on a short screen.
-                // The phase background is a radial gradient centered near the top; by
-                // the footer it has fully resolved to backgroundBase, so this matches
-                // seamlessly.
-                .background(theme.backgroundBase)
+                footer(state: state, elapsed: elapsed, theme: theme)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, max(insets.bottom, 32))
+                    .frame(maxWidth: .infinity)
+                    // Opaque backdrop so the translucent footer card doesn't let the
+                    // scrolling middle (chip/timeline) show through on a short screen.
+                    // The phase background is a radial gradient centered near the top; by
+                    // the footer it has fully resolved to backgroundBase, so this matches
+                    // seamlessly and fills into the bottom safe area to the screen edge.
+                    .background(theme.backgroundBase)
+                    // Measured, because the scroll content below reserves exactly this
+                    // much and nothing else can tell it how much that is: the card's
+                    // height moves with the state, the locale and the text size.
+                    .background(GeometryReader { proxy in
+                        Color.clear.preference(key: FooterHeightKey.self, value: proxy.size.height)
+                    })
             }
+            .onPreferenceChange(FooterHeightKey.self) { height in
+                footerHeight = height
+            }
+            .ignoresSafeArea(.container, edges: .bottom)
         }
         // Detect the goal crossing here (inside the per-second tick) — it is
         // time-driven, so the outer body wouldn't re-evaluate to catch it.
