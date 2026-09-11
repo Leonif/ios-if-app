@@ -103,4 +103,40 @@ final class HistoryStatsTests: XCTestCase {
                           goalHours: 16,
                           planLabel: "16:8")
     }
+
+    /// A fast of an exact length, starting at a fixed moment — the totals do not care
+    /// when it ran, only how long.
+    private func record(duration: TimeInterval) -> FastRecord {
+        let start = Date(timeIntervalSince1970: 1_750_000_000)
+        return FastRecord(id: UUID(),
+                          startTimestamp: start.timeIntervalSince1970,
+                          endTimestamp: start.timeIntervalSince1970 + duration,
+                          goalHours: 16,
+                          planLabel: "16:8")
+    }
+
+    /// SU-13. The summary card prints `TOTAL` and `LONGEST` side by side, and a sum
+    /// truncated to whole hours printed below the single fast it was made of: one
+    /// 16h 01m fast read "TOTAL 16h · LONGEST 16h 01m". The invariant is asserted on
+    /// the rendered strings, not on the numbers — the numbers were never wrong, the
+    /// two granularities were.
+    func testTotalNeverRendersBelowTheLongestFastItContains() {
+        let sixteenOhOne: TimeInterval = 16 * 3600 + 60
+        let stats = HistoryStats.compute(records: [record(duration: sixteenOhOne)])
+
+        XCTAssertEqual(stats.total, stats.longest)
+        XCTAssertEqual(HistoryFormat.duration(stats.total),
+                       HistoryFormat.duration(stats.longest))
+    }
+
+    /// And the sum still adds up once there is more than one fast in it.
+    func testTotalIsTheSumOfEveryFastToTheSecond() {
+        let stats = HistoryStats.compute(records: [
+            record(duration: 16 * 3600 + 60),
+            record(duration: 12 * 3600 + 1800),
+        ])
+        XCTAssertEqual(stats.total, 28 * 3600 + 1860)
+        XCTAssertEqual(stats.longest, 16 * 3600 + 60)
+    }
+
 }

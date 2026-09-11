@@ -29,7 +29,16 @@ struct HistoryMonthGroup: Identifiable, Equatable {
 
 struct HistoryStats: Equatable {
     let fastsCount: Int
-    let totalHours: Int
+    /// Every fast added up, in seconds — not in whole hours, and the difference is
+    /// visible on screen. Truncated to hours the sum printed *below* the longest fast
+    /// it contains: one 16h 01m fast gave "TOTAL 16h · LONGEST 16h 01m", side by side
+    /// on the same card, which is arithmetic that cannot be true. Minutes really are
+    /// noise on an aggregate of many fasts — the month headers still drop them, and
+    /// they are a different scope with nothing beside them to contradict — but an
+    /// aggregate that reads smaller than its own largest member is worse than noise.
+    /// The direction of the fix is forced: the longest fast cannot give up its minutes,
+    /// because those minutes are the personal best.
+    let total: TimeInterval
     let longest: TimeInterval
     /// Longest run of consecutive goal days found in the history.
     let bestStreak: Int
@@ -43,7 +52,7 @@ struct HistoryStats: Equatable {
 
         return HistoryStats(
             fastsCount: records.count,
-            totalHours: Int(records.reduce(0) { $0 + $1.duration } / 3600),
+            total: records.reduce(0) { $0 + $1.duration },
             longest: records.map(\.duration).max() ?? 0,
             bestStreak: longestRun(of: goalDays),
             since: records.map(\.startDate).min(),

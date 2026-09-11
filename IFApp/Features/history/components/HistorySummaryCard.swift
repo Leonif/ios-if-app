@@ -137,7 +137,10 @@ struct HistorySummaryCard: View {
             HStack(spacing: 0) {
                 stat(strings.History.statFasts, "\(stats.fastsCount)", theme.ink)
                 divider
-                stat(strings.History.statTotal, HistoryFormat.totalHours(stats.totalHours), theme.deep)
+                // Same formatter as `LONGEST` beside it, on purpose: the two are the
+                // same quantity, and printed at two granularities the sum read lower
+                // than the maximum it contains (SU-13).
+                stat(strings.History.statTotal, HistoryFormat.duration(stats.total), theme.deep)
                 divider
                 stat(strings.History.statLongest, HistoryFormat.duration(stats.longest), theme.ink)
             }
