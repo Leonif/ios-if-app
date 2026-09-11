@@ -13,43 +13,43 @@
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Нагадування Sunnah"
+          "value": "Нагадування про сунна-пости"
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Sunnah-Erinnerungen"
+          "value": "Sunna-Erinnerungen"
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Recordatorios Sunnah"
+          "value": "Recordatorios de ayuno sunna"
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Rappels Sunnah"
+          "value": "Rappels de jeûne sunna"
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Przypomnienia Sunnah"
+          "value": "Przypomnienia o postach sunny"
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "スンナのリマインダー"
+          "value": "スンナ断食のリマインダー"
         }
       },
       "ko": {
         "stringUnit": {
-          "state": "translated",
-          "value": "순나 알림"
+          "state": "needs_review",
+          "value": "순나 단식 알림"
         }
       },
       "zh-Hans": {
@@ -60,8 +60,8 @@
       },
       "ar": {
         "stringUnit": {
-          "state": "translated",
-          "value": "تذكيرات صيام السنّة"
+          "state": "needs_review",
+          "value": "تذكيرات صيام التطوّع"
         }
       }
     }
@@ -178,14 +178,14 @@
       },
       "ko": {
         "stringUnit": {
-          "state": "translated",
-          "value": "이슬람력 13~15일"
+          "state": "needs_review",
+          "value": "아이얌 알비드 · 이슬람력 13~15일"
         }
       },
       "zh-Hans": {
         "stringUnit": {
-          "state": "translated",
-          "value": "白月日 · 13–15日"
+          "state": "needs_review",
+          "value": "白日斋 · 13–15日"
         }
       },
       "ar": {
@@ -256,7 +256,7 @@
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "ذكّرني في اليوم السابق"
+          "value": "وقت التذكير في اليوم السابق"
         }
       }
     }
@@ -315,7 +315,7 @@
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "时"
+          "value": "小时"
         }
       },
       "ar": {
@@ -380,7 +380,7 @@
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "分"
+          "value": "分钟"
         }
       },
       "ar": {
@@ -433,7 +433,7 @@
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "次の断食日"
+          "value": "今後の断食日"
         }
       },
       "ko": {
@@ -486,7 +486,7 @@
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Rappels gratuits et facultatifs. Ils ne lancent pas de jeûne et ne modifient pas votre programme. IF24 ne calcule ni l’aube ni le coucher du soleil."
+          "value": "Rappels gratuits et facultatifs. Ils ne lancent pas de jeûne et ne modifient pas votre plan. IF24 ne calcule ni l’aube ni le coucher du soleil."
         }
       },
       "pl": {
@@ -497,14 +497,14 @@
       },
       "ja": {
         "stringUnit": {
-          "state": "translated",
-          "value": "無料の任意リマインダーです。断食の開始やプランの変更は行いません。IF24は暁や日没を計算しません。"
+          "state": "needs_review",
+          "value": "無料の任意リマインダーです。断食の開始やプランの変更は行いません。IF24は夜明けや日没を計算しません。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "무료 선택 알림입니다. 단식을 시작하거나 계획을 변경하지 않습니다. IF24는 새벽이나 일몰을 계산하지 않습니다."
+          "value": "무료 선택 알림입니다. 단식을 시작하거나 플랜을 변경하지 않습니다. IF24는 새벽이나 일몰 시각을 계산하지 않습니다."
         }
       },
       "zh-Hans": {
@@ -533,7 +533,7 @@
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Дати за Умм аль-Кура можуть відрізнятися від місцевого спостереження місяця. Звіряйте на місці. Без добровільних нагадувань у Рамадан, на Ід і 11–13 Зуль-хіджі."
+          "value": "Дати за Умм аль-Кура можуть відрізнятися від місцевого спостереження місяця. Звіряйте на місці. У Рамадан, у дні Ід і 11–13 зуль-хіджа добровільних нагадувань немає."
         }
       },
       "de": {
@@ -568,8 +568,8 @@
       },
       "ko": {
         "stringUnit": {
-          "state": "translated",
-          "value": "날짜는 움 알쿠라 달력을 따르며 현지 달 관측과 다를 수 있습니다. 현지에서 확인하세요. 라마단, 이드, 둘힛자월 11~13일에는 자발적 단식 알림을 보내지 않습니다."
+          "state": "needs_review",
+          "value": "날짜는 움 알쿠라력을 따르며 현지 달 관측과 다를 수 있습니다. 현지에서 확인하십시오. 라마단, 이드, 둘힛자월 11~13일에는 자발적 단식 알림을 보내지 않습니다."
         }
       },
       "zh-Hans": {
@@ -580,8 +580,8 @@
       },
       "ar": {
         "stringUnit": {
-          "state": "translated",
-          "value": "التواريخ وفق تقويم أم القرى وقد تختلف عن رؤية الهلال محليًا؛ تحقّق منها محليًا. لا تُرسل تذكيرات صيام التطوّع في رمضان أو العيدين أو أيام ⁦11–13⁩ من ذي الحجة."
+          "state": "needs_review",
+          "value": "التواريخ وفق تقويم أم القرى، وقد تختلف عن الرؤية المحلية للهلال. تحقّق من التاريخ محليًا. لا يُرسل IF24 تذكيرات صيام التطوّع في رمضان أو العيدين أو أيام التشريق (⁦11–13⁩ ذي الحجة)."
         }
       }
     }
@@ -628,13 +628,13 @@
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "リマインダーはオフです"
+          "value": "リマインダーはオフです。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "알림이 꺼져 있습니다"
+          "value": "알림이 꺼져 있어요"
         }
       },
       "zh-Hans": {
@@ -764,7 +764,7 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "알림이 예약되었습니다. 예정 날짜를 갱신하려면 IF24를 정기적으로 열어 주세요."
+          "value": "알림을 예약했어요. 다가오는 날짜를 갱신하려면 IF24를 주기적으로 열어 주세요."
         }
       },
       "zh-Hans": {
@@ -776,7 +776,7 @@
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "تمت جدولة التذكيرات. افتح IF24 بانتظام لتحديث المواعيد القادمة."
+          "value": "تمت جدولة التذكيرات. افتح IF24 بانتظام لتحديث التواريخ القادمة."
         }
       }
     }
@@ -829,7 +829,7 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "iOS 설정에서 알림이 꺼져 있습니다."
+          "value": "iOS 설정에서 알림이 꺼져 있어요."
         }
       },
       "zh-Hans": {
@@ -894,7 +894,7 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "알림을 예약하지 못했습니다. 다시 시도해 주세요."
+          "value": "알림을 예약하지 못했어요. 다시 시도해 주세요."
         }
       },
       "zh-Hans": {
@@ -906,7 +906,7 @@
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "تعذّرت جدولة التذكيرات. حاول مجددًا."
+          "value": "تعذّرت جدولة التذكيرات. حاول مرة أخرى."
         }
       }
     }
@@ -971,7 +971,7 @@
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "افتح الإعدادات"
+          "value": "فتح الإعدادات"
         }
       }
     }
@@ -988,7 +988,7 @@
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Спробувати ще раз"
+          "value": "Ще раз"
         }
       },
       "de": {
@@ -1036,7 +1036,7 @@
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "حاول مجددًا"
+          "value": "محاولة مرة أخرى"
         }
       }
     }
@@ -1053,43 +1053,43 @@
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Завтра день посту Sunnah. Звірте дату й час світанку та заходу сонця на місці."
+          "value": "Завтра день сунна-посту. Звірте дату й час світанку та заходу сонця на місці."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Morgen ist ein Sunnah-Fastentag. Prüfe Datum, Morgendämmerung und Sonnenuntergang vor Ort."
+          "value": "Morgen ist ein Sunna-Fastentag. Prüfe Datum, Morgendämmerung und Sonnenuntergang vor Ort."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Mañana es un día de ayuno Sunnah. Confirma localmente la fecha y las horas del alba y del ocaso."
+          "value": "Mañana es un día de ayuno sunna. Confirma localmente la fecha y las horas del alba y de la puesta de sol."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Demain est un jour de jeûne Sunnah. Vérifiez localement la date et les heures de l’aube et du coucher du soleil."
+          "value": "Demain est un jour de jeûne sunna. Vérifiez localement la date et les heures de l’aube et du coucher du soleil."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Jutro dzień postu Sunnah. Sprawdź lokalnie datę oraz godziny świtu i zachodu słońca."
+          "value": "Jutro dzień postu sunny. Sprawdź lokalnie datę oraz godziny świtu i zachodu słońca."
         }
       },
       "ja": {
         "stringUnit": {
-          "state": "translated",
-          "value": "明日はスンナの断食日です。日付と暁・日没の時刻を現地で確認してください。"
+          "state": "needs_review",
+          "value": "明日はスンナ断食の日です。日付と夜明け・日没の時刻を現地で確認してください。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "내일은 순나 단식일입니다. 현지 날짜와 새벽·일몰 시간을 확인하세요."
+          "value": "내일은 순나 단식일이에요. 날짜와 새벽·일몰 시각을 현지에서 확인하세요."
         }
       },
       "zh-Hans": {
@@ -1100,8 +1100,8 @@
       },
       "ar": {
         "stringUnit": {
-          "state": "translated",
-          "value": "غدًا يوم لصيام السنّة. تحقّق من التاريخ ووقتي الفجر والغروب محليًا."
+          "state": "needs_review",
+          "value": "غدًا يوم من أيام صيام التطوّع. تحقّق من التاريخ ووقت الفجر والغروب محليًا."
         }
       }
     }
@@ -1153,8 +1153,8 @@
       },
       "ko": {
         "stringUnit": {
-          "state": "translated",
-          "value": "연구를 이해하다"
+          "state": "needs_review",
+          "value": "맥락으로 읽는 연구"
         }
       },
       "zh-Hans": {
@@ -1277,8 +1277,8 @@
       },
       "ja": {
         "stringUnit": {
-          "state": "translated",
-          "value": "IF24での読み方"
+          "state": "needs_review",
+          "value": "IF24にとっての意味"
         }
       },
       "ko": {
@@ -1296,7 +1296,7 @@
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "ماذا يعني هذا في IF24"
+          "value": "ما يعنيه هذا لتطبيق IF24"
         }
       }
     }
@@ -1361,7 +1361,7 @@
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "اقرأ الأصل"
+          "value": "قراءة الورقة الأصلية"
         }
       }
     }
@@ -1538,13 +1538,13 @@
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "無作為化試験 · 成人"
+          "value": "ランダム化比較試験・成人"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "무작위 시험 · 성인"
+          "value": "무작위 대조 시험 · 성인"
         }
       },
       "zh-Hans": {
@@ -1602,8 +1602,8 @@
       },
       "ja": {
         "stringUnit": {
-          "state": "translated",
-          "value": "機序の研究 · 主にマウス"
+          "state": "needs_review",
+          "value": "機序研究・主にマウス"
         }
       },
       "ko": {
@@ -1709,7 +1709,7 @@
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Glykogen speichert Glukose. Der Überblick erklärt, wie Enzyme und Hormone seine Speicherung und Nutzung steuern."
+          "value": "Glykogen speichert Glukose. Die Übersichtsarbeit erklärt, wie Enzyme und Hormone seine Speicherung und Nutzung steuern."
         }
       },
       "es": {
@@ -1739,7 +1739,7 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "글리코겐은 포도당을 저장합니다. 이 종설은 저장과 사용을 조절하는 효소와 호르몬을 설명합니다."
+          "value": "글리코겐은 포도당을 저장해요. 이 종설은 글리코겐의 저장과 사용을 조절하는 효소와 호르몬을 설명해요."
         }
       },
       "zh-Hans": {
@@ -1751,7 +1751,7 @@
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "يخزّن الغليكوجين الغلوكوز. تشرح هذه المراجعة الإنزيمات والهرمونات التي تنظّم تخزينه واستخدامه."
+          "value": "يخزّن الجليكوجين الجلوكوز. تشرح هذه المراجعة الإنزيمات والهرمونات التي تنظّم تخزينه واستخدامه."
         }
       }
     }
@@ -1816,7 +1816,7 @@
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "خلفية لفهم مصادر الطاقة. لا يقيس IF24 الغليكوجين، لذا لا يستطيع المؤقّت تحديد وقت نفاد مخزونك."
+          "value": "خلفية لفهم مصادر الطاقة. لا يقيس IF24 الجليكوجين، لذا لا يستطيع المؤقّت تحديد وقت نفاد مخزونك."
         }
       }
     }
@@ -1875,7 +1875,7 @@
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "隔日禁食效果更好吗？"
+          "value": "隔日断食效果更好吗？"
         }
       },
       "ar": {
@@ -1934,13 +1934,13 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "이 1년간의 시험에서 격일 단식은 체중 감량 면에서 매일 칼로리를 제한하는 방식보다 우수하지 않았습니다."
+          "value": "이 1년간의 시험에서 격일 단식은 체중 감량 면에서 매일 칼로리를 제한하는 방식보다 나은 결과를 보이지 않았어요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "在这项为期一年的试验中，隔日禁食的减重效果并未优于每日限制热量。"
+          "value": "在这项为期一年的试验中，隔日断食的减重效果并未优于每日限制热量。"
         }
       },
       "ar": {
@@ -2064,7 +2064,7 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "오토파지의 기전 이해하기"
+          "value": "자가포식의 기전 이해하기"
         }
       },
       "zh-Hans": {
@@ -2129,7 +2129,7 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "주로 생쥐를 대상으로 한 실험에서 FGF21–JMJD3 신호가 간의 오토파지 및 지질 분해와 연결되었습니다."
+          "value": "주로 생쥐를 대상으로 한 실험에서 FGF21–JMJD3 신호가 간의 자가포식과 지질 분해에 관련 있는 것으로 나타났어요."
         }
       },
       "zh-Hans": {
@@ -2158,7 +2158,7 @@
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Механізм — не особистий розклад. IF24 не може виявити аутофагію чи встановити, що вона починається в певну годину голодування людини."
+          "value": "Механізм — не особистий розклад. IF24 не може виявити аутофагію чи встановити, що вона починається в певну годину посту в людини."
         }
       },
       "de": {
@@ -2194,19 +2194,19 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "기전은 개인별 시간표가 아닙니다. IF24는 오토파지를 감지하거나 사람에게서 단식 몇 시간째에 시작되는지 확인할 수 없습니다."
+          "value": "기전은 개인별 시간표가 아닙니다. IF24는 자가포식을 감지하거나 사람에게서 단식 몇 시간째에 시작되는지 확인할 수 없습니다."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "机制并不是个人时间表。IF24 无法检测自噬，也无法确定它会在个人禁食的某个小时开始。"
+          "value": "机制并不是个人时间表。IF24 无法检测自噬，也无法确定它会在个人断食的某个小时开始。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "الآلية ليست جدولًا شخصيًا. لا يستطيع IF24 رصد الالتهام الذاتي أو إثبات أنه يبدأ في ساعة معيّنة من صيام الإنسان."
+          "value": "الآلية ليست جدولًا شخصيًا. لا يستطيع IF24 رصد الالتهام الذاتي أو إثبات أنه يبدأ عند ساعة صيام معيّنة لدى الإنسان."
         }
       }
     }
@@ -2223,7 +2223,7 @@
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Голодування та метаболічне здоров’я"
+          "value": "Інтервальне голодування та метаболічне здоров’я"
         }
       },
       "de": {
@@ -2265,7 +2265,7 @@
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "禁食与代谢健康"
+          "value": "断食与代谢健康"
         }
       },
       "ar": {
@@ -2288,13 +2288,13 @@
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Огляд розглядає режими голодування та метаболічні результати й наголошує на потребі довгострокових доказів."
+          "value": "Огляд розглядає режими інтервального голодування та метаболічні результати й наголошує на потребі довгострокових доказів."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Dieser Überblick bespricht Fastenrhythmen und Stoffwechselergebnisse und betont den Bedarf an längerfristigen Daten."
+          "value": "Diese Übersichtsarbeit bespricht Fastenrhythmen und Stoffwechselergebnisse und betont den Bedarf an längerfristigen Daten."
         }
       },
       "es": {
@@ -2324,13 +2324,13 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "이 종설은 단식 일정과 대사 결과를 논의하며 장기적 근거의 필요성을 강조합니다."
+          "value": "이 종설은 단식 일정과 대사 결과를 논의하며 장기적 근거의 필요성을 강조해요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "这篇综述讨论了禁食安排及代谢结果，并强调需要更长期的证据。"
+          "value": "这篇综述讨论了断食安排及代谢结果，并强调需要更长期的证据。"
         }
       },
       "ar": {
@@ -2353,7 +2353,7 @@
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Це контекст, а не індивідуальний план лікування. IF24 записує час, але не вимірює метаболічне здоров’я й не визначає, чи підходить вам голодування."
+          "value": "Це контекст, а не індивідуальний план лікування. IF24 записує час, але не вимірює метаболічне здоров’я й не визначає, чи підходить вам інтервальне голодування."
         }
       },
       "de": {
@@ -2389,13 +2389,13 @@
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "배경정보이며 개인별 치료 계획이 아닙니다. IF24는 시간을 기록할 뿐, 대사 건강을 측정하거나 단식의 적합성을 판단하지 않습니다."
+          "value": "배경 정보이며 개인별 치료 계획이 아닙니다. IF24는 시간을 기록할 뿐, 대사 건강을 측정하거나 단식의 적합성을 판단하지 않습니다."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "这是背景知识，而非个人治疗方案。IF24 记录时间，不测量代谢健康，也不判断禁食是否适合你。"
+          "value": "这是背景知识，而非个人治疗方案。IF24 记录时间，不测量代谢健康，也不判断断食是否适合你。"
         }
       },
       "ar": {
