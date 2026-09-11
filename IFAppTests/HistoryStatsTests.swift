@@ -51,4 +51,56 @@ final class HistoryStatsTests: XCTestCase {
     func testFirstNoteShownWithNoHistoryAndNoStreak() {
         XCTAssertTrue(HistoryStats.showsFirstNote(fastsCount: 0, streakCount: 0))
     }
+
+    // MARK: Month grouping (SU-6)
+
+    /// The month a record is filed under is a **Gregorian** month, whatever calendar
+    /// the device runs on. Taken from `Calendar.current`, an Arabic device grouped by
+    /// Hijri months and the id read "1448-03"; the header then printed that month's
+    /// first day through the Gregorian formatter and September records stood under
+    /// "أغسطس 2026".
+    func testMonthGroupIdIsTheGregorianMonth() {
+        let groups = HistoryStats.monthGroups(records: [record(day: 11, month: 9, year: 2026)])
+        XCTAssertEqual(groups.count, 1)
+        XCTAssertEqual(groups.first?.id, "2026-09")
+    }
+
+    /// And the date behind the header is the first day of that same Gregorian month —
+    /// the value `HistoryFormat.monthTitle` formats. The bug lived in this step: the
+    /// first day of the Hijri month containing 11 September 2026 falls in August.
+    func testMonthGroupDateIsTheFirstDayOfTheGregorianMonth() {
+        let groups = HistoryStats.monthGroups(records: [record(day: 11, month: 9, year: 2026)])
+        let parts = Clock.gregorian.dateComponents([.year, .month, .day],
+                                                   from: groups.first?.month ?? .distantPast)
+        XCTAssertEqual(parts.year, 2026)
+        XCTAssertEqual(parts.month, 9)
+        XCTAssertEqual(parts.day, 1)
+    }
+
+    /// Two Gregorian months, two groups, newest first — the Hijri buckets cut the same
+    /// records in different places, so the count is part of the claim.
+    func testRecordsSplitOnGregorianMonthBoundaries() {
+        let groups = HistoryStats.monthGroups(records: [
+            record(day: 31, month: 8, year: 2026),
+            record(day: 1, month: 9, year: 2026),
+            record(day: 30, month: 9, year: 2026),
+        ])
+        XCTAssertEqual(groups.map(\.id), ["2026-09", "2026-08"])
+        XCTAssertEqual(groups.first?.records.count, 2)
+    }
+
+    /// A 14-hour fast starting at noon on the given Gregorian day.
+    private func record(day: Int, month: Int, year: Int) -> FastRecord {
+        var components = DateComponents()
+        components.year = year
+        components.month = month
+        components.day = day
+        components.hour = 12
+        let start = Clock.gregorian.date(from: components) ?? Date()
+        return FastRecord(id: UUID(),
+                          startTimestamp: start.timeIntervalSince1970,
+                          endTimestamp: start.timeIntervalSince1970 + 14 * 3600,
+                          goalHours: 16,
+                          planLabel: "16:8")
+    }
 }

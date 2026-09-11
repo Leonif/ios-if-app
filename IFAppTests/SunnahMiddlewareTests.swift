@@ -58,12 +58,20 @@ final class SunnahMiddlewareTests: XCTestCase {
         withExtendedLifetime(middleware) {}
     }
 
+    /// SU-1: a refusal delivers no dates either. The upcoming list is what *was
+    /// scheduled*, and with the permission denied nothing was — the screen used to
+    /// print three fasting dates under a green switch while no reminder could fire.
     func testDeniedPermissionClearsRequestsAndReportsDenied() async {
         let finished = expectation(description: "denied delivered")
         let repository = Repository()
         let middleware = SunnahMiddleware(repository: repository, notifications: Notifications(status: .denied))
+        let dates = Recorder()
         let dispatch = DispatchFunction(dispatchAction: { action in
-            if case SunnahAction.deliveryUpdated(.denied, _) = action { finished.fulfill() }
+            if case SunnahAction.deliveryUpdated(.denied, let upcoming) = action {
+                // Fulfilled from inside the append so the assertion cannot read the
+                // recorder before the value lands in it.
+                Task { await dates.append(upcoming.count); finished.fulfill() }
+            }
         }, dispatchThunk: { _ in })
         var enabled = AppState()
         enabled.sunnahState.settings.weekly = true
@@ -71,6 +79,31 @@ final class SunnahMiddlewareTests: XCTestCase {
         await fulfillment(of: [finished], timeout: 3)
         let counts = await repository.recorder.values()
         XCTAssertEqual(counts, [0])
+        let delivered = await dates.values()
+        XCTAssertEqual(delivered, [0])
+        withExtendedLifetime(middleware) {}
+    }
+
+    /// The same run with the permission granted still carries the list, so the check
+    /// above is about the refusal and not about the dates having gone away.
+    func testGrantedPermissionStillDeliversUpcomingDates() async {
+        let finished = expectation(description: "scheduled delivered")
+        let repository = Repository()
+        let middleware = SunnahMiddleware(repository: repository, notifications: Notifications(status: .authorized))
+        let dates = Recorder()
+        let dispatch = DispatchFunction(dispatchAction: { action in
+            if case SunnahAction.deliveryUpdated(.scheduled, let upcoming) = action {
+                // Fulfilled from inside the append so the assertion cannot read the
+                // recorder before the value lands in it.
+                Task { await dates.append(upcoming.count); finished.fulfill() }
+            }
+        }, dispatchThunk: { _ in })
+        var enabled = AppState()
+        enabled.sunnahState.settings.weekly = true
+        middleware.handle(action: SunnahAction.refresh, state: enabled, dispatch: dispatch)
+        await fulfillment(of: [finished], timeout: 3)
+        let delivered = await dates.values()
+        XCTAssertEqual(delivered, [3])
         withExtendedLifetime(middleware) {}
     }
 }

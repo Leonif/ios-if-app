@@ -70,8 +70,15 @@ struct HistoryStats: Equatable {
 
     /// Records grouped by the month they *started* in — the row shows its start date,
     /// so a fast crossing a month boundary belongs to the month the user sees on it.
+    ///
+    /// The month is a Gregorian one (`Clock.gregorian`), like every other day the app
+    /// counts and like the header `HistoryFormat.monthTitle` prints. Taking it from
+    /// `Calendar.current` instead put an Arabic device on the Hijri calendar: the
+    /// bucket key became a Hijri month and its first day, rendered back through the
+    /// Gregorian formatter, landed in the previous Gregorian month — September
+    /// records under "أغسطس 2026" (SU-6).
     static func monthGroups(records: [FastRecord]) -> [HistoryMonthGroup] {
-        let calendar = Calendar.current
+        let calendar = Clock.gregorian
         let sorted = records.sorted { $0.startTimestamp > $1.startTimestamp }
 
         var order: [String] = []
@@ -111,7 +118,7 @@ struct HistoryStats: Equatable {
 
     /// Seven flags, oldest first: did a fast reach its goal on that local day.
     private static func lastSeven(goalDays: Set<String>, now: Date) -> [Bool] {
-        let calendar = Calendar.current
+        let calendar = Clock.gregorian
         return (0..<7).reversed().map { daysAgo in
             guard let day = calendar.date(byAdding: .day, value: -daysAgo, to: now) else { return false }
             return goalDays.contains(Clock.dayKey(day))

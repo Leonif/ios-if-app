@@ -63,7 +63,12 @@ final class SunnahMiddleware: Middleware {
             guard !Task.isCancelled else { return }
             let delivery = SunnahState.Delivery.resolve(
                 enabled: settings.enabled, otherwise: !allowed ? .denied : (success ? .scheduled : .failed))
-            dispatch(SunnahAction.deliveryUpdated(delivery, dates: reminders.prefix(3).map(\.fastDate)))
+            // Upcoming dates are what *was scheduled*, not what the calendar holds.
+            // With the permission refused nothing was written (`replace([])` above), so
+            // the list would be a promise the app cannot keep — the loudest half of
+            // SU-1, where the screen read as configured while no reminder could fire.
+            dispatch(SunnahAction.deliveryUpdated(
+                delivery, dates: allowed ? reminders.prefix(3).map(\.fastDate) : []))
         }
     }
 }

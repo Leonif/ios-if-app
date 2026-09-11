@@ -1,3 +1,17 @@
+//
+//  SunnahSettingsView.swift
+//  IFApp
+//
+//  The opt-in for voluntary Sunnah reminders. One state on this screen is not a
+//  variant of the others: with notifications refused in iOS Settings nothing here
+//  can ever be delivered, and until SU-1 the screen said the opposite — a green
+//  switch on top, a list of upcoming fasting dates below, and the refusal itself a
+//  grey line between them. So `denied` reorders the screen rather than annotating
+//  it: the refusal and the way out of it come first, the switches stop reading as a
+//  running schedule, and the upcoming list is gone (the middleware stops sending
+//  dates it did not schedule).
+//
+
 import SwiftUI
 
 struct SunnahSettingsView: View {
@@ -10,12 +24,26 @@ struct SunnahSettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                if isDenied {
+                    Section {
+                        Text(SunnahStrings.denied)
+                            .accessibilityIdentifier("sunnah.status")
+                        Button(SunnahStrings.settings, action: onSettings)
+                            .buttonStyle(.borderedProminent)
+                            .frame(maxWidth: .infinity)
+                            .accessibilityIdentifier("sunnah.settings")
+                    }
+                }
+                // The switches stay operable while denied — they are how someone turns
+                // the opt-in back off — but they lose the on-tint, which is the part
+                // that claimed a schedule exists.
                 Section {
                     Toggle(SunnahStrings.weekly, isOn: binding(\.weekly))
                         .accessibilityIdentifier("sunnah.weekly")
                     Toggle(SunnahStrings.whiteDays, isOn: binding(\.whiteDays))
                         .accessibilityIdentifier("sunnah.whiteDays")
                 } footer: { Text(SunnahStrings.note) }
+                    .tint(isDenied ? Color.secondary : nil)
                 Section(SunnahStrings.eve) {
                     Picker(SunnahStrings.hour, selection: Binding(
                         get: { state.settings.minuteOfDay / 60 },
@@ -28,16 +56,17 @@ struct SunnahSettingsView: View {
                         ForEach(0..<60) { Text(String(format: "%02d", $0)).tag($0) }
                     }.accessibilityIdentifier("sunnah.minute")
                 }
-                Section {
-                    Text(statusText).accessibilityIdentifier("sunnah.status")
-                    if state.delivery == .denied {
-                        Button(SunnahStrings.settings, action: onSettings)
-                    }
-                    if state.delivery == .failed {
-                        Button(SunnahStrings.retry, action: onRetry)
+                if !isDenied {
+                    Section {
+                        Text(statusText).accessibilityIdentifier("sunnah.status")
+                        if state.delivery == .failed {
+                            Button(SunnahStrings.retry, action: onRetry)
+                        }
                     }
                 }
-                if state.settings.enabled && !state.upcoming.isEmpty {
+                // Never a list of dates under a refusal, whatever the state still holds
+                // from before the permission changed.
+                if !isDenied && state.settings.enabled && !state.upcoming.isEmpty {
                     Section(SunnahStrings.upcoming) {
                         ForEach(state.upcoming, id: \.self) { date in
                             Text(date.formatted(Date.FormatStyle.latinDigits.day().month().year()))
@@ -58,6 +87,12 @@ struct SunnahSettingsView: View {
         }
     }
 
+    /// `denied` is the one delivery state the layout itself answers to.
+    private var isDenied: Bool { state.delivery == .denied }
+
+    /// `.denied` no longer reaches this text — the refusal owns a section of its own
+    /// above, and this one is hidden while it does. The case stays because the switch
+    /// is exhaustive over the states, not over the ones this row happens to render.
     private var statusText: String {
         switch state.delivery {
         case .off: return SunnahStrings.off
