@@ -30,6 +30,9 @@ final class AnalyticsEventTests: XCTestCase {
         .timeAdjusted,
         .lastMealLogged(backdated: true, minutesAgo: 7, inputMethod: "ribbon"),
         .sourcesOpened,
+        .sourceArticleOpened(articleID: 2),
+        .sourceOriginalOpened(articleID: 2),
+        .sourceArticleClosed(articleID: 2, reachedEnd: true),
         .sunnahOpened(source: "about"),
         .sunnahEnabled(mode: "white_days", pushAllowed: false),
         .historyOpened(source: "streak_badge"),
@@ -96,6 +99,13 @@ final class AnalyticsEventTests: XCTestCase {
         XCTAssertEqual(
             AnalyticsEvent.streakMilestone(days: 7).parameters["days"] as? String, "07"
         )
+        // The paper's catalog index, padded like every other dimension that is a
+        // number: the four papers are read as a distribution, and a distribution is
+        // sorted by its dimension.
+        XCTAssertEqual(
+            AnalyticsEvent.sourceArticleOpened(articleID: 3).parameters["article"] as? String,
+            "03"
+        )
         let stopped = AnalyticsEvent.fastStopped(
             durationSeconds: 57_600, completed: true, stage: "ketosis", backdatedMinutes: 150
         ).parameters
@@ -112,7 +122,7 @@ final class AnalyticsEventTests: XCTestCase {
         let names = Self.catalog.map(\.name)
         XCTAssertEqual(Set(names).count, names.count, "duplicate sample in the catalog")
         XCTAssertEqual(
-            names.count, 28,
+            names.count, 31,
             "AnalyticsEvent gained or lost a case — add its sample to `catalog` and "
             + "update this count"
         )

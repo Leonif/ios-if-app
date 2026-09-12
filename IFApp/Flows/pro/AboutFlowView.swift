@@ -60,7 +60,20 @@ struct AboutFlowView: View {
             onRestore: { store.dispatch(RestorePurchasesThunk()) },
             onPrivacy: { openURL(SiteLinks.privacyPolicy) },
             onSunnah: onSunnah,
-            onOpenSource: { store.dispatch(OpenExternalLinkThunk(url: $0)) }
+            // The event is dispatched here rather than from the thunk: the same thunk
+            // opens the privacy policy and the system Settings, and an event inside it
+            // would report those as papers.
+            onOpenSource: { articleID, url in
+                store.dispatch(AppLifecycleAction.sourceOriginalOpened(articleID: articleID))
+                store.dispatch(OpenExternalLinkThunk(url: url))
+            },
+            onOpenArticle: {
+                store.dispatch(AppLifecycleAction.sourceArticleOpened(articleID: $0))
+            },
+            onCloseArticle: { articleID, reachedEnd in
+                store.dispatch(AppLifecycleAction.sourceArticleClosed(articleID: articleID,
+                                                                      reachedEnd: reachedEnd))
+            }
         )
         .animation(.easeInOut(duration: 0.18), value: props.showsNothingToRestore)
         .connect(to: store, mapState: { AboutProps(state: $0) }, onPropsChange: { props = $0 })

@@ -52,13 +52,28 @@ struct AboutIF24View: View {
     let onSunnah: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme
-    let onOpenSource: (URL) -> Void
+    /// The reader left for the paper itself: which article, and where to. The article
+    /// travels with it because the funnel is counted per paper, and because the URL is
+    /// the one thing the event must not carry.
+    let onOpenSource: (Int, URL) -> Void
+    /// The reader was opened on an article, and closed again — the two ends of "is any
+    /// of this read". The closing call also carries whether the foot of the article
+    /// was ever on screen.
+    let onOpenArticle: (Int) -> Void
+    let onCloseArticle: (Int, Bool) -> Void
     /// The sheet is presented, so it starts a fresh environment and does not inherit
     /// the root's `dynamicTypeSize` ceiling — the accessibility sizes reach this view
     /// for real, and one slot has to know it.
     @Environment(\.dynamicTypeSize) private var typeSize
 
     @State private var selectedSource: SourceArticle?
+    /// The article the reader is on, kept past the dismissal: `onDismiss` runs after
+    /// `selectedSource` has been cleared, and the closing report has to name the
+    /// article it closed.
+    @State private var readingArticleID: Int?
+    /// The foot of the open article has been on screen. Reset when a reader opens, not
+    /// when one closes — the next reading must not inherit the last one's answer.
+    @State private var readerReachedEnd = false
     private var sources: [SourceArticle] { SourceArticle.all }
 
     var body: some View {
@@ -104,8 +119,15 @@ struct AboutIF24View: View {
             .padding(.bottom, 28)
         }
         .background(theme.sheetBg.ignoresSafeArea())
-        .sheet(item: $selectedSource) { article in
-            SourceArticleView(article: article, onOpenOriginal: onOpenSource)
+        // `onDismiss` rather than an `onDisappear` inside the reader: it is the one
+        // hook that fires exactly once per reading, for the close button and for the
+        // swipe alike, and the closing report is meant to be countable one-to-one.
+        .sheet(item: $selectedSource, onDismiss: reportReaderClosed) { article in
+            SourceArticleView(
+                article: article,
+                onOpenOriginal: { onOpenSource(article.id, $0) },
+                onReachedEnd: { readerReachedEnd = true }
+            )
         }
     }
 
@@ -313,7 +335,10 @@ struct AboutIF24View: View {
         groupCard(theme) {
             ForEach(sources) { source in
                 Button {
+                    readerReachedEnd = false
+                    readingArticleID = source.id
                     selectedSource = source
+                    onOpenArticle(source.id)
                 } label: {
                     HStack(spacing: 12) {
                         // Localized editorial titles lead to an offline reader.
@@ -335,6 +360,15 @@ struct AboutIF24View: View {
                 if source.id < sources.count - 1 { divider(theme) }
             }
         }
+    }
+
+    /// One report per reading. The stored article is cleared with it, so a dismissal
+    /// that arrives without a reading behind it — there is no known one, and that is
+    /// the point — stays silent instead of repeating the last article.
+    private func reportReaderClosed() {
+        guard let articleID = readingArticleID else { return }
+        readingArticleID = nil
+        onCloseArticle(articleID, readerReachedEnd)
     }
 
     // MARK: Pieces

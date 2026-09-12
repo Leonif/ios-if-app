@@ -46,6 +46,17 @@ enum AppLifecycleAction: Action {
     /// Drives the pending "next open" review fallback; not a funnel event.
     case appBecameActive
     case sourcesOpened
+    /// One of the bundled papers was opened in the reader. `articleID` = its index in
+    /// `SourceArticle.all`, the same identifier the rows are addressed by.
+    case sourceArticleOpened(articleID: Int)
+    /// The reader's "read the original" link was followed out to the paper.
+    ///
+    /// Dispatched from that button and nowhere else. `OpenExternalLinkThunk` opens the
+    /// privacy policy and the system Settings as well, so the event cannot hang off
+    /// the thunk without counting those as papers.
+    case sourceOriginalOpened(articleID: Int)
+    /// The reader was closed, and whether the foot of the article had been on screen.
+    case sourceArticleClosed(articleID: Int, reachedEnd: Bool)
     /// The Sunnah reminders screen was opened, and from where.
     case sunnahOpened(source: SunnahEntrySource)
     /// The fasting history screen was opened, and from where.

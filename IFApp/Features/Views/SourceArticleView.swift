@@ -33,77 +33,131 @@ struct SourceArticle: Identifiable {
     }
 }
 
+/// How far the foot of the article sits below the top of the reader's visible area.
+/// A preference rather than an `onChange` inside the `GeometryReader` itself: the
+/// reader closure is not re-run for a position that moves without a size changing, so
+/// an observer written there never hears the scroll — measured, and it was silent all
+/// the way to the bottom of the article.
+private struct ArticleFootOffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = .greatestFiniteMagnitude
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = min(value, nextValue())
+    }
+}
+
 struct SourceArticleView: View {
     let article: SourceArticle
     let onOpenOriginal: (URL) -> Void
+    /// The foot of the article came into view. Called once per reading — whoever
+    /// presents the reader keeps the answer and spends it when the sheet closes.
+    let onReachedEnd: () -> Void
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
+
+    /// `onReachedEnd` has already been spent. Scrolling back up and down again is the
+    /// same reading, not a second one.
+    @State private var reportedEnd = false
+
+    private static let scrollSpace = "source.article.scroll"
 
     var body: some View {
         let theme = ThemeTokens.resolve(colorScheme)
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(SourceReaderStrings.kicker)
-                            .font(.hanken(12, .semibold))
-                            .foregroundStyle(theme.deep)
-                        Text(article.title)
-                            .font(.bricolage(30, .semibold))
-                            .foregroundStyle(theme.ink)
-                            .accessibilityAddTraits(.isHeader)
-                            .accessibilityIdentifier("source.article.title")
-                        Text(article.kind)
-                            .font(.hanken(14, .medium))
-                            .foregroundStyle(theme.mut)
-                        Text(article.credit)
-                            .font(.hanken(12))
-                            .foregroundStyle(theme.mut)
-                            .environment(\.layoutDirection, .leftToRight)
-                    }
-                    Rectangle().fill(theme.deep).frame(width: 48, height: 3)
-                    section(SourceReaderStrings.findings, body: article.finding, theme: theme)
-                    section(SourceReaderStrings.limits, body: article.limitation, theme: theme)
-                        .padding(18)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(RoundedRectangle(cornerRadius: 16).fill(theme.backgroundBase))
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(SourceReaderStrings.editorial)
-                            .font(.hanken(12)).foregroundStyle(theme.mut)
-                        Text(article.citation)
-                            .font(.hanken(13)).foregroundStyle(theme.mut)
-                            .environment(\.layoutDirection, .leftToRight)
-                        Button { onOpenOriginal(article.url) } label: {
-                            HStack {
-                                Text(SourceReaderStrings.original)
-                                    .font(.hanken(16, .medium))
-                                Spacer(minLength: 12)
-                                Image(systemName: "arrow.up.forward")
-                            }
-                            .foregroundStyle(theme.deep)
-                            .frame(minHeight: 48)
-                            .contentShape(Rectangle())
+            // The reader's visible height, read here rather than measured into state:
+            // the foot's position has to be compared against it on every scroll, and a
+            // second measurement landing in `@State` is a second update with its own
+            // ordering — which is exactly how the first attempt failed, the comparison
+            // running all the way to the bottom of the article against a height of
+            // zero that had not arrived yet.
+            GeometryReader { viewport in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(SourceReaderStrings.kicker)
+                                .font(.hanken(12, .semibold))
+                                .foregroundStyle(theme.deep)
+                            Text(article.title)
+                                .font(.bricolage(30, .semibold))
+                                .foregroundStyle(theme.ink)
+                                .accessibilityAddTraits(.isHeader)
+                                .accessibilityIdentifier("source.article.title")
+                            Text(article.kind)
+                                .font(.hanken(14, .medium))
+                                .foregroundStyle(theme.mut)
+                            Text(article.credit)
+                                .font(.hanken(12))
+                                .foregroundStyle(theme.mut)
+                                .environment(\.layoutDirection, .leftToRight)
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityIdentifier("source.article.original")
-                        Text(strings.About.medicalNote)
-                            .font(.hanken(12)).foregroundStyle(theme.mut)
+                        Rectangle().fill(theme.deep).frame(width: 48, height: 3)
+                        section(SourceReaderStrings.findings, body: article.finding, theme: theme)
+                        section(SourceReaderStrings.limits, body: article.limitation, theme: theme)
+                            .padding(18)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(RoundedRectangle(cornerRadius: 16).fill(theme.backgroundBase))
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(SourceReaderStrings.editorial)
+                                .font(.hanken(12)).foregroundStyle(theme.mut)
+                            Text(article.citation)
+                                .font(.hanken(13)).foregroundStyle(theme.mut)
+                                .environment(\.layoutDirection, .leftToRight)
+                            Button { onOpenOriginal(article.url) } label: {
+                                HStack {
+                                    Text(SourceReaderStrings.original)
+                                        .font(.hanken(16, .medium))
+                                    Spacer(minLength: 12)
+                                    Image(systemName: "arrow.up.forward")
+                                }
+                                .foregroundStyle(theme.deep)
+                                .frame(minHeight: 48)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("source.article.original")
+                            Text(strings.About.medicalNote)
+                                .font(.hanken(12)).foregroundStyle(theme.mut)
+                        }
+                        endMarker
                     }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: 600, alignment: .leading)
+                    .padding(24)
+                    .frame(maxWidth: .infinity)
                 }
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: 600, alignment: .leading)
-                .padding(24)
-                .frame(maxWidth: .infinity)
-            }
-            .background(theme.sheetBg.ignoresSafeArea())
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { dismiss() } label: { Image(systemName: "xmark") }
-                        .accessibilityLabel(strings.Pro.close)
-                        .accessibilityIdentifier("source.article.close")
+                .coordinateSpace(name: Self.scrollSpace)
+                .background(theme.sheetBg.ignoresSafeArea())
+                .onPreferenceChange(ArticleFootOffsetKey.self) { footOffset in
+                    guard !reportedEnd, footOffset <= viewport.size.height else { return }
+                    reportedEnd = true
+                    onReachedEnd()
+                }
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button { dismiss() } label: { Image(systemName: "xmark") }
+                            .accessibilityLabel(strings.Pro.close)
+                            .accessibilityIdentifier("source.article.close")
+                    }
                 }
             }
         }
+    }
+
+    /// A one-point marker at the foot of the article. When it enters the visible part
+    /// of the scroll view, the end has been seen — that is the whole of the "read or
+    /// merely opened" signal, and it costs one invisible row rather than a rebuilt
+    /// layout or a scroll observer.
+    ///
+    /// An article shorter than the sheet reports immediately, and rightly: its end is
+    /// on screen from the first frame.
+    private var endMarker: some View {
+        Color.clear
+            .frame(height: 1)
+            .background(GeometryReader { proxy in
+                Color.clear.preference(
+                    key: ArticleFootOffsetKey.self,
+                    value: proxy.frame(in: .named(Self.scrollSpace)).minY
+                )
+            })
     }
 
     private func section(_ title: String, body: String, theme: ThemeTokens) -> some View {

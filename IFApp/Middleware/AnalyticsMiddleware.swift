@@ -216,6 +216,12 @@ final class AnalyticsMiddleware: Middleware {
         switch action {
         case .appOpened: repo.log(.appOpened)
         case .sourcesOpened: repo.log(.sourcesOpened)
+        case let .sourceArticleOpened(articleID):
+            repo.log(.sourceArticleOpened(articleID: articleID))
+        case let .sourceOriginalOpened(articleID):
+            repo.log(.sourceOriginalOpened(articleID: articleID))
+        case let .sourceArticleClosed(articleID, reachedEnd):
+            repo.log(.sourceArticleClosed(articleID: articleID, reachedEnd: reachedEnd))
         case let .sunnahOpened(source): repo.log(.sunnahOpened(source: source.rawValue))
         case let .historyOpened(source): repo.log(.historyOpened(source: source.rawValue))
         case let .reviewPrompted(trigger): repo.log(.reviewPrompted(trigger: trigger.rawValue))

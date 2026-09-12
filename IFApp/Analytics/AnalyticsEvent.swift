@@ -71,6 +71,25 @@ enum AnalyticsEvent {
     case lastMealLogged(backdated: Bool, minutesAgo: Int, inputMethod: String)
     /// User opened the scientific Sources screen.
     case sourcesOpened
+    /// User opened one of the bundled papers in the reader. `article` = the paper's
+    /// index in the catalog, as a fixed-width code. The index and not the title,
+    /// which is localized and would give the dimension ten vocabularies; and not the
+    /// URL, which would make it a list of links rather than of papers. It is also the
+    /// identifier the rows are already addressed by (`about.source.<id>`).
+    case sourceArticleOpened(articleID: Int)
+    /// User left the reader for the paper itself. Carries the same `article` code, so
+    /// the funnel — list opened, article opened, original followed — counts end to end
+    /// and per paper rather than in three unrelated totals.
+    ///
+    /// Raised on the reader's own button only. The external-link thunk behind it also
+    /// opens the privacy policy and the system settings, and an event on the thunk
+    /// would count those as papers.
+    case sourceOriginalOpened(articleID: Int)
+    /// The reader was closed. `reached_end` = the foot of the article had been on
+    /// screen at least once — the cheapest honest split between read and merely
+    /// opened. An article shorter than the screen counts as reached, because its end
+    /// was indeed seen.
+    case sourceArticleClosed(articleID: Int, reachedEnd: Bool)
     /// User opened the Sunnah reminders screen. `source` = which door
     /// ("plan_editor" / "about"). The release's one free headline feature had a
     /// single door until now, and how many people ever find it is the question the
@@ -157,6 +176,9 @@ enum AnalyticsEvent {
         case .endFastRefused: return "end_fast_refused"
         case .lastMealLogged: return "last_meal_logged"
         case .sourcesOpened: return "sources_opened"
+        case .sourceArticleOpened: return "source_article_opened"
+        case .sourceOriginalOpened: return "source_original_opened"
+        case .sourceArticleClosed: return "source_article_closed"
         case .sunnahOpened: return "sunnah_opened"
         case .sunnahEnabled: return "sunnah_enabled"
         case .historyOpened: return "history_opened"
@@ -229,6 +251,18 @@ enum AnalyticsEvent {
             return ["source": source]
         case let .sunnahOpened(source):
             return ["source": source]
+        case let .sourceArticleOpened(articleID), let .sourceOriginalOpened(articleID):
+            // Two digits, like every other number that travels as a dimension: the
+            // catalog is read as a distribution over papers, and string sort keeps
+            // them in catalog order only while the widths match.
+            return ["article": code(articleID, width: 2)]
+        case let .sourceArticleClosed(articleID, reachedEnd):
+            return [
+                "article": code(articleID, width: 2),
+                // Text, like every other flag here: a `Bool` bridges to `NSNumber`
+                // and the dimension comes back `(not set)`.
+                "reached_end": reachedEnd ? "true" : "false",
+            ]
         case let .sunnahEnabled(mode, pushAllowed):
             return [
                 "mode": mode,
