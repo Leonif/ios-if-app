@@ -447,6 +447,12 @@ enum strings {
         static func goalHours(_ h: Int) -> String {
             String(format: String(localized: "%dh"), h)
         }
+        /// Compact whole days for summary aggregates, e.g. "23d". The existing
+        /// short-unit key is shared with the meal scale so all ten locales keep the
+        /// same abbreviation.
+        static func daysShort(_ d: Int) -> String {
+            String(format: String(localized: "%dd"), d)
+        }
         /// "17 hours" — the hour picker's rows, spelled out. Plural categories live
         /// in the catalog, never as an `h == 1` here.
         static func hoursSpelled(_ h: Int) -> String {
@@ -550,7 +556,7 @@ enum strings {
         /// without a sell — the way back is a goal reached, not a purchase.
         static func streakEnded(_ days: Int) -> String {
             String(localized: "history.streak.ended",
-                   defaultValue: "That streak ended at \(days) days. The next one starts with your next completed goal.",
+                   defaultValue: "After \(days) days in a row, the streak ended. A new one starts with your next completed goal.",
                    locale: .latinDigits,
                    comment: """
                    Sentence on the history summary card under the big number, in the state

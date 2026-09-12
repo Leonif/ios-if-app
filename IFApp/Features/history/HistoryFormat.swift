@@ -69,6 +69,17 @@ enum HistoryFormat {
         return strings.Duration.hm(total / 3600, (total / 60) % 60)
     }
 
+    /// Summary cards describe scale, not timestamps. Minutes add visual noise there,
+    /// so values stay in rounded whole hours until two days, then collapse to rounded
+    /// whole days. Exact hours and minutes remain available in each history row.
+    static func summaryDuration(_ seconds: TimeInterval) -> String {
+        let hours = max(0, seconds / 3600)
+        if hours >= 48 {
+            return strings.Duration.daysShort(max(1, Int((hours / 24).rounded())))
+        }
+        return strings.Duration.goalHours(max(seconds > 0 ? 1 : 0, Int(hours.rounded())))
+    }
+
     /// "152h" — an aggregate of many fasts, where minutes are noise.
     static func totalHours(_ hours: Int) -> String {
         strings.Duration.goalHours(hours)

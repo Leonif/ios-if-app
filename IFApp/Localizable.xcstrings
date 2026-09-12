@@ -8845,7 +8845,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "That streak ended at %#@days@. The next one starts with your next completed goal."
+            "value" : "After %#@days@ in a row, the streak ended. A new one starts with your next completed goal."
           },
           "substitutions" : {
             "days" : {
@@ -9025,7 +9025,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ця серія тривала %#@days@ і обірвалася. Нову почне наступна досягнута ціль."
+            "value" : "Після %#@days@ поспіль серія завершилася. Нова почнеться з наступної досягнутої цілі."
           },
           "substitutions" : {
             "days" : {
@@ -9036,7 +9036,7 @@
                   "few" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%lld дні"
+                      "value" : "%lld днів"
                     }
                   },
                   "many" : {
@@ -9048,13 +9048,13 @@
                   "one" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%lld день"
+                      "value" : "%lld дня"
                     }
                   },
                   "other" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%lld дня"
+                      "value" : "%lld днів"
                     }
                   }
                 }

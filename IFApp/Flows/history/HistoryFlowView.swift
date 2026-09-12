@@ -220,7 +220,10 @@ struct HistoryFlowView: View {
                         )
                     }
                 }
-                .frame(width: 76)
+                // The locked PRO capsule needs 76pt; the unlocked share circle does
+                // not. Keeping the wider slot after purchase stranded the icon 32pt
+                // from the card's trailing edge.
+                .frame(width: props.isPro ? 44 : 76)
                 .accessibilityHidden(true)
             }
             .background(RoundedRectangle(cornerRadius: 16).fill(theme.surface))

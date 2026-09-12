@@ -137,12 +137,11 @@ struct HistorySummaryCard: View {
             HStack(spacing: 0) {
                 stat(strings.History.statFasts, "\(stats.fastsCount)", theme.ink)
                 divider
-                // Same formatter as `LONGEST` beside it, on purpose: the two are the
-                // same quantity, and printed at two granularities the sum read lower
-                // than the maximum it contains (SU-13).
-                stat(strings.History.statTotal, HistoryFormat.duration(stats.total), theme.deep)
+                // Aggregates show scale rather than stopwatch precision: minutes stay
+                // in the rows, while the card rounds to hours and then days.
+                stat(strings.History.statTotal, HistoryFormat.summaryDuration(stats.total), theme.deep)
                 divider
-                stat(strings.History.statLongest, HistoryFormat.duration(stats.longest), theme.ink)
+                stat(strings.History.statLongest, HistoryFormat.summaryDuration(stats.longest), theme.ink)
             }
             .padding(.vertical, 14)
         }
