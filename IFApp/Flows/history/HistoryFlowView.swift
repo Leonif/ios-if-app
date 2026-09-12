@@ -12,6 +12,7 @@
 //
 
 import SwiftUI
+import UIKit
 import Redux
 
 struct HistoryProps: Equatable {
@@ -434,36 +435,109 @@ private struct SwipeToDeleteRow<Content: View>: View {
                 .disabled(!revealed)
             }
 
-            content
-                .offset(x: offset)
-                .onTapGesture {
-                    if revealed { close() } else { onTap() }
-                }
-                .gesture(
-                    DragGesture(minimumDistance: 14)
-                        .onChanged { value in
-                            // Ignore a drag that is mostly vertical — that belongs to
-                            // the scroll view.
-                            guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                            let travel = value.translation.width * direction
-                            offset = direction * min(actionWidth, max(0, travel))
-                        }
-                        .onEnded { value in
-                            let travel = value.translation.width * direction
-                            withAnimation(.easeOut(duration: 0.2)) {
-                                revealed = travel > actionWidth / 2
-                                offset = revealed ? direction * actionWidth : 0
-                            }
-                        }
-                )
+            swipeableContent
         }
         .accessibilityAction(named: Text(strings.History.delete), onDelete)
+    }
+
+    /// iOS 26 lets a child SwiftUI `DragGesture` capture a vertical touch before its
+    /// direction guard runs, even when it is simultaneous with the ScrollView. A UIKit
+    /// pan can fail in `gestureRecognizerShouldBegin` while the touch is still being
+    /// arbitrated, so vertical motion goes straight to scrolling. iOS 17 keeps the
+    /// former implementation because `UIGestureRecognizerRepresentable` starts at 18.
+    @ViewBuilder
+    private var swipeableContent: some View {
+        let row = content
+            .offset(x: offset)
+            .onTapGesture {
+                if revealed { close() } else { onTap() }
+            }
+
+        if #available(iOS 18.0, *) {
+            row.gesture(HorizontalRowPan(
+                onChanged: updateOffset,
+                onEnded: settleOffset
+            ))
+        } else {
+            row.gesture(
+                DragGesture(minimumDistance: 14)
+                    .onChanged { value in
+                        guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                        updateOffset(value.translation.width)
+                    }
+                    .onEnded { value in
+                        guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                        settleOffset(value.translation.width)
+                    }
+            )
+        }
+    }
+
+    private func updateOffset(_ horizontalTranslation: CGFloat) {
+        let travel = horizontalTranslation * direction
+        offset = direction * min(actionWidth, max(0, travel))
+    }
+
+    private func settleOffset(_ horizontalTranslation: CGFloat) {
+        let travel = horizontalTranslation * direction
+        withAnimation(.easeOut(duration: 0.2)) {
+            revealed = travel > actionWidth / 2
+            offset = revealed ? direction * actionWidth : 0
+        }
     }
 
     private func close() {
         withAnimation(.easeOut(duration: 0.2)) {
             revealed = false
             offset = 0
+        }
+    }
+}
+
+/// Direction-locking pan for a history row. SwiftUI receives it through the native
+/// gesture bridge, while UIKit gets the early failure hook needed to leave vertical
+/// movement to the enclosing scroll view.
+@available(iOS 18.0, *)
+private struct HorizontalRowPan: UIGestureRecognizerRepresentable {
+    let onChanged: (CGFloat) -> Void
+    let onEnded: (CGFloat) -> Void
+
+    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIGestureRecognizer(context: Context) -> UIPanGestureRecognizer {
+        let recognizer = UIPanGestureRecognizer()
+        recognizer.minimumNumberOfTouches = 1
+        recognizer.maximumNumberOfTouches = 1
+        recognizer.cancelsTouchesInView = false
+        recognizer.delegate = context.coordinator
+        return recognizer
+    }
+
+    func handleUIGestureRecognizerAction(_ recognizer: UIPanGestureRecognizer, context: Context) {
+        let horizontal = context.converter.translation(in: .local)?.x
+            ?? recognizer.translation(in: recognizer.view).x
+        switch recognizer.state {
+        case .began, .changed:
+            onChanged(horizontal)
+        case .ended, .cancelled, .failed:
+            onEnded(horizontal)
+        default:
+            break
+        }
+    }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return false }
+            let velocity = pan.velocity(in: pan.view)
+            return abs(velocity.x) > abs(velocity.y)
+        }
+
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                               shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            true
         }
     }
 }
