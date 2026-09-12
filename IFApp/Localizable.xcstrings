@@ -1632,61 +1632,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "One year, 100 obese adults: on average weight fell 6.0% on alternate-day fasting and 5.3% on daily calorie cutting - no real difference. More quit the fasting arm (38% vs 29%), and their LDL ran higher."
+          "value": "One year, 100 obese adults on alternate-day fasting - a different schedule from a daily 16:8 window. On average weight fell 6.0% on the fasting days plan and 5.3% on daily calorie cutting - no real difference. More quit the fasting arm (38% vs 29%), and their \"bad\" cholesterol ran higher."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Рік, 100 дорослих з ожирінням: вага в середньому впала на 6,0% при голодуванні через день і на 5,3% при щоденному обмеженні калорій - практичної різниці не було. З групи голодування вибуло більше учасників (38% проти 29%), і в них LDL був вищим."
+          "value": "Рік, 100 дорослих з ожирінням при голодуванні через день (інший графік, ніж 16:8): вага в середньому впала на 6,0%, а при щоденному обмеженні калорій - на 5,3% - практичної різниці не було. З групи голодування вибуло більше учасників (38% проти 29%), і в них «поганий» холестерин був вищим."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Ein Jahr, 100 adipöse Erwachsene: Das Gewicht sank im Schnitt um 6,0% bei alternierendem Fasten und um 5,3% bei täglicher Kalorienreduktion - kein wirklicher Unterschied. In der Fasten-Gruppe brachen mehr Teilnehmende ab (38% vs. 29%), und ihr LDL lag höher."
+          "value": "Ein Jahr, 100 adipöse Erwachsene bei alternierendem Fasten (anders als das tägliche 16:8-Fenster): Das Gewicht sank im Schnitt um 6,0% bzw. um 5,3% bei täglicher Kalorienreduktion - kein wirklicher Unterschied. In der Fasten-Gruppe brachen mehr ab (38% vs. 29%), und ihr „schlechtes“ Cholesterin lag höher."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Un año, 100 adultos con obesidad: el peso bajó en promedio un 6,0% con ayuno en días alternos y un 5,3% con restricción calórica diaria - sin diferencia real. Abandonaron más personas del grupo de ayuno (38% frente a 29%), y su LDL fue más alto."
+          "value": "Un año, 100 adultos con obesidad en ayuno en días alternos - un patrón distinto de la ventana diaria de 16:8. El peso bajó en promedio un 6,0% con el ayuno y un 5,3% con la restricción calórica diaria - sin diferencia real. Abandonaron más personas del grupo de ayuno (38% frente a 29%), y su colesterol «malo» fue más alto."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Un an, 100 adultes obèses : le poids a baissé en moyenne de 6,0 % avec le jeûne alterné et de 5,3 % avec la restriction calorique quotidienne - sans différence réelle. Plus de participants ont abandonné le groupe jeûne (38 % contre 29 %), et leur LDL était plus élevé."
+          "value": "Un an, 100 adultes obèses en jeûne alterné (un rythme différent de 16:8) : le poids a baissé en moyenne de 6,0 % et de 5,3 % avec la restriction calorique quotidienne - sans différence réelle. Plus de participants ont abandonné le groupe jeûne (38 % contre 29 %), et leur « mauvais » cholestérol était plus élevé."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Rok, 100 dorosłych z otyłością: masa ciała spadła średnio o 6,0% przy poście co drugi dzień i o 5,3% przy codziennym ograniczeniu kalorii - bez realnej różnicy. Z grupy poszczącej wypadło więcej osób (38% wobec 29%), a ich LDL był wyższy."
+          "value": "Rok, 100 dorosłych z otyłością na poście co drugi dzień - inny rytm niż codzienne okno 16:8. Masa ciała spadła średnio o 6,0% w tym rytmie postu i o 5,3% przy codziennym ograniczeniu kalorii - bez realnej różnicy. Z grupy poszczącej wypadło więcej osób (38% wobec 29%), a ich „zły” cholesterol był wyższy."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "1年間、肥満のある成人100人を対象にした試験です。体重は隔日断食群で平均6.0%、毎日のカロリー制限群で平均5.3%減少しましたが、実質的な差はありませんでした。断食群の離脱者は多く(38%対29%)、LDLコレステロールも高めでした。"
+          "value": "肥満のある成人100人を対象に1年間、隔日断食(毎日の16:8とは異なる方式)を検証した試験です。体重は隔日断食群で平均6.0%、毎日のカロリー制限群で平均5.3%減少しましたが、実質的な差はありませんでした。断食群の離脱者は多く(38%対29%)、悪玉コレステロールも高めでした。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "1년간 비만 성인 100명을 대상으로 한 연구예요. 평균 체중은 격일 단식 그룹에서 6.0%, 매일 칼로리를 제한한 그룹에서 5.3% 줄어 실질적인 차이는 없었어요. 단식 그룹의 중도 포기율이 더 높았고(38% 대 29%), LDL 수치도 더 높았어요."
+          "value": "비만 성인 100명을 대상으로 1년간 진행한 연구로, 격일 단식(매일 16:8과는 다른 방식이에요)과 매일 칼로리를 제한하는 방법을 비교했어요. 평균 체중은 격일 단식 그룹에서 6.0%, 매일 칼로리를 제한한 그룹에서 5.3% 줄어 실질적인 차이는 없었어요. 단식 그룹의 중도 포기율이 더 높았고(38% 대 29%), 나쁜 콜레스테롤 수치도 더 높았어요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "为期一年，100 名肥胖成年人：隔日断食组体重平均下降 6.0%，每日限制热量组平均下降 5.3%——没有实质差异。断食组的退出人数更多（38% 对 29%），且他们的 LDL 更高。"
+          "value": "为期一年，100 名肥胖成年人采用隔日断食——这是与每日 16:8 时间窗不同的安排。隔日断食组体重平均下降 6.0%，每日限制热量组平均下降 5.3%——没有实质差异。断食组的退出人数更多（38% 对 29%），且他们的“坏”胆固醇更高。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "مائة بالغ يعانون من السمنة على مدى عام واحد: انخفض الوزن في المتوسط بنسبة 6.0% مع الصيام يومًا بعد يوم، وبنسبة 5.3% مع تقليل السعرات الحرارية يوميًا - بلا فارق يُذكر. وانسحب من مجموعة الصيام عدد أكبر (38% في مقابل 29%)، وكان الكوليسترول الضار (LDL) لديهم أعلى."
+          "value": "مائة بالغ يعانون من السمنة اتبعوا نظام الصيام يومًا بعد يوم على مدى عام واحد - وهو نمط مختلف عن نافذة الصيام اليومية 16:8. انخفض الوزن في المتوسط بنسبة 6.0% مع هذا النظام، وبنسبة 5.3% مع تقليل السعرات الحرارية يوميًا - بلا فارق يُذكر. وانسحب من مجموعة الصيام عدد أكبر (38% في مقابل 29%)، وكان الكوليسترول الضار لديهم أعلى."
         }
       }
     }
