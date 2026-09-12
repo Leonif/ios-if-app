@@ -1502,61 +1502,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Glycogen is glucose packed into a branched particle - about 55,000 units at most, and the enzyme that frees glucose reaches only its outer layer. A chemistry review, not a study of fasting people."
+          "value": "Glycogen stores glucose in a branched particle of up to about 55,000 glucose molecules. The enzyme releases glucose only from the outer layer, so the whole reserve cannot be used at once. A chemistry review, not a study of fasting people."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Глікоген - це глюкоза, упакована в розгалужену частинку: щонайбільше близько 55 000 одиниць, а фермент, що звільняє глюкозу, дістається лише її зовнішнього шару. Хімічний огляд, а не дослідження людей, які голодують."
+          "value": "Глікоген - це запас глюкози, зібраний у розгалужену частинку: до 55 000 молекул глюкози. Фермент відщеплює глюкозу лише із зовнішнього шару, тож витратити весь запас миттєво неможливо. Хімічний огляд, а не дослідження людей, які голодують."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Glykogen ist Glukose, verpackt in einem verzweigten Partikel - höchstens etwa 55.000 Einheiten -, und das Enzym, das Glukose freisetzt, erreicht nur die äußere Schicht. Eine biochemische Übersichtsarbeit, keine Studie an fastenden Menschen."
+          "value": "Glykogen speichert Glukose in einem verzweigten Partikel aus bis zu etwa 55.000 Glukosemolekülen. Das Enzym löst Glukose nur aus der äußeren Schicht, daher lässt sich nicht der ganze Vorrat auf einmal verbrauchen. Eine biochemische Übersichtsarbeit, keine Studie an fastenden Menschen."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "El glucógeno es glucosa empaquetada en una partícula ramificada - unas 55.000 unidades como máximo -, y la enzima que libera glucosa solo alcanza su capa externa. Una revisión de química, no un estudio en personas que ayunan."
+          "value": "El glucógeno almacena glucosa en una partícula ramificada de hasta unas 55.000 moléculas de glucosa. La enzima solo libera glucosa de la capa externa, por lo que no se puede usar toda la reserva de una vez. Una revisión de química, no un estudio en personas que ayunan."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Le glycogène, c’est du glucose emballé dans une particule ramifiée - environ 55 000 unités au maximum -, et l’enzyme qui libère le glucose n’atteint que sa couche externe. Une revue de chimie, pas une étude sur des personnes qui jeûnent."
+          "value": "Le glycogène stocke le glucose dans une particule ramifiée comptant jusqu’à environ 55 000 molécules de glucose. L’enzyme ne libère le glucose que depuis la couche externe : toute la réserve ne peut donc pas être utilisée d’un coup. Une revue de chimie, pas une étude sur des personnes qui jeûnent."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Glikogen to glukoza upakowana w rozgałęzioną cząstkę - maksymalnie około 55 000 jednostek - a enzym uwalniający glukozę sięga tylko jej zewnętrznej warstwy. Przegląd chemiczny, nie badanie osób pościących."
+          "value": "Glikogen przechowuje glukozę w rozgałęzionej cząstce złożonej nawet z około 55 000 cząsteczek glukozy. Enzym uwalnia glukozę tylko z warstwy zewnętrznej, więc całego zapasu nie da się zużyć naraz. Przegląd chemiczny, nie badanie osób poszczących."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "needs_review",
-          "value": "グリコーゲンは、ブドウ糖が枝分かれした粒子状に詰め込まれたもので、最大でも約55,000単位です。ブドウ糖を切り離す酵素が届くのは、その粒子の外側の層だけです。断食中の人を対象にした研究ではなく、化学分野の総説です。"
+          "value": "グリコーゲンは、最大約55,000個のブドウ糖分子を枝分かれした粒子として蓄えます。酵素がブドウ糖を切り離せるのは外側の層だけなので、蓄え全体を一度に使うことはできません。断食中の人を対象にした研究ではなく、化学分野の総説です。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "needs_review",
-          "value": "글리코겐은 포도당이 가지 모양 입자로 뭉친 형태로, 포도당 단위가 최대 약 55,000개에 달해요. 포도당을 떼어내는 효소는 이 입자의 가장 바깥층에만 닿아요. 단식하는 사람을 연구한 것이 아니라 화학 종설이에요."
+          "value": "글리코겐은 최대 약 55,000개의 포도당 분자를 가지 모양 입자에 저장해요. 효소는 바깥층의 포도당만 떼어낼 수 있어서 저장량 전체를 한꺼번에 쓸 수는 없어요. 단식하는 사람을 연구한 것이 아니라 화학 종설이에요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "糖原是把葡萄糖打包成的分支结构颗粒——最多约 55,000 个单位，而释放葡萄糖的酶只能作用于它的外层。这是一篇化学综述，不是对断食者的研究。"
+          "value": "糖原把葡萄糖储存在分支结构的颗粒中，最多约含 55,000 个葡萄糖分子。释放葡萄糖的酶只能作用于外层，因此无法一次用完整个储备。这是一篇化学综述，不是对断食者的研究。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "needs_review",
-          "value": "الجليكوجين هو الجلوكوز مُعبَّأ في جزيء متفرّع - بحد أقصى نحو 55,000 وحدة، والإنزيم الذي يُحرِّر الجلوكوز لا يصل إلا إلى طبقته الخارجية. هذه مراجعة كيميائية، لا دراسة على صائمين."
+          "value": "يخزّن الجليكوجين الجلوكوز في جزيء متفرّع يضم ما يصل إلى نحو 55,000 جزيء جلوكوز. ولا يحرّر الإنزيم الجلوكوز إلا من الطبقة الخارجية، لذلك لا يمكن استهلاك المخزون كله دفعة واحدة. هذه مراجعة كيميائية، لا دراسة على صائمين."
         }
       }
     }
@@ -1632,61 +1632,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "One year, 100 obese adults on alternate-day fasting - a different schedule from a daily 16:8 window. On average weight fell 6.0% on the fasting days plan and 5.3% on daily calorie cutting - no real difference. More quit the fasting arm (38% vs 29%), and their \"bad\" cholesterol ran higher."
+          "value": "For one year, 100 adults with obesity were compared. One group fasted every other day: about 25% of their usual calories on fasting days and slightly more than usual on the others. The second ate 75% of usual calories every day. Average weight fell 6.0% and 5.3% - no meaningful difference. More people left the alternate-day group (38% vs 29%), and its \"bad\" cholesterol was higher; the study does not explain why."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Рік, 100 дорослих з ожирінням при голодуванні через день (інший графік, ніж 16:8): вага в середньому впала на 6,0%, а при щоденному обмеженні калорій - на 5,3% - практичної різниці не було. З групи голодування вибуло більше учасників (38% проти 29%), і в них «поганий» холестерин був вищим."
+          "value": "Рік, 100 дорослих з ожирінням. Одна група голодувала через день: у постові дні їла близько чверті звичної норми, в інші - трохи більше звичного. Друга щодня їла 75% норми. Вага в середньому впала на 6,0% і 5,3% - практичної різниці не було. З тих, хто голодував через день, вибуло більше учасників, ніж з другої групи (38% проти 29%), і в них був вищий «поганий» холестерин; чому - дослідження не пояснює."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Ein Jahr, 100 adipöse Erwachsene bei alternierendem Fasten (anders als das tägliche 16:8-Fenster): Das Gewicht sank im Schnitt um 6,0% bzw. um 5,3% bei täglicher Kalorienreduktion - kein wirklicher Unterschied. In der Fasten-Gruppe brachen mehr ab (38% vs. 29%), und ihr „schlechtes“ Cholesterin lag höher."
+          "value": "Ein Jahr lang wurden 100 Erwachsene mit Adipositas verglichen. Eine Gruppe fastete jeden zweiten Tag: an Fastentagen etwa ein Viertel der üblichen Kalorien, an den anderen etwas mehr als üblich. Die zweite aß täglich 75% der üblichen Menge. Das Gewicht sank im Schnitt um 6,0% und 5,3% - kein bedeutsamer Unterschied. Aus der alternierend fastenden Gruppe stiegen mehr aus (38% vs. 29%), und ihr „schlechtes“ Cholesterin lag höher; warum, erklärt die Studie nicht."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Un año, 100 adultos con obesidad en ayuno en días alternos - un patrón distinto de la ventana diaria de 16:8. El peso bajó en promedio un 6,0% con el ayuno y un 5,3% con la restricción calórica diaria - sin diferencia real. Abandonaron más personas del grupo de ayuno (38% frente a 29%), y su colesterol «malo» fue más alto."
+          "value": "Durante un año se comparó a 100 adultos con obesidad. Un grupo ayunó en días alternos: comía cerca del 25% de sus calorías habituales en los días de ayuno y algo más de lo habitual en los demás. El segundo comía cada día el 75% de lo habitual. El peso bajó un 6,0% y un 5,3% - sin diferencia relevante. Abandonaron más personas del grupo de días alternos (38% frente a 29%) y su colesterol «malo» fue más alto; el estudio no explica por qué."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Un an, 100 adultes obèses en jeûne alterné (un rythme différent de 16:8) : le poids a baissé en moyenne de 6,0 % et de 5,3 % avec la restriction calorique quotidienne - sans différence réelle. Plus de participants ont abandonné le groupe jeûne (38 % contre 29 %), et leur « mauvais » cholestérol était plus élevé."
+          "value": "Pendant un an, 100 adultes obèses ont été comparés. Un groupe jeûnait un jour sur deux : environ 25 % des calories habituelles les jours de jeûne et un peu plus que d’habitude les autres jours. Le second mangeait chaque jour 75 % de la quantité habituelle. Le poids a baissé de 6,0 % et 5,3 % - sans différence notable. Le groupe en jeûne alterné a connu plus d’abandons (38 % contre 29 %) et un « mauvais » cholestérol plus élevé ; l’étude n’explique pas pourquoi."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Rok, 100 dorosłych z otyłością na poście co drugi dzień - inny rytm niż codzienne okno 16:8. Masa ciała spadła średnio o 6,0% w tym rytmie postu i o 5,3% przy codziennym ograniczeniu kalorii - bez realnej różnicy. Z grupy poszczącej wypadło więcej osób (38% wobec 29%), a ich „zły” cholesterol był wyższy."
+          "value": "Przez rok porównywano 100 dorosłych z otyłością. Jedna grupa pościła co drugi dzień: w dni postu jadła około 25% zwykłej liczby kalorii, a w pozostałe nieco więcej niż zwykle. Druga codziennie jadła 75% zwykłej ilości. Masa ciała spadła o 6,0% i 5,3% - bez istotnej różnicy. Z grupy poszczącej co drugi dzień zrezygnowało więcej osób (38% wobec 29%), a ich „zły” cholesterol był wyższy; badanie nie wyjaśnia dlaczego."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "肥満のある成人100人を対象に1年間、隔日断食(毎日の16:8とは異なる方式)を検証した試験です。体重は隔日断食群で平均6.0%、毎日のカロリー制限群で平均5.3%減少しましたが、実質的な差はありませんでした。断食群の離脱者は多く(38%対29%)、悪玉コレステロールも高めでした。"
+          "value": "肥満のある成人100人を1年間比較しました。一方は隔日断食で、断食日は普段の約25%、それ以外の日は普段より少し多く食べました。もう一方は毎日、普段の75%を食べました。体重は平均6.0%と5.3%減り、実質的な差はありませんでした。隔日断食群は離脱者が多く(38%対29%)、悪玉コレステロールも高めでしたが、理由は研究で説明されていません。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "비만 성인 100명을 대상으로 1년간 진행한 연구로, 격일 단식(매일 16:8과는 다른 방식이에요)과 매일 칼로리를 제한하는 방법을 비교했어요. 평균 체중은 격일 단식 그룹에서 6.0%, 매일 칼로리를 제한한 그룹에서 5.3% 줄어 실질적인 차이는 없었어요. 단식 그룹의 중도 포기율이 더 높았고(38% 대 29%), 나쁜 콜레스테롤 수치도 더 높았어요."
+          "value": "비만 성인 100명을 1년간 비교했어요. 한 그룹은 격일 단식을 하며 단식일에는 평소 열량의 약 25%, 다른 날에는 평소보다 조금 더 먹었어요. 두 번째 그룹은 매일 평소의 75%를 먹었어요. 체중은 평균 6.0%와 5.3% 줄어 의미 있는 차이가 없었어요. 격일 단식 그룹의 중도 포기율이 더 높았고(38% 대 29%) 나쁜 콜레스테롤도 더 높았지만, 이유는 연구에서 설명하지 않아요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "为期一年，100 名肥胖成年人采用隔日断食——这是与每日 16:8 时间窗不同的安排。隔日断食组体重平均下降 6.0%，每日限制热量组平均下降 5.3%——没有实质差异。断食组的退出人数更多（38% 对 29%），且他们的“坏”胆固醇更高。"
+          "value": "研究用一年比较了 100 名肥胖成年人。一组隔日断食：断食日摄入约为平时的 25%，其余日子略多于平时；另一组每天摄入平时的 75%。两组体重平均下降 6.0% 和 5.3%，没有实质差异。隔日断食组退出者更多（38% 对 29%），且“坏”胆固醇更高；研究没有解释原因。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "مائة بالغ يعانون من السمنة اتبعوا نظام الصيام يومًا بعد يوم على مدى عام واحد - وهو نمط مختلف عن نافذة الصيام اليومية 16:8. انخفض الوزن في المتوسط بنسبة 6.0% مع هذا النظام، وبنسبة 5.3% مع تقليل السعرات الحرارية يوميًا - بلا فارق يُذكر. وانسحب من مجموعة الصيام عدد أكبر (38% في مقابل 29%)، وكان الكوليسترول الضار لديهم أعلى."
+          "value": "قورِن 100 بالغ يعانون من السمنة على مدى عام. صامت مجموعة يومًا بعد يوم: تناولت نحو 25% من السعرات المعتادة في أيام الصيام وأكثر قليلًا من المعتاد في الأيام الأخرى. وتناولت المجموعة الثانية 75% من المعتاد يوميًا. انخفض الوزن في المتوسط بنسبة 6.0% و5.3% بلا فارق مهم. وانسحب من مجموعة الصيام يومًا بعد يوم عدد أكبر (38% مقابل 29%)، وكان الكوليسترول الضار لديها أعلى؛ ولا تفسر الدراسة السبب."
         }
       }
     }
@@ -1762,61 +1762,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "In mice, fasting raises the hormone FGF21, which unlocks autophagy genes; the liver then digests its own fat. Giving obese mice FGF21 cleared fatty liver. No fasting people were studied."
+          "value": "In mice, fasting raises the hormone FGF21, which starts cellular cleanup; the liver then digests its own fat. Giving obese mice FGF21 cleared fatty liver. No fasting people were studied."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "У мишей голодування підвищує рівень гормону FGF21, який активує гени автофагії; після цього печінка «перетравлює» власний жир. Введення FGF21 мишам з ожирінням усувало жирову дистрофію печінки. Людей, які голодують, не досліджували."
+          "value": "У мишей голодування підвищує рівень гормону FGF21, і той запускає в клітині самоочищення; після цього печінка «перетравлює» власний жир. Введення FGF21 мишам з ожирінням усувало жирову дистрофію печінки. Людей, які голодують, не досліджували."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Bei Mäusen erhöht Fasten das Hormon FGF21, das Autophagie-Gene aktiviert; die Leber baut daraufhin ihr eigenes Fett ab. Die Gabe von FGF21 an adipöse Mäuse beseitigte die Fettleber. Fastende Menschen wurden nicht untersucht."
+          "value": "Bei Mäusen erhöht Fasten das Hormon FGF21, das die zelluläre Selbstreinigung anstößt; die Leber baut daraufhin ihr eigenes Fett ab. Die Gabe von FGF21 an adipöse Mäuse beseitigte die Fettleber. Fastende Menschen wurden nicht untersucht."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "En ratones, el ayuno eleva la hormona FGF21, que activa genes de autofagia; el hígado descompone entonces su propia grasa. Administrar FGF21 a ratones obesos eliminó el hígado graso. No se estudió a personas que ayunan."
+          "value": "En ratones, el ayuno eleva la hormona FGF21, que inicia la limpieza celular; el hígado descompone entonces su propia grasa. Administrar FGF21 a ratones obesos eliminó el hígado graso. No se estudió a personas que ayunan."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Chez la souris, le jeûne augmente l’hormone FGF21, qui active des gènes de l’autophagie ; le foie digère alors sa propre graisse. L’administration de FGF21 à des souris obèses a fait disparaître la stéatose hépatique. Aucune personne jeûnant n’a été étudiée."
+          "value": "Chez la souris, le jeûne augmente l’hormone FGF21, qui déclenche le nettoyage cellulaire ; le foie digère alors sa propre graisse. L’administration de FGF21 à des souris obèses a fait disparaître la stéatose hépatique. Aucune personne jeûnant n’a été étudiée."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "U myszy post zwiększa poziom hormonu FGF21, który aktywuje geny autofagii; wątroba wtedy rozkłada własny tłuszcz. Podanie FGF21 myszom z otyłością usuwało stłuszczenie wątroby. Osób poszczących nie badano."
+          "value": "U myszy post zwiększa poziom hormonu FGF21, który uruchamia oczyszczanie komórek; wątroba wtedy rozkłada własny tłuszcz. Podanie FGF21 myszom z otyłością usuwało stłuszczenie wątroby. Osób poszczących nie badano."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "マウスでは、断食によってホルモンFGF21が増加し、これがオートファジーの遺伝子を活性化させます。その結果、肝臓は自らの脂肪を分解します。肥満マウスにFGF21を投与すると脂肪肝が解消しました。断食中の人を対象にした研究ではありません。"
+          "value": "マウスでは、断食によってホルモンFGF21が増え、細胞内の清掃が始まります。その結果、肝臓は自らの脂肪を分解します。肥満マウスにFGF21を投与すると脂肪肝が解消しました。断食中の人を対象にした研究ではありません。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "생쥐 실험에서 단식은 호르몬 FGF21을 증가시키고, 이 호르몬이 자가포식 유전자를 활성화해서 간이 스스로 지방을 분해해요. 비만 생쥐에게 FGF21을 투여하자 지방간이 사라졌어요. 단식하는 사람을 대상으로 한 연구는 아니에요."
+          "value": "생쥐 실험에서 단식은 호르몬 FGF21을 증가시키고, 이 호르몬이 세포의 정화 작용을 시작하게 해서 간이 스스로 지방을 분해해요. 비만 생쥐에게 FGF21을 투여하자 지방간이 사라졌어요. 단식하는 사람을 대상으로 한 연구는 아니에요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "在小鼠中，断食会提高激素 FGF21 的水平，从而激活自噬相关基因；肝脏随后分解自身的脂肪。给肥胖小鼠注射 FGF21 可以消除脂肪肝。这项研究没有涉及断食的人。"
+          "value": "在小鼠中，断食会提高激素 FGF21 的水平，从而启动细胞内的清理过程；肝脏随后分解自身的脂肪。给肥胖小鼠注射 FGF21 可以消除脂肪肝。这项研究没有涉及断食的人。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "في الفئران، يرفع الصيام مستوى هرمون FGF21، الذي يُنشّط جينات الالتهام الذاتي؛ فيهضم الكبد دهونه الخاصة. وأدى إعطاء الفئران البدينة هرمون FGF21 إلى التخلص من الكبد الدهني. لم تُجرَ دراسة على صائمين."
+          "value": "في الفئران، يرفع الصيام مستوى هرمون FGF21، الذي يبدأ عملية التنظيف داخل الخلية؛ فيهضم الكبد دهونه الخاصة. وأدى إعطاء الفئران البدينة هرمون FGF21 إلى التخلص من الكبد الدهني. لم تُجرَ دراسة على صائمين."
         }
       }
     }
@@ -1892,61 +1892,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "A review with no measurements of its own. It reports that fasting schedules, including a 6-hour eating window, are associated with lower weight, better lipids and lower blood pressure, and that longer trials are still needed."
+          "value": "A review with no measurements of its own. It reports that fasting schedules, including a 6-hour eating window, are associated with lower weight, better cholesterol and triglycerides, and lower blood pressure, and that longer trials are still needed."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Огляд без власних вимірювань. У ньому зазначено, що режими голодування, зокрема 6-годинне вікно харчування, повʼязані з нижчою вагою, кращими показниками ліпідів і нижчим артеріальним тиском, і що потрібні довші випробування."
+          "value": "Огляд без власних вимірювань. У ньому сказано, що режими голодування, зокрема 6-годинне вікно харчування, повʼязані з нижчою вагою, кращим холестерином і тригліцеридами та нижчим тиском, і що потрібні довші дослідження."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Eine Übersichtsarbeit ohne eigene Messungen. Sie berichtet, dass Fastenpläne, darunter ein 6-stündiges Essensfenster, mit niedrigerem Gewicht, besseren Blutfettwerten und niedrigerem Blutdruck einhergehen, und dass längere Studien noch nötig sind."
+          "value": "Eine Übersichtsarbeit ohne eigene Messungen. Sie berichtet, dass Fastenpläne, darunter ein 6-stündiges Essensfenster, mit niedrigerem Gewicht, besseren Cholesterin- und Triglyzeridwerten sowie niedrigerem Blutdruck einhergehen, und dass längere Studien noch nötig sind."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Una revisión sin mediciones propias. Indica que los horarios de ayuno, incluida una ventana de comida de 6 horas, se asocian con menor peso, mejores lípidos y menor presión arterial, y que aún se necesitan ensayos más largos."
+          "value": "Una revisión sin mediciones propias. Indica que los horarios de ayuno, incluida una ventana de comida de 6 horas, se asocian con menor peso, mejores niveles de colesterol y triglicéridos y menor presión arterial, y que aún se necesitan ensayos más largos."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Une revue sans mesures propres. Elle indique que les rythmes de jeûne, y compris une fenêtre alimentaire de 6 heures, sont associés à un poids plus faible, de meilleurs lipides et une tension artérielle plus basse, et que des essais plus longs restent nécessaires."
+          "value": "Une revue sans mesures propres. Elle indique que les rythmes de jeûne, y compris une fenêtre alimentaire de 6 heures, sont associés à un poids plus faible, de meilleurs taux de cholestérol et de triglycérides et une tension artérielle plus basse, et que des essais plus longs restent nécessaires."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Przegląd bez własnych pomiarów. Wskazuje, że harmonogramy postu, w tym 6-godzinne okno żywieniowe, wiążą się z niższą masą ciała, lepszym profilem lipidowym i niższym ciśnieniem krwi, oraz że wciąż potrzebne są dłuższe badania."
+          "value": "Przegląd bez własnych pomiarów. Wskazuje, że harmonogramy postu, w tym 6-godzinne okno żywieniowe, wiążą się z niższą masą ciała, lepszym poziomem cholesterolu i triglicerydów oraz niższym ciśnieniem krwi, i że wciąż potrzebne są dłuższe badania."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "これは独自の測定を行っていない総説です。6時間の食事時間帯を含む断食スケジュールは、体重の減少、脂質の改善、血圧の低下と関連していると報告しています。また、より長期の試験がまだ必要だとしています。"
+          "value": "これは独自の測定を行っていない総説です。6時間の食事時間帯を含む断食スケジュールは、体重の減少、コレステロールと中性脂肪の改善、血圧の低下と関連していると報告しています。また、より長期の試験がまだ必要だとしています。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "needs_review",
-          "value": "이 종설은 자체 측정 없이 기존 연구를 정리한 자료예요. 6시간 식사 시간대를 포함한 단식 일정이 체중 감소, 지질 개선, 혈압 하락과 연관이 있다고 보고하며, 더 긴 기간의 연구가 여전히 필요하다고 말해요."
+          "value": "이 종설은 자체 측정 없이 기존 연구를 정리한 자료예요. 6시간 식사 시간대를 포함한 단식 일정이 체중 감소, 콜레스테롤과 중성지방 개선, 혈압 하락과 연관이 있다고 보고하며, 더 긴 기간의 연구가 여전히 필요하다고 말해요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "这是一篇没有自己测量数据的综述。文中指出，断食安排（包括 6 小时进食窗口）与更低的体重、更好的血脂和更低的血压相关，并指出仍需要更长期的试验。"
+          "value": "这是一篇没有自己测量数据的综述。文中指出，断食安排（包括 6 小时进食窗口）与更低的体重、更好的胆固醇和甘油三酯以及更低的血压相关，并指出仍需要更长期的试验。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "مراجعة لا تتضمّن قياسات أجرتها بنفسها. وتذكر أن جداول الصيام، بما فيها نافذة أكل مدتها 6 ساعات، مرتبطة بانخفاض الوزن وتحسّن الدهون وانخفاض ضغط الدم، وأن الحاجة لا تزال قائمة إلى تجارب أطول أمدًا."
+          "value": "مراجعة لا تتضمّن قياسات أجرتها بنفسها. وتذكر أن جداول الصيام، بما فيها نافذة أكل مدتها 6 ساعات، مرتبطة بانخفاض الوزن وتحسّن الكوليسترول والدهون الثلاثية وانخفاض ضغط الدم، وأن الحاجة لا تزال قائمة إلى تجارب أطول أمدًا."
         }
       }
     }
