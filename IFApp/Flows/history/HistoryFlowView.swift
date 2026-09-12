@@ -58,7 +58,6 @@ struct HistoryFlowView: View {
     @State private var props: HistoryProps
     @State private var expandedID: UUID?
     @State private var pendingDelete: FastRecord?
-    @State private var appeared = false
 
     init(store: Store<AppState>, source: HistoryEntrySource, focusRecordID: UUID? = nil,
          onStartFast: @escaping () -> Void) {
@@ -106,8 +105,6 @@ struct HistoryFlowView: View {
             } else if source == .eatingWindow {
                 expandedID = HistoryStats.monthGroups(records: props.records).first?.records.first?.id
             }
-            // Drives the entry animation: rows rise into place on the first frame only.
-            withAnimation(reduceMotion ? .easeOut(duration: 0.2) : nil) { appeared = true }
         }
         // Apple's sheet, so it is presented the system way rather than as an overlay
         // with our own motion numbers.
@@ -266,8 +263,8 @@ struct HistoryFlowView: View {
                 // Charts land here in a later release — between the totals and the
                 // first group, so adding them shifts nothing above or below.
 
-                ForEach(Array(HistoryStats.monthGroups(records: props.records).enumerated()), id: \.element.id) { groupIndex, group in
-                    monthGroup(group, groupIndex: groupIndex, theme: theme)
+                ForEach(HistoryStats.monthGroups(records: props.records)) { group in
+                    monthGroup(group, theme: theme)
                 }
             }
             .padding(.horizontal, 20)
@@ -275,7 +272,7 @@ struct HistoryFlowView: View {
         }
     }
 
-    private func monthGroup(_ group: HistoryMonthGroup, groupIndex: Int, theme: ThemeTokens) -> some View {
+    private func monthGroup(_ group: HistoryMonthGroup, theme: ThemeTokens) -> some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack {
                 Text(HistoryFormat.monthTitle(group.month).uppercased())
@@ -304,9 +301,6 @@ struct HistoryFlowView: View {
                     ) {
                         HistoryRow(record: record, isExpanded: expandedID == record.id, theme: theme)
                     }
-                    .modifier(RowEntrance(index: groupIndex == 0 ? index : 8,
-                                          appeared: appeared,
-                                          reduceMotion: reduceMotion))
                 }
             }
             .background(
@@ -397,29 +391,6 @@ private struct InteractivePopGesture: UIViewControllerRepresentable {
         func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                                shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
             false
-        }
-    }
-}
-
-/// Rows on the first screen fade and rise into place, staggered. Reduce Motion gets
-/// a plain crossfade — no movement, no stagger.
-private struct RowEntrance: ViewModifier {
-    let index: Int
-    let appeared: Bool
-    let reduceMotion: Bool
-
-    func body(content: Content) -> some View {
-        if reduceMotion {
-            content.opacity(appeared ? 1 : 0)
-        } else {
-            content
-                .opacity(appeared ? 1 : 0)
-                .offset(y: appeared ? 0 : 6)
-                .animation(
-                    .timingCurve(0.22, 0.8, 0.3, 1, duration: 0.32)
-                        .delay(Double(min(index, 8)) * 0.03),
-                    value: appeared
-                )
         }
     }
 }

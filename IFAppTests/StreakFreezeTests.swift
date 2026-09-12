@@ -160,6 +160,17 @@ final class StreakFreezeTests: XCTestCase {
         XCTAssertEqual(state.streak(ownsFreeze: true).displayed(at: day(2026, 8, 12)), 0)
     }
 
+    /// A broken-run projection carries the actual final goal day beside its count,
+    /// so history can name when that particular run ended rather than showing an
+    /// unexplained number.
+    func testBrokenRunCarriesItsLastGoalDate() {
+        let lastGoal = key(2026, 8, 10)
+        let state = streakState(count: 5, last: lastGoal)
+
+        XCTAssertEqual(state.streak(ownsFreeze: false).display(at: day(2026, 8, 12)),
+                       .justEnded(5, lastGoalDate: lastGoal))
+    }
+
     // MARK: Edge 8 — buying within 24 hours of the break
 
     /// The break becomes visible at midnight starting the day after the missed one:

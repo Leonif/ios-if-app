@@ -90,6 +90,12 @@ enum Clock {
         return dayKeyFormatter.string(from: next)
     }
 
+    /// Parses a persisted streak day without letting the device's selected calendar
+    /// reinterpret it. The matching formatter is also what created the key.
+    static func date(forDayKey dayKey: String) -> Date? {
+        dayKeyFormatter.date(from: dayKey)
+    }
+
     /// The calendar month a day key belongs to, as "yyyy-MM". Taken off the key
     /// rather than re-derived from a date: the key's shape is fixed by the formatter
     /// above, and a second parse could only disagree with it.

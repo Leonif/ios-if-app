@@ -554,17 +554,22 @@ enum strings {
         /// number now is, and how the next one starts. The pill shows the lost number;
         /// this is the only place that says out loud that it ended. Without reproach and
         /// without a sell — the way back is a goal reached, not a purchase.
-        static func streakEnded(_ days: Int) -> String {
-            String(localized: "history.streak.ended",
-                   defaultValue: "After \(days) days in a row, the streak ended. A new one starts with your next completed goal.",
-                   locale: .latinDigits,
-                   comment: """
-                   Sentence on the history summary card under the big number, in the state
-                   where the streak has just ended (shown for 7 days after the missed day).
-                   The number is the run that was lost. Plural categories belong in the
-                   catalog. Up to 3 lines at xxLarge in a 299pt slot. No blame, no call to
-                   action, no mention of the paid freeze.
-                   """)
+        static func streakEnded(_ days: Int, lastGoalDate: String?) -> String {
+            let date = lastGoalDate
+                .flatMap(Clock.date(forDayKey:))
+                .map(HistoryFormat.sinceDate)
+                ?? ""
+            return String(localized: "history.streak.ended",
+                          defaultValue: "The streak lasted \(days) days and ended on \(date). A new one starts with your next completed goal.",
+                          locale: .latinDigits,
+                          comment: """
+                          Sentence on the history summary card under the big number, in the state
+                          where the streak has just ended (shown for 7 days after the missed day).
+                          The number is the run that was lost; the date is its final completed goal
+                          day, formatted as localized day and month. Plural categories belong in
+                          the catalog. Up to 3 lines at xxLarge in a 299pt slot. No blame, no call
+                          to action, no mention of the paid freeze.
+                          """)
         }
 
         /// "Last fast · 16h 24m" — the eating window's link into the history.

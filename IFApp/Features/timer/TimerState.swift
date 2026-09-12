@@ -97,7 +97,8 @@ struct StreakStatus: Equatable, Sendable {
     /// What the streak surfaces should show — the single projection of the three
     /// states, so the pill and the summary card cannot disagree about which one holds.
     ///
-    /// `.justEnded` carries `count`, the persisted counter, and never `bestStreak`:
+    /// `.justEnded` carries `count` and the last day that belonged to that run. The
+    /// count is the persisted counter, never `bestStreak`:
     /// the best run is recomputed from history rows and after an update from 1.4.4 can
     /// be *smaller* than the run that was actually lost. Naming a number below the one
     /// the person remembers is worse than naming none.
@@ -107,7 +108,7 @@ struct StreakStatus: Equatable, Sendable {
         guard count > 0, let lastGoalDate,
               let gap = Clock.daysBetween(lastGoalDate, Clock.dayKey(now)),
               gap <= Self.lostRunFreshnessDays else { return .none }
-        return .justEnded(count)
+        return .justEnded(count, lastGoalDate: lastGoalDate)
     }
 }
 
@@ -119,7 +120,7 @@ enum StreakDisplay: Equatable, Sendable {
     /// A run in progress — the number to show.
     case alive(Int)
     /// A run that broke inside the freshness window — the number that was lost.
-    case justEnded(Int)
+    case justEnded(Int, lastGoalDate: String)
     /// Nothing to name: never started, or the lost run is no longer news.
     case none
 
@@ -129,7 +130,7 @@ enum StreakDisplay: Equatable, Sendable {
     /// is how the two came to show different numbers for one state before.
     var count: Int {
         switch self {
-        case .alive(let days), .justEnded(let days): return days
+        case .alive(let days), .justEnded(let days, _): return days
         case .none: return 0
         }
     }
@@ -140,6 +141,14 @@ enum StreakDisplay: Equatable, Sendable {
     var hasEnded: Bool {
         if case .justEnded = self { return true }
         return false
+    }
+
+    /// The final goal day of a run that has ended. Keeping the persisted day key in
+    /// the projection lets the history explain when the displayed number happened,
+    /// without making the compact header badge carry or format a date.
+    var lastGoalDate: String? {
+        if case .justEnded(_, let dayKey) = self { return dayKey }
+        return nil
     }
 }
 

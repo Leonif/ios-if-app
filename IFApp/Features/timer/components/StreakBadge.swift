@@ -46,7 +46,7 @@ struct StreakBadge: View {
     private var accessibilityLabel: String {
         switch display {
         case .alive(let days): return strings.History.entryA11y(days)
-        case .justEnded(let days): return strings.History.entryA11yLastStreak(days)
+        case .justEnded(let days, _): return strings.History.entryA11yLastStreak(days)
         case .none: return strings.History.entryA11yNoStreak
         }
     }

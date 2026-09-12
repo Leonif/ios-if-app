@@ -106,7 +106,7 @@ struct HistorySummaryCard: View {
             // comes first: it is the only one of them that says something the reader
             // does not already know from the number above it.
             if hasEnded {
-                Text(strings.History.streakEnded(streak))
+                Text(strings.History.streakEnded(streak, lastGoalDate: display.lastGoalDate))
                     .font(.hanken(14, .medium))
                     .foregroundColor(theme.sec)
                     .fixedSize(horizontal: false, vertical: true)
