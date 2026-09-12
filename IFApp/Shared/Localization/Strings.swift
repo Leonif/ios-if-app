@@ -490,7 +490,11 @@ enum strings {
                    keep it to two short words.
                    """)
         }
-        static var lastSevenDays: String { String(localized: "Last 7 days") }
+        static var goalDays: String {
+            String(localized: "history.goalDays",
+                   defaultValue: "Goal days",
+                   comment: "Label above seven weekday dots; a filled dot means the fasting goal was reached on that day.")
+        }
         static var statFasts: String { String(localized: "Fasts") }
         static var statTotal: String { String(localized: "Total") }
         static var statLongest: String { String(localized: "Longest") }

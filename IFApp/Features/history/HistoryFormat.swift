@@ -54,6 +54,13 @@ enum HistoryFormat {
         formatter(template: "dMMMM").string(from: date)
     }
 
+    /// Narrow localized weekday under a seven-day goal dot: M / T / W, or the
+    /// locale's equivalent. The full dates still drive the dots; this is only the
+    /// compact map that makes their oldest-to-today order visible.
+    static func weekdayNarrow(_ date: Date) -> String {
+        formatter(template: "EEEEE").string(from: date)
+    }
+
     /// "8:40 PM" / "20:40"
     static func time(_ date: Date) -> String {
         let f = DateFormatter()

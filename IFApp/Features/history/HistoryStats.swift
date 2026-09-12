@@ -27,6 +27,15 @@ struct HistoryMonthGroup: Identifiable, Equatable {
     }
 }
 
+/// One of the seven calendar days in the summary strip, oldest first. Carrying the
+/// date with the flag lets the UI label each dot instead of presenting seven
+/// anonymous circles whose direction and meaning have to be guessed.
+struct HistoryDay: Identifiable, Equatable {
+    let date: Date
+    let reachedGoal: Bool
+    var id: String { Clock.dayKey(date) }
+}
+
 struct HistoryStats: Equatable {
     let fastsCount: Int
     /// Every fast added up, in seconds — not in whole hours, and the difference is
@@ -45,7 +54,7 @@ struct HistoryStats: Equatable {
     /// When the history begins — the "since" in "Best 9 · since 12 March".
     let since: Date?
     /// Goal reached on each of the last 7 local days, oldest first.
-    let lastSevenDays: [Bool]
+    let lastSevenDays: [HistoryDay]
 
     static func compute(records: [FastRecord], now: Date = Date()) -> HistoryStats {
         let goalDays = Set(records.compactMap(\.goalDayKey))
@@ -126,11 +135,11 @@ struct HistoryStats: Equatable {
     }
 
     /// Seven flags, oldest first: did a fast reach its goal on that local day.
-    private static func lastSeven(goalDays: Set<String>, now: Date) -> [Bool] {
+    private static func lastSeven(goalDays: Set<String>, now: Date) -> [HistoryDay] {
         let calendar = Clock.gregorian
         return (0..<7).reversed().map { daysAgo in
-            guard let day = calendar.date(byAdding: .day, value: -daysAgo, to: now) else { return false }
-            return goalDays.contains(Clock.dayKey(day))
+            let day = calendar.date(byAdding: .day, value: -daysAgo, to: now) ?? now
+            return HistoryDay(date: day, reachedGoal: goalDays.contains(Clock.dayKey(day)))
         }
     }
 }

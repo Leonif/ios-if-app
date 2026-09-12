@@ -89,6 +89,19 @@ final class HistoryStatsTests: XCTestCase {
         XCTAssertEqual(groups.first?.records.count, 2)
     }
 
+    /// The seven-dot strip is an actual calendar map: each dot carries its day so the
+    /// UI can label Monday through Sunday instead of showing anonymous circles.
+    func testLastSevenDaysCarryDatesOldestToToday() {
+        let now = Clock.gregorian.date(from: DateComponents(year: 2026, month: 9, day: 12, hour: 12))!
+        let stats = HistoryStats.compute(records: [], now: now)
+
+        XCTAssertEqual(stats.lastSevenDays.map(\.id), [
+            "2026-09-06", "2026-09-07", "2026-09-08", "2026-09-09",
+            "2026-09-10", "2026-09-11", "2026-09-12",
+        ])
+        XCTAssertEqual(stats.lastSevenDays.map(\.reachedGoal), Array(repeating: false, count: 7))
+    }
+
     /// A 14-hour fast starting at noon on the given Gregorian day.
     private func record(day: Int, month: Int, year: Int) -> FastRecord {
         var components = DateComponents()

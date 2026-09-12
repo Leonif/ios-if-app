@@ -92,7 +92,7 @@ struct HistorySummaryCard: View {
 
                 if showsDots {
                     VStack(alignment: .trailing, spacing: 9) {
-                        Text(strings.History.lastSevenDays.uppercased())
+                        Text(strings.History.goalDays.uppercased())
                             .font(.hanken(11, .semibold))
                             .overlineTracking(1.1)
                             .foregroundColor(theme.mut)
@@ -186,20 +186,27 @@ struct HistorySummaryCard: View {
 /// Seven days, oldest first. A missed day is an unfilled ring, not a cross — the
 /// gap is a fact, not a verdict.
 struct StreakDots: View {
-    let days: [Bool]
+    let days: [HistoryDay]
     let theme: ThemeTokens
 
     var body: some View {
-        HStack(spacing: 6) {
-            ForEach(Array(days.enumerated()), id: \.offset) { _, reached in
-                Group {
-                    if reached {
-                        Circle().fill(theme.accent)
-                    } else {
-                        Circle().stroke(theme.faint, lineWidth: 1.5)
+        HStack(spacing: 5) {
+            ForEach(days) { day in
+                VStack(spacing: 4) {
+                    Group {
+                        if day.reachedGoal {
+                            Circle().fill(theme.accent)
+                        } else {
+                            Circle().stroke(theme.faint, lineWidth: 1.5)
+                        }
                     }
+                    .frame(width: 8, height: 8)
+
+                    Text(HistoryFormat.weekdayNarrow(day.date).uppercased())
+                        .font(.hanken(9, .semibold))
+                        .foregroundColor(theme.mut)
+                        .frame(width: 10)
                 }
-                .frame(width: 8, height: 8)
             }
         }
         .accessibilityHidden(true)
