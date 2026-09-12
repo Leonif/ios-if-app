@@ -102,6 +102,32 @@ final class HistoryStatsTests: XCTestCase {
         XCTAssertEqual(stats.lastSevenDays.map(\.reachedGoal), Array(repeating: false, count: 7))
     }
 
+    /// The dot uses the same date printed on the history row. A Tuesday-evening fast
+    /// reaches a 16-hour goal on Wednesday, but the row is filed and labelled Tuesday;
+    /// lighting Wednesday made the two parts of the same screen contradict each other.
+    func testGoalDotUsesTheHistoryRowsStartDayForAnOvernightFast() {
+        let calendar = Clock.gregorian
+        let start = calendar.date(from: DateComponents(
+            year: 2026, month: 9, day: 8, hour: 19, minute: 25
+        ))!
+        let record = FastRecord(
+            id: UUID(),
+            startTimestamp: start.timeIntervalSince1970,
+            endTimestamp: start.addingTimeInterval(18 * 3600 + 17 * 60).timeIntervalSince1970,
+            goalHours: 16,
+            planLabel: "16:8"
+        )
+        let now = calendar.date(from: DateComponents(
+            year: 2026, month: 9, day: 12, hour: 12
+        ))!
+
+        let stats = HistoryStats.compute(records: [record], now: now)
+        let reachedDays = stats.lastSevenDays.filter(\.reachedGoal).map(\.id)
+
+        XCTAssertEqual(reachedDays, ["2026-09-08"])
+        XCTAssertEqual(record.goalDayKey, "2026-09-09")
+    }
+
     /// A 14-hour fast starting at noon on the given Gregorian day.
     private func record(day: Int, month: Int, year: Int) -> FastRecord {
         var components = DateComponents()

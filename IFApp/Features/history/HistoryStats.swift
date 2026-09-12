@@ -58,6 +58,14 @@ struct HistoryStats: Equatable {
 
     static func compute(records: [FastRecord], now: Date = Date()) -> HistoryStats {
         let goalDays = Set(records.compactMap(\.goalDayKey))
+        // Rows in history are dated by the day the fast started. The seven-day strip
+        // must use that same visible date: an overnight fast that starts Tuesday and
+        // crosses its goal Wednesday otherwise lights Wednesday while the matching
+        // row says Tuesday. Streak accounting intentionally keeps using `goalDayKey`
+        // above, because it records the actual day on which the goal was crossed.
+        let historyGoalDays = Set(records.compactMap { record in
+            record.goalReached ? Clock.dayKey(record.startDate) : nil
+        })
 
         return HistoryStats(
             fastsCount: records.count,
@@ -65,7 +73,7 @@ struct HistoryStats: Equatable {
             longest: records.map(\.duration).max() ?? 0,
             bestStreak: longestRun(of: goalDays),
             since: records.map(\.startDate).min(),
-            lastSevenDays: lastSeven(goalDays: goalDays, now: now)
+            lastSevenDays: lastSeven(goalDays: historyGoalDays, now: now)
         )
     }
 
