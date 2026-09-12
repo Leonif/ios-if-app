@@ -789,7 +789,7 @@ enum strings {
         /// closed list reads as "everyone else is fine".
         static var medicalNote: String {
             String(localized: "About.medicalNote",
-                   defaultValue: "The fasting phases IF24 shows are estimates based on typical timing, not a measurement of your body. IF24 is not a medical device and does not give medical advice. Talk to a clinician before changing how you eat - especially if you are pregnant, managing diabetes, taking medication with food, have a history of disordered eating, or are under 18.")
+                   defaultValue: "IF24 shows estimated phases, not measurements of your body. It is not a medical device and does not give medical advice. Talk to a doctor before changing how you eat - especially if you are pregnant, on medication, managing a condition such as diabetes, have a history of disordered eating, or are under 18.")
         }
     }
 

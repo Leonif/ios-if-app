@@ -96,6 +96,10 @@ struct SourceArticleView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(RoundedRectangle(cornerRadius: 16).fill(theme.backgroundBase))
                         VStack(alignment: .leading, spacing: 12) {
+                            // The medical disclaimer used to close this block on its
+                            // own key; it now rides inside the editorial line, which
+                            // stays exactly the quiet signature it was. Presence and
+                            // legibility are what the note is for — not volume.
                             Text(SourceReaderStrings.editorial)
                                 .font(.hanken(12)).foregroundStyle(theme.mut)
                             Text(article.citation)
@@ -114,8 +118,6 @@ struct SourceArticleView: View {
                             }
                             .buttonStyle(.plain)
                             .accessibilityIdentifier("source.article.original")
-                            Text(strings.About.medicalNote)
-                                .font(.hanken(12)).foregroundStyle(theme.mut)
                         }
                         endMarker
                     }

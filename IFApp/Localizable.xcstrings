@@ -1242,61 +1242,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "An IF24 summary, not a translation of the full paper."
+          "value": "An IF24 summary, not a translation of the full paper. IF24 is not a medical device and does not give medical advice - talk to a doctor before changing how you eat."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Виклад IF24, а не переклад повної статті."
+          "value": "Виклад IF24, а не переклад повної статті. IF24 не є медичним виробом і не дає медичних порад - перш ніж змінювати режим харчування, порадьтеся з лікарем."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Eine Zusammenfassung von IF24, keine Übersetzung der gesamten Arbeit."
+          "value": "Eine Zusammenfassung von IF24, keine Übersetzung der gesamten Arbeit. IF24 ist kein Medizinprodukt und gibt keine medizinischen Ratschläge - sprich mit einem Arzt, bevor du deine Ernährung umstellst."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Un resumen de IF24, no una traducción del artículo completo."
+          "value": "Un resumen de IF24, no una traducción del artículo completo. IF24 no es un producto sanitario y no ofrece consejo médico - consulta a un médico antes de cambiar tu forma de comer."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Un résumé IF24, pas une traduction de l’article intégral."
+          "value": "Un résumé IF24, pas une traduction de l’article intégral. IF24 n’est pas un dispositif médical et ne donne pas de conseils médicaux - consultez un médecin avant de modifier votre alimentation."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Podsumowanie IF24, a nie tłumaczenie całego artykułu."
+          "value": "Podsumowanie IF24, a nie tłumaczenie całego artykułu. IF24 nie jest wyrobem medycznym i nie udziela porad medycznych - zanim zmienisz sposób odżywiania, skonsultuj się z lekarzem."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "IF24による要約であり、論文全文の翻訳ではありません。"
+          "value": "IF24による要約であり、論文全文の翻訳ではありません。IF24は医療機器ではなく、医学的な助言を行うものではありません。食生活を変える前に、医師に相談してください。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "IF24의 요약이며 논문 전문의 번역이 아닙니다."
+          "value": "IF24의 요약이며 논문 전문의 번역이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 식습관을 바꾸기 전에 의사와 상의하십시오."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "这是 IF24 编写的摘要，并非论文全文的翻译。"
+          "value": "这是 IF24 编写的摘要，并非论文全文的翻译。IF24 不是医疗器械，也不提供医疗建议——请在改变饮食方式前咨询医生。"
         }
       },
       "ar": {
         "stringUnit": {
-          "state": "translated",
-          "value": "ملخص أعدّه IF24، وليس ترجمة للورقة كاملة."
+          "state": "needs_review",
+          "value": "ملخص أعدّه IF24، وليس ترجمة للورقة كاملة. تطبيق IF24 ليس جهازًا طبيًا ولا يقدّم مشورة طبية - يُنصح باستشارة الطبيب قبل تغيير نمط الأكل."
         }
       }
     }
@@ -1567,61 +1567,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Glycogen stores glucose. This review explains the enzymes and hormones that regulate its storage and use."
+          "value": "Glycogen is glucose packed into a branched particle - about 55,000 units at most, and the enzyme that frees glucose reaches only its outer layer. A chemistry review, not a study of fasting people."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Глікоген зберігає глюкозу. Огляд пояснює, як ферменти та гормони регулюють його накопичення й використання."
+          "value": "Глікоген - це глюкоза, упакована в розгалужену частинку: щонайбільше близько 55 000 одиниць, а фермент, що звільняє глюкозу, дістається лише її зовнішнього шару. Хімічний огляд, а не дослідження людей, які голодують."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Glykogen speichert Glukose. Die Übersichtsarbeit erklärt, wie Enzyme und Hormone seine Speicherung und Nutzung steuern."
+          "value": "Glykogen ist Glukose, verpackt in einem verzweigten Partikel - höchstens etwa 55.000 Einheiten -, und das Enzym, das Glukose freisetzt, erreicht nur die äußere Schicht. Eine biochemische Übersichtsarbeit, keine Studie an fastenden Menschen."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "El glucógeno almacena glucosa. Esta revisión explica las enzimas y hormonas que regulan su almacenamiento y uso."
+          "value": "El glucógeno es glucosa empaquetada en una partícula ramificada - unas 55.000 unidades como máximo -, y la enzima que libera glucosa solo alcanza su capa externa. Una revisión de química, no un estudio en personas que ayunan."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Le glycogène stocke le glucose. Cette revue explique les enzymes et hormones qui régulent son stockage et son utilisation."
+          "value": "Le glycogène, c’est du glucose emballé dans une particule ramifiée - environ 55 000 unités au maximum -, et l’enzyme qui libère le glucose n’atteint que sa couche externe. Une revue de chimie, pas une étude sur des personnes qui jeûnent."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Glikogen magazynuje glukozę. Przegląd wyjaśnia, jak enzymy i hormony regulują jego gromadzenie i wykorzystanie."
+          "value": "Glikogen to glukoza upakowana w rozgałęzioną cząstkę - maksymalnie około 55 000 jednostek - a enzym uwalniający glukozę sięga tylko jej zewnętrznej warstwy. Przegląd chemiczny, nie badanie osób pościących."
         }
       },
       "ja": {
         "stringUnit": {
-          "state": "translated",
-          "value": "グリコーゲンはグルコースを蓄えます。この総説は、その貯蔵と利用を調節する酵素やホルモンを解説しています。"
+          "state": "needs_review",
+          "value": "グリコーゲンは、ブドウ糖が枝分かれした粒子状に詰め込まれたもので、最大でも約55,000単位です。ブドウ糖を切り離す酵素が届くのは、その粒子の外側の層だけです。断食中の人を対象にした研究ではなく、化学分野の総説です。"
         }
       },
       "ko": {
         "stringUnit": {
-          "state": "translated",
-          "value": "글리코겐은 포도당을 저장해요. 이 종설은 글리코겐의 저장과 사용을 조절하는 효소와 호르몬을 설명해요."
+          "state": "needs_review",
+          "value": "글리코겐은 포도당이 가지 모양 입자로 뭉친 형태로, 포도당 단위가 최대 약 55,000개에 달해요. 포도당을 떼어내는 효소는 이 입자의 가장 바깥층에만 닿아요. 단식하는 사람을 연구한 것이 아니라 화학 종설이에요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "糖原储存葡萄糖。这篇综述介绍了调节糖原储存和利用的酶与激素。"
+          "value": "糖原是把葡萄糖打包成的分支结构颗粒——最多约 55,000 个单位，而释放葡萄糖的酶只能作用于它的外层。这是一篇化学综述，不是对断食者的研究。"
         }
       },
       "ar": {
         "stringUnit": {
-          "state": "translated",
-          "value": "يخزّن الجليكوجين الجلوكوز. تشرح هذه المراجعة الإنزيمات والهرمونات التي تنظّم تخزينه واستخدامه."
+          "state": "needs_review",
+          "value": "الجليكوجين هو الجلوكوز مُعبَّأ في جزيء متفرّع - بحد أقصى نحو 55,000 وحدة، والإنزيم الذي يُحرِّر الجلوكوز لا يصل إلا إلى طبقته الخارجية. هذه مراجعة كيميائية، لا دراسة على صائمين."
         }
       }
     }
@@ -1632,61 +1632,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Useful background for the fuel story. IF24 does not measure glycogen, so its timer cannot tell when your stores are empty."
+          "value": "IF24 does not measure glycogen. The timer counts hours; it cannot tell how full your stores are or when they run out."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Це контекст для пояснення джерел енергії. IF24 не вимірює глікоген, тож таймер не визначає, коли саме ваші запаси вичерпалися."
+          "value": "IF24 не вимірює глікоген. Таймер лише рахує години; він не може сказати, наскільки повні ваші запаси чи коли вони закінчаться."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Hintergrundwissen zu Energiequellen. IF24 misst kein Glykogen; der Timer kann daher nicht bestimmen, wann deine Speicher leer sind."
+          "value": "IF24 misst kein Glykogen. Der Timer zählt nur Stunden; er kann nicht sagen, wie voll deine Speicher sind oder wann sie leer sind."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Sirve de contexto sobre la energía. IF24 no mide el glucógeno: el temporizador no indica cuándo se agotan tus reservas."
+          "value": "IF24 no mide el glucógeno. El temporizador solo cuenta horas: no puede indicar cuán llenas están tus reservas ni cuándo se agotan."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Un éclairage sur les sources d’énergie. IF24 ne mesure pas le glycogène : le minuteur ne peut pas déterminer quand vos réserves sont épuisées."
+          "value": "IF24 ne mesure pas le glycogène. Le minuteur compte seulement les heures ; il ne peut pas dire à quel point vos réserves sont pleines ni quand elles s’épuisent."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "To kontekst dla opisu źródeł energii. IF24 nie mierzy glikogenu, więc timer nie określi, kiedy twoje zapasy się wyczerpią."
+          "value": "IF24 nie mierzy glikogenu. Timer liczy tylko godziny; nie może określić, jak pełne są twoje zapasy ani kiedy się wyczerpią."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "エネルギー源を理解するための背景情報です。IF24はグリコーゲンを測定しないため、タイマーで貯蔵量が尽きる時刻は分かりません。"
+          "value": "IF24はグリコーゲンを測定しません。タイマーは経過時間を数えるだけで、体内の貯蔵量がどれくらい残っているか、いつ尽きるかはわかりません。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "에너지원에 대한 배경지식입니다. IF24는 글리코겐을 측정하지 않으므로 타이머로 저장량이 소진되는 시점을 알 수 없습니다."
+          "value": "IF24는 글리코겐을 측정하지 않습니다. 타이머는 시간만 셀 뿐, 저장량이 얼마나 남았는지, 언제 소진되는지는 알 수 없습니다."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "这有助于理解能量来源。IF24 不测量糖原，因此计时器无法判断你的糖原储备何时耗尽。"
+          "value": "IF24 不测量糖原。计时器只计算小时数，无法判断你的储备还剩多少，或什么时候会耗尽。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "خلفية لفهم مصادر الطاقة. لا يقيس IF24 الجليكوجين، لذا لا يستطيع المؤقّت تحديد وقت نفاد مخزونك."
+          "value": "لا يقيس تطبيق IF24 مستوى الجليكوجين. فالمؤقت يحسب عدد الساعات فقط، ولا يمكنه تحديد مدى امتلاء مخازن الجسم أو موعد نفادها."
         }
       }
     }
@@ -1762,61 +1762,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Over one year, alternate-day fasting did not outperform daily calorie restriction for weight loss in this trial."
+          "value": "One year, 100 obese adults: on average weight fell 6.0% on alternate-day fasting and 5.3% on daily calorie cutting - no real difference. More quit the fasting arm (38% vs 29%), and their LDL ran higher."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "У цьому річному випробуванні голодування через день не перевершило щоденне обмеження калорій за зниженням ваги."
+          "value": "Рік, 100 дорослих з ожирінням: вага в середньому впала на 6,0% при голодуванні через день і на 5,3% при щоденному обмеженні калорій - практичної різниці не було. З групи голодування вибуло більше учасників (38% проти 29%), і в них LDL був вищим."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "In dieser einjährigen Studie führte alternierendes Fasten nicht zu mehr Gewichtsverlust als tägliche Kalorienreduktion."
+          "value": "Ein Jahr, 100 adipöse Erwachsene: Das Gewicht sank im Schnitt um 6,0% bei alternierendem Fasten und um 5,3% bei täglicher Kalorienreduktion - kein wirklicher Unterschied. In der Fasten-Gruppe brachen mehr Teilnehmende ab (38% vs. 29%), und ihr LDL lag höher."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "En este ensayo de un año, ayunar en días alternos no superó la restricción calórica diaria para perder peso."
+          "value": "Un año, 100 adultos con obesidad: el peso bajó en promedio un 6,0% con ayuno en días alternos y un 5,3% con restricción calórica diaria - sin diferencia real. Abandonaron más personas del grupo de ayuno (38% frente a 29%), y su LDL fue más alto."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Dans cet essai d’un an, le jeûne alterné n’a pas surpassé la restriction calorique quotidienne pour la perte de poids."
+          "value": "Un an, 100 adultes obèses : le poids a baissé en moyenne de 6,0 % avec le jeûne alterné et de 5,3 % avec la restriction calorique quotidienne - sans différence réelle. Plus de participants ont abandonné le groupe jeûne (38 % contre 29 %), et leur LDL était plus élevé."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "W tym rocznym badaniu post co drugi dzień nie dawał większego spadku masy ciała niż codzienne ograniczenie kalorii."
+          "value": "Rok, 100 dorosłych z otyłością: masa ciała spadła średnio o 6,0% przy poście co drugi dzień i o 5,3% przy codziennym ograniczeniu kalorii - bez realnej różnicy. Z grupy poszczącej wypadło więcej osób (38% wobec 29%), a ich LDL był wyższy."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "この1年間の試験では、隔日断食による減量効果は毎日のカロリー制限を上回りませんでした。"
+          "value": "1年間、肥満のある成人100人を対象にした試験です。体重は隔日断食群で平均6.0%、毎日のカロリー制限群で平均5.3%減少しましたが、実質的な差はありませんでした。断食群の離脱者は多く(38%対29%)、LDLコレステロールも高めでした。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "이 1년간의 시험에서 격일 단식은 체중 감량 면에서 매일 칼로리를 제한하는 방식보다 나은 결과를 보이지 않았어요."
+          "value": "1년간 비만 성인 100명을 대상으로 한 연구예요. 평균 체중은 격일 단식 그룹에서 6.0%, 매일 칼로리를 제한한 그룹에서 5.3% 줄어 실질적인 차이는 없었어요. 단식 그룹의 중도 포기율이 더 높았고(38% 대 29%), LDL 수치도 더 높았어요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "在这项为期一年的试验中，隔日断食的减重效果并未优于每日限制热量。"
+          "value": "为期一年，100 名肥胖成年人：隔日断食组体重平均下降 6.0%，每日限制热量组平均下降 5.3%——没有实质差异。断食组的退出人数更多（38% 对 29%），且他们的 LDL 更高。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "في هذه التجربة التي استمرت عامًا، لم يتفوّق الصيام يومًا بعد يوم على تقليل السعرات يوميًا في خفض الوزن."
+          "value": "مائة بالغ يعانون من السمنة على مدى عام واحد: انخفض الوزن في المتوسط بنسبة 6.0% مع الصيام يومًا بعد يوم، وبنسبة 5.3% مع تقليل السعرات الحرارية يوميًا - بلا فارق يُذكر. وانسحب من مجموعة الصيام عدد أكبر (38% في مقابل 29%)، وكان الكوليسترول الضار (LDL) لديهم أعلى."
         }
       }
     }
@@ -1957,61 +1957,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "Experiments mainly in mice linked FGF21–JMJD3 signaling to liver autophagy and lipid breakdown."
+          "value": "In mice, fasting raises the hormone FGF21, which unlocks autophagy genes; the liver then digests its own fat. Giving obese mice FGF21 cleared fatty liver. No fasting people were studied."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Експерименти переважно на мишах пов’язали сигналізацію FGF21–JMJD3 з аутофагією печінки та розщепленням жирів."
+          "value": "У мишей голодування підвищує рівень гормону FGF21, який активує гени автофагії; після цього печінка «перетравлює» власний жир. Введення FGF21 мишам з ожирінням усувало жирову дистрофію печінки. Людей, які голодують, не досліджували."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Experimente überwiegend an Mäusen verknüpften FGF21–JMJD3-Signale mit Autophagie und Fettabbau in der Leber."
+          "value": "Bei Mäusen erhöht Fasten das Hormon FGF21, das Autophagie-Gene aktiviert; die Leber baut daraufhin ihr eigenes Fett ab. Die Gabe von FGF21 an adipöse Mäuse beseitigte die Fettleber. Fastende Menschen wurden nicht untersucht."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Experimentos principalmente en ratones vincularon la señalización FGF21–JMJD3 con la autofagia hepática y la degradación de lípidos."
+          "value": "En ratones, el ayuno eleva la hormona FGF21, que activa genes de autofagia; el hígado descompone entonces su propia grasa. Administrar FGF21 a ratones obesos eliminó el hígado graso. No se estudió a personas que ayunan."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Des expériences surtout chez la souris ont relié la signalisation FGF21–JMJD3 à l’autophagie hépatique et à la dégradation des lipides."
+          "value": "Chez la souris, le jeûne augmente l’hormone FGF21, qui active des gènes de l’autophagie ; le foie digère alors sa propre graisse. L’administration de FGF21 à des souris obèses a fait disparaître la stéatose hépatique. Aucune personne jeûnant n’a été étudiée."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Eksperymenty głównie na myszach powiązały sygnalizację FGF21–JMJD3 z autofagią w wątrobie i rozkładem tłuszczów."
+          "value": "U myszy post zwiększa poziom hormonu FGF21, który aktywuje geny autofagii; wątroba wtedy rozkłada własny tłuszcz. Podanie FGF21 myszom z otyłością usuwało stłuszczenie wątroby. Osób poszczących nie badano."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "主にマウスを用いた実験で、FGF21–JMJD3シグナルが肝臓のオートファジーと脂質分解に関わることが示されました。"
+          "value": "マウスでは、断食によってホルモンFGF21が増加し、これがオートファジーの遺伝子を活性化させます。その結果、肝臓は自らの脂肪を分解します。肥満マウスにFGF21を投与すると脂肪肝が解消しました。断食中の人を対象にした研究ではありません。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "주로 생쥐를 대상으로 한 실험에서 FGF21–JMJD3 신호가 간의 자가포식과 지질 분해에 관련 있는 것으로 나타났어요."
+          "value": "생쥐 실험에서 단식은 호르몬 FGF21을 증가시키고, 이 호르몬이 자가포식 유전자를 활성화해서 간이 스스로 지방을 분해해요. 비만 생쥐에게 FGF21을 투여하자 지방간이 사라졌어요. 단식하는 사람을 대상으로 한 연구는 아니에요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "主要基于小鼠的实验将 FGF21–JMJD3 信号与肝脏自噬及脂质分解联系起来。"
+          "value": "在小鼠中，断食会提高激素 FGF21 的水平，从而激活自噬相关基因；肝脏随后分解自身的脂肪。给肥胖小鼠注射 FGF21 可以消除脂肪肝。这项研究没有涉及断食的人。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "ربطت تجارب على الفئران أساسًا إشارات FGF21–JMJD3 بالالتهام الذاتي في الكبد وتفكيك الدهون."
+          "value": "في الفئران، يرفع الصيام مستوى هرمون FGF21، الذي يُنشّط جينات الالتهام الذاتي؛ فيهضم الكبد دهونه الخاصة. وأدى إعطاء الفئران البدينة هرمون FGF21 إلى التخلص من الكبد الدهني. لم تُجرَ دراسة على صائمين."
         }
       }
     }
@@ -2152,61 +2152,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "This review discusses fasting schedules and metabolic outcomes, while highlighting the need for longer-term evidence."
+          "value": "A review with no measurements of its own. It reports that fasting schedules, including a 6-hour eating window, are associated with lower weight, better lipids and lower blood pressure, and that longer trials are still needed."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Огляд розглядає режими інтервального голодування та метаболічні результати й наголошує на потребі довгострокових доказів."
+          "value": "Огляд без власних вимірювань. У ньому зазначено, що режими голодування, зокрема 6-годинне вікно харчування, повʼязані з нижчою вагою, кращими показниками ліпідів і нижчим артеріальним тиском, і що потрібні довші випробування."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Diese Übersichtsarbeit bespricht Fastenrhythmen und Stoffwechselergebnisse und betont den Bedarf an längerfristigen Daten."
+          "value": "Eine Übersichtsarbeit ohne eigene Messungen. Sie berichtet, dass Fastenpläne, darunter ein 6-stündiges Essensfenster, mit niedrigerem Gewicht, besseren Blutfettwerten und niedrigerem Blutdruck einhergehen, und dass längere Studien noch nötig sind."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Esta revisión aborda horarios de ayuno y resultados metabólicos, y destaca la necesidad de evidencia a largo plazo."
+          "value": "Una revisión sin mediciones propias. Indica que los horarios de ayuno, incluida una ventana de comida de 6 horas, se asocian con menor peso, mejores lípidos y menor presión arterial, y que aún se necesitan ensayos más largos."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Cette revue examine les rythmes de jeûne et leurs résultats métaboliques, en soulignant le besoin de données à plus long terme."
+          "value": "Une revue sans mesures propres. Elle indique que les rythmes de jeûne, y compris une fenêtre alimentaire de 6 heures, sont associés à un poids plus faible, de meilleurs lipides et une tension artérielle plus basse, et que des essais plus longs restent nécessaires."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "Przegląd omawia harmonogramy postu i wyniki metaboliczne, podkreślając potrzebę danych długoterminowych."
+          "value": "Przegląd bez własnych pomiarów. Wskazuje, że harmonogramy postu, w tym 6-godzinne okno żywieniowe, wiążą się z niższą masą ciała, lepszym profilem lipidowym i niższym ciśnieniem krwi, oraz że wciąż potrzebne są dłuższe badania."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "この総説は断食のスケジュールと代謝への影響を検討し、長期的な研究の必要性を指摘しています。"
+          "value": "これは独自の測定を行っていない総説です。6時間の食事時間帯を含む断食スケジュールは、体重の減少、脂質の改善、血圧の低下と関連していると報告しています。また、より長期の試験がまだ必要だとしています。"
         }
       },
       "ko": {
         "stringUnit": {
-          "state": "translated",
-          "value": "이 종설은 단식 일정과 대사 결과를 논의하며 장기적 근거의 필요성을 강조해요."
+          "state": "needs_review",
+          "value": "이 종설은 자체 측정 없이 기존 연구를 정리한 자료예요. 6시간 식사 시간대를 포함한 단식 일정이 체중 감소, 지질 개선, 혈압 하락과 연관이 있다고 보고하며, 더 긴 기간의 연구가 여전히 필요하다고 말해요."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "这篇综述讨论了断食安排及代谢结果，并强调需要更长期的证据。"
+          "value": "这是一篇没有自己测量数据的综述。文中指出，断食安排（包括 6 小时进食窗口）与更低的体重、更好的血脂和更低的血压相关，并指出仍需要更长期的试验。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "تناقش هذه المراجعة جداول الصيام والنتائج الأيضية، مع التأكيد على الحاجة إلى أدلة أطول أمدًا."
+          "value": "مراجعة لا تتضمّن قياسات أجرتها بنفسها. وتذكر أن جداول الصيام، بما فيها نافذة أكل مدتها 6 ساعات، مرتبطة بانخفاض الوزن وتحسّن الدهون وانخفاض ضغط الدم، وأن الحاجة لا تزال قائمة إلى تجارب أطول أمدًا."
         }
       }
     }
@@ -2217,61 +2217,61 @@
       "en": {
         "stringUnit": {
           "state": "translated",
-          "value": "This is context, not an individual treatment plan. IF24 records time; it does not measure metabolic health or decide whether fasting is suitable for you."
+          "value": "IF24 records time. It does not measure metabolic health and cannot decide whether fasting is suitable for you."
         }
       },
       "uk": {
         "stringUnit": {
           "state": "translated",
-          "value": "Це контекст, а не індивідуальний план лікування. IF24 записує час, але не вимірює метаболічне здоров’я й не визначає, чи підходить вам інтервальне голодування."
+          "value": "IF24 записує час. Він не вимірює метаболічне здоров’я і не може визначити, чи підходить вам голодування."
         }
       },
       "de": {
         "stringUnit": {
           "state": "translated",
-          "value": "Das ist Hintergrundwissen, kein individueller Behandlungsplan. IF24 erfasst Zeit, misst aber keine Stoffwechselgesundheit und entscheidet nicht, ob Fasten für dich geeignet ist."
+          "value": "IF24 erfasst Zeit. Es misst keine Stoffwechselgesundheit und kann nicht entscheiden, ob Fasten für dich geeignet ist."
         }
       },
       "es": {
         "stringUnit": {
           "state": "translated",
-          "value": "Es contexto, no un tratamiento individual. IF24 registra tiempo; no mide la salud metabólica ni decide si ayunar es adecuado para ti."
+          "value": "IF24 registra tiempo. No mide la salud metabólica ni puede decidir si el ayuno es adecuado para ti."
         }
       },
       "fr": {
         "stringUnit": {
           "state": "translated",
-          "value": "Un éclairage, pas un traitement individuel. IF24 enregistre le temps ; il ne mesure pas la santé métabolique et ne décide pas si le jeûne vous convient."
+          "value": "IF24 enregistre le temps. Il ne mesure pas la santé métabolique et ne peut pas décider si le jeûne vous convient."
         }
       },
       "pl": {
         "stringUnit": {
           "state": "translated",
-          "value": "To kontekst, nie indywidualny plan leczenia. IF24 rejestruje czas; nie mierzy zdrowia metabolicznego ani nie określa, czy post jest dla ciebie odpowiedni."
+          "value": "IF24 rejestruje czas. Nie mierzy zdrowia metabolicznego i nie może zdecydować, czy post jest dla ciebie odpowiedni."
         }
       },
       "ja": {
         "stringUnit": {
           "state": "translated",
-          "value": "背景情報であり、個人の治療計画ではありません。IF24は時間を記録するもので、代謝の健康を測定したり、断食が適しているかを判断したりしません。"
+          "value": "IF24は時間を記録するだけです。代謝の状態を測定するものではなく、断食が適しているかどうかを判断することもできません。"
         }
       },
       "ko": {
         "stringUnit": {
           "state": "translated",
-          "value": "배경 정보이며 개인별 치료 계획이 아닙니다. IF24는 시간을 기록할 뿐, 대사 건강을 측정하거나 단식의 적합성을 판단하지 않습니다."
+          "value": "IF24는 시간을 기록합니다. 대사 건강을 측정하지 않으며, 단식의 적합성을 판단할 수 없습니다."
         }
       },
       "zh-Hans": {
         "stringUnit": {
           "state": "translated",
-          "value": "这是背景知识，而非个人治疗方案。IF24 记录时间，不测量代谢健康，也不判断断食是否适合你。"
+          "value": "IF24 只记录时间，不测量代谢健康，也无法判断断食是否适合你。"
         }
       },
       "ar": {
         "stringUnit": {
           "state": "translated",
-          "value": "هذا سياق معرفي، وليس خطة علاج فردية. يسجّل IF24 الوقت، ولا يقيس صحة الأيض أو يحدّد إن كان الصيام مناسبًا لك."
+          "value": "يسجّل تطبيق IF24 الوقت فقط. لا يقيس صحة التمثيل الغذائي، ولا يمكنه تحديد مدى ملاءمة الصيام لحالة الشخص."
         }
       }
     }
@@ -4569,62 +4569,62 @@
       "localizations" : {
         "ar" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "مراحل الصيام التي يعرضها تطبيق IF24 هي تقديرات مبنية على التوقيت المعتاد، لا قياس لجسمك. تطبيق IF24 لا يُصنَّف ضمن الأجهزة الطبية ولا يقدم مشورة طبية. يجب استشارة الطبيب قبل تغيير نمط طعامك، خصوصًا في حالات الحمل أو السكري أو تناول دواء مع الطعام أو اضطراب في الأكل، أو لمن هم دون 18 عامًا."
+            "state" : "needs_review",
+            "value" : "يعرض تطبيق IF24 مراحل تقديرية، لا قياسات فعلية للجسم. تطبيق IF24 ليس جهازًا طبيًا ولا يقدّم مشورة طبية. يُنصح باستشارة الطبيب قبل تغيير نمط الأكل، خصوصًا في حالات الحمل، أو تناول دواء، أو وجود حالة صحية مثل السكري، أو وجود تاريخ من اضطراب في الأكل، أو لمن هم دون 18 عامًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Fastenphasen, die IF24 anzeigt, sind Schätzwerte auf Basis typischer Zeitverläufe, keine Messung deines Körpers. IF24 ist kein Medizinprodukt und gibt keine medizinischen Ratschläge. Hol ärztlichen Rat ein, bevor du deine Ernährung umstellst - besonders wenn du schwanger bist, Diabetes hast, Medikamente zu den Mahlzeiten einnimmst, Erfahrungen mit gestörtem Essverhalten hast oder unter 18 bist."
+            "value" : "IF24 zeigt geschätzte Phasen, keine Messung deines Körpers. Es ist kein Medizinprodukt und gibt keine medizinischen Ratschläge. Sprich mit einem Arzt, bevor du deine Ernährung umstellst - besonders wenn du schwanger bist, Medikamente einnimmst, eine Erkrankung wie Diabetes hast, Erfahrungen mit gestörtem Essverhalten hast oder unter 18 bist."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The fasting phases IF24 shows are estimates based on typical timing, not a measurement of your body. IF24 is not a medical device and does not give medical advice. Talk to a clinician before changing how you eat - especially if you are pregnant, managing diabetes, taking medication with food, have a history of disordered eating, or are under 18."
+            "value" : "IF24 shows estimated phases, not measurements of your body. It is not a medical device and does not give medical advice. Talk to a doctor before changing how you eat - especially if you are pregnant, on medication, managing a condition such as diabetes, have a history of disordered eating, or are under 18."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Las fases de ayuno que muestra IF24 son estimaciones basadas en tiempos típicos, no una medición de tu cuerpo. IF24 no es un producto sanitario y no ofrece consejo médico. Consulta a un profesional sanitario antes de cambiar tu forma de comer, sobre todo si estás embarazada, tienes diabetes, tomas medicación con las comidas, has tenido problemas con la alimentación o tienes menos de 18 años."
+            "value" : "IF24 muestra fases estimadas, no mediciones de tu cuerpo. No es un producto sanitario y no ofrece consejo médico. Consulta a un médico antes de cambiar tu forma de comer, sobre todo si estás embarazada, tomas medicación, tienes una enfermedad como la diabetes, has tenido problemas con la alimentación o tienes menos de 18 años."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les phases de jeûne affichées par IF24 sont des estimations fondées sur des durées typiques, et non le résultat d’une mesure de votre corps. IF24 n’est pas un dispositif médical et ne donne pas de conseils médicaux. Consultez un professionnel de santé avant de modifier votre alimentation, en particulier si vous êtes enceinte ou diabétique, si vous prenez des médicaments au cours des repas, si vous avez déjà eu des difficultés avec l’alimentation ou si vous avez moins de 18 ans."
+            "value" : "IF24 affiche des phases estimées, pas une mesure de votre corps. Ce n’est pas un dispositif médical et il ne donne pas de conseils médicaux. Consultez un médecin avant de modifier votre alimentation, en particulier si vous êtes enceinte, si vous prenez des médicaments, si vous avez une maladie comme le diabète, si vous avez déjà eu des difficultés avec l’alimentation ou si vous avez moins de 18 ans."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24が表示する断食フェーズは、一般的な経過時間に基づく目安であり、体を測定した結果ではありません。IF24は医療機器ではなく、医学的な助言を行うものではありません。食生活を変える前に、医師などの医療従事者にご相談ください。特に、妊娠中の方、糖尿病のある方、食事と一緒に薬を服用している方、これまでに食行動の乱れがあった方、18歳未満の方は、ご相談が大切です。"
+            "value" : "IF24が表示する断食フェーズは推定値であり、体を測定した結果ではありません。IF24は医療機器ではなく、医学的な助言を行うものではありません。食生活を変える前に、医師に相談してください。特に、妊娠中の方、薬を服用している方、糖尿病など何らかの持病がある方、これまでに食行動の乱れがあった方、18歳未満の方は、医師にご相談ください。"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "IF24가 보여주는 단식 단계는 일반적인 경과 시간을 바탕으로 추정한 것이고, 몸을 측정한 것이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 식습관을 바꾸기 전에 의사와 상의하십시오. 특히 임신 중이거나, 당뇨병을 관리 중이거나, 식사와 함께 약을 복용 중이거나, 섭식 문제를 겪은 적이 있거나, 18세 미만이라면 반드시 상의하십시오."
+            "state" : "needs_review",
+            "value" : "IF24가 보여주는 단계는 추정치이며, 몸을 측정한 것이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 식습관을 바꾸기 전에 의사와 상의하십시오. 특히 임신 중이거나, 약을 복용 중이거나, 당뇨병 같은 질환을 관리 중이거나, 섭식 문제를 겪은 적이 있거나, 18세 미만이라면 상의하십시오."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fazy postu pokazywane przez IF24 to szacunki oparte na typowym czasie, a nie pomiar twojego ciała. IF24 nie jest wyrobem medycznym i nie udziela porad medycznych. Zanim zmienisz sposób odżywiania, skonsultuj się z lekarzem - zwłaszcza jeśli jesteś w ciąży, masz cukrzycę, przyjmujesz leki do posiłków, masz za sobą problemy z odżywianiem lub nie masz jeszcze 18 lat."
+            "value" : "IF24 pokazuje szacowane fazy, a nie pomiar twojego ciała. Nie jest wyrobem medycznym i nie udziela porad medycznych. Zanim zmienisz sposób odżywiania, skonsultuj się z lekarzem - zwłaszcza jeśli jesteś w ciąży, przyjmujesz leki, masz chorobę taką jak cukrzyca, masz za sobą problemy z odżywianiem lub nie masz jeszcze 18 lat."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Фази посту, які показує IF24, - це оцінки на основі типового часу, а не вимірювання вашого тіла. IF24 не є медичним виробом і не дає медичних порад. Перш ніж змінювати режим харчування, порадьтеся з лікарем - особливо якщо ви вагітні, маєте діабет, приймаєте ліки разом із їжею, стикалися з розладами харчової поведінки або вам менше 18 років."
+            "value" : "IF24 показує орієнтовні фази, а не вимірювання вашого тіла. Він не є медичним виробом і не дає медичних порад. Перш ніж змінювати режим харчування, порадьтеся з лікарем - особливо якщо ви вагітні, приймаєте ліки, маєте захворювання, як-от діабет, стикалися з розладами харчової поведінки або вам менше 18 років."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24 显示的断食阶段是基于典型时间的估算，不是对你身体的测量。IF24 不是医疗器械，也不提供医疗建议。请在改变饮食方式前咨询医生，尤其是当你正在怀孕、患有糖尿病、需要随餐服药、曾有饮食失调的经历，或未满 18 岁时。"
+            "value" : "IF24 显示的是估算的阶段，不是对你身体的测量。它不是医疗器械，也不提供医疗建议。请在改变饮食方式前咨询医生，尤其是当你正在怀孕、正在服药、患有糖尿病等疾病、曾有饮食失调的经历，或未满 18 岁时。"
           }
         }
       }
