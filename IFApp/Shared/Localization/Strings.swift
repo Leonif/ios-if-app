@@ -492,8 +492,8 @@ enum strings {
         }
         static var goalDays: String {
             String(localized: "history.goalDays",
-                   defaultValue: "Goal days",
-                   comment: "Label above seven weekday dots; a filled dot means the fasting goal was reached on that day.")
+                   defaultValue: "Goal reached",
+                   comment: "Label above seven weekday dots. It describes the dots as a result: filled means the fasting goal was reached for the fast dated that day; hollow means it was not reached, not that the day is unfinished.")
         }
         static var statFasts: String { String(localized: "Fasts") }
         static var statTotal: String { String(localized: "Total") }
