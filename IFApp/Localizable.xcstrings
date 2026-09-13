@@ -8825,12 +8825,12 @@
       }
     },
     "history.streak.ended" : {
-      "comment" : "Sentence on the history summary card under the big number, in the state\nwhere the streak has just ended (shown for 7 days after the missed day).\nThe number is the run that was lost; the date is its final completed goal\nday, formatted as localized day and month. Plural categories belong in\nthe catalog. Up to 3 lines at xxLarge in a 299pt slot. No blame, no call\nto action, no mention of the paid freeze.",
+      "comment" : "Sentence on the history summary card under the big number, in the state\nwhere the streak has just ended (shown for 7 days after the missed day).\nThe number is the run that was lost; the date is explicitly its final\ncompleted goal day, formatted as localized day and month — never call it\nthe day the streak ended, because the break is detected later. Plural\ncategories belong in the catalog. Up to 3 lines at xxLarge in a 299pt\nslot. No blame, no call to action, no mention of the paid freeze.",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-              "value" : "استمرت السلسلة %#@days@ وانتهت في %2$@. تبدأ سلسلة جديدة بأول هدف تبلغه."
+              "value" : "استمرت السلسلة %#@days@. تحقق آخر هدف في %2$@. تبدأ سلسلة جديدة بأول هدف تبلغه."
           },
           "substitutions" : {
             "days" : {
@@ -8882,7 +8882,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-              "value" : "Die Serie dauerte %#@days@ und endete am %2$@. Die nächste beginnt mit deinem nächsten erreichten Ziel."
+              "value" : "Die Serie dauerte %#@days@. Das letzte Ziel wurde am %2$@ erreicht. Die nächste beginnt mit deinem nächsten erreichten Ziel."
           },
           "substitutions" : {
             "days" : {
@@ -8910,7 +8910,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-              "value" : "The streak lasted %#@days@ and ended on %2$@. A new one starts with your next completed goal."
+              "value" : "The streak lasted %#@days@. The last goal was reached on %2$@. A new one starts with your next completed goal."
           },
           "substitutions" : {
             "days" : {
@@ -8938,7 +8938,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-              "value" : "La racha duró %#@days@ y terminó el %2$@. La próxima empieza con tu siguiente objetivo cumplido."
+              "value" : "La racha duró %#@days@. El último objetivo se cumplió el %2$@. La próxima empieza con tu siguiente objetivo cumplido."
           },
           "substitutions" : {
             "days" : {
@@ -8972,7 +8972,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-              "value" : "La série a duré %#@days@ et s’est terminée le %2$@. La suivante commencera avec votre prochain objectif atteint."
+              "value" : "La série a duré %#@days@. Le dernier objectif a été atteint le %2$@. La suivante commencera avec votre prochain objectif atteint."
           },
           "substitutions" : {
             "days" : {
@@ -9006,7 +9006,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-              "value" : "連続記録は%#@days@続き、%2$@に途切れました。次に目標を達成すると、新しい記録が始まります。"
+              "value" : "連続記録は%#@days@続きました。最後に目標を達成したのは%2$@です。次に目標を達成すると、新しい記録が始まります。"
           },
           "substitutions" : {
             "days" : {
@@ -9028,7 +9028,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-              "value" : "연속 기록은 %#@days@ 동안 이어졌고 %2$@에 끊겼어요. 다음에 목표를 달성하면 새 연속 기록이 시작돼요."
+              "value" : "연속 기록은 %#@days@ 동안 이어졌어요. 마지막 목표 달성일은 %2$@예요. 다음에 목표를 달성하면 새 연속 기록이 시작돼요."
           },
           "substitutions" : {
             "days" : {
@@ -9050,7 +9050,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-              "value" : "Seria trwała %#@days@ i zakończyła się %2$@. Nową zacznie kolejny osiągnięty cel."
+              "value" : "Seria trwała %#@days@. Ostatni cel osiągnięto %2$@. Nową zacznie kolejny osiągnięty cel."
           },
           "substitutions" : {
             "days" : {
@@ -9090,7 +9090,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-              "value" : "Серія тривала %#@days@ і завершилася %2$@. Нова почнеться з наступної досягнутої цілі."
+              "value" : "Серія тривала %#@days@. Останню ціль досягнуто %2$@. Нова почнеться з наступної досягнутої цілі."
           },
           "substitutions" : {
             "days" : {
@@ -9130,7 +9130,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-              "value" : "这次连续记录持续了%#@days@，并于%2$@结束。下次达成目标，新的连续记录就开始了。"
+              "value" : "这次连续记录持续了%#@days@。最后一次达标是在%2$@。下次达成目标，新的连续记录就开始了。"
           },
           "substitutions" : {
             "days" : {
