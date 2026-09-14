@@ -74,7 +74,7 @@
 
 **Что с этим делать — решает владелец, не следующий прогон.** Решение 26.07 остаётся в силе; здесь зафиксировано только то, что его опора ослабла, чтобы пересмотр (если он будет) начинался с фактов, а не с воспоминания о старом замере.
 
-**Зачем.** На этом стоит три вещи сразу. `AppStoreFactory` восстанавливает состояние из персиста, не спрашивая «а сколько сейчас». `UITestSeed` подменяет время офсетами timestamp'ов и потому не нуждается в fake-часах — Maestro-флоу доезжает до «16 часов поста» за секунду. И пост, пересёкший полночь, зачисляется в тот день, когда цель реально была достигнута, а не в тот, когда редьюсер случайно проснулся. Редьюсер, дёрнувший `Date()`, ломает всё три и делает баг невоспроизводимым: он зависит от того, в какую секунду вызвался редьюсер, а редьюсер вызывается на каждый экшен.
+**Зачем.** На этом стоит три вещи сразу. `AppStoreFactory` восстанавливает состояние из персиста, и в редьюсер время при этом не попадает. С 14.09.2026 (Queue-24) бутстрап читает часы **один раз**, `Clock.now()` в `AppStoreFactory.make()`: восстановленный экран результата держится, только пока окно, которое он открыл бы, не вышло за горизонт закрытого окна. Решение принимает чистая `TimerState.droppingLapsedEnding(at:plan:)`, момент ей передаётся аргументом, так что это впрыск времени по тому же образцу, что в тханках, а не чтение часов состоянием. Редьюсер и начальный стор «который час» по-прежнему не спрашивают. `UITestSeed` подменяет время офсетами timestamp'ов и потому не нуждается в fake-часах — Maestro-флоу доезжает до «16 часов поста» за секунду. И пост, пересёкший полночь, зачисляется в тот день, когда цель реально была достигнута, а не в тот, когда редьюсер случайно проснулся. Редьюсер, дёрнувший `Date()`, ломает всё три и делает баг невоспроизводимым: он зависит от того, в какую секунду вызвался редьюсер, а редьюсер вызывается на каждый экшен.
 
 **Тонкость — обязательна к прочтению.** `Features/timer/TimerReducer.swift:70` вызывает `Clock.isDayBefore(last, dayKey)`. Это **не** нарушение: функция сравнивает две строки-ключа дня и часов не читает. Правило запрещает *чтение текущего времени* (`Date()`, `Clock.now()`, `Clock.dayKey()` и `Clock.minuteOfDay()` без аргумента), а не любое упоминание `Clock`. Не «чините» этот вызов и не выводите из него, что часы в редьюсере допустимы.
 
@@ -385,9 +385,13 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 - `Core/Clock.swift:52` — `dayKey`, `:71` `daysBetween`, `:78` `isDayBefore`, `:84` `nextDay` — календарная арифметика **по day-key**. Календарь, которым она считает, с 11.09.2026 назван один раз — `Core/Clock.swift:35` (`Clock.gregorian`, вычисляемый, таймзона `.current`); его же зовут `HistoryStats.monthGroups` и `HistoryStats.lastSeven` (дифф SU-6: до него оба брали `Calendar.current`, и на арабском устройстве это `islamic-umm-al-qura` — сутки такое переживают, месяцы нет). Это не второе тело `Locale.latinDigits`: та пиннит календарь **показа**, `Clock.gregorian` — календарь **счёта**, и связывать арифметику с локалью отображения значило бы завести обратную зависимость. Оба конца закрыты тестами: показ — `IFAppTests/DateFormatStyleTests.swift`, счёт — `IFAppTests/HistoryStatsTests.swift`. Формулировка «единственная арифметика календарных дней» снята 18.08.2026: с IF-5 те же сутки считаются и от timestamp'ов (`EndFastMath.daysBefore`), см. нарушение 8.10
 - `Features/plan/PlanState.swift:9` — `plan` как канонический доступ к плану
 - `Features/timer/TimerState.swift:83` — `StreakStatus.displayed(at:)` (закоммичено, сверено 07.08.2026; номер переснят 18.08.2026)
-- `Features/timer/TimerState.swift:205` — `resolvedGoalHours(planHours:)`: что считается «целью текущего цикла»
-- `Features/timer/TimerState.swift:217` — `startTimestamp(at:)`: куда попадает старт поста, запускаемого при накопленном `stagedElapsed`. Зовут `StartFastThunk:29` и `ResumeFastThunk:33` (заведено 07.08.2026, см. ниже)
-- `Features/timer/TimerState.swift:235` — `eatingEndTimestamp(plan:)`: когда закроется пищевое окно. Зовут `NotificationMiddleware:56`, `ContinueFastingThunk:26`, `ConfirmLastMealThunk:32`, `SeedLastMealFromWindowCloseThunk:17`, `TimerFlowView:80`
+- `Features/timer/TimerState.swift:218` — `resolvedGoalHours(planHours:)`: что считается «целью текущего цикла»
+- `Features/timer/TimerState.swift:230` — `startTimestamp(at:)`: куда попадает старт поста, запускаемого при накопленном `stagedElapsed`. Зовут `StartFastThunk:29` и `ResumeFastThunk:33` (заведено 07.08.2026, см. ниже)
+- `Features/timer/TimerState.swift:248` — `eatingEndTimestamp(plan:)`: когда закроется пищевое окно. Зовут `NotificationMiddleware:56`, `ContinueFastingThunk:26`, `ConfirmLastMealThunk:32`, `SeedLastMealFromWindowCloseThunk:17`, `TimerFlowView:80`
+- `Features/timer/TimerState.swift:255` — `windowEndTimestamp(openedAt:plan:)`: арифметика «окно, открытое в момент X, закроется в Y». Тело `eatingEndTimestamp` зовёт её же; второй вызывающий — `droppingLapsedEnding` для окна, которое экран результата ещё не открыл (Queue-24, 14.09.2026)
+- `Features/timer/TimerState.swift:266` — `closedWindowHasLapsed(closedAt:now:)`: вышло ли закрытое окно за горизонт. Зовут `TimerFlowView:124` (`.eatingOver` → `.idle`) и `droppingLapsedEnding`. До Queue-24 горизонт был литералом `24 * 3600` по месту в `TimerFlowView`; порог и предикат о нём — пункт 12
+- `Features/timer/TimerState.swift:283` — `droppingLapsedEnding(at:plan:)`: сколько живёт восстановленный с диска экран результата. Зовёт один бутстрап, `Core/AppStoreFactory.swift:80-81`
+- `Features/timer/TimerState.swift:299` — `withoutCycle()`: что остаётся от состояния, когда цикла больше нет. Зовут `TimerReducer` (`.reset`, `:46`) и `droppingLapsedEnding`. Заведено по находке `architect` на ревью `94e3355`: обнуление было выписано дважды, и копии уже разошлись — бутстрап не чистил `eatingStartTimestamp`
 - `Features/plan/Plan.swift:46` — `windowHours`: **почему** окно такой длины (остаток суток). Отделено от арифметики «когда закроется» сознательно — правило и его применение живут врозь
 
 **Адреса пересняты 11.09.2026 на `2bdcf62`** (карточка Queue-14): `TimerFlowView` 96 → 105, 866 → 886, 891 → 911, 980-990 → 1000-1010, 995 → 1015, 70 → 80; `ConfirmEndFastThunk` 41 → 48; `EndFastState` 60 → 64, 64 → 68, 67 → 71 и doc-комментарий 50-59 → 49-63. Значения и состав таблицы не менялись.
@@ -672,13 +676,14 @@ static func isNearGoal(secondsLeft: Double) -> Bool {
 
 Порог рядом, предикат назван, вызывающий (`OpenEndFastThunk:40`) не знает ни про округление вверх, ни про то, что отрицательный остаток — не «близко к цели».
 
-**Следуют: 5** (все именованные пороги дерева, кроме одного — замер 22.08.2026; адреса пересняты 11.09.2026 на `2bdcf62`: `TimerFlowView` 612 → 632, `EndFastState` 60 → 64, `TimerFlowView` 862 → 882 в таблице ниже):
+**Следуют: 6** (все именованные пороги дерева, кроме одного — замер 22.08.2026, шестой добавлен 14.09.2026; адреса пересняты 11.09.2026 на `2bdcf62`: `TimerFlowView` 612 → 632, `EndFastState` 60 → 64, `TimerFlowView` 862 → 882 в таблице ниже):
 
 - `Features/endfast/EndFastMath.swift:140` — `isNearGoal(secondsLeft:)` для `nearGoalThresholdMinutes`; единственное тело, зовёт `OpenEndFastThunk:40`
 - `Flows/timer/TimerFlowView.swift:632` — `consequenceLine` спрашивает `PhaseProgress.compute(...).isComplete` вместо того, чтобы выписать порог цели. Это и есть починка после `fail` 21.08.2026, и она стоит здесь как образец, а не как история
 - `Features/meal/thunk/PickMealChipThunk.swift:39` — `MealChip.lastNightFloor` читается в сравнении ровно один раз
 - `Middleware/HistoryMiddleware.swift:65` — `minimumDuration`, одно сравнение; второе упоминание (`ResumeFastThunk:49`) — комментарий, не код
 - `Features/pro/Pro.swift:68` — `minimumGoalFraction`, одно сравнение, и оно стоит внутри того же типа, где объявлена константа
+- `Features/timer/TimerState.swift:262` — `closedWindowHorizon`, одно сравнение внутри `closedWindowHasLapsed(closedAt:now:)` (`:266`). Зовут `TimerFlowView:124` и `droppingLapsedEnding`. Заведено Queue-24 (14.09.2026): до того горизонт был литералом в `TimerFlowView`, а экран результата получил тот же горизонт вторым вызовом, а не вторым сравнением
 
 **Нарушают: 1.**
 
@@ -694,10 +699,10 @@ static func isNearGoal(secondsLeft: Double) -> Bool {
 
 **Как проверить.** Для каждой именованной константы-порога посмотреть, сколько мест читают её **в сравнении**:
 ```
-grep -rn "overtimeNeutralThreshold\|nearGoalThresholdMinutes\|minimumFastDuration\|lastNightFloor" \
+grep -rn "overtimeNeutralThreshold\|nearGoalThresholdMinutes\|minimumFastDuration\|lastNightFloor\|closedWindowHorizon" \
   IFApp --include='*.swift'
 ```
-Список констант пересобирается от объявлений, а не дописывается: `grep -rn "static let .*Threshold\|static let .*Floor\|static let minimum\|static let maximum" IFApp --include='*.swift'`.
+Список констант пересобирается от объявлений, а не дописывается: `grep -rn "static let .*Threshold\|static let .*Floor\|static let .*Horizon\|static let minimum\|static let maximum" IFApp --include='*.swift'`.
 
 Критерий: **два и более чтения в операторе сравнения** (`>=`, `>`, `<=`, `<`) — нарушение; одно чтение в сравнении плюс сколько угодно вызовов предиката — соблюдение. Чтение константы **не** в сравнении под пункт не подпадает — это использование значения, а не решение о пороге: `OpenEndFastThunk:59` (`earliest: fastStartTimestamp + minimumFastDuration`) и `ConfirmEndFastThunk:30` (граница в `min`/`max`) законны оба.
 

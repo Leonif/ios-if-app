@@ -41,16 +41,9 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.fastEndTimestamp = 0
 
     case .reset:
-        newState.isRunning = false
-        newState.fastStartTimestamp = 0
-        // The cycle is gone, so its pinned goal goes with it: the next fast starts
-        // from the plan as it stands then.
-        newState.goalHours = 0
-        newState.stagedElapsed = 0
-        newState.fastEndTimestamp = 0
-        newState.hasCelebrated = false
-        newState.isEating = false
-        newState.eatingStartTimestamp = 0
+        // What a cycle leaves behind when it is gone is `TimerState`'s rule, shared
+        // with the launch that drops a lapsed result screen.
+        newState = state.withoutCycle()
 
     case let .timeAdjusted(newElapsed, runningStartTimestamp):
         newState.stagedElapsed = newElapsed

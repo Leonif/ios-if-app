@@ -275,8 +275,8 @@ struct TimerState: Equatable, Sendable {
     /// open a window anchored a week back. So it is held only while the window it would
     /// open — from the confirmed ending, as `StartEatingThunk` anchors it, under `plan`
     /// (pass `AppState.activePlan`) — is still inside the same horizon a closed window
-    /// gets. Past that the state goes to idle the way `.reset` leaves it, minus the
-    /// event: the cycle is over, so its pinned goal and celebration go with it.
+    /// gets. Past that the state goes to `withoutCycle()`, the idle `.reset` leaves,
+    /// minus the event.
     ///
     /// An ending with no confirmed moment (`fastEndTimestamp == 0`) has nothing to
     /// measure from and is cleared as lapsed.
@@ -286,12 +286,26 @@ struct TimerState: Equatable, Sendable {
             let windowEnd = Self.windowEndTimestamp(openedAt: fastEndTimestamp, plan: plan)
             guard Self.closedWindowHasLapsed(closedAt: windowEnd, now: now) else { return self }
         }
+        return withoutCycle()
+    }
+
+    /// This state with the cycle in flight gone — no fast, no ending, no window — and
+    /// everything that is not the cycle (sessions count, streak) kept. The single
+    /// definition of idle: `.reset` and `droppingLapsedEnding` both land here, so the
+    /// two ways out cannot disagree about what is left behind.
+    ///
+    /// The pinned goal goes with the cycle: the next fast starts from the plan as it
+    /// stands then.
+    func withoutCycle() -> TimerState {
         var idle = self
+        idle.isRunning = false
         idle.fastStartTimestamp = 0
         idle.goalHours = 0
         idle.stagedElapsed = 0
         idle.fastEndTimestamp = 0
         idle.hasCelebrated = false
+        idle.isEating = false
+        idle.eatingStartTimestamp = 0
         return idle
     }
 }

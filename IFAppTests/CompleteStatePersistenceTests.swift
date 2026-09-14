@@ -176,4 +176,21 @@ final class CompleteStatePersistenceTests: XCTestCase {
         XCTAssertFalse(TimerState.closedWindowHasLapsed(closedAt: 100, now: 100 + 24 * 3600 - 1))
         XCTAssertTrue(TimerState.closedWindowHasLapsed(closedAt: 100, now: 100 + 24 * 3600))
     }
+
+    /// One definition of idle: a lapsed result screen dropped at launch lands on
+    /// exactly the state `.reset` leaves — including the window fields the first copy
+    /// of that rule forgot.
+    func testLapsedEndingLandsOnTheSameIdleAsReset() {
+        var state = restored()
+        state.eatingStartTimestamp = 1_234   // stray value only `withoutCycle` clears
+        state.streakCount = 5
+        state.completedSessionsCount = 7
+        let dropped = state.droppingLapsedEnding(at: 9_999_999_999, plan: plan)
+        let reset = timerReducer(state: state, action: TimerAction.reset(elapsed: 57_600))
+        XCTAssertEqual(dropped, reset)
+        XCTAssertEqual(dropped, state.withoutCycle())
+        XCTAssertEqual(dropped.eatingStartTimestamp, 0)
+        XCTAssertEqual(dropped.streakCount, 5)
+        XCTAssertEqual(dropped.completedSessionsCount, 7)
+    }
 }
