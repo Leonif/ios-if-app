@@ -10,8 +10,22 @@ import Foundation
 
 final class NotificationManager {
     static let shared = NotificationManager()
-    
+
+    /// Held here because `UNUserNotificationCenter.delegate` is weak: a presenter
+    /// created at the call site would be released at once and the center would go
+    /// back to swallowing foreground deliveries without a word.
+    private let foregroundPresenter = ForegroundPresenter()
+
     private init() {}
+
+    /// Lets local pushes show while the app is open. Without a center delegate iOS
+    /// delivers a notification whose moment arrives in the foreground to nobody — the
+    /// eating-window-closed and goal-reached pushes simply never appeared for someone
+    /// sitting on the screen they are about. Must run before launch finishes, since a
+    /// notification can be due the instant the app opens.
+    func enableForegroundPresentation() {
+        UNUserNotificationCenter.current().delegate = foregroundPresenter
+    }
 
     /// Shows the system permission dialog and waits for the user's answer. The
     /// caller must await it: reading `authorizationStatus()` before it returns
@@ -122,5 +136,21 @@ final class NotificationManager {
     func cancelAllNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         print("All notifications cancelled")
+    }
+}
+
+/// Presents every local push the app schedules — goal reached, eating window closed,
+/// Sunnah reminders — the same way in the foreground as in the background: banner,
+/// Notification Center entry and sound. Nothing is filtered by identifier: each of
+/// them is scheduled for a moment the user asked to be told about, and being inside
+/// the app at that moment is not a reason to stay silent.
+///
+/// `didReceive` is deliberately not implemented: a tap keeps the system default of
+/// opening the app, exactly as before a delegate existed.
+private final class ForegroundPresenter: NSObject, UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner, .list, .sound])
     }
 }

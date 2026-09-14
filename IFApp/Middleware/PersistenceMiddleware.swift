@@ -32,6 +32,8 @@ final class PersistenceMiddleware: Middleware {
                 hasCelebrated: timer.hasCelebrated,
                 eatingStartTimestamp: timer.eatingStartTimestamp,
                 isEating: timer.isEating,
+                stagedElapsed: timer.stagedElapsed,
+                fastEndTimestamp: timer.fastEndTimestamp,
                 streakCount: timer.streakCount,
                 lastGoalDate: timer.lastGoalDate,
                 freezeSpentMonth: timer.freezeSpentMonth

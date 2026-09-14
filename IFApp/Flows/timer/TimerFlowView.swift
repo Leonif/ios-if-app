@@ -121,7 +121,8 @@ struct TimerScreenProps: Equatable {
         // chain screen (count-up + Continue fasting) holds for 24h, then falls to idle.
         if isEating {
             if eatingRemaining(at: now) > 0 { return .eating }
-            return eatingOverElapsed(at: now) < 24 * 3600 ? .eatingOver : .idle
+            return TimerState.closedWindowHasLapsed(closedAt: eatingEndTimestamp,
+                                                    now: now.timeIntervalSince1970) ? .idle : .eatingOver
         }
         if !isRunning { return stagedElapsed > 0 ? .complete : .idle }
         // Running: past the goal is the overtime "goal reached" state, else active.

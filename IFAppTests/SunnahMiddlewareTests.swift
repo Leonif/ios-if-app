@@ -27,6 +27,7 @@ final class SunnahMiddlewareTests: XCTestCase {
     }
     private struct Notifications: NotificationRepositoryProtocol {
         let status: UNAuthorizationStatus
+        func enableForegroundPresentation() {}
         func requestAuthorization() async -> Bool { false }
         func authorizationStatus() async -> UNAuthorizationStatus { status }
         func removeLegacyDailyReminders() {}

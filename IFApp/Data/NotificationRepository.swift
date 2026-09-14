@@ -9,6 +9,9 @@ import Foundation
 import UserNotifications
 
 protocol NotificationRepositoryProtocol {
+    /// Makes scheduled pushes appear while the app is in the foreground. Called once
+    /// at launch, before any notification can be delivered.
+    func enableForegroundPresentation()
     /// Shows the system permission dialog and returns once the user has answered.
     @discardableResult
     func requestAuthorization() async -> Bool
@@ -25,6 +28,10 @@ protocol NotificationRepositoryProtocol {
 }
 
 struct NotificationRepository: NotificationRepositoryProtocol {
+    func enableForegroundPresentation() {
+        NotificationManager.shared.enableForegroundPresentation()
+    }
+
     @discardableResult
     func requestAuthorization() async -> Bool {
         await NotificationManager.shared.requestAuthorization()

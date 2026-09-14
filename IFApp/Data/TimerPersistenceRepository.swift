@@ -9,8 +9,8 @@
 import Foundation
 
 protocol TimerPersistenceRepositoryProtocol {
-    func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?)
-    func save(fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?)
+    func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, stagedElapsed: Double, fastEndTimestamp: Double, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?)
+    func save(fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, stagedElapsed: Double, fastEndTimestamp: Double, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?)
     /// The selected plan's fast length in whole hours. nil = never saved.
     func loadPlanHours() -> Int?
     func savePlanHours(_ hours: Int)
@@ -28,6 +28,12 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         static let hasCelebrated = "has_celebrated"
         static let eatingStartTimestamp = "eating_start_timestamp"
         static let isEating = "is_eating"
+        /// The ended fast still on the result screen: its elapsed seconds and the moment
+        /// it was confirmed to end. Absent on every install from before 1.5.2, which
+        /// reads as 0 — "nothing ended" — i.e. exactly the idle screen those builds
+        /// relaunched into.
+        static let stagedElapsed = "staged_elapsed"
+        static let fastEndTimestamp = "fast_end_timestamp"
         static let planHours = "plan_hours"
         /// Pre-1.5.0 plan storage: an index into the four presets. Read once for
         /// migration, never written again.
@@ -47,7 +53,7 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         self.defaults = defaults
     }
 
-    func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?) {
+    func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, stagedElapsed: Double, fastEndTimestamp: Double, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?) {
         (
             fastStartTimestamp: defaults.double(forKey: Key.startTimestamp),
             // Absent (state written before 1.5.0) reads as 0, which every reader
@@ -58,13 +64,15 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
             hasCelebrated: defaults.bool(forKey: Key.hasCelebrated),
             eatingStartTimestamp: defaults.double(forKey: Key.eatingStartTimestamp),
             isEating: defaults.bool(forKey: Key.isEating),
+            stagedElapsed: defaults.double(forKey: Key.stagedElapsed),
+            fastEndTimestamp: defaults.double(forKey: Key.fastEndTimestamp),
             streakCount: defaults.integer(forKey: Key.streakCount),
             lastGoalDate: defaults.string(forKey: Key.streakLastGoalDate),
             freezeSpentMonth: defaults.string(forKey: Key.streakFreezeSpentMonth)
         )
     }
 
-    func save(fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?) {
+    func save(fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, stagedElapsed: Double, fastEndTimestamp: Double, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?) {
         defaults.set(fastStartTimestamp, forKey: Key.startTimestamp)
         defaults.set(goalHours, forKey: Key.goalHours)
         defaults.set(isRunning, forKey: Key.isRunning)
@@ -72,6 +80,8 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         defaults.set(hasCelebrated, forKey: Key.hasCelebrated)
         defaults.set(eatingStartTimestamp, forKey: Key.eatingStartTimestamp)
         defaults.set(isEating, forKey: Key.isEating)
+        defaults.set(stagedElapsed, forKey: Key.stagedElapsed)
+        defaults.set(fastEndTimestamp, forKey: Key.fastEndTimestamp)
         defaults.set(streakCount, forKey: Key.streakCount)
         if let lastGoalDate {
             defaults.set(lastGoalDate, forKey: Key.streakLastGoalDate)

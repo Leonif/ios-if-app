@@ -29,6 +29,8 @@ enum UITestSeed {
         defaults.set(false, forKey: "has_celebrated")
         defaults.set(0.0, forKey: "eating_start_timestamp")
         defaults.set(false, forKey: "is_eating")
+        defaults.set(0.0, forKey: "staged_elapsed")
+        defaults.set(0.0, forKey: "fast_end_timestamp")
         defaults.set(0, forKey: "streak_count")
         defaults.removeObject(forKey: "streak_last_goal_date")
         defaults.removeObject(forKey: "streak_freeze_spent_month")

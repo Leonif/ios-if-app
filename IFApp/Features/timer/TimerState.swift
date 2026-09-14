@@ -164,7 +164,10 @@ struct TimerState: Equatable, Sendable {
     /// exactly the old behaviour.
     var goalHours: Double = 0
     var isRunning: Bool = false
-    /// Elapsed seconds to display while NOT running (paused/staged value). Not persisted.
+    /// Elapsed seconds to display while NOT running (paused/staged value). Persisted
+    /// since 1.5.2: a value above 0 with no fast running *is* the result screen (see
+    /// `screenState`), and before it was stored a cold start on that screen fell back
+    /// to idle — the ended fast never opened its eating window.
     var stagedElapsed: TimeInterval = 0
     /// Epoch seconds the fast that just ended was confirmed to have ended at. 0 = no
     /// ending on the table.
@@ -173,8 +176,9 @@ struct TimerState: Equatable, Sendable {
     /// has to outlive the fast it belonged to: `.stopped` clears `fastStartTimestamp`,
     /// and without this the result screen no longer knows any absolute time at all —
     /// which is why the eating window used to open from the tap instead of from the
-    /// meal. Not persisted, like `stagedElapsed` beside it: the result screen does not
-    /// survive a cold start, and a stale anchor would be worse than none.
+    /// meal. Persisted together with `stagedElapsed` beside it: the result screen now
+    /// survives a cold start, and an eating window opened from a restored result screen
+    /// must still anchor to the meal rather than to the tap after relaunch.
     var fastEndTimestamp: Double = 0
     /// Count of fasts that reached the "completed" threshold — gates the review prompt.
     var completedSessionsCount: Int = 0
@@ -242,6 +246,52 @@ struct TimerState: Equatable, Sendable {
     /// Pass `AppState.activePlan` — the plan the cycle in flight is running to, not
     /// `planState.plan`, which is merely what the user currently has selected.
     func eatingEndTimestamp(plan: Plan) -> Double {
-        eatingStartTimestamp + Double(plan.windowHours) * 3600
+        Self.windowEndTimestamp(openedAt: eatingStartTimestamp, plan: plan)
+    }
+
+    /// Where a window opened at `openedAt` under `plan` closes. The arithmetic behind
+    /// `eatingEndTimestamp(plan:)`, named on its own for the window that has *not* been
+    /// opened yet — the one a result screen would open from its confirmed ending.
+    static func windowEndTimestamp(openedAt: Double, plan: Plan) -> Double {
+        openedAt + Double(plan.windowHours) * 3600
+    }
+
+    /// How long a closed eating window keeps its screen before the app falls back to
+    /// idle. One horizon for both screens that sit on a window: the window-closed chain
+    /// screen, and the result screen whose window was never opened.
+    static let closedWindowHorizon: TimeInterval = 24 * 3600
+
+    /// Whether a window that closed at `closedAt` is past `closedWindowHorizon` at `now`.
+    /// The single comparison against the horizon (invariant 12).
+    static func closedWindowHasLapsed(closedAt: Double, now: Double) -> Bool {
+        now - closedAt >= closedWindowHorizon
+    }
+
+    /// This state with a stale result screen cleared, as it should be restored at `now`.
+    ///
+    /// The result screen ("complete": no fast running, an ending staged, no window
+    /// open) is persisted so that iOS unloading the app does not lose it. Restored
+    /// without a limit it would outlive any meaning: a week later "Start eating" would
+    /// open a window anchored a week back. So it is held only while the window it would
+    /// open — from the confirmed ending, as `StartEatingThunk` anchors it, under `plan`
+    /// (pass `AppState.activePlan`) — is still inside the same horizon a closed window
+    /// gets. Past that the state goes to idle the way `.reset` leaves it, minus the
+    /// event: the cycle is over, so its pinned goal and celebration go with it.
+    ///
+    /// An ending with no confirmed moment (`fastEndTimestamp == 0`) has nothing to
+    /// measure from and is cleared as lapsed.
+    func droppingLapsedEnding(at now: Double, plan: Plan) -> TimerState {
+        guard !isRunning, !isEating, stagedElapsed > 0 else { return self }
+        if fastEndTimestamp > 0 {
+            let windowEnd = Self.windowEndTimestamp(openedAt: fastEndTimestamp, plan: plan)
+            guard Self.closedWindowHasLapsed(closedAt: windowEnd, now: now) else { return self }
+        }
+        var idle = self
+        idle.fastStartTimestamp = 0
+        idle.goalHours = 0
+        idle.stagedElapsed = 0
+        idle.fastEndTimestamp = 0
+        idle.hasCelebrated = false
+        return idle
     }
 }

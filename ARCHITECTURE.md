@@ -219,13 +219,13 @@ grep -rnE "UI(Impact|Notification|Selection)FeedbackGenerator|UIApplication\.sha
 
 **Зачем.** Репозитории stateless по интерфейсу, но за ними стоит `UserDefaults` и файл в Documents. Второй экземпляр, собранный на месте, даёт второй снимок и второй набор ключей — состояние начинает расходиться тихо, без падения и без варнинга. Плюс подмена в тестах перестаёт существовать как возможность: подменять становится нечего.
 
-**Следуют:** 8 мидлвар, 7 тханков, 3 бутстрап-точки. Регистрация одна — `Core/AppDependencies.swift`.
+**Следуют:** 9 мидлвар, 8 тханков, 3 бутстрап-точки. Регистрация одна — `Core/AppDependencies.swift`.
 
-Пересобрано грепом 18.08.2026 — 25 вызовов `container.inject` в 17 файлах (26-е совпадение — строка примера в шапке `Core/Container.swift`):
+Пересобрано грепом 14.09.2026 (IF-24, рабочее дерево) — 32 вызова `container.inject` в 20 файлах (33-е совпадение — строка примера в шапке `Core/Container.swift`). До того — 18.08.2026: 25 в 17 файлах. Отстал не один `AppStoreFactory` (там было 6, а не 4, ещё до IF-24): `SunnahMiddleware` и `OpenExternalLinkThunk` появились в 1.5.2 и в список не попали, номера строк у пяти файлов уехали. Все новые — в разрешённых местах.
 
-- **Мидлвары** (`IFApp/Middleware/`, 9 вызовов в 8 файлах): `PersistenceMiddleware.swift:14,15`, `StreakMiddleware.swift:15`, `NotificationMiddleware.swift:16`, `StoreMiddleware.swift:22`, `DiagnosticsMiddleware.swift:23`, `ReviewMiddleware.swift:25`, `AnalyticsMiddleware.swift:26`, `HistoryMiddleware.swift:27`
-- **Тханки** (9 вызовов в 7 файлах): `Features/timer/thunk/StartFastThunk.swift:18,19`, `Features/timer/thunk/ScheduleNotificationsThunk.swift:16`, `Features/ui/SyncPushStatusThunk.swift:19,20`, `Features/history/thunk/ExportHistoryThunk.swift:19`, `Features/pro/thunk/PurchaseProThunk.swift:15`, `Features/pro/thunk/RestorePurchasesThunk.swift:15`, `Features/pro/thunk/RefreshEntitlementThunk.swift:16`
-- **Бутстрап** (7 вызовов в 3 файлах): `Core/AppStoreFactory.swift:14,23,38,39`, `Core/UITestSeed.swift:175,230`, `Core/AppDependencies.swift:29`
+- **Мидлвары** (`IFApp/Middleware/`, 12 вызовов в 9 файлах): `PersistenceMiddleware.swift:14,15`, `StreakMiddleware.swift:15`, `SunnahMiddleware.swift:14,15,16`, `NotificationMiddleware.swift:16`, `StoreMiddleware.swift:22`, `DiagnosticsMiddleware.swift:23`, `HistoryMiddleware.swift:27`, `ReviewMiddleware.swift:32`, `AnalyticsMiddleware.swift:43`
+- **Тханки** (10 вызовов в 8 файлах): `Features/timer/thunk/StartFastThunk.swift:18,19`, `Features/timer/thunk/ScheduleNotificationsThunk.swift:16`, `Features/ui/SyncPushStatusThunk.swift:20,21`, `Features/ui/OpenExternalLinkThunk.swift:8`, `Features/history/thunk/ExportHistoryThunk.swift:19`, `Features/pro/thunk/PurchaseProThunk.swift:15`, `Features/pro/thunk/RestorePurchasesThunk.swift:15`, `Features/pro/thunk/RefreshEntitlementThunk.swift:16`
+- **Бутстрап** (10 вызовов в 3 файлах): `Core/AppStoreFactory.swift:17,20,28,31,46,47,49`, `Core/UITestSeed.swift:177,232`, `Core/AppDependencies.swift:33`
 
 **Список пересобран 07.08.2026 — устарел состав, не только номера.** Значилось 6 мидлвар и 2 тханка, фактически 8 и 7. Разошлось не сегодня: `StoreMiddleware` и четыре тханка (`StartFastThunk`, `ExportHistoryThunk`, `PurchaseProThunk`, `RestorePurchasesThunk`, `RefreshEntitlementThunk`) инжектят зависимости с дев-циклов 1.4.x-1.5.0, а `DiagnosticsMiddleware` добавлен сегодня. Все — в разрешённых местах, нарушений среди них нет; расходился учёт, а не код.
 
@@ -233,7 +233,7 @@ grep -rnE "UI(Impact|Notification|Selection)FeedbackGenerator|UIApplication\.sha
 
 **Нарушают:** 0. Ни один вью, компонент или редьюсер контейнера не касается.
 
-**Смежное.** `NotificationManager.shared` — синглтон, но достижим ровно из одного места: `Data/NotificationRepository.swift` (6 вызовов). В этом и смысл обёртки. Обращение к `.shared` мимо репозитория обходит правило.
+**Смежное.** `NotificationManager.shared` — синглтон, но достижим ровно из одного места: `Data/NotificationRepository.swift` (8 вызовов на 14.09.2026; в документе значилось 6, до IF-24 фактически было 7, восьмой — `enableForegroundPresentation`). В этом и смысл обёртки. Обращение к `.shared` мимо репозитория обходит правило.
 
 **Как проверить.** Расширено доаудитом 26.07.2026: инъекция мимо контейнера — не единственный способ добыть зависимость, есть ещё прямое конструирование и обращение к системному хранилищу напрямую.
 
@@ -257,7 +257,7 @@ grep -rn "UserDefaults" IFApp/Flows IFApp/Features --include='*.swift'
 
 **Нарушают:** 0.
 
-**Известная дыра — см. открытый вопрос F.** `Core/AppStoreFactory.swift:89` регистрирует `Store<AppState>` в контейнере, и никто его оттуда не инжектит. Это готовый механизм бесшумного обхода: `let store: Store<AppState> = container.inject()` внутри компонента скомпилируется и заработает, а грепы ниже его не поймают. Решение за владельцем.
+**Известная дыра — см. открытый вопрос F.** `Core/AppStoreFactory.swift:106` регистрирует `Store<AppState>` в контейнере, и никто его оттуда не инжектит. Это готовый механизм бесшумного обхода: `let store: Store<AppState> = container.inject()` внутри компонента скомпилируется и заработает, а грепы ниже его не поймают. Решение за владельцем.
 
 **Как проверить.** Расширено доаудитом 26.07.2026: `Store` — это `ObservableObject`, поэтому SwiftUI даёт к нему ещё два пути помимо явного объявления типа.
 
@@ -1440,7 +1440,7 @@ missing compliance и привязка билда впервые случатс�
 
 ### F. Регистрация `Store<AppState>` в контейнере
 
-`Core/AppStoreFactory.swift:89` регистрирует стор в контейнере. **Никто его оттуда не инжектит.** Регистрация не используется, но существует — и это готовый механизм бесшумного обхода инварианта 4: `let store: Store<AppState> = container.inject()` внутри компонента скомпилируется, заработает и не попадётся греп-проверке из пункта 4.
+`Core/AppStoreFactory.swift:106` регистрирует стор в контейнере. **Никто его оттуда не инжектит.** Регистрация не используется, но существует — и это готовый механизм бесшумного обхода инварианта 4: `let store: Store<AppState> = container.inject()` внутри компонента скомпилируется, заработает и не попадётся греп-проверке из пункта 4.
 
 **Выбор:** убрать регистрацию либо оставить и явно записать её как запрещённую к использованию (тогда проверка пункта 4 должна ловить `container.inject()` с типом `Store<...>`).
 
