@@ -78,6 +78,35 @@ struct SecondaryButton: View {
     }
 }
 
+/// A text-only action at the bottom of a footer: no fill, no outline. For an exit the
+/// card offers but does not want tapped by accident — it ranks below the bordered
+/// secondary, so it must not look like one.
+///
+/// The label wraps to a second line before it shrinks, and shrinks no further than
+/// 0.94: at the xxLarge ceiling the Ukrainian and French labels outgrow the ~267pt the
+/// footer column leaves, and a scale floor alone would have taken them below the size
+/// the reader asked for.
+struct TertiaryTextButton: View {
+    let title: String
+    let theme: ThemeTokens
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.hanken(15, .semibold))
+                .foregroundColor(theme.mut)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.94)
+                .padding(.horizontal, labelInset)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.pressable)
+    }
+}
+
 /// The full-width actions of the consequence sheets, stacked one under the other.
 ///
 /// Not `PrimaryButton` with a different number: three of its properties are wrong

@@ -11,4 +11,7 @@ struct UIState: Equatable, Sendable {
     var mealPickerOpen: Bool = false
     var streakMilestoneOpen: Bool = false
     var resetConfirmOpen: Bool = false
+    /// The confirmation in front of ending an open eating window early. The footer
+    /// button used to end it on the tap, and read as "close this screen".
+    var endEatingConfirmOpen: Bool = false
 }

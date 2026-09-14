@@ -176,10 +176,12 @@ enum strings {
             String(localized: "Footer.declineWindow", defaultValue: "No thanks")
         }
 
-        /// `.eating`, beside "Start fast": ends the eating window early. A real activity
-        /// finished, not a sheet dismissed — which is why it is not the plan sheet's key.
+        /// `.eating`, under "Start fast": ends the eating window early, behind the
+        /// `EndEating` confirmation. Names the window rather than saying "Done", which
+        /// read as "close this screen" and was tapped by accident. The key keeps its old
+        /// name so the `eating.skip` flows and the catalogue history stay put.
         static var doneEating: String {
-            String(localized: "Footer.doneEating", defaultValue: "Done")
+            String(localized: "Footer.doneEating", defaultValue: "End eating window")
         }
 
         /// `.eatingOver`, beside "Continue fasting": the window has already closed, so
@@ -315,6 +317,25 @@ enum strings {
         static var confirmMessage: String { String(localized: "This discards the current fast and returns to the start.") }
         static var confirmAction: String { String(localized: "Reset fast") }
         static var keepThisFast: String { String(localized: "Keep this fast") }
+    }
+
+    /// The confirmation in front of ending an open eating window early
+    /// (`EndEatingConfirmSheet`), opened from `Footer.doneEating`.
+    enum EndEating {
+        static var confirmTitle: String {
+            String(localized: "EndEating.confirmTitle", defaultValue: "End your eating window now?")
+        }
+        static var confirmMessage: String {
+            String(localized: "EndEating.confirmMessage",
+                   defaultValue: "It closes now instead of at the set time, and you won’t get the closing notification.")
+        }
+        static var confirmAction: String {
+            String(localized: "EndEating.confirmAction", defaultValue: "End window")
+        }
+        /// The safe action, and the bottom one in the sheet.
+        static var keepOpen: String {
+            String(localized: "EndEating.keepOpen", defaultValue: "Keep it open")
+        }
     }
 
     enum Sheet {

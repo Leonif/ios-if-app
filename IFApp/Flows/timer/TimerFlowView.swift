@@ -50,6 +50,7 @@ struct TimerScreenProps: Equatable {
     let mealPickerOpen: Bool
     let streakMilestoneOpen: Bool
     let resetConfirmOpen: Bool
+    let endEatingConfirmOpen: Bool
     /// The end-of-fast correction sheet, whole. Unlike the other sheets it is not a
     /// flag: which of its four cards is on screen, and every label on them, is
     /// decided from this one value.
@@ -91,6 +92,7 @@ struct TimerScreenProps: Equatable {
         mealPickerOpen = state.uiState.mealPickerOpen
         streakMilestoneOpen = state.uiState.streakMilestoneOpen
         resetConfirmOpen = state.uiState.resetConfirmOpen
+        endEatingConfirmOpen = state.uiState.endEatingConfirmOpen
         endFast = state.endFastState
         isPro = state.proState.isPro
         isVerifiedFree = state.proState.isVerifiedFree
@@ -221,6 +223,7 @@ struct TimerFlowView: View {
             overlays(theme: theme)
                 .animation(.easeOut(duration: 0.3), value: props.streakMilestoneOpen)
                 .animation(.easeOut(duration: 0.3), value: props.resetConfirmOpen)
+                .animation(.easeOut(duration: 0.3), value: props.endEatingConfirmOpen)
                 .animation(.easeOut(duration: 0.3), value: props.notice != nil)
         }
         // The offer used to be presented here. It moved to `AppFlowView` when the
@@ -613,7 +616,8 @@ struct TimerFlowView: View {
             EatingFooterCard(
                 lastFast: props.lastFastDuration.map(hoursMinutes),
                 theme: theme,
-                onSkip: { store.dispatch(TimerAction.eatingEnded) },
+                // Asks first; `.eatingEnded` is dispatched from the sheet.
+                onSkip: { store.dispatch(UIAction.endEatingConfirmOpened) },
                 onStartFast: { store.dispatch(StartFastThunk()) },
                 onHistory: { openHistory(from: .eatingWindow) }
             )
@@ -684,6 +688,7 @@ struct TimerFlowView: View {
             && !props.mealPickerOpen
             && !props.streakMilestoneOpen
             && !props.resetConfirmOpen
+            && !props.endEatingConfirmOpen
             && !props.endFast.isOpen
     }
 
@@ -903,6 +908,16 @@ struct TimerFlowView: View {
             onDismiss: { store.dispatch(UIAction.resetConfirmClosed) }
         )
         .zIndex(3)
+        EndEatingConfirmSheet(
+            isOpen: props.endEatingConfirmOpen,
+            theme: theme,
+            onConfirm: {
+                store.dispatch(TimerAction.eatingEnded)
+                store.dispatch(UIAction.endEatingConfirmClosed)
+            },
+            onDismiss: { store.dispatch(UIAction.endEatingConfirmClosed) }
+        )
+        .zIndex(3)
         ProNoticeSheet(
             notice: props.notice,
             theme: theme,
@@ -951,6 +966,13 @@ struct TimerFlowView: View {
     /// `.eatingOver` seeds the Last-meal control to the window close moment, so
     /// "Continue fasting" backdates from there by default.
     private func reconcileEating(_ state: ScreenState) {
+        // The question "end the window early?" is about an open window. If it closes
+        // on its own while the sheet is up, the question is gone with it — confirming
+        // would end a window that already ended, and keeping it would promise one that
+        // is no longer open.
+        if props.endEatingConfirmOpen && state != .eating {
+            store.dispatch(UIAction.endEatingConfirmClosed)
+        }
         if props.isEating && state != .eating && state != .eatingOver {
             store.dispatch(TimerAction.eatingEnded)
             store.dispatch(MealAction.cleared)

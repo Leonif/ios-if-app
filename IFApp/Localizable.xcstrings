@@ -4881,7 +4881,7 @@
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "يُغلق الساعة %@"
+            "value" : "تنتهي الساعة %@"
           }
         },
         "de" : {
@@ -6232,6 +6232,266 @@
         }
       }
     },
+    "EndEating.confirmAction" : {
+      "comment" : "Destructive action (red text) in the end-eating-window confirmation sheet: ends the open eating window immediately and cancels its closing notification. Sits above the safe action EndEating.keepOpen.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنهاء النافذة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster beenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End window"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminar ventana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminer la fenêtre"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "食事の時間帯を終了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 종료"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończ okno"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершити вікно"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "结束窗口"
+          }
+        }
+      }
+    },
+    "EndEating.confirmMessage" : {
+      "comment" : "Body of the end-eating-window confirmation sheet, under EndEating.confirmTitle. States the two consequences: the window closes now rather than at its scheduled time, and the closing notification will not arrive.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ستنتهي النافذة الآن قبل موعدها المحدد، ولن يصلك إشعار انتهائها."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Fenster schließt früher als geplant, und die Benachrichtigung zum Schließen entfällt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It closes now instead of at the set time, and you won’t get the closing notification."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se cerrará antes de la hora prevista y no recibirás la notificación de cierre."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elle se fermera avant l’heure prévue et vous ne recevrez pas la notification de fermeture."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "予定の時刻を待たずに、今すぐ終了します。終了の通知は届きません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "예정보다 일찍 종료되고, 종료 알림은 오지 않습니다."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Okno zamknie się przed ustaloną godziną i nie dostaniesz powiadomienia o zamknięciu."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вікно закриється раніше встановленого часу, і сповіщення про закриття не надійде."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "进食窗口将提前结束，你不会再收到窗口结束的通知。"
+          }
+        }
+      }
+    },
+    "EndEating.confirmTitle" : {
+      "comment" : "Title of the confirmation sheet shown when the user taps 'End eating window' (Footer.doneEating) while an eating window is open. Ending it early closes the window before its scheduled time and cancels the window-closed notification. A yes/no question about ending the window now.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنهاء نافذة الأكل الآن؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essensfenster jetzt beenden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End your eating window now?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Terminar tu ventana de comida ahora?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminer la fenêtre alimentaire maintenant ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "食事の時間帯を終了しますか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "식사 시간을 지금 종료할까요?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończyć okno żywieniowe teraz?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завершити вікно харчування зараз?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "现在结束进食窗口？"
+          }
+        }
+      }
+    },
+    "EndEating.keepOpen" : {
+      "comment" : "Safe action in the end-eating-window confirmation sheet, the bottom button (filled). Only closes the sheet: the eating window stays open and its closing notification stays scheduled. Must read as the opposite of EndEating.confirmAction.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إبقاء النافذة مفتوحة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offen lassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep it open"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenerla abierta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La garder ouverte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "그대로 두기"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zostaw otwarte"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Залишити відкритим"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保持开启"
+          }
+        }
+      }
+    },
     "End this fast?" : {
       "comment" : "End-fast sheet header, near-goal state (S2).",
       "extractionState" : "manual",
@@ -6257,7 +6517,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Terminer ce jeûne ?"
+            "value" : "Terminer ce jeûne ?"
           }
         },
         "ja" : {
@@ -7830,66 +8090,66 @@
       }
     },
     "Footer.doneEating" : {
-      "comment" : "Secondary action on the .eating footer card, beside 'Start fast'. Tapping ends the eating window early and cancels the scheduled end-of-window push. This is the user declaring a real activity finished, NOT a sheet dismissal — do not use the locale's dismiss lexeme (fr 'OK', es 'OK') even where the platform prefers it for the word Done.",
+      "comment" : "Tertiary text action on the .eating footer card, under 'Start fast'. Tapping opens a confirmation sheet (EndEating.*); confirming ends the eating window early and cancels the scheduled end-of-window push. Names the window explicitly: the former label 'Done' read as 'close this screen' and was tapped by accident. NOT a sheet dismissal — never use the locale's dismiss lexeme. Layout: text-only button in a ~267pt column; it may wrap to 2 lines or scale down to 0.94.",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إنهاء الأكل"
+            "value" : "إنهاء نافذة الأكل"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fertig"
+            "value" : "Essensfenster beenden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Done"
+            "value" : "End eating window"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hecho"
+            "value" : "Terminar ventana de comida"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Terminé"
+            "value" : "Terminer la fenêtre alimentaire"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "食事を終了"
+            "value" : "食事の時間帯を終了"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "식사 종료"
+            "value" : "식사 시간 종료하기"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gotowe"
+            "value" : "Zakończ okno żywieniowe"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Готово"
+            "value" : "Завершити вікно харчування"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "结束进食"
+            "value" : "结束进食窗口"
           }
         }
       }
@@ -14963,7 +15223,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tu ventana de comida ha terminado. Cada minuto desde entonces ya cuenta - continúa tu ayuno cuando quieras."
+            "value" : "Tu ventana de comida se ha cerrado. Cada minuto desde entonces ya cuenta - continúa tu ayuno cuando quieras."
           }
         },
         "fr" : {

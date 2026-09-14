@@ -151,11 +151,11 @@ grep -rnE "Date\(\)|Clock\.(now|dayKey|minuteOfDay)\(\)|UUID\(\)|Locale\.current
 
 | # | Эффект | Где |
 |---|---|---|
-| 2.1 | Хаптика `UINotificationFeedbackGenerator().notificationOccurred(.success)` | `Flows/timer/TimerFlowView.swift:953` |
+| 2.1 | Хаптика `UINotificationFeedbackGenerator().notificationOccurred(.success)` | `Flows/timer/TimerFlowView.swift:1028` |
 | 2.2 | Хаптика `UIImpactFeedbackGenerator(style: .light).impactOccurred()` | `Flows/history/HistoryFlowView.swift:325` |
-| 2.4 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + 1.6)` | `Flows/timer/TimerFlowView.swift:973` |
+| 2.4 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + 1.6)` | `Flows/timer/TimerFlowView.swift:1048` |
 | 2.5 | Подмена делегата чужого рекогнайзера — `gesture.delegate = self`, `gesture.isEnabled = true` | `Flows/history/HistoryFlowView.swift:367-368` (`InteractivePopGesture.Host`, объявлен `:349`, монтируется `:100`) |
-| 2.6 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + autoOfferDelay)` — `scheduleAutoOffer`, T1' | `Flows/timer/TimerFlowView.swift:715` |
+| 2.6 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + autoOfferDelay)` — `scheduleAutoOffer`, T1' | `Flows/timer/TimerFlowView.swift:772` |
 
 **Номера строк пересняты 18.08.2026 на `HEAD` `b24be30`.** Все пять адресов проверены грепом по дереву: 738→822, 303→311, 758→842, 345-346→353-354 (объявление 327→331, монтирование 89→95), 576→624. Сами позиции не менялись — только адреса; сдвинули их коммиты IF-5 после `a76cf55`, который был последним пересчётом. Расхождение нашёл `architect` на ревью 18.08.2026 — оно уже было в `HEAD` и к правке, на которой всплыло, отношения не имеет.
 
@@ -164,6 +164,8 @@ grep -rnE "Date\(\)|Clock\.(now|dayKey|minuteOfDay)\(\)|UUID\(\)|Locale\.current
 **Пересняты снова 17.08.2026, после ревью диффа IF-9** (постоянная дверь в Pro на главном; правки приняты, дерево остановлено, `HEAD` `7c6c1fc`). Стало 738 / 303 / 758 / 345-346. Ни одну из четырёх позиций дифф IF-9 не трогал — сдвинулись только номера.
 
 **Номера пересняты 11.09.2026 (карточка Queue-14, дерево остановлено на `2bdcf62`).** `TimerFlowView` 865 → 953, 885 → 973, 639 → 715; `HistoryFlowView` 311 → 325, 353-354 → 367-368 (объявление `Host` 331 → 349, монтирование 95 → 100). Сами позиции не менялись — только адреса. Сдвинули их коммиты этой же карточки: `852253c` в `HistoryFlowView`, `1e17ce0` и `2bdcf62` в `TimerFlowView`. Расхождение в `HistoryFlowView` пережило предыдущую пересъёмку по пункту 5 (`5b19f05`) — она смотрела только на свои адреса, и это ровно тот промах, который уже описан в пункте 5 абзацем про IF-10: снимать по одному пункту, оставляя соседние, значит откладывать расхождение, а не избегать его.
+
+**Номера пересняты 14.09.2026 (Queue-24, ревью диффа шторки подтверждения конца пищевого окна; дерево остановлено перед коммитом).** `TimerFlowView` 953 → 1028, 973 → 1048, 715 → 772. Сами позиции не менялись. Сдвиг двойной: 22 строки (для 2.6 — 5) дал этот дифф, остальные ~50 — коммиты `94e3355` и `b864b00` того же дня, которые переснимали пункты 3, 8 и 12 и не посмотрели на пункт 2. Тем же заходом пересняты адреса `TimerFlowView` во всех остальных местах документа — пункты 4, 5, 6, 8 (8.2, 8.6, 8.7, 8.8, 8.12 и список сайтов `Duration.hm`), 12 (образец и 12.1), 14, открытый вопрос B и решение 05.08.2026: снимать один пункт, оставляя соседние, — ровно тот промах, что описан абзацем выше.
 
 **2.6 — не находка сегодняшнего диффа, а дыра в учёте.** Позиция лежит в `HEAD` (`git show HEAD:…` — обе `asyncAfter` на месте, `:539` и `:721`), то есть приехала в дев-цикле 1.5.0 вместе с автооффером T1' и не попала в таблицу тогда же, когда её сосед 2.4 в ней уже стоял. Греп пункта её ловил всё это время — прогон 07.08.2026 отдал пять строк по `Flows/`, а в таблицу перенесли четыре.
 
@@ -253,7 +255,7 @@ grep -rn "UserDefaults" IFApp/Flows IFApp/Features --include='*.swift'
 
 **Зачем.** Компонент, дотянувшийся до стора, нельзя отрендерить в SwiftUI-превью и нельзя поставить на второй экран — он тащит за собой всё состояние приложения. Его перерисовка перестаёт быть предсказуемой: она зависит уже не от входных пропсов, а от того, что там в сторе. И хендофф из Claude Design перестаёт ложиться 1:1 — dev вынужден затаскивать стор в вёрстку, чтобы собрать макет.
 
-**Следуют:** 7 объявлений — `IFAppApp.swift:22`, `Flows/app/AppFlowView.swift:20`, `Flows/timer/TimerFlowView.swift:158`, `Flows/history/HistoryFlowView.swift:44`, `Flows/pro/PaywallFlowView.swift:43`, `Flows/pro/AboutFlowView.swift:36`, `Flows/sunnah/SunnahFlowView.swift:6` (номера пересняты 11.09.2026, до того — 22.08.2026 и 07.08.2026; считается объявление поля, инициализаторы тех же типов идут следом и отдельными объявлениями не считаются). Было 4, затем 6; два флоу пейвола добавились в дев-цикле 1.5.0, `Flows/sunnah/SunnahFlowView.swift` — в 1.5.2, все три лежат в `Flows/` и правилу соответствуют — счёт вырос, нарушений не прибавилось. Счёт 6 держался в документе и после того, как флоу Sunnah появился: пункт не пересматривали, потому что дифф, который его завёл, не трогал стор явно. Все 23 компонента и шторки принимают значения + замыкания (`FooterCard`, `RingCenter`, `TimerHeader`, `PlanEditorSheet`, `LastMealPickerSheet`, `HistoryRow`, `StreakBadge`, …).
+**Следуют:** 7 объявлений — `IFAppApp.swift:22`, `Flows/app/AppFlowView.swift:20`, `Flows/timer/TimerFlowView.swift:161`, `Flows/history/HistoryFlowView.swift:44`, `Flows/pro/PaywallFlowView.swift:43`, `Flows/pro/AboutFlowView.swift:36`, `Flows/sunnah/SunnahFlowView.swift:6` (номера пересняты 11.09.2026, до того — 22.08.2026 и 07.08.2026; считается объявление поля, инициализаторы тех же типов идут следом и отдельными объявлениями не считаются). Было 4, затем 6; два флоу пейвола добавились в дев-цикле 1.5.0, `Flows/sunnah/SunnahFlowView.swift` — в 1.5.2, все три лежат в `Flows/` и правилу соответствуют — счёт вырос, нарушений не прибавилось. Счёт 6 держался в документе и после того, как флоу Sunnah появился: пункт не пересматривали, потому что дифф, который его завёл, не трогал стор явно. Все 23 компонента и шторки принимают значения + замыкания (`FooterCard`, `RingCenter`, `TimerHeader`, `PlanEditorSheet`, `LastMealPickerSheet`, `HistoryRow`, `StreakBadge`, …).
 
 **Нарушают:** 0.
 
@@ -281,7 +283,7 @@ grep -rn "container.inject" IFApp --include='*.swift' | grep "Store<"
 
 **Зачем.** Уже стрельнуло: на одном экране в арабском стояли рядом «٦» и «118». Причина структурная — `String(format:)` цифры не локализует никогда, а `Int`, интерполированный в `String(localized:)`, локализует всегда. Без единой точки пиннинга каждое новое место форматирования — это лотерея, и заметна она только на арабской локали, то есть в самом конце цикла или в сторе. Второе, что пиннит `latinDigits`, — григорианский календарь: без него `ar_SA` отрисует в истории даты хиджры, тогда как стрик, семидневные точки и все day-key считаются по григорианским дням, и список начнёт описывать другие дни, чем цифры над ним.
 
-**Следуют:** канон — `Shared/Localization/Strings.swift:32` (`Locale.latinDigits`) и `:52` (`Date.FormatStyle.latinDigits`, заведён 11.09.2026 — см. ниже). Потребители: `Features/history/HistoryFormat.swift:23` (→ 6 форматтеров), `Features/meal/MealMath.swift:74` и `:167` (`dayFormatter`), `Flows/timer/TimerFlowView.swift:1000` (`clockTime`), `Features/endfast/EndFastMath.swift:154` (`clock`) и `:163` (`weekday`) — оба заведены IF-5 18.08.2026 и локаль пиннят, пункт 5 соблюдён; то, что тело форматтера при этом четвёртое в дереве, — вопрос пункта 8 (нарушение 8.8), а не этого, Int-принимающие аксессоры в `Strings.swift` (`:266`, `:283`, `:359`, `:453`, `:465`, `:554`, `:571`, `:576`), и `Features/timer/components/StreakBadge.swift:94` + `Features/history/components/HistorySummaryCard.swift:78` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте). Номера пересняты 22.08.2026: `TimerFlowView` 829 → 918, `EndFastMath` 137 → 156 и 147 → 165, `StreakBadge` 66 → 94, `HistorySummaryCard` 64 → 78 — сдвиг от дев-цикла 19-21.08, значения не менялись. Предыдущая пересъёмка 07.08.2026: `MealMath` 45 → 74 и `TimerFlowView` 782 → 829 (дифф IF-4, 18.08.2026).
+**Следуют:** канон — `Shared/Localization/Strings.swift:32` (`Locale.latinDigits`) и `:52` (`Date.FormatStyle.latinDigits`, заведён 11.09.2026 — см. ниже). Потребители: `Features/history/HistoryFormat.swift:23` (→ 6 форматтеров), `Features/meal/MealMath.swift:74` и `:167` (`dayFormatter`), `Flows/timer/TimerFlowView.swift:1075` (`clockTime`), `Features/endfast/EndFastMath.swift:154` (`clock`) и `:163` (`weekday`) — оба заведены IF-5 18.08.2026 и локаль пиннят, пункт 5 соблюдён; то, что тело форматтера при этом четвёртое в дереве, — вопрос пункта 8 (нарушение 8.8), а не этого, Int-принимающие аксессоры в `Strings.swift` (`:266`, `:283`, `:359`, `:453`, `:465`, `:554`, `:571`, `:576`), и `Features/timer/components/StreakBadge.swift:94` + `Features/history/components/HistorySummaryCard.swift:78` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте). Номера пересняты 22.08.2026: `TimerFlowView` 829 → 918, `EndFastMath` 137 → 156 и 147 → 165, `StreakBadge` 66 → 94, `HistorySummaryCard` 64 → 78 — сдвиг от дев-цикла 19-21.08, значения не менялись. Предыдущая пересъёмка 07.08.2026: `MealMath` 45 → 74 и `TimerFlowView` 782 → 829 (дифф IF-4, 18.08.2026).
 
 **Номера пересняты в третий раз 11.09.2026, уже на `2bdcf62`** (первая пересъёмка этого дня стояла на `f753774` и устарела к вечеру того же дня): `TimerFlowView` 980 → 1000 (`clockTime`), `MealMath` 45 → 66 и `Strings.swift` 25-30 → 32-37 в формулировке правила, `entryA11y` 257-259 → 590-592. Значения не менялись.
 
@@ -293,7 +295,7 @@ grep -rn "container.inject" IFApp --include='*.swift' | grep "Store<"
 
 **Три позиции пересняты 17.08.2026, при ревью диффа IF-10** (RTL/ar; дерево остановлено перед коммитом). `HistoryFormat` 22 → 23: шапка файла выросла на строку при выносе изолята в `BidiText`. `clockTime` 697 → 782: `TimerFlowView` рос дев-циклами 1.5.x, и позиция была устаревшей ещё до этого диффа — то есть промах не диффа, а того, что при снятии 17.08 по пункту 2 остальные пункты не пересматривались. Значения не менялись, только позиции.
 
-**Нарушают: 0.** Обе позиции закрыты и **закоммичены** — сверено на `HEAD` 05.08.2026: `Features/meal/MealMath.swift:66` (`timeLabel`, был `f.locale = .current`) и `Flows/timer/TimerFlowView.swift:1000` (`clockTime`, собирал latn-локаль инлайном; адреса обоих пересняты 11.09.2026) — обе теперь `f.locale = .latinDigits`.
+**Нарушают: 0.** Обе позиции закрыты и **закоммичены** — сверено на `HEAD` 05.08.2026: `Features/meal/MealMath.swift:66` (`timeLabel`, был `f.locale = .current`) и `Flows/timer/TimerFlowView.swift:1075` (`clockTime`, собирал latn-локаль инлайном; адреса обоих пересняты 11.09.2026) — обе теперь `f.locale = .latinDigits`.
 
 **Решение 26.07.2026: `entryA11y` — не нарушение.** `Shared/Localization/Strings.swift:590-592` интерполирует `Int` в `String(localized:)` без `locale: .latinDigits`, тогда как все остальные Int-принимающие аксессоры файла локаль передают (список в «Следуют» выше; адреса пересняты 11.09.2026, было `:257-259` и `:155`, `:193`, `:197`, `:239`, `:244`). Доаудит вынес это в нарушения; владелец и `dev` независимо решили иначе, и по одной причине: `entryA11y` — VoiceOver-метка. Для арабского скринридера локальные цифры и есть правильное поведение, а исходное правило речь от изображения не отличало. Поэтому сужена **область правила** (см. выше), а не заведено исключение из списка: исключение следующий прогон нашёл бы снова и снова поднял бы тот же вопрос.
 
@@ -326,7 +328,7 @@ grep -rn 'Text("' IFApp --include='*.swift' | grep '\\('
 
 **Нарушают: 0.** Правило было принято с известным долгом в две позиции; обе закрыты и **закоммичены** — сверено на `HEAD` 05.08.2026. `Clock.dayKey()` под `goalCelebrated` ушёл в `Features/timer/thunk/CelebrateGoalThunk.swift`, `MealMath.dayAndMinute` под `MealAction.initialized` — в `Features/meal/thunk/SeedLastMealFromWindowCloseThunk.swift`. В `Flows/` часов, идущих в payload, не осталось.
 
-**Не нарушают: 8 позиций** — `TimerFlowView.swift:133` (`currentScreenState`), `:150` (`offerPhaseColor`), `:206` (фолбэк `screen(theme:now:)` вне `TimelineView`), `:301` (фон), `:313` (`nowMinute` для рендера), `:776` (`Clock.minuteOfDay()` под открытую шторку — на месте написано, почему: в экшен едет дистанция, а не момент), `:816` (`Clock.now()` в `EndFastSheet` как аргумент отображения) и `HistoryFlowView.swift:247` (`streak.display(at:)`). Все восемь — чтение часов для отображения, а не для payload.
+**Не нарушают: 8 позиций** — `TimerFlowView.swift:136` (`currentScreenState`), `:153` (`offerPhaseColor`), `:213` (фолбэк `screen(theme:now:)` вне `TimelineView`), `:321` (фон), `:333` (`nowMinute` для рендера), `:834` (`Clock.minuteOfDay()` под открытую шторку — на месте написано, почему: в экшен едет дистанция, а не момент), `:874` (`Clock.now()` в `EndFastSheet` как аргумент отображения) и `HistoryFlowView.swift:247` (`streak.display(at:)`). Все восемь — чтение часов для отображения, а не для payload.
 
 Адреса пересняты 11.09.2026 на `2bdcf62`; сам состав не менялся. Список пересобран 22.08.2026 по выводу грепа целиком: прошлая версия (`108`, `125`, `165`, `248`, `260`, `541` + `HistoryFlowView:223`) была снята 07.08.2026 и с тех пор устарела вся. Пересобирать надо от вывода грепа целиком, а не подправлять номера — предыдущая версия списка уже один раз оказалась не только сдвинутой, но и неполной.
 
@@ -400,15 +402,15 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 
 | # | Что задвоено | Где |
 |---|---|---|
-| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **3 определения** (было 4) | `Flows/timer/TimerFlowView.swift:105` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` · `Features/timer/thunk/ResetFastThunk.swift:20-22` |
+| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **3 определения** (было 4) | `Flows/timer/TimerFlowView.swift:108` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` · `Features/timer/thunk/ResetFastThunk.swift:20-22` |
 | 8.4 | Предикат «цель достигнута» `elapsed ≥ goalHours × 3600` — **3 определения** | `Features/phase/Phase.swift:88-93` (`PhaseProgress.isComplete`) · `Features/history/FastRecord.swift:27` (`goalReached`) · `Features/endfast/thunk/ConfirmEndFastThunk.swift:48` (`qualifies`) |
-| 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:67-70` · `Flows/timer/TimerFlowView.swift:1015` |
-| 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела, включая doc-комментарий** | `Features/timer/components/RingCenter.swift:116` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:911` (`overtimeShort`) |
-| 8.8 | Настенные часы «9:10 AM»: `DateFormatter` + `.latinDigits` + `.short` / `.none` — **4 тела** | `Features/history/HistoryFormat.swift:58-63` (`time`) · `Features/meal/MealMath.swift:66-77` (`timeLabel`) · `Features/endfast/EndFastMath.swift:154-160` (`clock`) · `Flows/timer/TimerFlowView.swift:1000-1010` (`clockTime`) |
+| 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:67-70` · `Flows/timer/TimerFlowView.swift:1088` |
+| 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела, включая doc-комментарий** | `Features/timer/components/RingCenter.swift:116` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:986` (`overtimeShort`) |
+| 8.8 | Настенные часы «9:10 AM»: `DateFormatter` + `.latinDigits` + `.short` / `.none` — **4 тела** | `Features/history/HistoryFormat.swift:58-63` (`time`) · `Features/meal/MealMath.swift:66-77` (`timeLabel`) · `Features/endfast/EndFastMath.swift:154-160` (`clock`) · `Flows/timer/TimerFlowView.swift:1075-1085` (`clockTime`) |
 | 8.9 | Название дня по расстоянию: `0 → Today`, `1 → Yesterday`, `n → n days ago` — **2 тела на одних и тех же ключах** | `Features/meal/MealMath.swift:57-63` (`dateLabel`) · `Features/endfast/EndFastMath.swift:115-123` (`dayCaption`) |
 | 8.10 | Целые календарные сутки между двумя моментами (календарём, не делением на 86400) — **2 тела, с одинаковым DST-обоснованием в комментарии** | `Core/Clock.swift:71-75` (`daysBetween`, от day-key) · `Features/endfast/EndFastMath.swift:145-150` (`daysBefore`, от timestamp) |
 | 8.11 | Как пишется диапазон одного `FastRecord` — **2 тела, уже разъехавшиеся** | `Features/history/HistoryFormat.swift:80-86` (`rowSubline`: стрелка, зеркалится по `isRTL`) · `Features/endfast/EndFastMath.swift:186-190` (`recordSpan`: дефис, направление не учитывается) |
-| 8.12 | Предложение «таймер шёл дальше»: `strings.EndFast.timerRanPast(strings.Duration.hm(total / 3600, (total / 60) % 60))` — **2 идентичные целые строки** | `Flows/timer/TimerFlowView.swift:886` (`editorial`, `.goalReached` за порогом) · `Features/timer/sheets/EndFastSheet.swift:144` (`overtimeLine`, S3) |
+| 8.12 | Предложение «таймер шёл дальше»: `strings.EndFast.timerRanPast(strings.Duration.hm(total / 3600, (total / 60) % 60))` — **2 идентичные целые строки** | `Flows/timer/TimerFlowView.swift:954` (`editorial`, `.goalReached` за порогом) · `Features/timer/sheets/EndFastSheet.swift:144` (`overtimeLine`, S3) |
 
 **8.2 уменьшилось на одно определение.** `StopFastThunk` исчез в IF-5 (`a6c04e6`), его заменил `ConfirmEndFastThunk`, который прошедшее время **не** выводит: он берёт подтверждённый конец из шторки и считает `end − start` под гардом `timer.isRunning`. Это другое правило, а не четвёртая копия того же. Строка таблицы, ссылавшаяся на несуществующий файл, — то, ради чего этот заход и был назначен.
 
@@ -420,7 +422,7 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 
 **8.8 / 8.9 / 8.10 — не про инвариант 5.** Все четыре форматтера 8.8 берут `Locale.latinDigits`, то есть пункт 5 соблюдён; задвоено то, из чего форматтер собирается, а это область пункта 8. Разводить их важно, чтобы починка 8.8 не читалась как починка 5: свести четыре тела в одно можно, ничего не меняя в поведении.
 
-**`Duration.hm(total / 3600, (total / 60) % 60)` по месту — 5 сайтов, и в таблицу попал только один из них.** Позиции: `HistoryFormat:69`, `EndFastMath:174` (`previewValue`), `EndFastSheet:144`, `TimerFlowView:866`, `TimerFlowView:995` (номера `TimerFlowView` пересняты 11.09.2026, дифф Queue-14). Сам разбор секунд остаётся дешёвой арифметикой на месте, а формат определён один раз — в `strings.Duration.hm`; по уточнённой границе это по-прежнему **не** нарушение, и четыре из пяти сайтов ни во что не внесены. Нарушением стала одна пара (8.12), и не потому, что в ней есть деление, а потому, что две её строки совпадают **целиком**, включая строковый ключ: задвоен ответ, а не вычисление. Формулировка «спорно, решает владелец», стоявшая здесь до 22.08.2026, снята — граница проведена, и проведена так, чтобы этот счёт можно было воспроизвести грепом.
+**`Duration.hm(total / 3600, (total / 60) % 60)` по месту — 5 сайтов, и в таблицу попал только один из них.** Позиции: `HistoryFormat:69`, `EndFastMath:174` (`previewValue`), `EndFastSheet:144`, `TimerFlowView:954`, `TimerFlowView:1090` (номера `TimerFlowView` пересняты 11.09.2026, дифф Queue-14). Сам разбор секунд остаётся дешёвой арифметикой на месте, а формат определён один раз — в `strings.Duration.hm`; по уточнённой границе это по-прежнему **не** нарушение, и четыре из пяти сайтов ни во что не внесены. Нарушением стала одна пара (8.12), и не потому, что в ней есть деление, а потому, что две её строки совпадают **целиком**, включая строковый ключ: задвоен ответ, а не вычисление. Формулировка «спорно, решает владелец», стоявшая здесь до 22.08.2026, снята — граница проведена, и проведена так, чтобы этот счёт можно было воспроизвести грепом.
 
 **Номера 8.6 и 8.7 пересняты снова 18.08.2026, при ревью диффа IF-4:** `TimerFlowView` 794 → 836 (`hoursMinutes`) и 705 → 752 (`overtimeShort`) — сдвиг от этого диффа, `HistoryFormat` и `RingCenter` не двигались, оба задвоения на месте. Предыдущая пересъёмка:
 
@@ -557,17 +559,18 @@ grep -rnE 'Locale\.current\.language|Locale\.preferredLanguages|preferredLocaliz
 
 Оба вреда конкретны и разные. Мёртвый ключ **дорог**: он приезжает `loc` как работа, его переводят на девять локалей, он едет в каждый релиз, и никто не знает, что он мёртв — потому что мёртвым его делает не каталог, а удалённый экран, о котором каталог ничего не знает. Пустой перевод **опаснее**: он не отсутствует, а лжёт — статус `translated` заставляет и ворота, и `loc` считать позицию закрытой, а пользователь в этой локали видит пустое место там, где должно быть слово. Второе нашлось 21.08.2026 не проверкой, а случайно: `loc` заметила пустую японскую строку `Inactive` со статусом «переведено», разбирая другую задачу.
 
-**Нарушают вторую половину: 3.**
+**Нарушают вторую половину: 4.** (было 3 до 14.09.2026 — добавлена 10.13)
 
 | # | Ключ | Что не так |
 |---|---|---|
 | 10.10 | `Eating window` | Мёртвый: `String(localized: "Eating window")` в дереве нет. Переведён на 9 локалей |
 | 10.11 | `Tap to change` | Мёртвый: чтения нет. Переведён на 9 локалей |
 | 10.12 | `Inactive` / `ja` | Читается (`Strings.swift:740`, `statusInactive`; номер переснят 11.09.2026), но японское значение — пустая строка при `state: translated`. Открыто и на 11.09.2026 — работа `loc` |
+| 10.13 | `Last 7 days` | Мёртвый: чтения нет с `48c85f0` (Queue-14, «Explain weekly goal dots»), который убрал место отрисовки и оставил ключ. Переведён на 9 локалей. Внесено 14.09.2026 — нашёл разбор второй половины при ревью диффа Queue-24, сам дифф ключ не трогал |
 
 **Происхождение двух мёртвых ключей названо в самом коде, и это стоит прочесть**: шапка `Features/timer/sheets/PlanEditorSheet.swift:7-13` описывает, что в 1.5.0 переписан белый ряд, который печатал «Eating window · 12:00 - 8:00 PM», и текст «Tap to change» под ним. Экран переписали, ключи остались. То есть механизм, который правило описывает, уже сработал один раз в полном объёме — от удаления места отрисовки до перевода мёртвого текста на девять языков, — и не был замечен ничем.
 
-**Что чинить (работа `dev` и `loc`).** 10.10 и 10.11 — удалить ключи из каталога целиком; чтений нет, поведение не меняется. 10.12 — это работа `loc`, а не `dev`: строку надо перевести, а не удалить, потому что читающий её экран существует.
+**Что чинить (работа `dev` и `loc`).** 10.10, 10.11 и 10.13 — удалить ключи из каталога целиком; чтений нет, поведение не меняется. 10.12 — это работа `loc`, а не `dev`: строку надо перевести, а не удалить, потому что читающий её экран существует.
 
 ---
 
@@ -679,7 +682,7 @@ static func isNearGoal(secondsLeft: Double) -> Bool {
 **Следуют: 6** (все именованные пороги дерева, кроме одного — замер 22.08.2026, шестой добавлен 14.09.2026; адреса пересняты 11.09.2026 на `2bdcf62`: `TimerFlowView` 612 → 632, `EndFastState` 60 → 64, `TimerFlowView` 862 → 882 в таблице ниже):
 
 - `Features/endfast/EndFastMath.swift:140` — `isNearGoal(secondsLeft:)` для `nearGoalThresholdMinutes`; единственное тело, зовёт `OpenEndFastThunk:40`
-- `Flows/timer/TimerFlowView.swift:632` — `consequenceLine` спрашивает `PhaseProgress.compute(...).isComplete` вместо того, чтобы выписать порог цели. Это и есть починка после `fail` 21.08.2026, и она стоит здесь как образец, а не как история
+- `Flows/timer/TimerFlowView.swift:667` — `consequenceLine` спрашивает `PhaseProgress.compute(...).isComplete` вместо того, чтобы выписать порог цели. Это и есть починка после `fail` 21.08.2026, и она стоит здесь как образец, а не как история
 - `Features/meal/thunk/PickMealChipThunk.swift:39` — `MealChip.lastNightFloor` читается в сравнении ровно один раз
 - `Middleware/HistoryMiddleware.swift:65` — `minimumDuration`, одно сравнение; второе упоминание (`ResumeFastThunk:49`) — комментарий, не код
 - `Features/pro/Pro.swift:68` — `minimumGoalFraction`, одно сравнение, и оно стоит внутри того же типа, где объявлена константа
@@ -689,7 +692,7 @@ static func isNearGoal(secondsLeft: Double) -> Bool {
 
 | # | Порог | Тела предиката |
 |---|---|---|
-| 12.1 | `EndFastState.overtimeNeutralThreshold` (`Features/endfast/EndFastState.swift:64`) | `Features/endfast/thunk/OpenEndFastThunk.swift:44` (`-secondsLeft >= …`) · `Flows/timer/TimerFlowView.swift:882` (`over >= …`) |
+| 12.1 | `EndFastState.overtimeNeutralThreshold` (`Features/endfast/EndFastState.swift:64`) | `Features/endfast/thunk/OpenEndFastThunk.swift:44` (`-secondsLeft >= …`) · `Flows/timer/TimerFlowView.swift:950` (`over >= …`) |
 
 Оба места отвечают на один вопрос — «пост зашёл в овертайм так далеко, что подбадривать больше нельзя» — и записывают его двумя разными выражениями от двух разных величин (`-secondsLeft` и `over`), что само по себе уже требует держать в голове, почему это одно и то же.
 
@@ -764,7 +767,7 @@ grep -rnE "cos\(|sin\(" IFApp --include='*.swift'
 **Следуют: 2.**
 
 - `Features/endfast/EndFastState.swift` — образцовая форма. Подсостояние шторки **и есть** `pending`: `endTimestamp` живёт в нём, `.opened` его заводит, чипы и степпер правят его, `.closed` чистит целиком (`EndFastReducer.swift:44-45`, `newState = EndFastState()`). Подтверждённое значение лежит в `TimerState` и не трогается ничем, кроме `ConfirmEndFastThunk`
-- `Features/timer/sheets/PlanEditorSheet.swift:46` — `@State private var draftHours: Int?`, и `shown` (`:64`) читает `draftHours ?? plan`. Черновик локальный, в стор он попадает только через `confirmPlan` (`Flows/timer/TimerFlowView.swift:662`). Форма та же, слой другой — и это ровно то, о чём молчит абзац выше
+- `Features/timer/sheets/PlanEditorSheet.swift:46` — `@State private var draftHours: Int?`, и `shown` (`:64`) читает `draftHours ?? plan`. Черновик локальный, в стор он попадает только через `confirmPlan` (`Flows/timer/TimerFlowView.swift:793`). Форма та же, слой другой — и это ровно то, о чём молчит абзац выше
 
 **Нарушают: 1.**
 
@@ -1419,7 +1422,7 @@ missing compliance и привязка билда впервые случатс�
 
 Из `TimerFlowView` — 36 сырых `dispatch(SomeAction.x)` против 19 `dispatch(SomeThunk())` (пересчитано 22.08.2026; было 26 против 13 — соотношение держится, выросли обе стороны). Различие в целом логичное (тханк там, где надо прочитать состояние или часы), но нигде не записано, поэтому граница держится на вкусе автора.
 
-Отдельная деталь: вью местами диспатчит **пары** экшенов, воспроизводя логику, которая в другом месте живёт в тханке — `TimerFlowView:521-523` и `:823-824` делают `TimerAction.eatingEnded` + `MealAction.cleared`, а `ResetFastThunk:24-25` делает ровно `TimerAction.reset` + `MealAction.cleared` (номера пересняты 22.08.2026, до того — 07.08.2026).
+Отдельная деталь: вью местами диспатчит **пары** экшенов, воспроизводя логику, которая в другом месте живёт в тханке — `TimerFlowView:628-630` и `:977-978` делают `TimerAction.eatingEnded` + `MealAction.cleared`, а `ResetFastThunk:24-25` делает ровно `TimerAction.reset` + `MealAction.cleared` (номера пересняты 22.08.2026, до того — 07.08.2026).
 
 **Выбор:** либо «вью диспатчит один экшен или один тханк, пара — всегда тханк», либо «сырой экшен из вью нормален, пары тоже».
 
@@ -1609,7 +1612,7 @@ missing compliance и привязка билда впервые случатс�
 
 **Правило (не инвариант — случай в кодовой базе один).** Экран, в который есть вход больше чем с одного флоу, презентуется из **ближайшего общего предка** этих флоу, а не из одного из них. В корне z-порядок и сохранение состояния экрана под оффером получаются конструкцией, а не кодом, который надо тестировать.
 
-**Оговорка — дописано 06.08.2026.** «Получается конструкцией» верно ровно для **push-навигации**: таймер и история лежат в одном `NavigationStack`, поэтому оверлей корня накрывает обе. `sheet` и `fullScreenCover` в это z-пространство не входят — системная презентация живёт над всем хостящим контроллером, и оверлей предка её не накрывает. Третий вход в оффер — как раз такой: шторка About. Порядок там держится **кодом** — строкой `showSources = false` в `Flows/timer/TimerFlowView.swift:207` (`onChange(of: props.offerOpen)`, номер переснят 22.08.2026), без которой оффер открылся бы под шторкой, с которой его позвали. То есть правило снимает вопрос z-порядка для push и не снимает его для презентаций: презентованный экран обязан закрываться явно, и эта строка — самое хрупкое место конструкции.
+**Оговорка — дописано 06.08.2026.** «Получается конструкцией» верно ровно для **push-навигации**: таймер и история лежат в одном `NavigationStack`, поэтому оверлей корня накрывает обе. `sheet` и `fullScreenCover` в это z-пространство не входят — системная презентация живёт над всем хостящим контроллером, и оверлей предка её не накрывает. Третий вход в оффер — как раз такой: шторка About. Порядок там держится **кодом** — строкой `showSources = false` в `Flows/timer/TimerFlowView.swift:252` (`onChange(of: props.offerOpen)`, номер переснят 22.08.2026), без которой оффер открылся бы под шторкой, с которой его позвали. То есть правило снимает вопрос z-порядка для push и не снимает его для презентаций: презентованный экран обязан закрываться явно, и эта строка — самое хрупкое место конструкции.
 
 **Цена, названная заранее.** Тинт оффера (`offerPhaseColor`) — производная от состояния таймера, и корню она тоже нужна. Копия в корне была бы ровно тем случаем, о котором пункт 8; поэтому определение переехало на `TimerScreenProps` и читается обоими хостами. В экшен `offerOpened` тинт не кладётся: результат чтения часов в аргументе экшена — нарушение пункта 6 буквально.
 

@@ -14,4 +14,6 @@ enum UIAction: Action {
     case streakMilestoneClosed
     case resetConfirmOpened
     case resetConfirmClosed
+    case endEatingConfirmOpened
+    case endEatingConfirmClosed
 }

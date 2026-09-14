@@ -17,6 +17,8 @@ func uiReducer(state: UIState, action: Action) -> UIState {
     case .streakMilestoneClosed: newState.streakMilestoneOpen = false
     case .resetConfirmOpened: newState.resetConfirmOpen = true
     case .resetConfirmClosed: newState.resetConfirmOpen = false
+    case .endEatingConfirmOpened: newState.endEatingConfirmOpen = true
+    case .endEatingConfirmClosed: newState.endEatingConfirmOpen = false
     case .none: break
     }
 

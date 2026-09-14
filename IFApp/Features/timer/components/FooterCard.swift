@@ -133,8 +133,8 @@ struct GoalReachedFooterCard: View {
     }
 }
 
-/// Eating-window footer: Done (secondary, ends the window early) + Start fast (primary,
-/// begins a new fast early). No stats — the countdown is the hero above, and it
+/// Eating-window footer: Start fast (primary, begins a new fast early) + End eating
+/// window (tertiary text, ends the window early behind a confirmation). No stats — the countdown is the hero above, and it
 /// already names the closing hour.
 ///
 /// The window lasts hours, so it gets its own way into the history: the fast that
@@ -156,7 +156,10 @@ struct EatingFooterCard: View {
             VStack(spacing: 12) {
                 PrimaryButton(title: strings.Footer.startFast, theme: theme, action: onStartFast)
                     .accessibilityIdentifier("eating.startFast")
-                SecondaryButton(title: strings.Footer.doneEating, theme: theme, action: onSkip)
+                // Quiet on purpose, and it only asks: ending the window early also drops
+                // its closing push, and as a full-width bordered button right under
+                // "Start fast" it was tapped by accident as "close this screen".
+                TertiaryTextButton(title: strings.Footer.doneEating, theme: theme, action: onSkip)
                     .accessibilityIdentifier("eating.skip")
             }
         }
