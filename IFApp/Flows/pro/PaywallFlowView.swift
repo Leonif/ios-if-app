@@ -6,27 +6,11 @@
 import Redux
 import SwiftUI
 
-private struct PaywallProps: Equatable {
-    let isOpen: Bool
-    let state: OfferState
-    let price: String?
-    let trigger: PaywallTrigger
-    let showsNothingToRestore: Bool
-
-    init(state: AppState) {
-        isOpen = state.proState.isOfferOpen
-        self.state = state.proState.offerState
-        price = state.proState.product?.displayPrice
-        trigger = state.proState.trigger ?? .unknown
-        showsNothingToRestore = state.proState.showsNothingToRestore
-    }
-}
-
 struct PaywallFlowView: View {
     private let store: Store<AppState>
     private let phaseColor: Color
 
-    @State private var props: PaywallProps
+    @State private var props: Props
     @State private var appeared = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -35,7 +19,7 @@ struct PaywallFlowView: View {
     init(store: Store<AppState>, phaseColor: Color) {
         self.store = store
         self.phaseColor = phaseColor
-        _props = State(initialValue: PaywallProps(state: store.getCurrentState()))
+        _props = State(initialValue: Props(state: store.getCurrentState()))
     }
 
     var body: some View {
@@ -76,7 +60,7 @@ struct PaywallFlowView: View {
                 appeared = true
             }
         }
-        .connect(to: store, mapState: { PaywallProps(state: $0) }, onPropsChange: { next in
+        .connect(to: store, mapState: { Props(state: $0) }, onPropsChange: { next in
             guard next.isOpen else { return }
             props = next
         })

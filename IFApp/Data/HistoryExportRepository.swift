@@ -5,10 +5,6 @@
 
 import Foundation
 
-protocol HistoryExportRepositoryProtocol {
-    func write(csv: String, fileName: String) -> URL?
-}
-
 struct HistoryExportRepository: HistoryExportRepositoryProtocol {
     func write(csv: String, fileName: String) -> URL? {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)

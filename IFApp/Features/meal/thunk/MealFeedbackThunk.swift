@@ -6,12 +6,6 @@
 import UIKit
 import Redux
 
-enum MealScrubFeedback {
-    case begin
-    case step
-    case edge
-}
-
 @MainActor
 private enum Taptic {
     static let selection = UISelectionFeedbackGenerator()

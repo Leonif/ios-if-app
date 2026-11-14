@@ -4,24 +4,10 @@ Why the timer feature's code is the way it is. Read the section of a file before
 
 ## TimerState.swift
 
-- `TimerState` — elapsed time is not stored: it is derived from `fastStartTimestamp` and the current clock in the view (see `TimerProps`).
-- `StreakStatus` — the run length and the day it was last extended travel together on purpose: a screen holding only the counter cannot apply the missed-day rule, and two screens would show two numbers for one state.
-- `StreakStatus.ownsFreeze` — whether the install holds Pro (owns the protected day). Not stored with the streak: handed in by whoever projects it (`AppState.streak`, `TimerAction.goalCelebrated`), because the entitlement has exactly one home and the streak is not it.
-- `StreakStatus.freezeCovers(_:)` — the single definition of the three freeze conditions; the projection and the reducer that spends the freeze both ask here:
-  - exactly one calendar day was missed (`dayKey` two days after the last goal); two missed days are a hard reset — one protected day protects one day;
-  - the install owns Pro; without it a missed day resets;
-  - the month is unspent. The month charged is the month of the *missed day*, not of the goal after it: the benefit protects a day, so that day decides who pays. This is what makes a day missed on the 31st and one missed on the 1st two different months' business — the plain reading of "one per calendar month".
-- `StreakStatus.freezeMonthCharged(afterGoalOn:)` — the single definition of who pays: the check, the debit in `freezeMonth(coveringGapTo:)` and the `-seedFreezeSpent` test hook all ask here. Written out in each, the rule could change in one place and still compile elsewhere — a hook charging the old month would turn the "one per calendar month" flow green while the freeze is still available.
-- `StreakStatus.freezeMonth(coveringGapTo:)` — returns nil when there is no gap. Paired with `freezeCovers(_:)` so the month-picking rule is written once and the reducer reads the answer instead of recomputing which day was missed.
-- `StreakStatus.displayed(at:)` — 0 once a day was missed (last goal before yesterday) unless the protected day still stands in the gap; the persisted counter is only rewritten on the next goal. The freeze is applied to what is *shown*, not only when the next goal banks it: the promise sold is that the run does not break, and a counter that drops to 0 for a day has already broken it where the user can see. Reading `ownsFreeze` as it stands *now* is all of edge 8: buying Pro during the gap day restores the run, buying a day later does not — the 24-hour window stated in days.
-- `StreakStatus.lostRunFreshnessDays` — how long a just-broken run keeps being named, in days from the last goal. Needed because `count` is not rewritten until the next goal: without it someone who missed a day in March would read "that streak ended at six days" in June. Past it the state is plain "no streak", not a second kind of silence.
-- `StreakStatus.display(at:)` — the single projection of the three states, so the header pill and the summary card cannot disagree. `.justEnded` carries the persisted counter, never `bestStreak`: the best run is recomputed from history rows and after an update from 1.4.4 can be *smaller* than the run actually lost — naming a number below the one the person remembers is worse than naming none.
-- `StreakDisplay` — a separate type rather than `Int` + `Bool`: both surfaces pick one of three branches, and the pair spells two of them the same way (0 and "just ended at 0") while allowing a fourth that cannot happen. `.justEnded` = a run that broke inside the freshness window; `.none` = never started, or the lost run is no longer news.
-- `StreakDisplay.count` / `.hasEnded` — the single definitions both surfaces read (count, drained accent, past-tense overline, the sentence) instead of unwrapping the cases themselves.
-- `StreakDisplay.lastGoalDate` — kept in the projection so the history can say when the displayed number happened, without the compact header badge carrying or formatting a date.
+- `TimerState` — elapsed time is not stored: it is derived from `fastStartTimestamp` and a moment the caller passes in (`elapsed(at:)`). Every derivation here that depends on time takes `now` as an argument and never reads the clock itself, so the reducer, the bootstrap and the tests can ask it about any moment (invariants 1 and 6).
 - `TimerState.fastStartTimestamp` — epoch seconds; 0 = no running fast.
 - `TimerState.goalHours` — pinned at `.started` and carried until the cycle ends, so a plan change mid-fast, or losing Pro under a custom goal, cannot rewrite the goal of a running fast, move its push, or flip the `completed` flag it is recorded with. 0 = not pinned (no cycle, or state persisted before the field existed); readers fall back to the plan.
-- `TimerState.stagedElapsed` — persisted: a value above 0 with no fast running *is* the result screen (`screenState`); without it a cold start on that screen falls back to idle and the ended fast never opens its eating window.
+- `TimerState.stagedElapsed` — persisted: a value above 0 with no fast running *is* the result screen (`screenState(at:plan:)`); without it a cold start on that screen falls back to idle and the ended fast never opens its eating window.
 - `TimerState.fastEndTimestamp` — the moment the user confirmed the ending; 0 = none on the table. It must outlive the fast: `.stopped` clears `fastStartTimestamp`, and without this the result screen has no absolute time, so the window could only open from the tap instead of from the meal. Persisted with `stagedElapsed` so a window opened from a restored result screen still anchors to the meal.
 - `TimerState.completedSessionsCount` — fasts that reached the goal; gates the review prompt.
 - `TimerState.hasCelebrated` — persisted so relaunching mid-overtime restores the steady end-state without replaying the goal moment.
@@ -33,12 +19,39 @@ Why the timer feature's code is the way it is. Read the section of a file before
 - `TimerState.streak(ownsFreeze:)` — the only thing screens should project, so the missed-day rule is applied once. `ownsFreeze` comes from the entitlement, which this substate deliberately does not hold; callers use `AppState.streak`.
 - `TimerState.resolvedGoalHours(planHours:)` — the single definition of the pinned-or-plan fallback; every screen, push, record and event asks here.
 - `TimerState.startTimestamp(at:)` — shifts the start back by what is staged so the count carries on. Staged time arrives two ways (a back-dated last meal, an undone ending) with the same arithmetic. One definition: if elapsed ever grows a rule (pause, segmented count), a second copy would compile with the old one and only its screen would be wrong.
+- `TimerState.elapsed(at:)` — the single definition of how long the cycle has run: from the start while running (floored at 0, so a start a moment ahead of the clock reads 0, not negative), the staged value otherwise. The screen, the end-of-fast sheet, the time adjuster, the reset event and the offer tint all ask here; written out per caller, a pause or a segmented count would compile in one and be missed in the others.
 - `TimerState.eatingEndTimestamp(plan:)` — the single definition of the window's close moment (countdown card, window-closed push, chained fast, last-meal seed). Meaningless while `isEating` is false. Takes a `Plan`, not hours, on purpose: *why* the window is that long is stated once in `Plan.windowHours`, and a plan cannot be confused at the call site with the goal length — `windowHours: activeGoalHours` would have compiled and produced a 16-hour window instead of 8. Pass `AppState.activePlan` (the plan the cycle runs to), not `planState.plan` (merely what is selected).
+- `TimerState.eatingRemaining(at:plan:)` / `.eatingOverElapsed(at:plan:)` — the two sides of the window's close, both floored at 0: the countdown card and the count-up on the chain screen.
+- `TimerState.screenState(at:plan:)` — which of the six frames the cycle is in. An open eating window shows the countdown until it closes; once closed, the chain screen (count-up + Continue fasting) holds for `closedWindowHorizon` (24h), then falls to idle. Stopped with time staged is the result screen. Running past the goal is `.goalReached` (overtime), otherwise `.active`. One definition for the timer screen and for the offer tint (`AppState.offerPhase(at:)`), which must agree with the screen it was called from on whether a window is up. Pass `AppState.activePlan`: its hours are the goal the cycle runs to.
 - `TimerState.windowEndTimestamp(openedAt:plan:)` — the same arithmetic, named for a window not yet opened: the one a result screen would open from its confirmed ending.
 - `TimerState.closedWindowHorizon` — one horizon for both screens that sit on a window: the window-closed chain screen and the result screen whose window was never opened.
 - `TimerState.closedWindowHasLapsed(closedAt:now:)` — the single comparison against the horizon (invariant 12).
 - `TimerState.droppingLapsedEnding(at:plan:)` — the result screen is persisted so iOS unloading the app does not lose it, but restored without a limit a week later "Start eating" would open a window anchored a week back. Held only while the window it would open (from the confirmed ending, as `StartEatingThunk` anchors it, under `AppState.activePlan`) is inside the closed-window horizon; past that it becomes `withoutCycle()` — the idle `.reset` leaves, minus the event. No confirmed moment (`fastEndTimestamp == 0`) = cleared as lapsed.
 - `TimerState.withoutCycle()` — the single definition of idle: `.reset` and `droppingLapsedEnding` both land here so they cannot disagree about what is left (sessions count and streak kept). The pinned goal goes with the cycle: the next fast starts from the plan as it stands then.
+
+## StreakStatus.swift
+
+- `StreakStatus` — the run length and the day it was last extended travel together on purpose: a screen holding only the counter cannot apply the missed-day rule, and two screens would show two numbers for one state.
+- `StreakStatus.ownsFreeze` — whether the install holds Pro (owns the protected day). Not stored with the streak: handed in by whoever projects it (`AppState.streak`, `TimerAction.goalCelebrated`), because the entitlement has exactly one home and the streak is not it.
+- `StreakStatus.freezeCovers(_:)` — the single definition of the three freeze conditions; the projection and the reducer that spends the freeze both ask here:
+  - exactly one calendar day was missed (`dayKey` two days after the last goal); two missed days are a hard reset — one protected day protects one day;
+  - the install owns Pro; without it a missed day resets;
+  - the month is unspent. The month charged is the month of the *missed day*, not of the goal after it: the benefit protects a day, so that day decides who pays. This is what makes a day missed on the 31st and one missed on the 1st two different months' business — the plain reading of "one per calendar month".
+- `StreakStatus.freezeMonthCharged(afterGoalOn:)` — the single definition of who pays: the check, the debit in `freezeMonth(coveringGapTo:)` and the `-seedFreezeSpent` test hook all ask here. Written out in each, the rule could change in one place and still compile elsewhere — a hook charging the old month would turn the "one per calendar month" flow green while the freeze is still available.
+- `StreakStatus.freezeMonth(coveringGapTo:)` — returns nil when there is no gap. Paired with `freezeCovers(_:)` so the month-picking rule is written once and the reducer reads the answer instead of recomputing which day was missed.
+- `StreakStatus.displayed(at:)` — 0 once a day was missed (last goal before yesterday) unless the protected day still stands in the gap; the persisted counter is only rewritten on the next goal. The freeze is applied to what is *shown*, not only when the next goal banks it: the promise sold is that the run does not break, and a counter that drops to 0 for a day has already broken it where the user can see. Reading `ownsFreeze` as it stands *now* is all of edge 8: buying Pro during the gap day restores the run, buying a day later does not — the 24-hour window stated in days.
+- `StreakStatus.lostRunFreshnessDays` — how long a just-broken run keeps being named, in days from the last goal. Needed because `count` is not rewritten until the next goal: without it someone who missed a day in March would read "that streak ended at six days" in June. Past it the state is plain "no streak", not a second kind of silence.
+- `StreakStatus.display(at:)` — the single projection of the three states, so the header pill and the summary card cannot disagree. `.justEnded` carries the persisted counter, never `bestStreak`: the best run is recomputed from history rows and after an update from 1.4.4 can be *smaller* than the run actually lost — naming a number below the one the person remembers is worse than naming none.
+
+## StreakDisplay.swift
+
+- `StreakDisplay` — a separate type rather than `Int` + `Bool`: both surfaces pick one of three branches, and the pair spells two of them the same way (0 and "just ended at 0") while allowing a fourth that cannot happen. `.justEnded` = a run that broke inside the freshness window; `.none` = never started, or the lost run is no longer news.
+- `StreakDisplay.count` / `.hasEnded` — the single definitions both surfaces read (count, drained accent, past-tense overline, the sentence) instead of unwrapping the cases themselves.
+- `StreakDisplay.lastGoalDate` — kept in the projection so the history can say when the displayed number happened, without the compact header badge carrying or formatting a date.
+
+## TimerScreenState.swift
+
+- `TimerScreenState` — the six frames a cycle can be in, as the timer screen draws them. A domain type rather than nested in the screen: the offer tint, presented from the root, branches on it too, and a type owned by one screen would make the root depend on that screen.
 
 ## TimerAction.swift
 
@@ -106,7 +119,7 @@ Why the timer feature's code is the way it is. Read the section of a file before
 - `CompleteFooterCard` resume — the undo sits on the same quiet material as the sentence explaining it (warning and way out visibly one family). 50pt tall so the only reversible control is not the one thing below the HIG minimum, and because rank resting on grey does not survive Arabic, where grey semibold reads stronger. No chevron (it goes nowhere); no lead-in like "Ended by mistake?" — that frames the tap as a confession.
 - `View.endFastAvailability(_:)` — the one place the unavailable look of "End fast" is defined, so the two footers cannot drift. `.disabled` alone is invisible: the button paints its own fill, which no system style dims.
 
-## GoalCelebration.swift
+## GoalMomentView.swift
 
 - `GoalMomentView` — a pure view: the parent owns the animation values so the one-shot moment plays only on a genuine live crossing, and relaunching mid-overtime restores the settled end-state with no replay. `sealScale`: 0 hidden, 1 full; `sweepAngle`: degrees, 0...360.
 - `GoalMomentView.sealDiameter` — shared with `PhaseRing`, which opens its arc around a seal this size; the seal's place is a real break in the ring, not a disc painted over it.
@@ -298,7 +311,7 @@ Why the timer feature's code is the way it is. Read the section of a file before
 ## ResetFastThunk.swift
 
 - `ResetFastThunk` — reset is not a completed session: no review prompt.
-- `ResetFastThunk.execute` — `now` / elapsed — resolved exactly as `StopFastThunk` does: this is the last point where elapsed exists. `fast_reset.elapsed_minutes` separates a start-time correction (minutes) from giving up (hours).
+- `ResetFastThunk.execute` — `now` / elapsed — read here and asked of `TimerState.elapsed(at:)`: this is the last point where elapsed exists. `fast_reset.elapsed_minutes` separates a start-time correction (minutes) from giving up (hours).
 - `ResetFastThunk.execute` — `ProAction.autoOfferCancelled` — reset out of the complete state means "this fast was rubbish"; selling a lifetime purchase on it would spend the install's one show on its worst second. Suppression, not consumption: the flag is untouched and the next qualified fast arms a new show.
 
 ## ResumeFastThunk.swift

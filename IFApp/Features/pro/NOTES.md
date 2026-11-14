@@ -4,16 +4,29 @@ Why the paid tier's code is the way it is. Read the section of a file before edi
 
 Codes used below: T1' / T2 / T3 / T4 are the offer's trigger rules and S1-S6 the offer screen's states, both from the paywall spec and handoff; "edge N" is the spec's numbered edge case.
 
-## Pro.swift
+## AppState+OfferPhase.swift
+
+- `AppState.offerPhase(at:)` — the offer inherits the phase of the screen it was called from; an open or closed eating window has no phase on screen, so the offer takes `.fat`, the neutral green its backdrop already uses. Returns a `Phase`, not a colour: the caller asks `Phase.color`. Lives on `AppState`, not on a screen's props, because the host that needs it (`AppFlowView`, which presents the offer) is not the screen the tint describes; reading it off the timer's props would make the root build another screen's whole projection for one colour. The window branch is asked of `TimerState.screenState(at:plan:)`, so the tint and the timer cannot disagree on whether a window is up (invariant 8). `now` is an argument (invariants 1 and 6).
+
+## ProCatalog.swift
+
+- `ProCatalog.productID` — must match, character for character, the in-app purchase in App Store Connect (Apple ID 6798140298) and the one in `IFApp.storekit` used for local testing. Not derived from the bundle id: `simple-L.if-app.com` has dashes, and Apple allows only letters, digits, underscores and dots in a product identifier. Permanent — a deleted product does not release its id for reuse.
+
+## Entitlement.swift
 
 - `Entitlement` — the vocabulary of the paid tier is one non-consumable, bought once, kept for good: no subscription, no renewal, no account, so "does this install own Pro" is the whole model. Three states, not two: on a fresh install that has never reached the store, "we have not checked" is a different fact from "not bought", and reading the first as the second tells a paying user their purchase is gone (edge 16).
-- `ProCatalog.productID` — must match, character for character, the in-app purchase in App Store Connect (Apple ID 6798140298) and the one in `IFApp.storekit` used for local testing. Not derived from the bundle id: `simple-L.if-app.com` has dashes, and Apple allows only letters, digits, underscores and dots in a product identifier. Permanent — a deleted product does not release its id for reuse.
 - `Entitlement.unknown` — not verified yet. Gating behaves as `free` (Pro is never handed out on a guess), but the offer never opens by itself here, and a tap on a lock leads to "purchases not checked yet" with Restore as the first action.
 - `Entitlement.isLocked` — `unknown` locks like `free` on purpose.
 - `Entitlement.analyticsValue` — the `pro_status` user property: a fixed, unlocalised list. `unknown` is a value of its own, not folded into `free`, or the property would say the app knows something it does not.
+
+## OfferQualification.swift
+
 - `OfferQualification` — which finished fasts may carry the one-time offer (T1'). A fast abandoned in the first minutes does not qualify, for two reasons pulling the same way: the first paid request in someone's life should not land on their first failure, and such a fast must not spend the single show this install will ever get.
 - `OfferQualification.minimumGoalFraction` — a constant, not logic: the final value comes from the distribution of `fast_stopped.duration_hours`, so tuning it is changing this number and nothing else.
 - `OfferQualification.qualifies(elapsed:goalHours:)` — reaching the goal needs no branch: a fast at its goal is at 100%, past the fraction. `goalHours` is the goal the fast actually ran to (`AppState.activeGoalHours`), not the plan as it stands now: a plan changed mid-fast must not re-decide whether the fast that just ended earned an offer.
+
+## PaywallTrigger.swift
+
 - `PaywallTrigger` — where the offer was opened from. Raw values are the GA4 `trigger` parameter: a fixed ASCII list, never a string that also appears on screen. Named after the action, not the ordinal — the offer routinely appears on a third or fifth fast, so `first_fast` would describe something that did not happen. This is the analytics parameter, not a presentation router.
 - `PaywallTrigger.fastFinished` — T1': the first qualified finished fast, after the user left the complete state.
 - `PaywallTrigger.planCustom` — T3: the Custom row in the plan editor.
@@ -22,20 +35,38 @@ Codes used below: T1' / T2 / T3 / T4 are the offer's trigger rules and S1-S6 the
 - `PaywallTrigger.historyExport` — the locked export row in History. Split out of `manual` because it is the one permanent entry whose door names a single benefit: someone tapping a padlock on "History as CSV" has already said which of the three they came for, and the offer leads with it. Folded into `manual`, neither half could be read — the distribution would mix "went looking for the offer" with "asked for the export", and the offer would open on the wrong benefit.
 - `PaywallTrigger.home` — the Pro control in the timer header. Kept apart from `manual` on purpose: `manual` means "the user went looking for the offer", this means "the door was on screen and got tapped", and the hypothesis behind a home-screen door is that it becomes the main manual entry. Folded in, the distribution over triggers — the number the release is read by — would be unreadable.
 - `PaywallTrigger.unknown` — no entry point on record. Not a door and never dispatched: what reporting falls back to for an event raised while no offer is open (today, restore run from the About sheet's own button). It exists so that "we do not know" is visibly absent from the distribution rather than hidden inside a door — without it `manual` would double as the fallback, and a restore nobody opened an offer for would inflate the very door `home` is compared against.
+
+## PurchaseFailure.swift
+
 - `PurchaseFailure` — raw values are the GA4 `reason` parameter, same fixed-list rule as `trigger`.
 - `PurchaseFailure.cancelled` — the user backed out of Apple's sheet; not an error state on screen.
 - `PurchaseFailure.network` — the one distinction the offer's error state renders differently: two bodies, one visual state.
 - `PurchaseFailure.pending` — Ask to Buy: the purchase is waiting for someone else's approval.
+
+## ProProductInfo.swift
+
 - `ProProductInfo.displayPrice` — the store's own formatted price ("$6.99", "¥1,000", "COP 29.900,00"), rendered as one string and never taken apart: currency position, digits and separators are the storefront's business.
+
+## EntitlementSource.swift
+
 - `EntitlementSource` — how the right arrived. It never changes what the user owns or what the confirmation frame looks like, only the words on it: "you just paid", "your purchase came back" and "someone approved it for you" are three different things to happen to you and one thing to own.
+
+## PurchasePhase.swift
+
 - `PurchasePhase` — what the purchase machinery is doing now; about the attempt in progress, not about what the user owns.
 - `PurchasePhase.purchasing` — Apple's sheet is up or the transaction is being settled.
 - `PurchasePhase.awaitingApproval` — Ask to Buy, waiting for a parent's approval. Not a failure the user caused; resolves later through `Transaction.updates`, with no relaunch.
 - `PurchasePhase.granted` — the right is in hand and not yet confirmed to the user. Every way of coming by it lands here: money changing hands is not allowed to be quieter than a free Restore.
 - `PurchasePhase.outlivesOffer` — whether the phase describes something still happening off the offer screen and so survives it opening or closing. Ask to Buy is the only one: the request is out with whoever approves it and resolves through `Transaction.updates` whenever they get to it, possibly long after the user walked away. Every other phase is feedback about one presentation and says nothing about the next (edge 18).
+
+## ProNotice.swift
+
 - `ProNotice` — the two things the app has to say after the entitlement goes away. They share one sheet and differ only in when it appears: the first at the next neutral moment, the second at the next fast that runs to a different goal. Never shown together: told at once, "Pro is gone" swallows "and your goal is now sixteen hours", and the second is the one that changes what the timer does.
 - `ProNotice.entitlementRevoked` — edge 6. The reason is never named: a refund and leaving a Family Sharing group are the same fact to the user, and one key covers both.
 - `ProNotice.goalChanged` — edge 17, the other half of edge 9: the fast in flight was allowed to finish on its custom goal, so the next one starting shorter has to be said out loud.
+
+## OfferState.swift
+
 - `OfferState` — the six states of the offer screen as one value. They replace each other in place — no navigation, one grid — so the screen renders this and nothing else.
 - `OfferState.offer` — S1, the offer itself.
 - `OfferState.purchasing` — S2, a purchase under way.
@@ -123,10 +154,13 @@ Codes used below: T1' / T2 / T3 / T4 are the offer's trigger rules and S1-S6 the
 - `PaywallView.framingLine` — the framing line introduces the lead benefit, so it moves with it: one line per lead, decided by the same `trigger` switch that orders `benefits`. Two independent expressions would let the sentence introduce a benefit the list no longer starts with — a padlock on "History as CSV" opening an offer whose first sentence is about plan length.
 - `PaywallView.benefits` — from a broken streak the protected day leads: it is the thing that just failed. From the locked export the export leads, for the stronger version of the same reason — the person asked for it by name. Everywhere else the person has never seen a streak badge, and a freeze would be insurance against an event they do not know exists.
 - `PaywallView.wedgeColor` — the wedge dims with the price block rather than on its own ladder. Left at `--secondary` it became the darkest thing on screen exactly where the price above it stands back, and the wedge is an argument for the price, so it cannot outrank it.
-- `PaywallBackdrop` — the offer's opaque surface: the theme's base colour with the phase glow, tinted by the phase the user came from so the offer stays attached to the screen that called it. A type of its own, drawn by the flow *outside* the part that switches: the six states replace each other by identity and cross-fade, and mid-fade both layers stand at partial alpha, so a background inside the switched layer stops being one for the length of the transition (the timer read through the offer on the way into Confirming and again after the charge went through). Anything opaque belongs on this side of the `.id`.
-- `PaywallBackdrop.body` — the handoff's tint is `radial-gradient(130% 55% at 50% 0%, phase 16%, transparent 72%)`. Those two numbers are *radii* — 1.3 screen widths across and 0.55 heights down from a centre on the top edge — so the ellipse's box is twice each, and the strong end of the gradient lands on the top edge of the screen. Using the radii as the box puts the core a quarter screen above the screen and leaves only the faded tail visible (5-7% instead of 16%). Drawn as a circular ramp squashed into the ellipse rather than with `EllipticalGradient`: the CSS ramp is linear in alpha and ends at a stated fraction of the radius, while `endRadiusFraction` is a fraction of a size SwiftUI does not name (measured against the handoff it ran a third of a screen long); `startRadius`/`endRadius` are points, so the 72% stop is the CSS number rather than a fitted value. The far stop keeps the phase's hue and drops only alpha: fading to `.clear` fades towards transparent *black* and prints a grey haze halfway down the light theme.
 - `OfferButton` — its own type rather than `PrimaryButton`: 54pt on a 16pt radius with a 600 label, a disabled shape flat on the track colour, and an optional spinner — none of which the footer's button needs. The shadow is `--shadow-cta`, not the footer button's glow: in the dark theme the handoff drops the green halo for plain black, so the button sits on the surface instead of lighting it.
 - `Spinner` — a quarter arc turning at a constant rate over a faint full ring. Pinned left-to-right: a spinner that reverses in Arabic reads as undoing rather than working.
+
+## PaywallBackdrop.swift
+
+- `PaywallBackdrop` — the offer's opaque surface: the theme's base colour with the phase glow, tinted by the phase the user came from so the offer stays attached to the screen that called it. A type of its own, drawn by the flow *outside* the part that switches: the six states replace each other by identity and cross-fade, and mid-fade both layers stand at partial alpha, so a background inside the switched layer stops being one for the length of the transition (the timer read through the offer on the way into Confirming and again after the charge went through). Anything opaque belongs on this side of the `.id`.
+- `PaywallBackdrop.body` — the handoff's tint is `radial-gradient(130% 55% at 50% 0%, phase 16%, transparent 72%)`. Those two numbers are *radii* — 1.3 screen widths across and 0.55 heights down from a centre on the top edge — so the ellipse's box is twice each, and the strong end of the gradient lands on the top edge of the screen. Using the radii as the box puts the core a quarter screen above the screen and leaves only the faded tail visible (5-7% instead of 16%). Drawn as a circular ramp squashed into the ellipse rather than with `EllipticalGradient`: the CSS ramp is linear in alpha and ends at a stated fraction of the radius, while `endRadiusFraction` is a fraction of a size SwiftUI does not name (measured against the handoff it ran a third of a screen long); `startRadius`/`endRadius` are points, so the 72% stop is the CSS number rather than a fitted value. The far stop keeps the phase's hue and drops only alpha: fading to `.clear` fades towards transparent *black* and prints a grey haze halfway down the light theme.
 
 ## PurchaseProThunk.swift
 

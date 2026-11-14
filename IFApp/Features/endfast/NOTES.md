@@ -7,11 +7,6 @@ State names S1-S4 are the sheet's four cards from its handoff: S1 the ordinary p
 ## EndFastState.swift
 
 - `EndFastState` — the sheet's single source of truth. A mirror of the last-meal picker asking about the other end of the fast: not "when did it start" but "when did it end", which without the sheet is the moment of the tap with no way to say otherwise.
-- `EndFastEntry` — how the sheet was entered, which decides the picker state drawn. Captured once by `OpenEndFastThunk`, not recomputed from the clock while the sheet is up: the card must not change shape under the user's finger — a fast 15:00 short of its goal stays `nearGoal` while the minute rolls over. It also keeps the clock out of the reducer (invariant 1): every branch is decided from an injected payload.
-- `EndFastEntry.ordinary` — S1: the goal is still far off, or passed recently enough that there is nothing extra to say.
-- `EndFastEntry.nearGoal` — S2: whole minutes left to the goal, 1...15.
-- `EndFastEntry.overtime` — S3: entered past the neutral-copy threshold — the person forgot to stop and came to correct rather than to confirm.
-- `EndFastStage` — which of the four mutually exclusive cards is on screen. Derived, never stored: two facts decide it (how the sheet was entered, and whether the current choice collides with a saved fast), and a third copy of that decision is how a header ends up over a body it no longer describes.
 - `EndFastState.nearGoalThresholdMinutes` — exactly 15 whole minutes: at 15:00 left the state is on, at 15:01 it is off.
 - `EndFastState.overtimeNeutralThreshold` — how far past the goal a fast runs before the app stops encouraging and offers the correction instead. One constant, read by both surfaces of one fast: this sheet's S3 (`OpenEndFastThunk`) and the main screen's editorial copy (`TimerFlowView.editorial(state:progress:elapsed:)`). If only one reads it, the main screen goes on praising "deeper autophagy" at hour 41 while the sheet behind the same button offers to correct the fast.
 - `EndFastState.minimumFastDuration` — the nearest a chosen end may come to the start; under a minute apart the two are the same moment and the record is not a fast.
@@ -20,6 +15,17 @@ State names S1-S4 are the sheet's four cards from its handoff: S1 the ordinary p
 - `EndFastState.conflict` — non-nil is the whole of the refusal state (S4); there is no separate flag to disagree with it.
 - `EndFastState.conflictUnavoidable` — the collision is on the fast's own start, so no end can clear it: the refusal drops "pick another time" (which would only loop) and leaves removing the old record as the one way out.
 - `EndFastState.showsStepper` — the exact-time control and its divider leave S2 and only S2: whoever pressed End fast that close to the goal is confirming a moment, not authoring one, and the freed height pays for the second action inside the sheet's height budget. S3 is where precision is the point, so it keeps them.
+
+## EndFastEntry.swift
+
+- `EndFastEntry` — how the sheet was entered, which decides the picker state drawn. Captured once by `OpenEndFastThunk`, not recomputed from the clock while the sheet is up: the card must not change shape under the user's finger — a fast 15:00 short of its goal stays `nearGoal` while the minute rolls over. It also keeps the clock out of the reducer (invariant 1): every branch is decided from an injected payload.
+- `EndFastEntry.ordinary` — S1: the goal is still far off, or passed recently enough that there is nothing extra to say.
+- `EndFastEntry.nearGoal` — S2: whole minutes left to the goal, 1...15.
+- `EndFastEntry.overtime` — S3: entered past the neutral-copy threshold — the person forgot to stop and came to correct rather than to confirm.
+
+## EndFastStage.swift
+
+- `EndFastStage` — which of the four mutually exclusive cards is on screen. Derived, never stored: two facts decide it (how the sheet was entered, and whether the current choice collides with a saved fast), and a third copy of that decision is how a header ends up over a body it no longer describes.
 
 ## EndFastAction.swift
 
@@ -37,9 +43,6 @@ State names S1-S4 are the sheet's four cards from its handoff: S1 the ordinary p
 ## EndFastMath.swift
 
 - `EndFastMath` — pure; "now" is injected, so none of it reads the clock from a view.
-- `EndFastChipOffset` — what a preset means, independent of when it is tapped. The row hands this back rather than an absolute moment: the sheet is drawn from a `TimelineView` that redraws every second, so a moment resolved at draw time is the moment of a *frame*, not of the tap. `EndFastMath.resolve` turns it into an instant once, inside the thunk.
-- `EndFastChipOffset.daysBack` — whole days back from the standing choice, keeping its clock time: the overtime presets.
-- `EndFastChip` — offset and label travel together because the label is a statement *about* the offset; built separately they drift, and a chip says "1 h ago" and sets something else.
 - `EndFastMath.quickOffsetsMinutes` — `Just now` is an offset of zero rather than a special case, so the presets are one list and no chip can lack a moment behind it.
 - `EndFastMath.chips(stage:now:selected:)` — the shape is the state's business: minutes-ago while the ending is recent, whole past days once the timer ran a day or more past the goal ("30 min ago" offers nothing to someone correcting a fast forgotten for two days). The overtime presets keep the clock time of the standing choice (which starts on the goal end) on each of the three days before today: the one hour the app can justify, without inventing a dinner time it cannot know.
 - `EndFastMath.resolve(_:now:selected:)` — the one definition of the instant a chip stands for: the row calls it to build labels, the thunk to set the value, so a chip cannot say one moment and select another.
@@ -51,15 +54,27 @@ State names S1-S4 are the sheet's four cards from its handoff: S1 the ordinary p
 - `EndFastMath.recordSpan(_:now:)` — both ends of the conflicting fast, because one of them is what the person must move away from and they cannot tell which without the span. The span never breaks across lines: an ASCII hyphen with ordinary spaces gives the layout two break points inside one value ("(Yesterday 9:00 -" / "1:10)"), and the line that names the conflict reads as two unrelated times (found by the Korean and Japanese passes).
 - `EndFastMath.spanSeparator` — non-breaking spaces around the hyphen everywhere; in Japanese the full-width wave dash (12:00〜21:45) with no spaces, since it carries its own side bearings.
 
+## EndFastChipOffset.swift
+
+- `EndFastChipOffset` — what a preset means, independent of when it is tapped. The row hands this back rather than an absolute moment: the sheet is drawn from a `TimelineView` that redraws every second, so a moment resolved at draw time is the moment of a *frame*, not of the tap. `EndFastMath.resolve` turns it into an instant once, inside the thunk.
+- `EndFastChipOffset.daysBack` — whole days back from the standing choice, keeping its clock time: the overtime presets.
+
+## EndFastChip.swift
+
+- `EndFastChip` — offset and label travel together because the label is a statement *about* the offset; built separately they drift, and a chip says "1 h ago" and sets something else.
+
 ## OpenEndFastThunk.swift
 
 - `OpenEndFastThunk` — "End fast" does not end the fast: it opens the correction sheet, and the fast keeps running until the sheet is confirmed. That makes a mis-tap reversible without an undo, and lets someone who forgot to stop say when they actually ate.
 - `OpenEndFastThunk.execute(state:dispatch:)` — one reading of the clock, and everything the four states branch on is resolved from it. Read twice, the state the sheet opens in and the range it clamps to could disagree by a second — and the second that matters is the one either side of the near-goal threshold.
 - `OpenEndFastThunk.execute(state:dispatch:)` — overtime default — past the threshold the default end stops being "just now": someone a day or more past their goal is here to correct, and the moment they most plausibly mean is the one the goal ran out on.
 
-## EndFastPickThunk.swift
+## EndFastChipThunk.swift
 
 - `EndFastChipThunk` — the two controls that move the choice go through a thunk because the right edge of the range is "now" and moves while the sheet is open; a clamp against the bound captured at open would let the future through the moment the user paused to read. The chip's moment is resolved here, at the tap: the sheet redraws every second, so a moment resolved in the view is that of whichever frame the finger landed on.
+
+## EndFastStepThunk.swift
+
 - `EndFastStepThunk` — the exact-time control, ± one step, carrying a fresh `latest` for the same reason.
 
 ## ConfirmEndFastThunk.swift

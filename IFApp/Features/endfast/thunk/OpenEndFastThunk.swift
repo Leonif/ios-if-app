@@ -13,7 +13,7 @@ struct OpenEndFastThunk: Thunk {
         guard timer.isRunning, timer.fastStartTimestamp > 0 else { return }
 
         let now = Clock.now().timeIntervalSince1970
-        let elapsed = max(0, now - timer.fastStartTimestamp)
+        let elapsed = timer.elapsed(at: now)
         let goalSeconds = app.activeGoalHours * 3600
         let secondsLeft = goalSeconds - elapsed
 

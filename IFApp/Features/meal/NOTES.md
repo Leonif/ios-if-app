@@ -15,7 +15,13 @@ Why the last-meal picker's code is the way it is. Read the section of a file bef
 - `MealState.markPickerOpened()` — overwrites unconditionally: the answer to put back is the one on screen this time, never one from a sheet two openings ago.
 - `MealState.revertToRestorePoint()` — spends the restore point. Confirming does not come through here; it keeps what was chosen.
 - `MealState.forgetRestorePoint()` — the answer the point described no longer exists to go back to.
+
+## MealInputMethod.swift
+
 - `MealInputMethod` — a GA4 dimension: raw values are fixed ASCII, never localised. Three are the ways a person answers (chip, ribbon, exact); `untouched` is a sheet confirmed as it stood and `seeded` a value the app put there from the closed eating window. Folding either into the three would report taps that never happened — the error that made `backdated` unreadable.
+
+## MealChip.swift
+
 - `MealChip` — all but `lastNight` are fixed offsets from now; `lastNight` resolves against the clock in `PickMealChipThunk`.
 - `MealChip.lastNightMinuteOfDay` — the evening "Last night" means: the most recent 9 PM that has passed.
 - `MealChip.lastNightFloor` — below this the reading is absurd (tonight, minutes ago), so the chip steps back one more evening.
@@ -82,7 +88,10 @@ Why the last-meal picker's code is the way it is. Read the section of a file bef
 ## MealFeedbackThunk.swift
 
 - `MealFeedbackThunk` — the ribbon decides *whether* to ask (it owns the velocity and the throttle); touching the taptic engine is a side effect, so it happens here, not in the view.
-- `MealScrubFeedback.begin` — nothing to feel yet; only warms the engine.
 - `Taptic` — the generators outlive a single tick on purpose: a fresh generator has to wake the taptic engine, late enough that the first click of a drag is late or lost, and the scrub feels like silence followed by a rattle. Kept alive and re-armed after every fire, the ribbon clicks like a system picker.
 - `MealFeedbackThunk.execute(state:dispatch:)` — `.step` re-arms straight away: the next step is at most 45 ms out (the ribbon's throttle in `MealScaleRibbon`).
 - `MealFeedbackThunk.execute(state:dispatch:)` — `.edge` — the tick label at the end reads "7d"; a screen reader gets the sentence, since it has no end-stop to feel.
+
+## MealScrubFeedback.swift
+
+- `MealScrubFeedback.begin` — nothing to feel yet; only warms the engine.

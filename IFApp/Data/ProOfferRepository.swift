@@ -5,11 +5,6 @@
 
 import Foundation
 
-protocol ProOfferRepositoryProtocol {
-    func wasOfferShown() -> Bool
-    func markOfferShown()
-}
-
 struct ProOfferRepository: ProOfferRepositoryProtocol {
     private enum Key {
         static let offerShown = "pro_offer_shown"

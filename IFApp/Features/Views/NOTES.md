@@ -5,9 +5,6 @@ Why the About IF24 sheet and the source reader are the way they are. Read the se
 ## AboutIF24View.swift
 
 - `AboutIF24View` — the app's own document, not a science note: the order of the sections sets its class. Pro first (status, the way into the offer, Restore), then Sunnah, then privacy, then the research, with the medical note closing the science section rather than sitting under a commercial row. Restore lives in the first section a person looks in after changing phone — the reason this sheet exists instead of a settings screen.
-- `ProRowStatus` — what the Pro row's right-hand column says. The axis is the state of the entitlement — never the tier, the purchase or the price.
-- `ProRowStatus.notCheckedYet` — nothing checked yet. Gating behaves as free, but the row never says "inactive": caution earns a lock, not a claim.
-- `ProRowStatus.opensOffer` — active is the one state with nothing to open: the offer must not appear for someone who already owns it, so the row loses its chevron and takes a check. This is the About door's own guard (see `proReducer` in `Features/pro/NOTES.md`).
 - `AboutIF24View.showsNothingToRestore` — restore ran from this sheet and found nothing. Where the status moved, that is the feedback; where it did not, this line is.
 - `AboutIF24View.onSunnah` — the second door into the Sunnah reminders screen. Without it the free headline feature was reachable only through the pencil inside the plan pill — a control whose whole promise is that it edits the plan.
 - `AboutIF24View.onOpenSource` — the reader left for the paper itself. The article id travels because the funnel is counted per paper; the URL is the one thing the event must not carry.
@@ -31,12 +28,21 @@ Why the About IF24 sheet and the source reader are the way they are. Read the se
 - `AboutIF24View.chevron(_:)` — `chevron.forward`, not `chevron.right`: a disclosure indicator points ahead, and ahead is leftward in Arabic; the absolute glyph would stay aimed right after the row mirrored, back at the label it leads away from.
 - `ExternalLinkArrow` — `arrow.up.right` mirrored by hand: SF Symbols leaves it pointing the same way in right-to-left layout, and an outbound arrow pointing into the text is the one glyph whose direction carries meaning.
 
+## ProRowStatus.swift
+
+- `ProRowStatus` — what the Pro row's right-hand column says. The axis is the state of the entitlement — never the tier, the purchase or the price.
+- `ProRowStatus.notCheckedYet` — nothing checked yet. Gating behaves as free, but the row never says "inactive": caution earns a lock, not a claim.
+- `ProRowStatus.opensOffer` — active is the one state with nothing to open: the offer must not appear for someone who already owns it, so the row loses its chevron and takes a check. This is the About door's own guard (see `proReducer` in `Features/pro/NOTES.md`).
+
 ## SourceArticleView.swift
 
-- `SourceArticle` — bundled editorial content: reading never requires a network connection.
 - `ArticleFootOffsetKey` — how far the foot of the article sits below the top of the reader's visible area. A preference rather than an `onChange` inside the `GeometryReader`: the reader closure is not re-run for a position that moves without a size changing, so an observer there never hears the scroll (measured: silent all the way to the bottom).
 - `SourceArticleView.onReachedEnd` — called once per reading; whoever presents the reader keeps the answer and spends it when the sheet closes.
 - `SourceArticleView.reportedEnd` — `onReachedEnd` already spent: scrolling back up and down again is the same reading.
 - `SourceArticleView.body` — the viewport height is read from the enclosing `GeometryReader`, not measured into state: the foot's position is compared against it on every scroll, and a second measurement landing in `@State` is a second update with its own ordering — the comparison would run against a height of zero that has not arrived yet.
 - `SourceArticleView.body` — `SourceReaderStrings.editorial` — the medical disclaimer rides inside the editorial line and stays a quiet signature: presence and legibility are what the note is for, not volume.
 - `SourceArticleView.endMarker` — a one-point marker at the foot of the article; when it enters the visible part of the scroll view the end has been seen. That is the whole "read or merely opened" signal, at the cost of one invisible row rather than a rebuilt layout or a scroll observer. An article shorter than the sheet reports immediately, and rightly: its end is on screen from the first frame.
+
+## SourceArticle.swift
+
+- `SourceArticle` — bundled editorial content: reading never requires a network connection.

@@ -6,25 +6,17 @@
 import SwiftUI
 import Redux
 
-private struct AppProps: Equatable {
-    let offerOpen: Bool
-
-    init(state: AppState) {
-        offerOpen = state.proState.isOfferOpen
-    }
-}
-
 struct AppFlowView: View {
     let store: Store<AppState>
 
-    @State private var props: AppProps
+    @State private var props: Props
     @State private var offerTint: Color
 
     init(store: Store<AppState>) {
         self.store = store
         let state = store.getCurrentState()
-        _props = State(initialValue: AppProps(state: state))
-        _offerTint = State(initialValue: TimerScreenProps(state: state).offerPhaseColor())
+        _props = State(initialValue: Props(state: state))
+        _offerTint = State(initialValue: state.offerPhase(at: Date().timeIntervalSince1970).color)
     }
 
     var body: some View {
@@ -39,13 +31,11 @@ struct AppFlowView: View {
         }
         .animation(.easeOut(duration: 0.2), value: props.offerOpen)
         .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-        .connect(to: store, mapState: { AppProps(state: $0) }, onPropsChange: { next in
-            if next.offerOpen && !props.offerOpen { offerTint = offerPhaseColor() }
+        .connect(to: store, mapState: { Props(state: $0) }, onPropsChange: { next in
+            if next.offerOpen && !props.offerOpen {
+                offerTint = store.getCurrentState().offerPhase(at: Date().timeIntervalSince1970).color
+            }
             props = next
         })
-    }
-
-    private func offerPhaseColor() -> Color {
-        TimerScreenProps(state: store.getCurrentState()).offerPhaseColor()
     }
 }

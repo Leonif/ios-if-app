@@ -15,9 +15,19 @@ Why the Sunnah reminders code is the way it is. Read the section of a file befor
 
 ## SunnahState.swift
 
+- `SunnahState.Delivery.resolve(enabled:otherwise:)` — disabled reminders are `.off` and nothing else, whether the schedule has run or not: one definition for the reducer's provisional value and the middleware's settled one.
+
+## SunnahReducer.swift
+
+- `sunnahReducer` — `.refresh` changes nothing here: it asks `SunnahMiddleware` to read the permission and reschedule, and the answer arrives as `deliveryUpdated`. Until it does, `settingsChanged` leaves the provisional delivery from `SunnahState.Delivery.resolve(enabled:otherwise:)` — `.checking`, or `.off` when disabled.
+
+## SunnahSettings.swift
+
 - `SunnahSettings.analyticsMode` — the GA4 `mode` dimension: a fixed ASCII list, never a displayed label — the switches are localised in ten languages and a dimension carrying their text could not be grouped.
 - `SunnahSettings.clamped(minuteOfDay:)` — the domain clamp, and the only one: a reminder time is a minute of a civil day. Both roads a value enters by — the picker (via the reducer) and the stored blob (via the repository) — pass through here.
-- `SunnahState.Delivery.resolve(enabled:otherwise:)` — disabled reminders are `.off` and nothing else, whether the schedule has run or not: one definition for the reducer's provisional value and the middleware's settled one.
+
+## SunnahSchedule.swift
+
 - `SunnahSchedule` — civil-date reminders, not a sunrise/sunset calculation; all time inputs are explicit.
 - `SunnahSchedule.maxReminders` — how many reminders are ever scheduled at once; `SunnahRepository` sizes its share of the pending-notification budget from it.
 - `SunnahSchedule.reminders(settings:now:timeZone:limit:)` — Ramadan is skipped (it is not a voluntary weekly schedule), and Eid and the days of Tashriq are never suggested.

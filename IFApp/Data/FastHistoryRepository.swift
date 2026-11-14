@@ -5,20 +5,6 @@
 
 import Foundation
 
-enum HistoryLoadFailure: String {
-    case unreadable
-    case decode
-    case futureSchema = "future_schema"
-    case quarantineFailed = "quarantine_failed"
-}
-
-protocol FastHistoryRepositoryProtocol {
-    func loadAll() -> [FastRecord]
-    func append(_ record: FastRecord)
-    func delete(id: UUID)
-    func replaceAll(_ records: [FastRecord])
-}
-
 struct FastHistoryRepository: FastHistoryRepositoryProtocol {
     private struct Envelope: Codable {
         var schemaVersion: Int

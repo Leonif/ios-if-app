@@ -5,6 +5,9 @@ Why the repositories are the way they are. `UserDefaults` keys and file names be
 ## AnalyticsRepository.swift
 
 - `AnalyticsRepository` — stateless gateway for analytics events. Events are never logged from a view: they come from `AnalyticsMiddleware`, the caller for everything that travels as an action, and from the one failure that does not — `history_load_failed` is found by the file layer and wired to this gateway in `AppDependencies`.
+
+## AnalyticsRepositoryProtocol.swift
+
 - `AnalyticsRepositoryProtocol.setUserProperty(_:forName:)` — a persistent user property for segmentation; `nil` clears it.
 
 ## DiagnosticsLogRepository.swift
@@ -22,11 +25,6 @@ Why the repositories are the way they are. `UserDefaults` keys and file names be
 - `FastHistoryRepository` — bytes that do not decode are never written over. A failed read that returned an empty array would let the next `append` put one fresh record where the whole history had been — a loss with nothing to recover from and no sign it happened. So the unreadable file is moved aside first, and if it cannot be moved the repository refuses to write at all.
 - `FastHistoryRepository` — the envelope's schema version is read as well as written, and read before the records. That order is the whole of it: a file left by a newer build is not damaged, only younger than this binary, and telling the two apart keeps a TestFlight downgrade from filing someone's history away as corrupt. A newer file is handed over read-only, because this build would write it back in the older shape.
 - `FastHistoryRepository` — there is no migration chain yet (its place is marked in `readFile()`), so the promise is narrower than a migration: the old bytes survive, not the old records.
-- `HistoryLoadFailure` — why a read did not produce today's records. Raw values are the GA4 `reason` parameter of `history_load_failed`: a fixed list, same rule as `trigger`.
-- `HistoryLoadFailure.unreadable` — the file is there and cannot be read at all (disk, permissions).
-- `HistoryLoadFailure.decode` — the bytes are not an envelope this build understands.
-- `HistoryLoadFailure.futureSchema` — written by a newer build. Records may still come back; writing does not.
-- `HistoryLoadFailure.quarantineFailed` — unreadable and immovable. The only copy is still where it was, and the repository has stopped writing to keep it that way.
 - `FastHistoryRepository.VersionProbe` — the version on its own. `Envelope` cannot stand in for it: it carries the records too, so a file whose records this build cannot parse fails to decode either way, and the version is exactly what separates "corrupt" from "written by a newer build".
 - `FastHistoryRepository.FileState` — what the file turned out to be. Every read and every write goes through it, because the guard's rule — never write on top of bytes that could not be read — is a property of writing, not of loading. One exception, not a user's: the DEBUG hook `wipeFile()` reads through here and then writes anyway, because a suite's baseline is not bytes the guard protects.
 - `FastHistoryRepository.FileState.blank` — no file or an empty one: a first launch, not a failure. Nothing is quarantined because there is nothing to lose.
@@ -54,6 +52,14 @@ Why the repositories are the way they are. `UserDefaults` keys and file names be
 - `FastHistoryRepository.futureSchemaFixture` — a well-formed envelope from a schema this build has not shipped: the `readOnly` path, as opposed to `corruptFixture`'s decode/quarantine path. One record with the goal reached, so the read-only history renders like an ordinary one and the only visible difference is that a later write does not change the file.
 - `FastHistoryRepository.seedFutureSchemaFile(_:)` — mirrors `seedCorruptFile` for the same reason: a newer-than-this-build envelope is not something the protocol can express.
 
+## HistoryLoadFailure.swift
+
+- `HistoryLoadFailure` — why a read did not produce today's records. Raw values are the GA4 `reason` parameter of `history_load_failed`: a fixed list, same rule as `trigger`.
+- `HistoryLoadFailure.unreadable` — the file is there and cannot be read at all (disk, permissions).
+- `HistoryLoadFailure.decode` — the bytes are not an envelope this build understands.
+- `HistoryLoadFailure.futureSchema` — written by a newer build. Records may still come back; writing does not.
+- `HistoryLoadFailure.quarantineFailed` — unreadable and immovable. The only copy is still where it was, and the repository has stopped writing to keep it that way.
+
 ## HistoryExportRepository.swift
 
 - `HistoryExportRepository` — puts the exported CSV on disk so the system share sheet has a real file to hand over. The mechanism only: what goes in the file is `HistoryExport`, and the decision to write one is the thunk's.
@@ -63,6 +69,9 @@ Why the repositories are the way they are. `UserDefaults` keys and file names be
 ## NotificationRepository.swift
 
 - `NotificationRepository` — a thin wrapper over `NotificationManager` so thunks depend on a protocol, not a singleton.
+
+## NotificationRepositoryProtocol.swift
+
 - `NotificationRepositoryProtocol.enableForegroundPresentation()` — makes scheduled pushes appear while the app is in the foreground; called once at launch, before any notification can be delivered.
 - `NotificationRepositoryProtocol.requestAuthorization()` — shows the system permission dialog and returns once the user has answered.
 - `NotificationRepositoryProtocol.removeLegacyDailyReminders()` — one-time cleanup of the legacy fixed daily reminders on existing installs.
@@ -72,26 +81,28 @@ Why the repositories are the way they are. `UserDefaults` keys and file names be
 ## ProOfferRepository.swift
 
 - `ProOfferRepository` — the one fact about the offer that outlives a launch: whether the automatic, once-per-install show (T1', see `Features/pro/NOTES.md`) has happened. Nothing else about the offer is persisted on purpose: the plan to show it belongs to the session that finished the fast (`ProState.autoOfferArmed`), so the only thing worth carrying across launches is that the show is spent.
+
+## ProOfferRepositoryProtocol.swift
+
 - `ProOfferRepositoryProtocol.markOfferShown()` — idempotent: written from the reduced state rather than from one action, so it lands again on every later Pro action and must not care.
 
 ## ReviewRepository.swift
 
 - `ReviewRepository` — native review-request persistence plus the StoreKit call. `ReviewMiddleware` gates every call (lifetime cap, once a day, once a launch) and owns the triggers; this repository remembers the gate state and the pending "next open" fallback.
+- `ReviewRepository.requestReview(completion:)` — only a `foregroundActive` scene counts. A request on a scene still `foregroundInactive` — exactly where a cold start sits when the "next open" fallback fires — is dropped by Apple without a trace, and falling back to `scenes.first` would spend a lifetime attempt on it.
+- `ReviewRepository.maxPrompts` — Apple's own 3-per-365-days limit is opaque, so the app stops asking itself after this many attempts.
+
+## ReviewRepositoryProtocol.swift
+
 - `ReviewRepositoryProtocol.canPrompt()` — not shown today and under the lifetime cap.
 - `ReviewRepositoryProtocol.markPromptShown()` — records a call: once a day, and it counts toward the cap.
 - `ReviewRepositoryProtocol.requestReview(completion:)` — reports `true` only when a `foregroundActive` scene was found and `AppStore.requestReview` was called; Apple still decides whether the panel appears. `false` means nothing was asked, and the caller must not spend an attempt on it.
-- `ReviewRepository.requestReview(completion:)` — only a `foregroundActive` scene counts. A request on a scene still `foregroundInactive` — exactly where a cold start sits when the "next open" fallback fires — is dropped by Apple without a trace, and falling back to `scenes.first` would spend a lifetime attempt on it.
 - `ReviewRepositoryProtocol.pendingGoalDate()` — the moment of the 3rd completed goal, when the "next open" fallback was armed.
-- `ReviewRepository.maxPrompts` — Apple's own 3-per-365-days limit is opaque, so the app stops asking itself after this many attempts.
 
 ## StoreRepository.swift
 
 - `StoreRepository` — the whole of StoreKit 2 for this app: one non-consumable, its price, buying, restoring, and being told when it goes away. Everything above this file speaks in `Entitlement` and outcomes and never imports StoreKit.
 - `StoreRepository` — verification is deliberately three-valued. `Transaction.currentEntitlements` never throws and returns nothing both when the user did not buy and when this install has not yet reached the store (a fresh install in airplane mode). Collapsing those into "free" tells a paying customer their purchase is gone, so the store is probed separately and "we could not check" is reported as such.
-- `PurchaseOutcome.pending` — Ask to Buy: approval pending, no entitlement yet.
-- `StoreRepositoryProtocol.refresh()` — resolves what this install owns and what the product costs, in one pass.
-- `StoreRepositoryProtocol.restore()` — syncs with the App Store account and re-reads the entitlement. The only path that works with no account of ours on a new device — an App Review requirement for a non-consumable, not a convenience.
-- `StoreRepositoryProtocol.entitlementUpdates()` — entitlement changes nobody asked for: an approved Ask to Buy, a purchase on another device, a refund, leaving a Family Sharing group.
 - `StoreRepository.Key.verifiedEntitlement` — the last verified verdict. Its absence is meaningful: this install has never had an answer from the store, the only condition under which the entitlement is reported as unknown.
 - `StoreRepository.refresh()` — `.found` / `.missing` — the store answered, so an empty entitlement set is the truth about this install whatever was cached before; this is also how a refund or a family member's departure settles.
 - `StoreRepository.refresh()` — `.unreachable` — no answer, so a previously verified verdict stands: a purchase already seen on this device must survive a flight, and one already known to be absent does not need re-proving to show the offer.
@@ -100,6 +111,16 @@ Why the repositories are the way they are. `UserDefaults` keys and file names be
 - `StoreRepository.entitlementUpdates()` — re-reads rather than trusting the single transaction: a revocation and a purchase arrive through the same door, and only the full set says which side the user ends up on.
 - `StoreRepository.ProductLookup.missing` — the store answered and does not know the identifier: a configuration mistake on our side, not the user's connection.
 - `StoreRepository.reason(for:)` — maps a StoreKit throw onto the reasons the offer screen can act on; only `network` changes what the user is told, the rest share one body.
+
+## PurchaseOutcome.swift
+
+- `PurchaseOutcome.pending` — Ask to Buy: approval pending, no entitlement yet.
+
+## StoreRepositoryProtocol.swift
+
+- `StoreRepositoryProtocol.refresh()` — resolves what this install owns and what the product costs, in one pass.
+- `StoreRepositoryProtocol.restore()` — syncs with the App Store account and re-reads the entitlement. The only path that works with no account of ours on a new device — an App Review requirement for a non-consumable, not a convenience.
+- `StoreRepositoryProtocol.entitlementUpdates()` — entitlement changes nobody asked for: an approved Ask to Buy, a purchase on another device, a refund, leaving a Family Sharing group.
 
 ## StubStoreRepository.swift
 
@@ -129,6 +150,9 @@ The arguments below are a contract with the Maestro flows; renaming one silently
 - `TimerPersistenceRepository.Key.legacyPlanIdx` — plan storage before 1.5.0: an index into the four presets. Read once for migration, never written.
 - `TimerPersistenceRepository.Key.streakFreezeSpentMonth` — the calendar month ("yyyy-MM") whose protected day is spent. Absent on installs that updated into 1.5.0, which reads as "none spent": the benefit starts available, which is what someone who just bought it expects.
 - `TimerPersistenceRepository.load()` — `goalHours` — absent (state written before 1.5.0) reads as 0, which every reader resolves to the current plan: the behaviour of those builds.
+- `TimerPersistenceRepository.loadPlanHours()` — hours first, falling back once to the preset index for installs that updated over a version which stored a plan as a position in a list. The fallback converts and then removes the old key rather than re-reading it every launch: otherwise an install whose owner never opens the plan editor keeps its plan as an index forever, and an index only means something relative to the order of `Plan.presets`, so reordering that array would quietly reinterpret the saved plan on exactly those installs. The key goes either way: an index that cannot be interpreted is not worth keeping.
+
+## TimerPersistenceRepositoryProtocol.swift
+
 - `TimerPersistenceRepositoryProtocol.loadPlanHours()` — the selected plan's fast length in whole hours; `nil` means never saved.
 - `TimerPersistenceRepositoryProtocol.loadLastMilestoneShown()` — the highest streak milestone (3/7/14/30) whose card was already shown; 0 means none.
-- `TimerPersistenceRepository.loadPlanHours()` — hours first, falling back once to the preset index for installs that updated over a version which stored a plan as a position in a list. The fallback converts and then removes the old key rather than re-reading it every launch: otherwise an install whose owner never opens the plan editor keeps its plan as an index forever, and an index only means something relative to the order of `Plan.presets`, so reordering that array would quietly reinterpret the saved plan on exactly those installs. The key goes either way: an index that cannot be interpreted is not worth keeping.

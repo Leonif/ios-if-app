@@ -12,17 +12,6 @@ Why the app's composition root, root state and clock are the way they are. Read 
 ## AppLifecycleAction.swift
 
 - `AppLifecycleAction` — app-level signals that mutate no substate but drive side effects (analytics, review, notifications). Reducers ignore them; middleware reacts.
-- `ReviewPromptTrigger` — what caused a native review request. The raw value is the GA4 `trigger` parameter.
-- `ReviewPromptTrigger.streakMilestone` — right after the streak milestone card was closed.
-- `ReviewPromptTrigger.nextOpen` — fallback: the next app open at least 4h after the 3rd completed goal, when no streak-3 milestone fired.
-- `HistoryEntrySource` — which entry point led into the history. The raw value is the GA4 `source` parameter: with several ways in, the event alone cannot say which one works.
-- `HistoryEntrySource.streakBadge` — the streak pill in the header, present in every state.
-- `HistoryEntrySource.completeCard` — "Saved to your history" in the complete card.
-- `HistoryEntrySource.eatingWindow` — "Last fast · 16h 24m" in the eating-window card.
-- `HistoryEntrySource.endFastOverlap` — "Open that fast" in the end-fast sheet's refusal: the record standing in the way of a back-dated ending, opened so it can be deleted.
-- `SunnahEntrySource` — which door led into the Sunnah reminders screen. The raw value is the GA4 `source` parameter, same fixed-list rule as `HistoryEntrySource`: with the screen reachable two ways, the event alone cannot say which one carries it.
-- `SunnahEntrySource.planEditor` — the "Sunnah reminders" row in the plan editor (the pencil in the plan pill).
-- `SunnahEntrySource.about` — the row in the About IF24 sheet.
 - `AppLifecycleAction.appBecameActive` — the scene became active (cold start or return from background). Drives the pending "next open" review fallback; not a funnel event.
 - `AppLifecycleAction.sourceArticleOpened` — `articleID` is the paper's index in `SourceArticle.all`, the same identifier the rows are addressed by.
 - `AppLifecycleAction.sourceOriginalOpened` — dispatched from the reader's "read the original" button and nowhere else. `OpenExternalLinkThunk` also opens the privacy policy and the system Settings, so the event cannot hang off the thunk without counting those as papers.
@@ -33,6 +22,26 @@ Why the app's composition root, root state and clock are the way they are. Read 
 - `AppLifecycleAction.pushAuthorizationResolved` — the user just answered the notification permission dialog. Reducers ignore it; it exists so `NotificationMiddleware` re-runs its sync, because the goal push scheduled on `.started` was rejected while the permission did not yet exist. Not a funnel event.
 - `AppLifecycleAction.fastChained` — a fast was started from the window-closed screen: the chain held.
 - `AppLifecycleAction.themeActive` — `dark` is system dark mode; the app follows the system scheme and has no in-app theme toggle.
+
+## ReviewPromptTrigger.swift
+
+- `ReviewPromptTrigger` — what caused a native review request. The raw value is the GA4 `trigger` parameter.
+- `ReviewPromptTrigger.streakMilestone` — right after the streak milestone card was closed.
+- `ReviewPromptTrigger.nextOpen` — fallback: the next app open at least 4h after the 3rd completed goal, when no streak-3 milestone fired.
+
+## HistoryEntrySource.swift
+
+- `HistoryEntrySource` — which entry point led into the history. The raw value is the GA4 `source` parameter: with several ways in, the event alone cannot say which one works.
+- `HistoryEntrySource.streakBadge` — the streak pill in the header, present in every state.
+- `HistoryEntrySource.completeCard` — "Saved to your history" in the complete card.
+- `HistoryEntrySource.eatingWindow` — "Last fast · 16h 24m" in the eating-window card.
+- `HistoryEntrySource.endFastOverlap` — "Open that fast" in the end-fast sheet's refusal: the record standing in the way of a back-dated ending, opened so it can be deleted.
+
+## SunnahEntrySource.swift
+
+- `SunnahEntrySource` — which door led into the Sunnah reminders screen. The raw value is the GA4 `source` parameter, same fixed-list rule as `HistoryEntrySource`: with the screen reachable two ways, the event alone cannot say which one carries it.
+- `SunnahEntrySource.planEditor` — the "Sunnah reminders" row in the plan editor (the pencil in the plan pill).
+- `SunnahEntrySource.about` — the row in the About IF24 sheet.
 
 ## AppState.swift
 

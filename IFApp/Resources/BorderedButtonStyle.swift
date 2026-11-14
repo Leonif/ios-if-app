@@ -1,5 +1,5 @@
 //
-//  Styles.swift
+//  BorderedButtonStyle.swift
 //  IFApp
 //
 import SwiftUI

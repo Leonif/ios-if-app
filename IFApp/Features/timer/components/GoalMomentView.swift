@@ -1,5 +1,5 @@
 //
-//  GoalCelebration.swift
+//  GoalMomentView.swift
 //  IFApp
 //
 

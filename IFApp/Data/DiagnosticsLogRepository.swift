@@ -8,10 +8,6 @@
 import Foundation
 import os
 
-protocol DiagnosticsLogRepositoryProtocol {
-    func append(_ line: String)
-}
-
 final class DiagnosticsLogRepository: DiagnosticsLogRepositoryProtocol {
     private static let maxBytes = 4 * 1024 * 1024
 

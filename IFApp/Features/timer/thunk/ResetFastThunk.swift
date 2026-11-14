@@ -12,9 +12,7 @@ struct ResetFastThunk: Thunk {
         let timer = app.timerState
 
         let now = Date().timeIntervalSince1970
-        let elapsed = timer.isRunning
-            ? max(0, now - timer.fastStartTimestamp)
-            : timer.stagedElapsed
+        let elapsed = timer.elapsed(at: now)
 
         dispatch(TimerAction.reset(elapsed: elapsed))
         dispatch(MealAction.cleared)

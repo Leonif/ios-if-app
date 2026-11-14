@@ -4,13 +4,13 @@ import Redux
 
 struct SunnahFlowView: View {
     private let store: Store<AppState>
-    @State private var props: SunnahState
+    @State private var props: Props
     init(store: Store<AppState>) {
         self.store = store
-        _props = State(initialValue: store.getCurrentState().sunnahState)
+        _props = State(initialValue: Props(state: store.getCurrentState()))
     }
     var body: some View {
-        SunnahSettingsView(state: props,
+        SunnahSettingsView(state: props.state,
             onChange: { store.dispatch(SunnahAction.settingsChanged($0)) },
             onRetry: { store.dispatch(SunnahAction.refresh) },
             onSettings: {
@@ -19,6 +19,6 @@ struct SunnahFlowView: View {
                 }
             })
             .onAppear { store.dispatch(SunnahAction.refresh) }
-            .connect(to: store, mapState: { $0.sunnahState }, onPropsChange: { props = $0 })
+            .connect(to: store, mapState: { Props(state: $0) }, onPropsChange: { props = $0 })
     }
 }

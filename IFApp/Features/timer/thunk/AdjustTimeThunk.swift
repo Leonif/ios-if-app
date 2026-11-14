@@ -18,9 +18,7 @@ struct AdjustTimeThunk: Thunk {
         let timer = app.timerState
 
         let now = Date().timeIntervalSince1970
-        let current = timer.isRunning
-            ? max(0, now - timer.fastStartTimestamp)
-            : timer.stagedElapsed
+        let current = timer.elapsed(at: now)
         let newElapsed = max(0, current + interval)
         let runningStart: Double? = timer.isRunning ? now - newElapsed : nil
 

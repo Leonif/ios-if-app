@@ -1,5 +1,5 @@
 //
-//  Theme.swift
+//  ThemeTokens.swift
 //  IFApp
 //
 

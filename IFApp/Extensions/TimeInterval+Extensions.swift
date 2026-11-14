@@ -21,9 +21,3 @@ extension TimeInterval {
         String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
 }
-
-extension Int {
-    var minTimeInterval: TimeInterval {
-        TimeInterval(self * 60)
-    }
-}

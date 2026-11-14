@@ -1,12 +1,6 @@
 import Foundation
 import UserNotifications
 
-protocol SunnahRepositoryProtocol {
-    func load() -> SunnahSettings
-    func save(_ settings: SunnahSettings)
-    func replace(_ reminders: [SunnahSchedule.Reminder]) async -> Bool
-}
-
 struct SunnahRepository: SunnahRepositoryProtocol {
     private let defaults: UserDefaults
     init(defaults: UserDefaults = .standard) { self.defaults = defaults }

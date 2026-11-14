@@ -5,52 +5,6 @@
 
 import SwiftUI
 
-extension Font {
-    static func bricolage(_ size: CGFloat, _ weight: Font.Weight = .semibold) -> Font {
-        .custom("Bricolage Grotesque", size: size).weight(weight)
-    }
-
-    static func hanken(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
-        .custom("Hanken Grotesk", size: size).weight(weight)
-    }
-}
-
-private struct OverlineTracking: ViewModifier {
-    let value: CGFloat
-    @Environment(\.layoutDirection) private var layoutDirection
-
-    private var suppressed: Bool {
-        layoutDirection == .rightToLeft || Locale.current.language.languageCode?.identifier == "ko"
-    }
-
-    func body(content: Content) -> some View {
-        content.tracking(suppressed ? 0 : value)
-    }
-}
-
-private struct DisplayTracking: ViewModifier {
-    let value: CGFloat
-    @Environment(\.layoutDirection) private var layoutDirection
-
-    private var suppressed: Bool {
-        layoutDirection == .rightToLeft || Locale.current.language.languageCode?.identifier == "ko"
-    }
-
-    func body(content: Content) -> some View {
-        content.tracking(suppressed ? 0 : value)
-    }
-}
-
-extension View {
-    func overlineTracking(_ value: CGFloat) -> some View {
-        modifier(OverlineTracking(value: value))
-    }
-
-    func displayTracking(_ size: CGFloat, _ em: CGFloat) -> some View {
-        modifier(DisplayTracking(value: size * em))
-    }
-}
-
 enum Typography {
     static let timerNumerals = Font.bricolage(66)
     static let timerSeconds = Font.bricolage(29)

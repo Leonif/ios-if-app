@@ -4,9 +4,12 @@ Why the event catalog and its transport are the way they are. Event and paramete
 
 ## AnalyticsClient.swift
 
+- `AnalyticsClient.setUserProperty(_:forName:)` — a persistent user property for segmentation; `nil` clears it.
+
+## DefaultAnalyticsClient.swift
+
 - `DefaultAnalyticsClient` — the transport: sends to Firebase when the SDK is linked, otherwise prints to the console, so analytics work in dev and test builds without Firebase.
 - `DefaultAnalyticsClient.isFirebaseConfigured` — Firebase is deliberately left unconfigured on mainland-China devices and on any build without the config plist (`IFAppApp.configureFirebase()`). Every event then drops here silently; the rest of the app keeps working.
-- `AnalyticsClient.setUserProperty(_:forName:)` — a persistent user property for segmentation; `nil` clears it.
 
 ## AnalyticsEvent.swift
 

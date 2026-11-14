@@ -103,6 +103,11 @@ Codes used below: T1' is the paywall spec's automatic-offer trigger and S1-S6 th
 - `MealPickerTests.testLastNightIsTheMostRecentEveningThatHasPassed` — one rule for all twenty-four hours: the most recent 9 PM that has passed.
 - `MealPickerTests.testLastNightStepsBackWhenTonightHasOnlyJustBecomeEvening` — just after 9 PM the nearest past evening is minutes ago, and calling that "last night" would be nonsense, so it steps back a day; half an hour past the floor it is a normal, short "last night".
 
+## OfferPhaseTests.swift
+
+- `OfferPhaseTests` — pins the offer tint to the timer's own frames: a running fast wears the phase it is in, both eating frames the neutral green, and a window past the closed-window horizon reads like idle. A copy of the window rule that forgot the horizon would turn the lapsed case green.
+- `OfferPhaseTests.testPinnedGoalDecidesThePhaseNotTheSelectedPlan` — the phase is measured against the goal the fast runs to (`AppState.activeGoalHours`), not the plan selected since: 13h of a 20h fast is still fat burning, even with a 12h plan picked.
+
 ## ProReducerTests.swift
 
 - `ProReducerTests` — the offer screen must never invite a purchase from someone who already owns Pro: with the entry point still set and the phase idle, the screen falls back to S1 with a live Buy button whose tap does nothing (`PurchaseProThunk` guards on `isPro`). The right can arrive three ways, so the guard is one rule over the state; the tests hold both halves — the offer closes once there is nothing left to sell, and stays up while an attempt still has something to say.
@@ -148,6 +153,14 @@ Codes used below: T1' is the paywall spec's automatic-offer trigger and S1-S6 th
 - `ReviewMiddlewareTests.recordingDispatch(into:)` — the middleware's dispatch is where `review_prompted` is born; `AnalyticsMiddleware` only forwards it.
 - `ReviewMiddlewareTests.testAttemptWithoutASceneDoesNotBlockTheNextOneInTheSameLaunch` — a cold start hits both: `onAppear` fires while the scene is still settling, the `scenePhase` change follows once it is active. The first must not consume the once-per-launch gate, or the second — the real one — is blocked.
 - `ReviewMiddlewareTests.testSecondActionWhileACallIsInFlightDoesNotStartASecondCall` — between "asked" and "answered" every gate still reads as open, and both `appBecameActive` and a closed milestone card can land inside it. One call at a time, or one attempt buys two requests.
+
+## TimerElapsedTests.swift
+
+- `TimerElapsedTests` — the time derivations on `TimerState` take the moment as an argument, so each case fixes `now` instead of reading the clock and is exact to the second.
+- `TimerElapsedTests.testRunningFastStartedInTheFutureReadsZero` — the floor at 0: a start a moment ahead of the clock must not show a negative count.
+- `TimerElapsedTests.testStoppedTimerReadsTheStagedValue` — a stale `fastStartTimestamp` is ignored once the fast is not running; the staged value is what the result screen and the reset event read.
+- `TimerElapsedTests.testClosedWindowFallsToIdleAtTheHorizon` — the same `>=` boundary `CompleteStatePersistenceTests` pins for the result screen.
+- `TimerElapsedTests.testGoalReachedFollowsThePlanPassedIn` — overtime is decided by the plan the caller passes, which must be `AppState.activePlan`.
 
 ## SourceAnalyticsTests.swift
 

@@ -48,13 +48,19 @@ Why the history feature's code is the way it is. Read the section of a file befo
 
 - `HistoryStats` — every number on the history screen is a pure function of the full record array, computed at render. No incremental counters: a running `total += duration` makes deletion expensive and lets the displayed totals drift from the data. At a few thousand records this is microseconds.
 - `HistoryStats` — a paywall may hide *rows* beyond a window, but must never narrow the input here: totals that shrink the day a paywall lands read as a bug, or as something taken away.
-- `HistoryMonthGroup.id` — "2026-07", stable across locales, used only as identity.
-- `HistoryDay` — carries the date with the flag so the UI can label each dot, instead of seven anonymous circles whose direction and meaning have to be guessed.
 - `HistoryStats.total` — seconds, not whole hours. Truncated to hours the sum can print *below* the longest fast it contains — one 16h 01m fast gives "TOTAL 16h · LONGEST 16h 01m" on the same card, arithmetic that cannot be true. The month headers still drop minutes (a different scope with nothing beside them to contradict). The direction is forced: the longest fast cannot give up its minutes, because they are the personal best.
 - `HistoryStats.compute(records:now:)` — two day sets on purpose. Rows are dated by the day the fast started, so the seven-day strip uses that visible date (`historyGoalDays`): an overnight fast starting Tuesday and crossing its goal Wednesday must light Tuesday, as its row says. The best streak keeps `goalDayKey`, the day the goal was actually crossed.
 - `HistoryStats.showsFirstNote(fastsCount:streakCount:)` — the beginner note is gated on both stores the card reads: the streak counter lives in the timer's persisted defaults (since 1.4.4), the records in a file (since 1.4.5), and nothing backfilled one from the other. Counting only records would welcome everyone updated from 1.4.4 as a first-timer under a four-day streak. The note shows while the history is short *and* the counter claims nothing the records cannot account for; the ordinary first fast (one record, streak of one) still gets it. Takes the raw counter, not `displayed(at:)`: a streak that lapsed yesterday displays as 0 and is still not a beginner's.
 - `HistoryStats.monthGroups(records:)` — grouped by the month a fast *started*, because the row shows its start date. The month is Gregorian (`Clock.gregorian`), like every day the app counts and like `HistoryFormat.monthTitle`. `Calendar.current` would put an Arabic device on the Hijri calendar: the bucket's first day, rendered through the Gregorian formatter, lands in the previous Gregorian month — September records under "أغسطس 2026".
 - `HistoryStats.lastSeven(goalDays:now:)` — seven flags, oldest first.
+
+## HistoryMonthGroup.swift
+
+- `HistoryMonthGroup.id` — "2026-07", stable across locales, used only as identity.
+
+## HistoryDay.swift
+
+- `HistoryDay` — carries the date with the flag so the UI can label each dot, instead of seven anonymous circles whose direction and meaning have to be guessed.
 
 ## HistoryFormat.swift
 
@@ -74,10 +80,13 @@ Why the history feature's code is the way it is. Read the section of a file befo
 ## HistoryEmptyState.swift
 
 - `HistoryEmptyState` — ghost rings rather than an icon: the ring is the app's one shape, and an empty one says "waiting to be filled" without a single zero on screen. The copy promises what will be kept; it never scolds.
+- `HistoryEmptyState.body` — button — hugs its label rather than spanning the screen like the footer's primary button: an invitation, not the screen's main action.
+
+## HistoryEmptyAction.swift
+
 - `HistoryEmptyAction` — there is always exactly one button, and the state never appears without it: an empty screen whose only interactive thing is a bare chevron is a dead end, and hiding a dead CTA would deepen it. The copy above does not vary — "no fast has finished yet" is the reason either way; only the way out changes.
 - `HistoryEmptyAction.backToFast` — a fast is already running and `StartFastThunk` refuses a second, so the honest action is the way back to it. The label names where it leads rather than "Back": the chevron already says that.
 - `HistoryEmptyAction.identifier` — `history.startFast` and `history.empty.backToFast` are addressed by the Maestro flows (H7, H13); keep them.
-- `HistoryEmptyState.body` — button — hugs its label rather than spanning the screen like the footer's primary button: an invitation, not the screen's main action.
 
 ## DeleteFastSheet.swift
 
@@ -111,6 +120,9 @@ Why the history feature's code is the way it is. Read the section of a file befo
 - `HistorySummaryCard.body` — first note — no accessibility identifier of its own: SwiftUI folds the card's leaves under the container's `history.summary`, so one here never resolves and an assert on it proves nothing. The flow matches `history.summary` plus the note's text.
 - `HistorySummaryCard.body` — totals — aggregates show scale, not stopwatch precision: the card rounds to hours then days, minutes stay in the rows.
 - `HistorySummaryCard.stat(_:_:_:)` — labels shrink inside their own third rather than wrapping: German runs long ("Am längsten"), and a wrapped label would shift the row's baseline.
+
+## StreakDots.swift
+
 - `StreakDots` — a missed day is an unfilled ring, not a cross: the gap is a fact, not a verdict.
 
 ## HistoryRow.swift
@@ -120,5 +132,8 @@ Why the history feature's code is the way it is. Read the section of a file befo
 - `HistoryRow.body` — subline — one line, always: Arabic and German run past the width on the longest rows (a 40h fast spelling two dates), so the line gives up a little size before characters.
 - `HistoryRow.tag` — either the goal a short fast fell short of, or the Extended chip past 24h.
 - `HistoryRow.accessibilityLabel` — one spoken sentence per row; the ring is decorative and hidden. The plan is spelled out ("fasting plan, 17 hours") rather than read off the pill: `planLabel` is a ratio ("17:7"), and a colon between numerals is announced as a time of day — a row already speaking the real start and end times would gain a third, invented one.
+
+## HistoryRowDetail.swift
+
 - `HistoryRowDetail` — read-only by design: the one destructive path is an explicit swipe with a confirmation, so an accordion opened by a tap can never delete anything and the screen owes no undo.
 - `HistoryRowDetail.detailRow(_:_:)` — the only place both ends of a fast are spelled out with date and time; the row leads with the start date, which is what the user recognises it by.

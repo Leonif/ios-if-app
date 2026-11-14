@@ -5,19 +5,6 @@
 
 import Foundation
 
-enum EndFastEntry: Equatable, Sendable {
-    case ordinary
-    case nearGoal(minutesLeft: Int)
-    case overtime(secondsPastGoal: TimeInterval)
-}
-
-enum EndFastStage: Equatable, Sendable {
-    case picker
-    case nearGoal
-    case overtime
-    case refusal
-}
-
 struct EndFastState: Equatable, Sendable {
     static let nearGoalThresholdMinutes = 15
 

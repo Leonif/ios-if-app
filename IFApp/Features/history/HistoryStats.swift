@@ -5,22 +5,6 @@
 
 import Foundation
 
-struct HistoryMonthGroup: Identifiable, Equatable {
-    let id: String
-    let month: Date
-    let records: [FastRecord]
-
-    var totalHours: Int {
-        Int(records.reduce(0) { $0 + $1.duration } / 3600)
-    }
-}
-
-struct HistoryDay: Identifiable, Equatable {
-    let date: Date
-    let reachedGoal: Bool
-    var id: String { Clock.dayKey(date) }
-}
-
 struct HistoryStats: Equatable {
     let fastsCount: Int
     let total: TimeInterval

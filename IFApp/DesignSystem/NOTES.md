@@ -16,7 +16,7 @@ Why the tokens, type and shared controls are the way they are. Values come from 
 
 - `PressableButtonStyle` — the iOS replacement for the handoff's HTML hover affordance: depress on press only, ~0.97 scale plus a slight dim, 0.13s ease-out.
 
-## Theme.swift
+## ThemeTokens.swift
 
 - `ThemeTokens` — design tokens for the two themes, Light "Mist" and Dark "Immersive", transcribed from the handoff. Resolved from the environment colour scheme: `ThemeTokens.resolve(colorScheme)`. `accent` / `deep` / `primaryButtonBg` are the single brand green, same role in both themes.
 - `ThemeTokens.surfaceQuiet` — the quiet fill: the material the handoff gives to "this has weight, and it is not an action". A rank of its own rather than a reuse of `secBg` or `iconCircle`: those are white-on-white and a green wash, and neither carries `ink` at the contrast this rank owes. The Pro control in the header uses it, and the reversible-action surfaces of the consequence sheets are meant to be drawn on it too, which is why it is a token and not a colour spelled out inside one view.
@@ -33,11 +33,17 @@ Why the tokens, type and shared controls are the way they are. Values come from 
 
 ## Typography.swift
 
-- `Font.bricolage(_:_:)` — Bricolage Grotesque, the display family: timer numerals, titles, big headings (handoff weight 600). Both bundled families are variable fonts loaded by family name, with the weight selected through `.weight()`.
-- `Font.hanken(_:_:)` — Hanken Grotesk, everything else: body, labels, buttons, stats (weights 400/500/600/700).
 - `Typography.timerNumerals` — timer numerals must be tabular: apply `.monospacedDigit()` at the call site.
 - `Typography.timerSeconds` — the dimmed `:SS` suffix beside the elapsed H:MM.
 - `Typography.statOverline` — uppercase, with tracking .13em applied at the call site (`overlineTracking`).
+
+## Font+Typography.swift
+
+- `Font.bricolage(_:_:)` — Bricolage Grotesque, the display family: timer numerals, titles, big headings (handoff weight 600). Both bundled families are variable fonts loaded by family name, with the weight selected through `.weight()`.
+- `Font.hanken(_:_:)` — Hanken Grotesk, everything else: body, labels, buttons, stats (weights 400/500/600/700).
+
+## View+Tracking.swift
+
 - `OverlineTracking` — letter-spacing for the uppercase overline labels, suppressed in right-to-left (Arabic) layouts, where positive tracking breaks the connected cursive script and words read as disjointed letters, and in Korean, where 1.92pt at 12pt is 0.16em against a word space of 0.263em — enough of the gap that the eye reads syllable blocks as separate words.
 - `DisplayTracking` — negative letter-spacing on display type, suppressed in Arabic, where tightening pulls a connected script apart, and in Korean, where it closes the gap between a syllable's 받침 and the stem of the next one until the two read as one block.
 - `View.displayTracking(_:_:)` — `em`-relative tracking for display type, e.g. `displayTracking(25, -0.015)`.

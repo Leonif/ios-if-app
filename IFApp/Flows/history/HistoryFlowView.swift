@@ -7,26 +7,6 @@ import SwiftUI
 import UIKit
 import Redux
 
-struct HistoryProps: Equatable {
-    let records: [FastRecord]
-    let streak: StreakStatus
-    let isRunning: Bool
-    let isPro: Bool
-    let exportFile: URL?
-    let isExporting: Bool
-    let isExportBusy: Bool
-
-    init(state: AppState) {
-        records = state.historyState.records
-        streak = state.streak
-        isRunning = state.timerState.isRunning
-        isPro = state.proState.isPro
-        exportFile = state.historyState.exportFile
-        isExporting = state.historyState.isExporting
-        isExportBusy = state.historyState.isExportBusy
-    }
-}
-
 struct HistoryFlowView: View {
     private let store: Store<AppState>
     let source: HistoryEntrySource
@@ -36,7 +16,7 @@ struct HistoryFlowView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dismiss) private var dismiss
-    @State private var props: HistoryProps
+    @State private var props: Props
     @State private var expandedID: UUID?
     @State private var pendingDelete: FastRecord?
 
@@ -46,7 +26,7 @@ struct HistoryFlowView: View {
         self.source = source
         self.focusRecordID = focusRecordID
         self.onStartFast = onStartFast
-        _props = State(initialValue: HistoryProps(state: store.getCurrentState()))
+        _props = State(initialValue: Props(state: store.getCurrentState()))
     }
 
     var body: some View {
@@ -73,7 +53,7 @@ struct HistoryFlowView: View {
         .background(theme.historyBackground.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
         .background(InteractivePopGesture().frame(width: 0, height: 0))
-        .connect(to: store, mapState: { HistoryProps(state: $0) }, onPropsChange: { props = $0 })
+        .connect(to: store, mapState: { Props(state: $0) }, onPropsChange: { props = $0 })
         .onAppear {
             store.dispatch(AppLifecycleAction.historyOpened(source: source))
             if let focusRecordID {
@@ -270,177 +250,6 @@ struct HistoryFlowView: View {
         }
         if !reduceMotion {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        }
-    }
-}
-
-private struct InteractivePopGesture: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIViewController { Host() }
-    func updateUIViewController(_ controller: UIViewController, context: Context) {}
-
-    private final class Host: UIViewController, UIGestureRecognizerDelegate {
-        private weak var borrowed: UIGestureRecognizer?
-        private weak var previousDelegate: (any UIGestureRecognizerDelegate)?
-        private var previousEnabled: Bool?
-
-        override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-            guard let gesture = navigationController?.interactivePopGestureRecognizer,
-                  gesture.delegate !== self else { return }
-            borrowed = gesture
-            previousDelegate = gesture.delegate
-            previousEnabled = gesture.isEnabled
-            gesture.delegate = self
-            gesture.isEnabled = true
-        }
-
-        override func viewWillDisappear(_ animated: Bool) {
-            super.viewWillDisappear(animated)
-            guard borrowed?.delegate === self else { return }
-            borrowed?.delegate = previousDelegate
-            if let previousEnabled { borrowed?.isEnabled = previousEnabled }
-        }
-
-        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-            (navigationController?.viewControllers.count ?? 0) > 1
-        }
-
-        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                               shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
-            false
-        }
-    }
-}
-
-private struct SwipeToDeleteRow<Content: View>: View {
-    let theme: ThemeTokens
-    let onDelete: () -> Void
-    let onTap: () -> Void
-    @ViewBuilder let content: Content
-
-    @Environment(\.layoutDirection) private var layoutDirection
-    @State private var offset: CGFloat = 0
-    @State private var revealed = false
-
-    private let actionWidth: CGFloat = 92
-    private var direction: CGFloat { layoutDirection == .rightToLeft ? 1 : -1 }
-
-    var body: some View {
-        ZStack {
-            HStack {
-                Spacer(minLength: 0)
-                Button(action: {
-                    close()
-                    onDelete()
-                }) {
-                    Text(strings.History.delete)
-                        .font(.hanken(14.5, .semibold))
-                        .foregroundColor(.white)
-                        .lineLimit(1)
-                        .frame(width: abs(offset))
-                        .frame(maxHeight: .infinity)
-                        .background(Color.red)
-                        .clipped()
-                }
-                .accessibilityIdentifier("history.row.delete")
-                .disabled(!revealed)
-            }
-
-            swipeableContent
-        }
-        .accessibilityAction(named: Text(strings.History.delete), onDelete)
-    }
-
-    @ViewBuilder
-    private var swipeableContent: some View {
-        let row = content
-            .offset(x: offset)
-            .onTapGesture {
-                if revealed { close() } else { onTap() }
-            }
-
-        if #available(iOS 18.0, *) {
-            row.gesture(HorizontalRowPan(
-                onChanged: updateOffset,
-                onEnded: settleOffset
-            ))
-        } else {
-            row.gesture(
-                DragGesture(minimumDistance: 14)
-                    .onChanged { value in
-                        guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                        updateOffset(value.translation.width)
-                    }
-                    .onEnded { value in
-                        guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                        settleOffset(value.translation.width)
-                    }
-            )
-        }
-    }
-
-    private func updateOffset(_ horizontalTranslation: CGFloat) {
-        let travel = horizontalTranslation * direction
-        offset = direction * min(actionWidth, max(0, travel))
-    }
-
-    private func settleOffset(_ horizontalTranslation: CGFloat) {
-        let travel = horizontalTranslation * direction
-        withAnimation(.easeOut(duration: 0.2)) {
-            revealed = travel > actionWidth / 2
-            offset = revealed ? direction * actionWidth : 0
-        }
-    }
-
-    private func close() {
-        withAnimation(.easeOut(duration: 0.2)) {
-            revealed = false
-            offset = 0
-        }
-    }
-}
-
-@available(iOS 18.0, *)
-private struct HorizontalRowPan: UIGestureRecognizerRepresentable {
-    let onChanged: (CGFloat) -> Void
-    let onEnded: (CGFloat) -> Void
-
-    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator {
-        Coordinator()
-    }
-
-    func makeUIGestureRecognizer(context: Context) -> UIPanGestureRecognizer {
-        let recognizer = UIPanGestureRecognizer()
-        recognizer.minimumNumberOfTouches = 1
-        recognizer.maximumNumberOfTouches = 1
-        recognizer.cancelsTouchesInView = false
-        recognizer.delegate = context.coordinator
-        return recognizer
-    }
-
-    func handleUIGestureRecognizerAction(_ recognizer: UIPanGestureRecognizer, context: Context) {
-        let horizontal = context.converter.translation(in: .local)?.x
-            ?? recognizer.translation(in: recognizer.view).x
-        switch recognizer.state {
-        case .began, .changed:
-            onChanged(horizontal)
-        case .ended, .cancelled, .failed:
-            onEnded(horizontal)
-        default:
-            break
-        }
-    }
-
-    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
-        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-            guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return false }
-            let velocity = pan.velocity(in: pan.view)
-            return abs(velocity.x) > abs(velocity.y)
-        }
-
-        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                               shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-            true
         }
     }
 }

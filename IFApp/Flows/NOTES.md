@@ -2,28 +2,35 @@
 
 Why the flow views (the store-connected screens) are the way they are. Read the section of a file before editing it; an edit that changes or cancels a point below updates the point in the same commit.
 
+Every helper of a screen is a nested, internal type of that screen in its own `<View>+<Name>.swift`, and the screen's props are `<View>.Props` in `<View>+Props.swift` — `ARCHITECTURE.md`, invariant 15. The points below do not repeat why the visibility is internal.
+
 ## AppFlowView.swift
 
 - `AppFlowView` — the root flow: owns the store, presents the current screen and hosts the offer.
 - `AppFlowView.body` — `NavigationStack` exists for the one push in the app, the history screen.
 - `AppFlowView.body` — offer overlay — a full surface rather than a `fullScreenCover` because its appearance is specified in numbers (28pt of travel over 420ms, no overshoot) and the system cover brings its own. Hosted here, not on the timer, because one of its doors — the export lock — is on History, a screen pushed onto the timer: an overlay on the timer renders under that push, so the offer would open behind the screen it was called from, compile cleanly and keep the timer's doors' tests green. The common ancestor of all entry points is the only place where the z-order is right by construction; it also keeps History alive underneath with its scroll position, which is what closing the offer returns to.
 - `AppFlowView.body` — `.dynamicTypeSize(...DynamicTypeSize.xxLarge)` — the timer's centre is a fixed 232pt circle holding a fixed 176×40 caption slot and the footer buttons are fixed-width, while `Font.custom` scales with the system text size, so past a point text outgrows containers that do not move ("Закривається о 20:00" clips to "Закриваєтьс…" in the circle). Capping once, at the root, keeps every screen within the sizes the layout was drawn for. The proper fix is a layout that stretches (`ScaledMetric` on the slots); this ceiling holds the line until then. Presented sheets (About) start their own environment and the ceiling does not reach them — deliberately: four locales overflow About's Pro row at xxLarge already, and its slots are built to stretch.
-- `AppFlowView.offerTint` — the tint the offer wears, taken once, on the opening edge in `onPropsChange`, and held while the offer is up.
-- `AppFlowView.offerPhaseColor()` — reads the one definition, `TimerScreenProps.offerPhaseColor()`. A view-side derivation and deliberately not an argument of `offerOpened`, which would put a clock reading into an action. Frozen at opening on purpose: it describes the phase of the screen the offer was called from, that screen is fully covered while the offer is up, so a later tint has nothing on display to agree with. It cannot honestly be a field of `AppProps` either — the phase advances with the clock, not the state, so a mapped prop would go stale between actions and then jump on an unrelated one. In `@State` it changes at one named moment.
+- `AppFlowView.offerTint` — the tint the offer wears, taken once, on the opening edge in `onPropsChange`, and held while the offer is up. Read from the one definition, `AppState.offerPhase(at:)`, with the clock read here and passed in. A view-side derivation and deliberately not an argument of `offerOpened`, which would put a clock reading into an action. Frozen at opening on purpose: it describes the phase of the screen the offer was called from, that screen is fully covered while the offer is up, so a later tint has nothing on display to agree with. It cannot honestly be a field of `AppFlowView.Props` either — the phase advances with the clock, not the state, so a mapped prop would go stale between actions and then jump on an unrelated one. In `@State` it changes at one named moment.
+
+## AppFlowView+Props.swift
+
+- `AppFlowView.Props` — the root flow's projection of `AppState`: only whether the offer is up.
 
 ## AboutFlowView.swift
 
 - `AboutFlowView` — the About IF24 sheet wired to the store. Beyond presentation its only job is mapping a three-valued entitlement plus an attempt in progress to the four statuses the Pro row can say, and the rule that an unverified entitlement opens the offer at S5 (`OfferState.unverified`) rather than at the offer itself.
-- `AboutProps.init(state:)` — `.unknown` maps to `.notCheckedYet`, never "inactive": we have not looked, and a lock is caution while a status is a claim.
 - `AboutFlowView.onSunnah` — the Sunnah door is handed up rather than presented here. The reminders screen has two entries (the plan editor's row and this one), and a screen with more than one entry is presented from the nearest common ancestor of its entries (the decision on screens with several entries in `ARCHITECTURE.md`) — the timer, which already hosts this sheet and the plan editor. Presented here it would get a second host and a second flag, and the two doors would disagree about where closing the reminders screen lands.
 - `AboutFlowView.body` — `onOpenOffer` — the permanent entry reports `.manual` whichever state the offer opens in: the value names the door, not the frame behind it.
 - `AboutFlowView.body` — `onOpenSource` — `sourceOriginalOpened` is dispatched here, not from `OpenExternalLinkThunk`: the same thunk opens the privacy policy and the system Settings, and an event inside it would report those as papers.
 
+## AboutFlowView+Props.swift
+
+- `AboutFlowView.Props` — the About sheet's projection of `AppState`.
+- `AboutFlowView.Props.init(state:)` — `.unknown` maps to `.notCheckedYet`, never "inactive": we have not looked, and a lock is caution while a status is a claim.
+
 ## PaywallFlowView.swift
 
 - `PaywallFlowView` — the offer screen wired to the store. It owns nothing about how the offer looks (`PaywallView`), only which of the six states is true now and what the four actions dispatch. Motion is from the handoff and stated in numbers: the screen rises 28pt over 420ms with no overshoot, and the six states cross-fade in 180ms without animating layout. A cross-fade cannot move the Buy button under a thumb already travelling; a layout animation can.
-- `PaywallProps.isOpen` — not rendered: it decides whether the rest of the props are still worth applying (see `onPropsChange` in `body`).
-- `PaywallProps.init(state:)` — `trigger ?? .unknown` — only the closed-offer snapshot reaches the nil branch, and `onPropsChange` drops those, so it decides nothing anyone sees; `.unknown` orders the benefits exactly as `.manual` would. Spelled `.unknown` because it is not a door: a value naming a door the user did not come through, even off-screen, is how the two meanings got mixed.
 - `PaywallFlowView.phaseColor` — passed in, not derived here: it is the phase at the moment the offer was called, not necessarily the phase by the time the user finishes reading.
 - `PaywallFlowView.body` — scrim — warm, under the screen, so whatever called the offer does not read through while the card is still travelling.
 - `PaywallFlowView.body` — `PaywallBackdrop` stays outside the view that carries `.id(props.state)`: a cross-fade stands both layers at partial alpha mid-way, and a background that fades with them is not a background.
@@ -31,22 +38,15 @@ Why the flow views (the store-connected screens) are the way they are. Read the 
 - `PaywallFlowView.body` — surface and contents rise together: the 28pt of travel is the card's, not the text's.
 - `PaywallFlowView.body` — `onPropsChange` — a screen on its way out keeps the state it was in. `offerClosed` clears the entry point and resets the purchase phase in one action, so the last props would cross-fade the frame on screen (the S6 confirmation, say) back into the plain offer with Buy — and reorder the benefits as the trigger goes nil — under a removal already running. Nothing said after the offer closes has a reader.
 
+## PaywallFlowView+Props.swift
+
+- `PaywallFlowView.Props` — the offer screen's projection of `AppState`.
+- `PaywallFlowView.Props.isOpen` — not rendered: it decides whether the rest of the props are still worth applying (see `onPropsChange` in `body`).
+- `PaywallFlowView.Props.init(state:)` — `trigger ?? .unknown` — only the closed-offer snapshot reaches the nil branch, and `onPropsChange` drops those, so it decides nothing anyone sees; `.unknown` orders the benefits exactly as `.manual` would. Spelled `.unknown` because it is not a door: a value naming a door the user did not come through, even off-screen, is how the two meanings got mixed.
+
 ## TimerFlowView.swift
 
-- `TimerFlowView` — the fasting screen on Redux: reads a `TimerScreenProps` projection and derives phase and fraction from elapsed against the cycle's goal. Elapsed is never stored; it comes from `fastStartTimestamp` and a `TimelineView` tick.
-- `FooterHeightKey` — carries the pinned footer's measured height up to the scroll content that reserves it. A preference rather than a second `GeometryReader` because the two live in different branches of the same `safeAreaInset` composition.
-- `TimerScreenProps.eatingEndTimestamp` — projected from the timer state, not recomputed here, so the screen and the window-closed push agree on the moment.
-- `TimerScreenProps.plan` / `.goalHours` — not the same fact. `plan` is what is selected (the header pill, the editor); `goalHours` is the goal of the cycle on screen. A plan changed mid-fast, or a custom goal whose entitlement went away, leaves the fast in flight running to the goal it started with.
-- `TimerScreenProps.minutesAgo` — the picker's value as the user expressed it, a distance; it becomes a clock time only for display, where it is displayed.
-- `TimerScreenProps.hasRecords` — the header pill only exists once there is a record to open.
-- `TimerScreenProps.lastFastDuration` — length of the newest finished fast: the eating window's link into history.
-- `TimerScreenProps.endFast` — the end-of-fast sheet is a whole value, not a flag: which of its four cards is up, and every label on them, is decided from it.
-- `TimerScreenProps.isPro` — drives the lock on the custom plan row and whether the offer is up.
-- `TimerScreenProps.isVerifiedFree` — whether the header's Pro entry has anyone to sell to. `!isPro` cannot answer it: `unknown` locks like free but must not be sold to, and negating `isPro` folds it in on the wrong side. The definition lives on `ProState`, shared with the automatic offer, so the two surfaces cannot drift on what `unknown` means.
-- `TimerScreenProps.notice` — the one-time notice on screen, or the one still waiting for a neutral moment.
-- `TimerScreenProps.autoOfferPending` — the post-fast offer (T1') is owed and the entitlement side has nothing against it. Whether this screen is the place to show it, and when, is decided by `TimerFlowView.scheduleAutoOffer()`.
-- `TimerScreenProps.screenState(progress:now:)` — an open eating window shows the countdown until it closes; once closed, the chain screen (count-up + Continue fasting) holds for `TimerState.closedWindowHorizon` (24h), then falls to idle. Running past the goal is `.goalReached` (overtime), otherwise `.active`.
-- `TimerScreenProps.offerPhaseColor()` — the offer inherits the phase tint of the screen it was called from; an open or closed eating window has no phase on screen, so the offer takes the neutral green its backdrop already uses. Lives on the props rather than on a view because two hosts need it — the timer, which the tint describes, and `AppFlowView`, which presents the offer. A second copy in the root would compile and then drift (invariant 8).
+- `TimerFlowView` — the fasting screen on Redux: reads a `TimerFlowView.Props` projection and derives phase and fraction from elapsed against the cycle's goal. Elapsed is never stored; it comes from `fastStartTimestamp` and a `TimelineView` tick.
 - `TimerFlowView.sunnahRequestedFromAbout` — a note between two updates, not state: the About sheet's Sunnah row was tapped and the sheet is on its way out. The reminders screen opens on the far side of the dismissal and the flag is spent there (`openSunnahIfRequested()`).
 - `TimerFlowView.historyFocus` — the record History opens on: the fast a refusal named, so the person sent there to delete it does not have to hunt for it.
 - `TimerFlowView.historySource` — which entry point opened the history: it names the analytics source, and the eating-window entry also decides that the record just closed opens with it.
@@ -99,13 +99,29 @@ Why the flow views (the store-connected screens) are the way they are. Read the 
 - `TimerFlowView.openMealPicker()` — opening the picker is two facts: the sheet is up, and this is the answer to restore if it is dismissed. One place because both entries (idle and window-closed) must take the restore point; an entry that forgets it brings the "dismiss applies the edit" bug back.
 - `TimerFlowView.clockTime(_:)` — `Locale.latinDigits` keeps the region's 12/24h convention (and the device's 24-Hour Time setting) while forcing Latin digits, so the footer clock matches the hand-built timer and chip numerals instead of Eastern Arabic digits in ar.
 
+## TimerFlowView+Props.swift
+
+- `TimerFlowView.Props` — the timer screen's projection of `AppState`.
+- `TimerFlowView.Props.timer` / `.activePlan` — the timer state and the plan the cycle runs to, held whole so elapsed time, the window's countdown and the screen's frame come from `TimerState`'s own definitions instead of from formulas written over copied fields. The flags and moments the view reads (`isRunning`, `eatingEndTimestamp`, `goalHours`...) are read through them.
+- `TimerFlowView.Props.eatingEndTimestamp` — asked of the timer state, not recomputed here, so the screen and the window-closed push agree on the moment.
+- `TimerFlowView.Props.plan` / `.goalHours` — not the same fact. `plan` is what is selected (the header pill, the editor); `goalHours` is the goal of the cycle on screen. A plan changed mid-fast, or a custom goal whose entitlement went away, leaves the fast in flight running to the goal it started with.
+- `TimerFlowView.Props.minutesAgo` — the picker's value as the user expressed it, a distance; it becomes a clock time only for display, where it is displayed.
+- `TimerFlowView.Props.hasRecords` — the header pill only exists once there is a record to open.
+- `TimerFlowView.Props.lastFastDuration` — length of the newest finished fast: the eating window's link into history.
+- `TimerFlowView.Props.endFast` — the end-of-fast sheet is a whole value, not a flag: which of its four cards is up, and every label on them, is decided from it.
+- `TimerFlowView.Props.isPro` — drives the lock on the custom plan row and whether the offer is up.
+- `TimerFlowView.Props.isVerifiedFree` — whether the header's Pro entry has anyone to sell to. `!isPro` cannot answer it: `unknown` locks like free but must not be sold to, and negating `isPro` folds it in on the wrong side. The definition lives on `ProState`, shared with the automatic offer, so the two surfaces cannot drift on what `unknown` means.
+- `TimerFlowView.Props.notice` — the one-time notice on screen, or the one still waiting for a neutral moment.
+- `TimerFlowView.Props.autoOfferPending` — the post-fast offer (T1') is owed and the entitlement side has nothing against it. Whether this screen is the place to show it, and when, is decided by `TimerFlowView.scheduleAutoOffer()`.
+- `TimerFlowView.Props.elapsed(at:)` / `.eatingRemaining(at:)` / `.eatingOverElapsed(at:)` / `.screenState(at:)` — adapters from the view's `Date` to the domain's epoch seconds; the rules are `TimerState`'s (`Features/timer/NOTES.md`).
+
+## TimerFlowView+FooterHeightKey.swift
+
+- `TimerFlowView.FooterHeightKey` — carries the pinned footer's measured height up to the scroll content that reserves it. A preference rather than a second `GeometryReader` because the two live in different branches of the same `safeAreaInset` composition.
+
 ## HistoryFlowView.swift
 
 - `HistoryFlowView` — what the fasts add up to, then the fasts grouped by month. Pushed from the main screen: history is deeper into the app, not a dialog over it. Months, not weeks: a month is the unit people judge "how am I doing" in and it gives the group header a meaningful aggregate; weekly headers would turn a long history into a picket fence of titles.
-- `HistoryProps.isRunning` — picks which action the empty state offers (`HistoryEmptyAction`).
-- `HistoryProps.isPro` — `unknown` locks the export exactly like `free`: Pro is never handed out on a guess.
-- `HistoryProps.exportFile` — the written CSV waiting to be shared; the share sheet is up while it exists.
-- `HistoryProps.isExportBusy` — mirrors `HistoryState.isExportBusy`, so the button is gated the same way the thunk gates itself.
 - `HistoryFlowView.source` — logged with the open. The eating-window entry arrives with the fast that just closed already expanded: the link named it ("Last fast · 16h 24m"), so the screen should not make it be hunted for.
 - `HistoryFlowView.focusRecordID` — a record to open expanded: the eating-window entry names its record in the link, the overlap refusal names one in its reason. Both arrive at a screen where hunting for it is the whole cost of the trip.
 - `HistoryFlowView.body` — empty state action — both choices leave the screen; only the invitation (`.startFast`) also starts a fast on the way out.
@@ -119,13 +135,34 @@ Why the flow views (the store-connected screens) are the way they are. Read the 
 - `HistoryFlowView.content(stats:theme:)` — charts, when they come, slot between the totals and the first group, so adding them shifts nothing above or below.
 - `HistoryFlowView.monthGroup(_:theme:)` — on a long history the group aggregate carries the value, not the rows.
 - `HistoryFlowView.toggle(_:)` — accordion: at most one record open, so the screen never becomes a wall of detail.
-- `InteractivePopGesture` — puts the system edge-swipe back on a screen that hides the navigation bar. Hiding the bar takes the pop gesture with it and the recogniser is not merely disabled — the navigation controller's own delegate vetoes it in `gestureRecognizerShouldBegin`, so flipping `isEnabled` alone changes nothing; both the flag and a delegate are set. Not a `DragGesture`: a hand-rolled one does not track interactively, does not mirror to the trailing edge in RTL, and would compete with the horizontal drag `SwipeToDeleteRow` owns. Nothing is drawn — the controller exists only to reach the navigation controller — so the header is untouched and no system back button appears.
-- `InteractivePopGesture.Host.borrowed` — the recogniser belongs to the navigation controller, which outlives this screen, so what was borrowed is given back in `viewWillDisappear`. A delegate left behind on the root is the classic way to wedge navigation for good.
-- `InteractivePopGesture.Host.previousEnabled` — `isEnabled` is given back too, not only the delegate: a flag deliberately false elsewhere would otherwise stay on after this screen and misfire far from here.
-- `InteractivePopGesture.Host.gestureRecognizerShouldBegin(_:)` — the depth check is not ceremony: allowing the gesture on the root view controller makes a navigation controller stop responding to pushes afterwards. The delegate is replaced wholesale, not proxied: the original is no longer asked any of the five methods, and the rest fall back to protocol defaults. That holds only because the one behaviour known from it — its answer on simultaneous recognition — is reproduced in `gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)`.
-- `InteractivePopGesture.Host.gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)` — the rows own a horizontal drag; the two must not run together.
-- `SwipeToDeleteRow` — trailing swipe reveals Delete; a full swipe never deletes on its own: the confirmation is the point, there is no undo.
-- `SwipeToDeleteRow.direction` — the row travels toward the trailing edge, whichever side that is (RTL).
-- `SwipeToDeleteRow.body` — the action fills exactly the strip the row was pulled aside by, so it never sits under the translucent row content at rest. Accessibility id `history.row.delete`.
-- `SwipeToDeleteRow.swipeableContent` — iOS 26 lets a child SwiftUI `DragGesture` capture a vertical touch before its direction guard runs, even when simultaneous with the `ScrollView`. A UIKit pan (`HorizontalRowPan`) can fail in `gestureRecognizerShouldBegin` while the touch is still being arbitrated, so vertical motion goes straight to scrolling. iOS 17 keeps the `DragGesture` because `UIGestureRecognizerRepresentable` starts at iOS 18.
-- `HorizontalRowPan` — direction-locking pan: SwiftUI receives it through the native gesture bridge, UIKit gets the early-failure hook that leaves vertical movement to the enclosing scroll view.
+
+## HistoryFlowView+Props.swift
+
+- `HistoryFlowView.Props` — the history screen's projection of `AppState`. Nested to keep the name scoped to the screen.
+- `HistoryFlowView.Props.isRunning` — picks which action the empty state offers (`HistoryEmptyAction`).
+- `HistoryFlowView.Props.isPro` — `unknown` locks the export exactly like `free`: Pro is never handed out on a guess.
+- `HistoryFlowView.Props.exportFile` — the written CSV waiting to be shared; the share sheet is up while it exists.
+- `HistoryFlowView.Props.isExportBusy` — mirrors `HistoryState.isExportBusy`, so the button is gated the same way the thunk gates itself.
+
+## HistoryFlowView+InteractivePopGesture.swift
+
+- `HistoryFlowView.InteractivePopGesture` — puts the system edge-swipe back on a screen that hides the navigation bar. Hiding the bar takes the pop gesture with it and the recogniser is not merely disabled — the navigation controller's own delegate vetoes it in `gestureRecognizerShouldBegin`, so flipping `isEnabled` alone changes nothing; both the flag and a delegate are set. Not a `DragGesture`: a hand-rolled one does not track interactively, does not mirror to the trailing edge in RTL, and would compete with the horizontal drag `SwipeToDeleteRow` owns. Nothing is drawn — the controller exists only to reach the navigation controller — so the header is untouched and no system back button appears.
+- `HistoryFlowView.InteractivePopGesture.Host.borrowed` — the recogniser belongs to the navigation controller, which outlives this screen, so what was borrowed is given back in `viewWillDisappear`. A delegate left behind on the root is the classic way to wedge navigation for good.
+- `HistoryFlowView.InteractivePopGesture.Host.previousEnabled` — `isEnabled` is given back too, not only the delegate: a flag deliberately false elsewhere would otherwise stay on after this screen and misfire far from here.
+- `HistoryFlowView.InteractivePopGesture.Host.gestureRecognizerShouldBegin(_:)` — the depth check is not ceremony: allowing the gesture on the root view controller makes a navigation controller stop responding to pushes afterwards. The delegate is replaced wholesale, not proxied: the original is no longer asked any of the five methods, and the rest fall back to protocol defaults. That holds only because the one behaviour known from it — its answer on simultaneous recognition — is reproduced in `gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)`.
+- `HistoryFlowView.InteractivePopGesture.Host.gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)` — the rows own a horizontal drag; the two must not run together.
+
+## HistoryFlowView+SwipeToDeleteRow.swift
+
+- `HistoryFlowView.SwipeToDeleteRow` — trailing swipe reveals Delete; a full swipe never deletes on its own: the confirmation is the point, there is no undo.
+- `HistoryFlowView.SwipeToDeleteRow.direction` — the row travels toward the trailing edge, whichever side that is (RTL).
+- `HistoryFlowView.SwipeToDeleteRow.body` — the action fills exactly the strip the row was pulled aside by, so it never sits under the translucent row content at rest. Accessibility id `history.row.delete`.
+- `HistoryFlowView.SwipeToDeleteRow.swipeableContent` — iOS 26 lets a child SwiftUI `DragGesture` capture a vertical touch before its direction guard runs, even when simultaneous with the `ScrollView`. A UIKit pan (`HorizontalRowPan`) can fail in `gestureRecognizerShouldBegin` while the touch is still being arbitrated, so vertical motion goes straight to scrolling. iOS 17 keeps the `DragGesture` because `UIGestureRecognizerRepresentable` starts at iOS 18.
+
+## HistoryFlowView+HorizontalRowPan.swift
+
+- `HistoryFlowView.HorizontalRowPan` — direction-locking pan: SwiftUI receives it through the native gesture bridge, UIKit gets the early-failure hook that leaves vertical movement to the enclosing scroll view.
+
+## SunnahFlowView+Props.swift
+
+- `SunnahFlowView.Props` — the reminders screen's projection of `AppState`: the Sunnah state whole, because `SunnahSettingsView` renders every field of it — the settings, the delivery state and the upcoming dates.

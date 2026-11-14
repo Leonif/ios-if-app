@@ -5,16 +5,6 @@
 
 import Foundation
 
-enum EndFastChipOffset: Equatable {
-    case minutesAgo(Int)
-    case daysBack(Int)
-}
-
-struct EndFastChip: Equatable {
-    let offset: EndFastChipOffset
-    let label: String
-}
-
 enum EndFastMath {
     private static let quickOffsetsMinutes = [0, 30, 60]
 

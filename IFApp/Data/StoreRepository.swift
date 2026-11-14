@@ -6,26 +6,6 @@
 import Foundation
 import StoreKit
 
-enum PurchaseOutcome: Equatable, Sendable {
-    case purchased
-    case pending
-    case cancelled
-    case failed(PurchaseFailure)
-}
-
-enum RestoreOutcome: Equatable, Sendable {
-    case restored
-    case nothingToRestore
-    case failed(PurchaseFailure)
-}
-
-protocol StoreRepositoryProtocol {
-    func refresh() async -> (entitlement: Entitlement, product: ProProductInfo?)
-    func purchase() async -> PurchaseOutcome
-    func restore() async -> RestoreOutcome
-    func entitlementUpdates() -> AsyncStream<Entitlement>
-}
-
 struct StoreRepository: StoreRepositoryProtocol {
     private enum Key {
         static let verifiedEntitlement = "pro_entitlement_verified"

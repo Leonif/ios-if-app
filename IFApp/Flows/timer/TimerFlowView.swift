@@ -7,117 +7,12 @@ import SwiftUI
 import UIKit
 import Redux
 
-private struct FooterHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
-    }
-}
-
-struct TimerScreenProps: Equatable {
-    let isRunning: Bool
-    let fastStartTimestamp: Double
-    let stagedElapsed: TimeInterval
-    let hasCelebrated: Bool
-    let isEating: Bool
-    let eatingEndTimestamp: Double
-    let plan: Plan
-    let goalHours: Double
-    let minutesAgo: Int
-    let chipIdx: Int
-    let streak: StreakStatus
-    let hasRecords: Bool
-    let lastFastDuration: TimeInterval?
-    let planEditorOpen: Bool
-    let mealPickerOpen: Bool
-    let streakMilestoneOpen: Bool
-    let resetConfirmOpen: Bool
-    let endEatingConfirmOpen: Bool
-    let endFast: EndFastState
-    let isPro: Bool
-    let isVerifiedFree: Bool
-    let offerOpen: Bool
-    let notice: ProNotice?
-    let revocationPending: Bool
-    let autoOfferPending: Bool
-
-    init(state: AppState) {
-        isRunning = state.timerState.isRunning
-        fastStartTimestamp = state.timerState.fastStartTimestamp
-        stagedElapsed = state.timerState.stagedElapsed
-        hasCelebrated = state.timerState.hasCelebrated
-        isEating = state.timerState.isEating
-        eatingEndTimestamp = state.timerState.eatingEndTimestamp(plan: state.activePlan)
-        streak = state.streak
-        hasRecords = !state.historyState.records.isEmpty
-        lastFastDuration = state.historyState.records
-            .max(by: { $0.endTimestamp < $1.endTimestamp })?
-            .duration
-        plan = state.planState.plan
-        goalHours = state.activeGoalHours
-        minutesAgo = state.mealState.minutesAgo
-        chipIdx = state.mealState.chipIdx
-        planEditorOpen = state.uiState.planEditorOpen
-        mealPickerOpen = state.uiState.mealPickerOpen
-        streakMilestoneOpen = state.uiState.streakMilestoneOpen
-        resetConfirmOpen = state.uiState.resetConfirmOpen
-        endEatingConfirmOpen = state.uiState.endEatingConfirmOpen
-        endFast = state.endFastState
-        isPro = state.proState.isPro
-        isVerifiedFree = state.proState.isVerifiedFree
-        offerOpen = state.proState.isOfferOpen
-        notice = state.proState.notice
-        revocationPending = state.proState.revocationPending
-        autoOfferPending = state.proState.autoOfferPending
-    }
-
-    var isMealFresh: Bool { minutesAgo == 0 }
-
-    func elapsed(at now: Date) -> TimeInterval {
-        isRunning ? max(0, now.timeIntervalSince1970 - fastStartTimestamp) : stagedElapsed
-    }
-
-    func eatingRemaining(at now: Date) -> TimeInterval {
-        max(0, eatingEndTimestamp - now.timeIntervalSince1970)
-    }
-
-    func eatingOverElapsed(at now: Date) -> TimeInterval {
-        max(0, now.timeIntervalSince1970 - eatingEndTimestamp)
-    }
-
-    fileprivate func screenState(progress: PhaseProgress, now: Date) -> ScreenState {
-        if isEating {
-            if eatingRemaining(at: now) > 0 { return .eating }
-            return TimerState.closedWindowHasLapsed(closedAt: eatingEndTimestamp,
-                                                    now: now.timeIntervalSince1970) ? .idle : .eatingOver
-        }
-        if !isRunning { return stagedElapsed > 0 ? .complete : .idle }
-        return progress.isComplete ? .goalReached : .active
-    }
-
-    fileprivate func currentScreenState() -> ScreenState {
-        let now = Date()
-        return screenState(progress: PhaseProgress.compute(elapsed: elapsed(at: now),
-                                                           goalHours: goalHours),
-                           now: now)
-    }
-
-    func offerPhaseColor() -> Color {
-        let state = currentScreenState()
-        guard state != .eating, state != .eatingOver else { return Phase.fat.color }
-        return PhaseProgress.compute(elapsed: elapsed(at: Date()),
-                                     goalHours: goalHours).phase.color
-    }
-}
-
-private enum ScreenState { case idle, active, goalReached, complete, eating, eatingOver }
-
 struct TimerFlowView: View {
     private let store: Store<AppState>
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
-    @State private var props: TimerScreenProps
+    @State private var props: Props
     @State private var showSunnah = false
     @State private var sunnahRequestedFromAbout = false
     @State private var showSources = false
@@ -134,7 +29,7 @@ struct TimerFlowView: View {
 
     init(store: Store<AppState>) {
         self.store = store
-        _props = State(initialValue: TimerScreenProps(state: store.getCurrentState()))
+        _props = State(initialValue: Props(state: store.getCurrentState()))
     }
 
     var body: some View {
@@ -180,7 +75,7 @@ struct TimerFlowView: View {
                             onStartFast: { store.dispatch(StartFastThunk()) })
         }
         .toolbar(.hidden, for: .navigationBar)
-        .connect(to: store, mapState: { TimerScreenProps(state: $0) }, onPropsChange: { props = $0 })
+        .connect(to: store, mapState: { Props(state: $0) }, onPropsChange: { props = $0 })
         .onAppear {
             store.dispatch(AppLifecycleAction.themeActive(dark: colorScheme == .dark))
             store.dispatch(AppLifecycleAction.appBecameActive)
@@ -218,7 +113,7 @@ struct TimerFlowView: View {
     private func screen(theme: ThemeTokens, now: Date) -> some View {
         let elapsed = props.elapsed(at: now)
         let progress = PhaseProgress.compute(elapsed: elapsed, goalHours: props.goalHours)
-        let state = props.screenState(progress: progress, now: now)
+        let state = props.screenState(at: now)
         let nowMinute = Clock.minuteOfDay(now)
 
         GeometryReader { proxy in
@@ -354,7 +249,7 @@ struct TimerFlowView: View {
     // MARK: - Ring center
 
     @ViewBuilder
-    private func ringCenter(state: ScreenState, elapsed: TimeInterval, progress: PhaseProgress, theme: ThemeTokens) -> some View {
+    private func ringCenter(state: TimerScreenState, elapsed: TimeInterval, progress: PhaseProgress, theme: ThemeTokens) -> some View {
         switch state {
         case .idle:
             RingCenterIdle(theme: theme, onStart: { store.dispatch(StartFastThunk()) })
@@ -372,7 +267,7 @@ struct TimerFlowView: View {
     // MARK: - Footer
 
     @ViewBuilder
-    private func footer(state: ScreenState, elapsed: TimeInterval, theme: ThemeTokens) -> some View {
+    private func footer(state: TimerScreenState, elapsed: TimeInterval, theme: ThemeTokens) -> some View {
         switch state {
         case .idle:
             EmptyView()
@@ -453,7 +348,7 @@ struct TimerFlowView: View {
         props.revocationPending && screenIsClear && props.currentScreenState() == .idle
     }
 
-    private func showsProEntry(state: ScreenState) -> Bool {
+    private func showsProEntry(state: TimerScreenState) -> Bool {
         props.isVerifiedFree && state != .goalReached && state != .complete
     }
 
@@ -607,7 +502,7 @@ struct TimerFlowView: View {
 
     // MARK: - Copy / formatting
 
-    private func editorial(state: ScreenState, progress: PhaseProgress,
+    private func editorial(state: TimerScreenState, progress: PhaseProgress,
                            elapsed: TimeInterval) -> String {
         switch state {
         case .idle: return PhaseCopy.idle
@@ -627,7 +522,7 @@ struct TimerFlowView: View {
 
     // MARK: - Goal-reached moment
 
-    private func reconcileEating(_ state: ScreenState) {
+    private func reconcileEating(_ state: TimerScreenState) {
         if props.endEatingConfirmOpen && state != .eating {
             store.dispatch(UIAction.endEatingConfirmClosed)
         }
@@ -647,7 +542,7 @@ struct TimerFlowView: View {
             : String(format: "%d:%02d", total / 3600, (total / 60) % 60)
     }
 
-    private func syncGoalMoment(to state: ScreenState) {
+    private func syncGoalMoment(to state: TimerScreenState) {
         guard state == .goalReached else {
             goalMomentPlayed = false
             return
