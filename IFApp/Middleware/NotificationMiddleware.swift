@@ -2,10 +2,6 @@
 //  NotificationMiddleware.swift
 //  IFApp
 //
-//  Keeps the single goal-reached local push in sync with the timer. Reacts to
-//  anything that can move the goal time or running state (start/stop/reset/adjust,
-//  back-dated meal, plan change) plus app launch, then schedules or cancels.
-//
 
 import Foundation
 import Redux
@@ -29,17 +25,11 @@ final class NotificationMiddleware: Middleware {
         }
     }
 
-    /// Keeps the goal push (running fast) and the eating-window push (open window) in
-    /// sync with the timer. Each is scheduled while its deadline is still ahead and
-    /// cancelled otherwise. Idempotent, so it's safe to call on every relevant action.
     private func sync(_ app: AppState) {
         let timer = app.timerState
-        // The goal of the cycle in flight, not the plan setting: a plan change mid-fast
-        // must not move a push that belongs to a fast already under way.
         let goalHours = app.activeGoalHours
         let now = Clock.now().timeIntervalSince1970
 
-        // Goal push while a fast is running.
         if timer.isRunning {
             let secondsUntilGoal = timer.fastStartTimestamp + goalHours * 3600 - now
             if secondsUntilGoal > 0 {
@@ -51,7 +41,6 @@ final class NotificationMiddleware: Middleware {
             repo.cancelGoalNotification()
         }
 
-        // Eating-window-closed push while a window is open.
         if timer.isEating {
             let secondsUntilClose = timer.eatingEndTimestamp(plan: app.activePlan) - now
             if secondsUntilClose > 0 {

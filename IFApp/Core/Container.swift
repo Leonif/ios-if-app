@@ -2,9 +2,6 @@
 //  Container.swift
 //  IFApp
 //
-//  Service Locator for dependency injection (see .cursor / architecture rules).
-//  Usage: `let repo: SomeProtocol = container.inject()`.
-//
 
 import Foundation
 
@@ -24,5 +21,4 @@ final class Container {
     }
 }
 
-/// Global service locator. Registrations happen once at app launch via `AppDependencies.register()`.
 let container = Container()

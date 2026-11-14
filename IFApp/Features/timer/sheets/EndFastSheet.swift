@@ -2,21 +2,6 @@
 //  EndFastSheet.swift
 //  IFApp
 //
-//  The end-of-fast correction sheet — four mutually exclusive cards, one component.
-//  Mode A of the consequence genre: the card is not in a ScrollView and has 583pt to
-//  live in on an iPhone SE 3, so every new line REPLACES an existing one rather than
-//  adding to it. The near-goal line takes the hint's slot; the refusal takes the
-//  whole card.
-//
-//  Two rules run through all four states and neither is stylistic:
-//
-//  - **No fixed heights on text.** Every block is a `minHeight` with slack. A box
-//    measured off the English mock-up overflows in German, and that defect does not
-//    look like a clip — it looks like overlap.
-//  - **No `minimumScaleFactor`.** At the xxLarge ceiling a label wider than ~153pt
-//    renders below base size under a 0.7 floor: someone turned text up and got
-//    smaller type. Text wraps and the block grows instead.
-//
 
 import SwiftUI
 
@@ -24,8 +9,6 @@ struct EndFastSheet: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let state: EndFastState
-    /// The clock the labels are drawn against. Passed in rather than read here: a
-    /// view that reads the clock cannot be rendered twice and compared.
     let now: Double
     let theme: ThemeTokens
     let onChip: (EndFastChipOffset) -> Void
@@ -49,7 +32,7 @@ struct EndFastSheet: View {
         .transition(.opacity)
     }
 
-    // MARK: Card
+    // MARK: - Card
 
     private var card: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -67,14 +50,11 @@ struct EndFastSheet: View {
                 .overlay(RoundedRectangle(cornerRadius: 22).stroke(theme.surfaceLine, lineWidth: 1))
                 .shadow(color: theme.cardShadow, radius: 30, x: 0, y: 12)
         )
-        // The whole card cross-fades between states; nothing animates its layout,
-        // which is why replacement is a hard rule — there is no animation available
-        // to absorb a height change.
         .animation(reduceMotion ? .easeInOut(duration: 0.24) : .easeInOut(duration: 0.18),
                    value: state.stage)
     }
 
-    // MARK: S1 / S2 / S3 — the picker
+    // MARK: - S1 / S2 / S3 — the picker
 
     @ViewBuilder
     private var pickerCard: some View {
@@ -89,10 +69,6 @@ struct EndFastSheet: View {
             SheetPrimaryButton(title: primaryLabel, theme: theme, action: onConfirm)
                 .accessibilityIdentifier("endFast.confirm")
             if state.stage == .nearGoal {
-                // Last element, no chevron, and it repeats the noun of the line above
-                // it: the pair reads as sentence and answer rather than as options
-                // three and four. It is the named form of closing the sheet — the same
-                // thing the scrim tap does, spelled out.
                 QuietActionButton(title: strings.Reset.keepThisFast, theme: theme, action: onKeepFast)
                     .accessibilityIdentifier("endFast.keepFast")
             }
@@ -144,21 +120,14 @@ struct EndFastSheet: View {
         return strings.EndFast.timerRanPast(strings.Duration.hm(total / 3600, (total / 60) % 60))
     }
 
-    /// The consequence message: the app's third register, next to prose and buttons.
-    /// The genre itself lives in `ConsequenceInset` — the same component the pinned
-    /// footer of the result screen draws, so the two surfaces cannot drift into two
-    /// dialects of one sentence.
     private func consequenceInset(_ text: String) -> some View {
         ConsequenceInset(text: text, theme: theme, identifier: "endFast.consequence")
     }
 
-    // MARK: Chips
+    // MARK: - Chips
 
     private var chipRow: some View {
         HStack(spacing: 8) {
-            // Keyed by position, not by label: two presets can be clamped onto the
-            // same moment near the edge of the reachable range, and identical labels
-            // would collapse the row from three chips to two.
             let chips = EndFastMath.chips(stage: state.stage, now: now,
                                           selected: state.endTimestamp)
             ForEach(chips.indices, id: \.self) { index in
@@ -175,15 +144,12 @@ struct EndFastSheet: View {
                         .background(RoundedRectangle(cornerRadius: 12).fill(theme.surfaceQuiet))
                 }
                 .buttonStyle(.pressable)
-                // Keyed by position for the same reason the row is: the labels are
-                // translated into ten languages and two of them can coincide, so a
-                // flow that named a chip by its text would be naming a moving target.
                 .accessibilityIdentifier("endFast.chip.\(index)")
             }
         }
     }
 
-    // MARK: Exact time (S1 / S3 only)
+    // MARK: - Exact time (S1 / S3 only)
 
     private var dividerLabel: some View {
         HStack(spacing: 10) {
@@ -225,9 +191,6 @@ struct EndFastSheet: View {
         .background(RoundedRectangle(cornerRadius: 12).fill(theme.surfaceQuiet))
     }
 
-    /// True while the exact-time value still sits where the sheet put it — the moment
-    /// the goal ran out. The caption says so, which is the difference between "9:10 AM
-    /// yesterday" and "the time your goal was reached".
     private var isOnGoalEnd: Bool {
         guard case .overtime = state.entry else { return false }
         return abs(state.endTimestamp - goalEnd) < 60
@@ -250,7 +213,7 @@ struct EndFastSheet: View {
         .accessibilityIdentifier("endFast.step.\(symbol)")
     }
 
-    // MARK: Preview
+    // MARK: - Preview
 
     private var previewRow: some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
@@ -277,21 +240,17 @@ struct EndFastSheet: View {
         }
     }
 
-    // MARK: S4 — the refusal
+    // MARK: - S4 — the refusal
 
     @ViewBuilder
     private var refusalCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Its own header. Reusing "When did you eat?" over a body that is no
-            // longer a picker makes the header describe something that is not there.
             Text(strings.EndFast.refusalTitle)
                 .font(.bricolage(20))
                 .foregroundColor(theme.ink)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("endFast.refusalTitle")
 
-            // Budgeted for four German lines by minimum height, never a fixed one: a
-            // fifth line grows the block instead of running under the actions.
             HStack(spacing: 0) {
                 Text(state.conflictUnavoidable
                      ? strings.EndFast.refusalReasonUnavoidable(conflictSpan)
@@ -308,11 +267,6 @@ struct EndFastSheet: View {
             .frame(maxWidth: .infinity, minHeight: 124, alignment: .leading)
             .background(RoundedRectangle(cornerRadius: 12).fill(theme.surfaceQuiet))
 
-            // Live exits, nothing dimmed or disabled: a silently inactive control is
-            // the unsaid refusal this state exists to replace. When the clash is on the
-            // start, "pick another time" is dropped entirely — it could only loop the
-            // person back here — and removing the old record leads as the one real way
-            // out. When a re-pick could still clear it, both stand, the re-pick first.
             VStack(spacing: 10) {
                 if state.conflictUnavoidable {
                     SheetPrimaryButton(title: strings.EndFast.openThatFast, theme: theme) {

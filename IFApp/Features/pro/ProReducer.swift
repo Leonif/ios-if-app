@@ -2,9 +2,6 @@
 //  ProReducer.swift
 //  IFApp
 //
-//  Pure and synchronous. Every transition between the six offer states is here and
-//  nowhere else — the screen renders `offerState`, it does not decide it.
-//
 
 import Redux
 
@@ -15,33 +12,18 @@ func proReducer(state: ProState, action: Action) -> ProState {
     case let .offerOpened(trigger):
         newState.trigger = trigger
         if trigger == .fastFinished {
-            // The one-time flag is spent here and nowhere else: on the fact of a
-            // show, which is the same instant `paywall_shown` is logged. Every
-            // suppression on the way to this line leaves it alone, which is what
-            // makes a suppressed show a postponement instead of a loss.
             newState.autoOfferShown = true
             newState.autoOfferArmed = false
         }
-        // A fresh presentation starts clean: an error or a confirmation left over from
-        // the last time the screen was up is not news about this one. A pending
-        // approval is not left over — the request is still out — so the screen opens
-        // on S4 rather than inviting a second purchase of the same thing.
         if !newState.phase.outlivesOffer { newState.phase = .idle }
         newState.showsNothingToRestore = false
 
     case .offerClosed:
         newState.trigger = nil
-        // Same rule, and the one PW9 was about: walking away from the offer is not an
-        // answer from whoever approves the purchase. The Pro row in About IF24 reads
-        // this phase, and it has to keep saying "awaiting approval" until the approval
-        // (or a failure) actually arrives — edge 18 / PW-13.
         if !newState.phase.outlivesOffer { newState.phase = .idle }
         newState.showsNothingToRestore = false
 
     case .autoOfferArmed:
-        // Checked against the spent flag here as well as at the show, so an install
-        // that has had its offer never arms one again and nothing downstream has to
-        // remember why it is holding a plan that can never fire.
         if !newState.autoOfferShown { newState.autoOfferArmed = true }
 
     case .autoOfferCancelled:
@@ -52,25 +34,14 @@ func proReducer(state: ProState, action: Action) -> ProState {
         newState.product = product
 
     case let .entitlementChanged(entitlement):
-        // Losing a right that was verifiably held is the one transition the user has
-        // to be told about — a refund, or a family member leaving the group. Both
-        // notices are armed here and shown much later, at two different moments.
         if state.isPro, entitlement != .pro {
             newState.revocationPending = true
             newState.goalChangePending = true
         }
         newState.entitlement = entitlement
         if entitlement == .pro {
-            // Having it again makes both queued notices false, whether they were
-            // queued a second ago or a week ago.
             newState.revocationPending = false
             newState.goalChangePending = false
-            // An approved Ask to Buy arrives here: the wait is over, so the screen
-            // stops saying it is waiting and says the purchase went through instead.
-            // The money was taken from someone who is not necessarily looking at this
-            // screen, so the confirmation waits on S6 to be dismissed by hand rather
-            // than flashing past. Nothing else about a change of entitlement is a
-            // statement about an attempt in progress.
             if newState.phase == .awaitingApproval { newState.phase = .granted(.approved) }
         }
 
@@ -80,16 +51,12 @@ func proReducer(state: ProState, action: Action) -> ProState {
 
     case .purchaseCompleted:
         newState.entitlement = .pro
-        // The one place the app can say "your money arrived" in the second it
-        // arrives. It lands in the same S6 the free Restore has always had.
         newState.phase = .granted(.purchased)
 
     case .purchasePending:
         newState.phase = .awaitingApproval
 
     case let .purchaseFailed(reason), let .restoreFailed(reason):
-        // Backing out of Apple's sheet is not a failure to report: the offer stays
-        // exactly as it was, which is what the user asked for by cancelling.
         newState.phase = reason == .cancelled ? .idle : .failed(reason)
 
     case .restoreCompleted:
@@ -97,10 +64,6 @@ func proReducer(state: ProState, action: Action) -> ProState {
         newState.phase = .granted(.restored)
 
     case .restoreFoundNothing:
-        // Nothing to restore is an answer, not an error: it also settles an
-        // entitlement that may have been unknown until now, so the screen leaves S5.
-        // Leaving S5 is its own feedback; the transient line below is for the two
-        // surfaces where the frame would otherwise not move at all.
         newState.entitlement = .free
         newState.phase = .idle
         newState.showsNothingToRestore = state.entitlement != .unknown
@@ -122,42 +85,10 @@ func proReducer(state: ProState, action: Action) -> ProState {
         break
     }
 
-    // The review prompt outranks the offer for the rest of the launch. Ratings are a
-    // growth asset and cost more than one attempt to sell; the flag stays unspent, so
-    // the price of suppressing wrongly (Apple may show nothing at all — the action
-    // means the request was made, not that a panel appeared) is zero.
     if case AppLifecycleAction.reviewPrompted = action {
         newState.reviewPromptedThisSession = true
     }
 
-    // The offer does not stand open in front of someone who already owns it. Stated
-    // once, over the state, rather than three times over the three ways the right can
-    // arrive: buying it here, an Ask to Buy approved minutes later, and the store
-    // answering `.pro` for a purchase made elsewhere are different actions with the
-    // same consequence — there is nothing left to sell.
-    //
-    // The condition is `idle` and not "the screen shows S1", because idle is exactly
-    // "nothing in flight to be about": every other phase is feedback on an attempt and
-    // has its own frame to finish in (S2 while it settles, S4 while approval is out,
-    // S6 for the confirmation, whatever the right came by, S3 for a failure worth
-    // reading). With the machinery idle, an open offer is only ever an invitation to
-    // buy — and the tap it invites does nothing at all, since `PurchaseProThunk`
-    // guards on `isPro`.
-    //
-    // Clearing the entry point is what closes the screen, and a purchase no longer
-    // reaches it in the same pass: it goes to `.granted`, which is not idle, so the
-    // screen stands on S6 until the user dismisses it — exactly as a restore already
-    // did. Analytics is unaffected: the middleware reads the trigger off its
-    // pre-reduce snapshot, so `purchase_completed` still carries the door the user
-    // came in through.
-    //
-    // Standing over the whole switch, it also refuses to *open* the offer for an
-    // owner: `offerOpened` sets the entry point and this takes it straight back. That
-    // is deliberate and today unreachable — all three doors are shut from outside
-    // (`AboutIF24View.opensOffer`, the history export button, the plan editor) — but
-    // if a fourth one is ever added without its own guard, note that the analytics
-    // middleware logs `paywall_shown` on the action, so it would report a screen that
-    // never appeared. The guard belongs on the door, not here.
     if newState.isPro, newState.phase == .idle {
         newState.trigger = nil
     }

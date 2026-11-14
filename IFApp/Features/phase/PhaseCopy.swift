@@ -2,8 +2,6 @@
 //  PhaseCopy.swift
 //  IFApp
 //
-//  Editorial copy. English for now; localization is a later pass.
-//
 
 import Foundation
 
@@ -21,7 +19,6 @@ enum PhaseCopy {
         }
     }
 
-    /// "Autophagy begins in 2h 36m"
     static func nextPhaseChip(next: Phase, secondsToNext: TimeInterval) -> String {
         let total = max(0, Int(secondsToNext))
         let h = total / 3600, m = (total / 60) % 60

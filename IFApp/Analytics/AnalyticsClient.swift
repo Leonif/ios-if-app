@@ -2,9 +2,6 @@
 //  AnalyticsClient.swift
 //  IFApp
 //
-//  The transport. Sends events to Firebase when the SDK is linked; otherwise
-//  logs to the console so analytics work in dev/test builds without Firebase.
-//
 
 import Foundation
 
@@ -18,14 +15,10 @@ import FirebaseAnalytics
 
 protocol AnalyticsClient {
     func log(name: String, parameters: [String: Any])
-    /// Sets a persistent user property for segmentation (nil clears it).
     func setUserProperty(_ value: String?, forName name: String)
 }
 
 struct DefaultAnalyticsClient: AnalyticsClient {
-    /// Firebase is deliberately left unconfigured on mainland-China devices, and on
-    /// any build without the config plist (`IFAppApp.configureFirebase()`). Every
-    /// event then drops here, silently — the rest of the app keeps working.
     private var isFirebaseConfigured: Bool {
         #if canImport(FirebaseCore)
         return FirebaseApp.app() != nil

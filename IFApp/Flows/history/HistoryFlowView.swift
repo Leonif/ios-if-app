@@ -2,14 +2,6 @@
 //  HistoryFlowView.swift
 //  IFApp
 //
-//  The history screen: what the fasts add up to, then the fasts themselves grouped
-//  by month. Pushed from the main screen — history is deeper into the app, not a
-//  dialog over it.
-//
-//  Months, not weeks: a month is the unit people think "how am I doing" in, and it
-//  gives the group header a meaningful aggregate. Weekly headers would turn a long
-//  history into a picket fence of titles.
-//
 
 import SwiftUI
 import UIKit
@@ -18,16 +10,10 @@ import Redux
 struct HistoryProps: Equatable {
     let records: [FastRecord]
     let streak: StreakStatus
-    /// Whether a fast is in flight. Picks which action the empty state offers — see
-    /// `HistoryEmptyAction`.
     let isRunning: Bool
-    /// Whether the export is unlocked. `unknown` locks exactly like `free` — Pro is
-    /// never handed out on a guess.
     let isPro: Bool
-    /// The written CSV waiting to be shared; the share sheet is up while it exists.
     let exportFile: URL?
     let isExporting: Bool
-    /// `HistoryState.isExportBusy` - gates the button the same way the thunk gates itself.
     let isExportBusy: Bool
 
     init(state: AppState) {
@@ -43,13 +29,7 @@ struct HistoryProps: Equatable {
 
 struct HistoryFlowView: View {
     private let store: Store<AppState>
-    /// Which entry point led here. Logged with the open, and the eating-window one
-    /// arrives with the fast that just closed already open — it is what the link
-    /// named ("Last fast · 16h 24m"), so the screen should not make it be hunted for.
     let source: HistoryEntrySource
-    /// A record to open expanded. The eating-window entry names its record in the
-    /// link it was tapped from; the overlap refusal names one in its reason. Both
-    /// arrive at a screen where hunting for it is the whole cost of the trip.
     let focusRecordID: UUID?
     let onStartFast: () -> Void
 
@@ -80,8 +60,6 @@ struct HistoryFlowView: View {
                 ScrollView {
                     HistoryEmptyState(theme: theme,
                                       action: props.isRunning ? .backToFast : .startFast) {
-                        // Both leave the screen; only the invitation also has a fast
-                        // to start on the way out.
                         if !props.isRunning { onStartFast() }
                         dismiss()
                     }
@@ -93,9 +71,6 @@ struct HistoryFlowView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(theme.historyBackground.ignoresSafeArea())
-        // The bar is hidden, and the back button is *not* separately hidden: that
-        // modifier switches the pop gesture off outright. Hiding the bar turns out to
-        // suppress it too, so the gesture is put back by hand below (F-9).
         .toolbar(.hidden, for: .navigationBar)
         .background(InteractivePopGesture().frame(width: 0, height: 0))
         .connect(to: store, mapState: { HistoryProps(state: $0) }, onPropsChange: { props = $0 })
@@ -107,8 +82,6 @@ struct HistoryFlowView: View {
                 expandedID = HistoryStats.monthGroups(records: props.records).first?.records.first?.id
             }
         }
-        // Apple's sheet, so it is presented the system way rather than as an overlay
-        // with our own motion numbers.
         .sheet(isPresented: Binding(
             get: { props.exportFile != nil },
             set: { if !$0 { store.dispatch(HistoryAction.exportFinished(shared: false)) } }
@@ -138,7 +111,7 @@ struct HistoryFlowView: View {
         }
     }
 
-    // MARK: Nav row
+    // MARK: - Nav row
 
     private func navRow(theme: ThemeTokens) -> some View {
         HStack(spacing: 12) {
@@ -166,18 +139,8 @@ struct HistoryFlowView: View {
         .padding(.bottom, 10)
     }
 
-    /// A labelled export row makes the Pro gate visible before the tap.
     private func exportButton(theme: ThemeTokens) -> some View {
         Button(action: {
-            // Locked, the control is a door rather than a statement (decision 93) —
-            // and a door that names one benefit, so it reports itself rather than
-            // borrowing `manual`. That value means "the user went looking for the
-            // offer"; this one means "the user asked for the export and found a
-            // padlock", and the offer opens on the export because of it. The reason
-            // `manual` was chosen when this shipped — that two columns of 20-35
-            // monthly impressions read as noise — argued the wrong way round: the
-            // column this one splits off is the only one whose entry says what the
-            // person wanted.
             if props.isPro {
                 store.dispatch(ExportHistoryThunk())
             } else {
@@ -218,9 +181,6 @@ struct HistoryFlowView: View {
                         )
                     }
                 }
-                // The locked PRO capsule needs 76pt; the unlocked share circle does
-                // not. Keeping the wider slot after purchase stranded the icon 32pt
-                // from the card's trailing edge.
                 .frame(width: props.isPro ? 44 : 76)
                 .accessibilityHidden(true)
             }
@@ -230,29 +190,20 @@ struct HistoryFlowView: View {
         }
         .buttonStyle(.pressable)
         .accessibilityLabel(strings.History.export)
-        // The lock badge is decorative to the accessibility tree and the label above
-        // overrides whatever the glyph would have contributed, so without these two the
-        // locked and unlocked states of the control are indistinguishable to VoiceOver.
-        // The tier goes in the value rather than the hint alone because hints are
-        // switchable and delayed: a gate needs one channel the user cannot turn off.
         .accessibilityValue(props.isPro ? "" : strings.Pro.productName)
         .accessibilityHint(props.isPro ? "" : strings.Pro.lockedDestinationHint)
         .accessibilityIdentifier("history.export")
         .disabled(props.isExportBusy)
     }
 
-    // MARK: List
+    // MARK: - List
 
     private func content(stats: HistoryStats, theme: ThemeTokens) -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack(alignment: .leading, spacing: 20) {
-                // Same projection the main screen shows — one rule, one number.
                 HistorySummaryCard(
                     display: props.streak.display(at: Clock.now()),
                     stats: stats,
-                    // The raw counter, not the projection above it: whether the reader
-                    // is a beginner is a fact about their past, and a streak that
-                    // lapsed yesterday displays as 0 without making them one.
                     showsFirstNote: HistoryStats.showsFirstNote(fastsCount: stats.fastsCount,
                                                                 streakCount: props.streak.count),
                     theme: theme
@@ -260,9 +211,6 @@ struct HistoryFlowView: View {
                 .padding(.bottom, 2)
 
                 exportButton(theme: theme)
-
-                // Charts land here in a later release — between the totals and the
-                // first group, so adding them shifts nothing above or below.
 
                 ForEach(HistoryStats.monthGroups(records: props.records)) { group in
                     monthGroup(group, theme: theme)
@@ -281,7 +229,6 @@ struct HistoryFlowView: View {
                     .overlineTracking(1.6)
                     .foregroundColor(theme.mut)
                 Spacer(minLength: 8)
-                // On a long history the aggregate carries the value, not the rows.
                 Text(strings.History.groupMeta(group.records.count,
                                                HistoryFormat.totalHours(group.totalHours)))
                     .font(.hanken(12, .semibold))
@@ -314,7 +261,6 @@ struct HistoryFlowView: View {
         }
     }
 
-    /// Accordion: at most one record open, so the screen never becomes a wall of detail.
     private func toggle(_ record: FastRecord) {
         let animation: Animation? = reduceMotion
             ? nil
@@ -328,34 +274,13 @@ struct HistoryFlowView: View {
     }
 }
 
-/// Puts the system's edge-swipe back on a screen that hides the navigation bar.
-///
-/// Hiding the bar takes the interactive pop gesture with it, and the recogniser is not
-/// merely disabled — the navigation controller's own delegate vetoes it in
-/// `gestureRecognizerShouldBegin`, so flipping `isEnabled` changes nothing on its own.
-/// Both are done here: the flag, and a delegate that allows the pop whenever there is
-/// something to pop back to.
-///
-/// Why not a `DragGesture`: a hand-rolled one is not the system gesture. It does not
-/// track interactively, it does not mirror itself to the trailing edge in RTL, and it
-/// would compete with the horizontal drag `SwipeToDeleteRow` already owns.
-///
-/// Nothing is drawn — the controller exists only to reach the navigation controller —
-/// so the header is untouched and no system back button can appear: the bar is still
-/// hidden, and hiding it is what hid the button.
 private struct InteractivePopGesture: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController { Host() }
     func updateUIViewController(_ controller: UIViewController, context: Context) {}
 
     private final class Host: UIViewController, UIGestureRecognizerDelegate {
-        /// The recogniser belongs to the navigation controller, which outlives this
-        /// screen, so what was borrowed is given back on the way out. A delegate left
-        /// behind on the root is the classic way to wedge navigation for good.
         private weak var borrowed: UIGestureRecognizer?
         private weak var previousDelegate: (any UIGestureRecognizerDelegate)?
-        /// Both borrowed properties are given back, not just the delegate: an
-        /// `isEnabled` that was deliberately false somewhere else would otherwise stay
-        /// on after this screen, and that misfires far from here.
         private var previousEnabled: Bool?
 
         override func viewDidAppear(_ animated: Bool) {
@@ -376,19 +301,10 @@ private struct InteractivePopGesture: UIViewControllerRepresentable {
             if let previousEnabled { borrowed?.isEnabled = previousEnabled }
         }
 
-        /// The depth check is not ceremony: allowing the gesture on the root view
-        /// controller is what makes a navigation controller stop responding to pushes
-        /// afterwards.
-        ///
-        /// Note the delegate is replaced wholesale, not proxied: this type answers two
-        /// of the five methods and the original is no longer asked any of them — the
-        /// rest fall back to the protocol defaults. That holds today only because the
-        /// one behaviour we know it had (simultaneous recognition) is reproduced below.
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
             (navigationController?.viewControllers.count ?? 0) > 1
         }
 
-        /// The rows own a horizontal drag of their own; the two must not run together.
         func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                                shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
             false
@@ -396,8 +312,6 @@ private struct InteractivePopGesture: UIViewControllerRepresentable {
     }
 }
 
-/// Trailing swipe reveals Delete. A full swipe never deletes on its own: the
-/// confirmation is the point, since there is no undo.
 private struct SwipeToDeleteRow<Content: View>: View {
     let theme: ThemeTokens
     let onDelete: () -> Void
@@ -409,13 +323,10 @@ private struct SwipeToDeleteRow<Content: View>: View {
     @State private var revealed = false
 
     private let actionWidth: CGFloat = 92
-    /// Which way the row travels: toward the trailing edge, whichever side that is.
     private var direction: CGFloat { layoutDirection == .rightToLeft ? 1 : -1 }
 
     var body: some View {
         ZStack {
-            // The action fills exactly the strip the row has been pulled aside by, so
-            // it never sits under the (translucent) row content at rest.
             HStack {
                 Spacer(minLength: 0)
                 Button(action: {
@@ -440,11 +351,6 @@ private struct SwipeToDeleteRow<Content: View>: View {
         .accessibilityAction(named: Text(strings.History.delete), onDelete)
     }
 
-    /// iOS 26 lets a child SwiftUI `DragGesture` capture a vertical touch before its
-    /// direction guard runs, even when it is simultaneous with the ScrollView. A UIKit
-    /// pan can fail in `gestureRecognizerShouldBegin` while the touch is still being
-    /// arbitrated, so vertical motion goes straight to scrolling. iOS 17 keeps the
-    /// former implementation because `UIGestureRecognizerRepresentable` starts at 18.
     @ViewBuilder
     private var swipeableContent: some View {
         let row = content
@@ -494,9 +400,6 @@ private struct SwipeToDeleteRow<Content: View>: View {
     }
 }
 
-/// Direction-locking pan for a history row. SwiftUI receives it through the native
-/// gesture bridge, while UIKit gets the early failure hook needed to leave vertical
-/// movement to the enclosing scroll view.
 @available(iOS 18.0, *)
 private struct HorizontalRowPan: UIGestureRecognizerRepresentable {
     let onChanged: (CGFloat) -> Void

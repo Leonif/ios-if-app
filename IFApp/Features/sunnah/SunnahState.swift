@@ -7,9 +7,6 @@ struct SunnahSettings: Codable, Equatable, Sendable {
     var minuteOfDay = 20 * 60
     var enabled: Bool { weekly || whiteDays }
 
-    /// Which schedule is armed, as the GA4 `mode` dimension. A fixed ASCII list, never
-    /// a displayed label: the switches are localized in ten languages and a dimension
-    /// carrying their text could not be grouped.
     var analyticsMode: String {
         switch (weekly, whiteDays) {
         case (true, true): return "both"
@@ -19,9 +16,6 @@ struct SunnahSettings: Codable, Equatable, Sendable {
         }
     }
 
-    /// The domain clamp, and the only one: a reminder time is a minute of a civil day.
-    /// Both roads a value enters by - the picker (via the reducer) and the stored
-    /// blob (via the repository) - pass through here.
     static func clamped(minuteOfDay: Int) -> Int { min(1439, max(0, minuteOfDay)) }
 }
 
@@ -29,9 +23,6 @@ struct SunnahState: Equatable, Sendable {
     enum Delivery: Equatable, Sendable {
         case off, checking, scheduled, denied, failed
 
-        /// Disabled reminders are `.off` and nothing else, whether the schedule has
-        /// run or not - one definition for the reducer's provisional value and the
-        /// middleware's settled one.
         static func resolve(enabled: Bool, otherwise: Delivery) -> Delivery { enabled ? otherwise : .off }
     }
     var settings = SunnahSettings()
@@ -61,12 +52,9 @@ func sunnahReducer(state: SunnahState, action: Action) -> SunnahState {
     return next
 }
 
-/// Civil-date reminders, not a sunrise/sunset calculation. All time inputs are explicit.
 enum SunnahSchedule {
     struct Reminder: Equatable, Sendable { let fastDate: Date; let fireDate: Date }
 
-    /// How many reminders are ever scheduled at once; the repository reserves the
-    /// same room in the pending-notification budget.
     static let maxReminders = 48
 
     static func reminders(settings: SunnahSettings, now: Date, timeZone: TimeZone,
@@ -83,7 +71,6 @@ enum SunnahSchedule {
                   let noon = civil.date(bySettingHour: 12, minute: 0, second: 0, of: day) else { continue }
             let h = hijri.dateComponents([.month, .day], from: noon)
             guard let month = h.month, let lunarDay = h.day else { continue }
-            // Ramadan is not a voluntary weekly schedule. Never suggest Eid or Tashriq.
             if month == 9 || (month == 10 && lunarDay == 1) ||
                 (month == 12 && (10...13).contains(lunarDay)) { continue }
             let weekday = civil.component(.weekday, from: day)

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Bundled editorial content. Reading never requires a network connection.
 struct SourceArticle: Identifiable {
     let id: Int
     let title: String
@@ -32,11 +31,6 @@ struct SourceArticle: Identifiable {
     }
 }
 
-/// How far the foot of the article sits below the top of the reader's visible area.
-/// A preference rather than an `onChange` inside the `GeometryReader` itself: the
-/// reader closure is not re-run for a position that moves without a size changing, so
-/// an observer written there never hears the scroll — measured, and it was silent all
-/// the way to the bottom of the article.
 private struct ArticleFootOffsetKey: PreferenceKey {
     static var defaultValue: CGFloat = .greatestFiniteMagnitude
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
@@ -47,14 +41,10 @@ private struct ArticleFootOffsetKey: PreferenceKey {
 struct SourceArticleView: View {
     let article: SourceArticle
     let onOpenOriginal: (URL) -> Void
-    /// The foot of the article came into view. Called once per reading — whoever
-    /// presents the reader keeps the answer and spends it when the sheet closes.
     let onReachedEnd: () -> Void
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
 
-    /// `onReachedEnd` has already been spent. Scrolling back up and down again is the
-    /// same reading, not a second one.
     @State private var reportedEnd = false
 
     private static let scrollSpace = "source.article.scroll"
@@ -62,12 +52,6 @@ struct SourceArticleView: View {
     var body: some View {
         let theme = ThemeTokens.resolve(colorScheme)
         NavigationStack {
-            // The reader's visible height, read here rather than measured into state:
-            // the foot's position has to be compared against it on every scroll, and a
-            // second measurement landing in `@State` is a second update with its own
-            // ordering — which is exactly how the first attempt failed, the comparison
-            // running all the way to the bottom of the article against a height of
-            // zero that had not arrived yet.
             GeometryReader { viewport in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
@@ -91,10 +75,6 @@ struct SourceArticleView: View {
                         Rectangle().fill(theme.deep).frame(width: 48, height: 3)
                         section(SourceReaderStrings.findings, body: article.finding, theme: theme)
                         VStack(alignment: .leading, spacing: 12) {
-                            // The medical disclaimer used to close this block on its
-                            // own key; it now rides inside the editorial line, which
-                            // stays exactly the quiet signature it was. Presence and
-                            // legibility are what the note is for — not volume.
                             Text(SourceReaderStrings.editorial)
                                 .font(.hanken(12)).foregroundStyle(theme.mut)
                             Text(article.citation)
@@ -139,13 +119,6 @@ struct SourceArticleView: View {
         }
     }
 
-    /// A one-point marker at the foot of the article. When it enters the visible part
-    /// of the scroll view, the end has been seen — that is the whole of the "read or
-    /// merely opened" signal, and it costs one invisible row rather than a rebuilt
-    /// layout or a scroll observer.
-    ///
-    /// An article shorter than the sheet reports immediately, and rightly: its end is
-    /// on screen from the first frame.
     private var endMarker: some View {
         Color.clear
             .frame(height: 1)

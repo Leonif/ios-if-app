@@ -1,13 +1,10 @@
 //
 //  Middleware.swift
-//  PawChamp
-//
-//  Created by LEONID NIFANTIJEV on 17.08.2025.
+//  Redux
 //
 
 import Foundation
 
-/// Dispatch function type that can dispatch both Actions and Thunks
 public struct DispatchFunction {
     private let dispatchAction: (Action) -> Void
     private let dispatchThunk: (Thunk) -> Void
@@ -29,7 +26,6 @@ public struct DispatchFunction {
     }
 }
 
-/// Protocol for middleware that can intercept and handle actions
 public protocol Middleware {
     func handle<State: Equatable>(thunk: Thunk, state: State)
     func handle<State: Equatable>(action: Action, state: State, dispatch: DispatchFunction)

@@ -2,15 +2,6 @@
 //  DebugScreen.swift
 //  IFApp
 //
-//  The device end of diagnostics. On the simulator the journal is read straight off
-//  disk and this screen is unnecessary; on a real device there is no container to
-//  reach into, and Copy / Share are the only ways anything gets out at all.
-//
-//  Not localised and not designed on purpose: it has no reference screen, it is never
-//  seen by a user, and every string here is meant to be read by whoever is debugging.
-//
-//  Compiled out entirely outside DEBUG and DEVELOPMENT.
-//
 
 #if DEBUG || DEVELOPMENT
 
@@ -18,8 +9,6 @@ import SwiftUI
 import UIKit
 
 struct DebugScreen: View {
-    /// Enough to see how a flow ended without loading a multi-megabyte file into a
-    /// view. The whole journal still goes out through Share.
     private static let tailLines = 120
 
     @Environment(\.dismiss) private var dismiss

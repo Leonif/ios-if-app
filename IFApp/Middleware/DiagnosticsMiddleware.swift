@@ -2,15 +2,6 @@
 //  DiagnosticsMiddleware.swift
 //  IFApp
 //
-//  Writes the action stream to the journal. Logging is a side effect, so it lives in a
-//  middleware rather than in the store or the views (invariant 2), and it is the only
-//  place that decides what a diagnostic line looks like.
-//
-//  It runs FIRST in the middleware list on purpose: if a later middleware throws or
-//  wedges, the action that led there is already on disk.
-//
-//  Compiled out entirely outside DEBUG and DEVELOPMENT.
-//
 
 #if DEBUG || DEVELOPMENT
 
@@ -37,13 +28,6 @@ final class DiagnosticsMiddleware: Middleware {
         log.append("        \(Self.digest(app))")
     }
 
-    /// The fields a failing flow is actually decided by, on one line.
-    ///
-    /// Deliberately not the whole `AppState`: a dump of every substate on every action
-    /// is unreadable at the moment it is needed, and the history array alone would bury
-    /// the sequence. What is here is what the state machine in `test-scenarios.md`
-    /// branches on — whether a cycle is in flight, which goal it runs to, and what the
-    /// entitlement machinery is doing.
     private static func digest(_ app: AppState) -> String {
         let timer = app.timerState
         var parts = [

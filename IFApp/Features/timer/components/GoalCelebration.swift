@@ -2,24 +2,18 @@
 //  GoalCelebration.swift
 //  IFApp
 //
-//  The "goal reached" moment ("Seal & sweep") and the steady overtime glow that
-//  follows it, drawn on top of the PhaseRing. A pure view: the parent owns the
-//  animation values so the one-shot moment plays only on a genuine live crossing
-//  and relaunching mid-overtime restores the settled end-state with no replay.
-//
 
 import SwiftUI
 
 struct GoalMomentView: View {
-    let sealScale: CGFloat      // 0 = hidden, 1 = full
+    let sealScale: CGFloat
     let haloOpacity: Double
-    let sweepAngle: Double      // degrees, 0...360 during the sweep
+    let sweepAngle: Double
     let sweepOpacity: Double
     let theme: ThemeTokens
     var diameter: CGFloat = 280
 
     private let lineWidth: CGFloat = 10
-    /// Shared with `PhaseRing`, which opens its arc around a seal this size.
     static let sealDiameter: CGFloat = 44
 
     var body: some View {
@@ -29,15 +23,10 @@ struct GoalMomentView: View {
             seal.scaleEffect(sealScale).offset(y: -diameter / 2)
         }
         .frame(width: diameter, height: diameter)
-        // Same pin as `PhaseRing` underneath, and for the same reason: the sweep is
-        // placed by `rotationEffect`, whose angle RTL negates. Unpinned, the arc that
-        // is meant to travel once around the ring from twelve o'clock started half a
-        // turn away from the ring it is celebrating.
         .environment(\.layoutDirection, .leftToRight)
         .allowsHitTesting(false)
     }
 
-    // Teal glow behind the ring — this is the "glowing ring" in the dark theme.
     private var halo: some View {
         Circle()
             .fill(
@@ -56,7 +45,6 @@ struct GoalMomentView: View {
             .blur(radius: theme.isDark ? 26 : 20)
     }
 
-    // One bright arc that travels once around the ring band.
     private var sweep: some View {
         Circle()
             .trim(from: 0, to: 0.06)
@@ -65,8 +53,6 @@ struct GoalMomentView: View {
             .rotationEffect(.degrees(-90 + sweepAngle))
     }
 
-    // Green check seal at 12 o'clock. Its place in the spectrum is a real break in
-    // the ring (`PhaseRing.sealDiameter`), not a disc painted over it.
     private var seal: some View {
         Circle()
             .fill(theme.primaryButtonBg)

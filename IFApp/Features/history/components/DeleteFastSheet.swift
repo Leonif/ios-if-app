@@ -2,11 +2,6 @@
 //  DeleteFastSheet.swift
 //  IFApp
 //
-//  Delete confirmation for a history record. Built as a bottom sheet for the same
-//  reason as ResetConfirmSheet: on iOS 26 the system `.confirmationDialog` renders
-//  as a popover that hides the `.cancel` button, leaving only the destructive
-//  action on screen — the opposite of what a confirmation is for.
-//
 
 import SwiftUI
 
@@ -46,7 +41,6 @@ struct DeleteFastSheet: View {
                 .foregroundColor(theme.mut)
                 .multilineTextAlignment(.center)
 
-            // Destructive, so it does not borrow the app's green primary button.
             Button(action: onConfirm) {
                 Text(strings.History.delete)
                     .font(.hanken(17, .bold))

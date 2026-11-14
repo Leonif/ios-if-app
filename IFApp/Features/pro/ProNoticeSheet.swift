@@ -2,21 +2,6 @@
 //  ProNoticeSheet.swift
 //  IFApp
 //
-//  One sheet, two things to say after the entitlement goes away: that it is gone
-//  (edge 6) and that the next fast runs to a different goal (edge 17). They share a
-//  component and never share a frame — the second arrives at the next start, which
-//  can be days after the first.
-//
-//  Why a sheet and not an alert, a toast or a banner. An alert's convention is "we
-//  need a decision from you", and there is none to make, so it reads as an error; it
-//  is also 238pt wide, which gives Korean three lines at the larger type sizes. A
-//  toast or a banner can swallow the second sentence, and the second sentence is the
-//  entire reason for showing this. There is no Restore button here: after a refund
-//  it would return nothing.
-//
-//  The title is 17/semibold and deliberately not the 25/600 state-headline slot —
-//  that slot overflows in English, Ukrainian, German and Polish at xxLarge.
-//
 
 import SwiftUI
 
@@ -84,8 +69,6 @@ struct ProNoticeSheet: View {
 
     private func body(_ notice: ProNotice) -> String {
         switch notice {
-        // The cause is never named, and no locale mentions money: one key covers
-        // both a refund and someone leaving a Family Sharing group.
         case .entitlementRevoked: return strings.Pro.revokedBody
         case let .goalChanged(hours): return strings.Pro.goalChangedBody(strings.Duration.hoursSpelled(hours))
         }

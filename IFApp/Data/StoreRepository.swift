@@ -2,23 +2,12 @@
 //  StoreRepository.swift
 //  IFApp
 //
-//  The whole of StoreKit 2 for this app: one non-consumable, its price, buying it,
-//  restoring it, and being told when it goes away. Everything above this file speaks
-//  in `Entitlement` and outcomes and never imports StoreKit.
-//
-//  Verification is deliberately three-valued. `Transaction.currentEntitlements` never
-//  throws and returns nothing both when the user did not buy and when this install has
-//  not yet reached the store — a fresh install in airplane mode. Collapsing those two
-//  into "free" is how an app tells a paying customer their purchase is gone, so the
-//  store is probed separately and "we could not check" is reported as such.
-//
 
 import Foundation
 import StoreKit
 
 enum PurchaseOutcome: Equatable, Sendable {
     case purchased
-    /// Ask to Buy — approval pending, no entitlement yet.
     case pending
     case cancelled
     case failed(PurchaseFailure)
@@ -31,23 +20,14 @@ enum RestoreOutcome: Equatable, Sendable {
 }
 
 protocol StoreRepositoryProtocol {
-    /// Resolves what this install owns and what the product costs, in one pass.
     func refresh() async -> (entitlement: Entitlement, product: ProProductInfo?)
     func purchase() async -> PurchaseOutcome
-    /// Syncs with the App Store account and re-reads the entitlement. This is the
-    /// only path that works with no account of ours, on a new device — an Apple
-    /// review requirement for a non-consumable, not just a convenience.
     func restore() async -> RestoreOutcome
-    /// Entitlement changes that happen without us asking: an approved Ask to Buy, a
-    /// purchase made on another device, a refund, leaving a Family Sharing group.
     func entitlementUpdates() -> AsyncStream<Entitlement>
 }
 
 struct StoreRepository: StoreRepositoryProtocol {
     private enum Key {
-        /// The last *verified* verdict. Its absence is meaningful: it means this
-        /// install has never had an answer from the store, which is the only
-        /// condition under which the entitlement is reported as unknown.
         static let verifiedEntitlement = "pro_entitlement_verified"
     }
 
@@ -57,7 +37,7 @@ struct StoreRepository: StoreRepositoryProtocol {
         self.defaults = defaults
     }
 
-    // MARK: Reading the entitlement
+    // MARK: - Reading the entitlement
 
     func refresh() async -> (entitlement: Entitlement, product: ProProductInfo?) {
         let lookup = await lookUpProduct()
@@ -69,21 +49,14 @@ struct StoreRepository: StoreRepositoryProtocol {
 
         switch lookup {
         case .found, .missing:
-            // The store answered. An empty entitlement set is then the truth about
-            // this install, whatever we may have cached before — this is also how a
-            // refund or a family member's departure settles.
             remember(false)
             return (.free, lookup.info)
         case .unreachable:
-            // No answer. A previously verified verdict stands: a purchase already
-            // seen on this device must survive a flight, and one already known to be
-            // absent does not need re-proving to show the offer.
             guard let remembered = rememberedVerdict() else { return (.unknown, nil) }
             return (remembered ? .pro : .free, nil)
         }
     }
 
-    /// True when a non-revoked transaction for the product is on this device.
     private func ownsPro() async -> Bool {
         for await result in Transaction.currentEntitlements {
             guard case let .verified(transaction) = result,
@@ -103,7 +76,7 @@ struct StoreRepository: StoreRepositoryProtocol {
         defaults.set(isPro, forKey: Key.verifiedEntitlement)
     }
 
-    // MARK: Buying
+    // MARK: - Buying
 
     func purchase() async -> PurchaseOutcome {
         let lookup = await lookUpProduct()
@@ -137,8 +110,6 @@ struct StoreRepository: StoreRepositoryProtocol {
         do {
             try await AppStore.sync()
         } catch {
-            // Backing out of the App Store sign-in comes back as `cancelled`, which
-            // the reducer treats as "nothing happened" rather than as an error.
             return .failed(Self.reason(for: error))
         }
         let owned = await ownsPro()
@@ -146,7 +117,7 @@ struct StoreRepository: StoreRepositoryProtocol {
         return owned ? .restored : .nothingToRestore
     }
 
-    // MARK: Listening
+    // MARK: - Listening
 
     func entitlementUpdates() -> AsyncStream<Entitlement> {
         AsyncStream { continuation in
@@ -154,9 +125,6 @@ struct StoreRepository: StoreRepositoryProtocol {
                 for await update in Transaction.updates {
                     guard case let .verified(transaction) = update else { continue }
                     await transaction.finish()
-                    // Re-read rather than trust the single transaction: a revocation
-                    // and a purchase arrive through the same door, and only the full
-                    // set says which side the user ends up on.
                     let owned = await ownsPro()
                     remember(owned)
                     continuation.yield(owned ? .pro : .free)
@@ -167,12 +135,10 @@ struct StoreRepository: StoreRepositoryProtocol {
         }
     }
 
-    // MARK: Product lookup
+    // MARK: - Product lookup
 
     private enum ProductLookup {
         case found(Product, ProProductInfo)
-        /// The store answered, and does not know this identifier — a configuration
-        /// mistake on our side, not the user's connection.
         case missing
         case unreachable
 
@@ -193,8 +159,6 @@ struct StoreRepository: StoreRepositoryProtocol {
         }
     }
 
-    /// Maps a StoreKit throw onto the three reasons the offer screen can act on.
-    /// Only `network` changes what the user is told; the rest share one body.
     private static func reason(for error: Error) -> PurchaseFailure {
         if let storeKitError = error as? StoreKitError {
             switch storeKitError {

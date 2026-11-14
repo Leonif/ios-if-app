@@ -2,19 +2,14 @@
 //  TimerPersistenceRepository.swift
 //  IFApp
 //
-//  Stateless, non-reactive UserDefaults access for the timer substate.
-//  Keys match the previous @AppStorage keys so existing installs migrate seamlessly.
-//
 
 import Foundation
 
 protocol TimerPersistenceRepositoryProtocol {
     func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, stagedElapsed: Double, fastEndTimestamp: Double, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?)
     func save(fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, stagedElapsed: Double, fastEndTimestamp: Double, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?)
-    /// The selected plan's fast length in whole hours. nil = never saved.
     func loadPlanHours() -> Int?
     func savePlanHours(_ hours: Int)
-    /// The highest streak milestone (3/7/14/30) whose card was already shown. 0 = none.
     func loadLastMilestoneShown() -> Int
     func saveLastMilestoneShown(_ days: Int)
 }
@@ -28,21 +23,12 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         static let hasCelebrated = "has_celebrated"
         static let eatingStartTimestamp = "eating_start_timestamp"
         static let isEating = "is_eating"
-        /// The ended fast still on the result screen: its elapsed seconds and the moment
-        /// it was confirmed to end. Absent on every install from before 1.5.2, which
-        /// reads as 0 — "nothing ended" — i.e. exactly the idle screen those builds
-        /// relaunched into.
         static let stagedElapsed = "staged_elapsed"
         static let fastEndTimestamp = "fast_end_timestamp"
         static let planHours = "plan_hours"
-        /// Pre-1.5.0 plan storage: an index into the four presets. Read once for
-        /// migration, never written again.
         static let legacyPlanIdx = "plan_idx"
         static let streakCount = "streak_count"
         static let streakLastGoalDate = "streak_last_goal_date"
-        /// The calendar month ("yyyy-MM") whose protected day is spent. Absent on
-        /// every install that updated into 1.5.0, which reads as "none spent" — the
-        /// benefit starts available, which is what someone who just bought it expects.
         static let streakFreezeSpentMonth = "streak_freeze_spent_month"
         static let streakLastMilestoneShown = "streak_last_milestone_shown"
     }
@@ -56,8 +42,6 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
     func load() -> (fastStartTimestamp: Double, goalHours: Double, isRunning: Bool, completedSessions: Int, hasCelebrated: Bool, eatingStartTimestamp: Double, isEating: Bool, stagedElapsed: Double, fastEndTimestamp: Double, streakCount: Int, lastGoalDate: String?, freezeSpentMonth: String?) {
         (
             fastStartTimestamp: defaults.double(forKey: Key.startTimestamp),
-            // Absent (state written before 1.5.0) reads as 0, which every reader
-            // resolves to the current plan — i.e. exactly the old behaviour.
             goalHours: defaults.double(forKey: Key.goalHours),
             isRunning: defaults.bool(forKey: Key.isRunning),
             completedSessions: defaults.integer(forKey: Key.completedSessions),
@@ -95,21 +79,10 @@ struct TimerPersistenceRepository: TimerPersistenceRepositoryProtocol {
         }
     }
 
-    /// Hours first; falling back once to the pre-1.5.0 preset index for installs that
-    /// updated over a version which stored a plan as a position in a list.
-    ///
-    /// The fallback converts and then removes the old key instead of leaving it to be
-    /// re-read every launch. Otherwise an install whose owner never opens the plan
-    /// editor would keep its plan as an index forever — and an index only means
-    /// something relative to the order of `Plan.presets`, so reordering that array
-    /// would quietly re-interpret the saved plan on exactly those installs.
     func loadPlanHours() -> Int? {
         if let hours = defaults.object(forKey: Key.planHours) as? Int { return hours }
 
         let legacy = defaults.object(forKey: Key.legacyPlanIdx) as? Int
-        // Read once, gone either way: an index we cannot interpret is not worth
-        // keeping, and leaving it would make the migration depend on presets order
-        // again the next time this runs.
         defaults.removeObject(forKey: Key.legacyPlanIdx)
 
         guard let idx = legacy, Plan.presets.indices.contains(idx) else { return nil }

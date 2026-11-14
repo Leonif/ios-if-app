@@ -2,20 +2,14 @@
 //  PhaseTimeline.swift
 //  IFApp
 //
-//  Five equal columns: a bar over a track + a label. Current phase fills by its
-//  real progress within the phase, passed 100%, future 0%. Labels recolor by state.
-//
 
 import SwiftUI
 
 struct PhaseTimeline: View {
     let currentPhase: Phase
-    /// Real progress through the current phase, 0...1.
     let currentFill: Double
     let isComplete: Bool
     let theme: ThemeTokens
-    /// The history detail panel reuses the bars without their labels — there the
-    /// phase is already named in the line above.
     var showsLabels: Bool = true
 
     private var currentIndex: Int { currentPhase.rawValue }

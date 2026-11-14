@@ -2,8 +2,6 @@
 //  TimeInterval+Extensions.swift
 //  IFApp
 //
-//  Created by LEONID NIFANTIJEV on 17.11.2024.
-//
 
 import Foundation
 

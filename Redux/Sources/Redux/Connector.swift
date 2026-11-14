@@ -2,8 +2,6 @@
 //  Connector.swift
 //  Redux
 //
-//  Created by Leonid-user on 29.08.2025.
-//
 import SwiftUI
 
 public struct ReduxConnector<Props, UIState: Equatable>: ViewModifier {
@@ -13,7 +11,6 @@ public struct ReduxConnector<Props, UIState: Equatable>: ViewModifier {
     private let onPropsChange: (Props) -> Void
     private let areEqual: (Props, Props) -> Bool
 
-    // Store last value for manual comparison
     @State private var lastProps: Props?
 
     public init(
@@ -59,7 +56,6 @@ public extension View {
         ))
     }
 
-    // Overload for Equatable Props - uses standard == comparison
     func connect<Props: Equatable, State>(
         to store: Store<State>,
         mapState: @escaping (State) -> Props,

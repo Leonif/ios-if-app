@@ -43,15 +43,45 @@
 		338688722DBE5D87001E3019 /* Exceptions for "IFApp" folder in "IFApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Analytics/NOTES.md,
+				Core/NOTES.md,
+				Data/NOTES.md,
+				Debug/NOTES.md,
+				DesignSystem/NOTES.md,
+				Features/endfast/NOTES.md,
+				Features/history/NOTES.md,
+				Features/meal/NOTES.md,
+				Features/phase/NOTES.md,
+				Features/plan/NOTES.md,
+				Features/pro/NOTES.md,
+				Features/sunnah/NOTES.md,
+				Features/timer/NOTES.md,
+				Features/ui/NOTES.md,
+				Features/Views/NOTES.md,
+				Flows/NOTES.md,
 				Info.plist,
+				Middleware/NOTES.md,
+				NOTES.md,
+				README.md,
+				Shared/NOTES.md,
 			);
 			target = CEC5D0C42CD29D9300888D81 /* IFApp */;
+		};
+		B4A100000000000000000B41 /* Exceptions for "IFAppTests" folder in "IFAppTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				NOTES.md,
+			);
+			target = 7457078B7650BCD7B6A56E00 /* IFAppTests */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		11E4B1D2864FF44736CE88BE /* IFAppTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B4A100000000000000000B41 /* Exceptions for "IFAppTests" folder in "IFAppTests" target */,
+			);
 			path = IFAppTests;
 			sourceTree = "<group>";
 		};

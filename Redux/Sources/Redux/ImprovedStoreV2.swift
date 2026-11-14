@@ -2,8 +2,6 @@
 //  ImprovedStoreV2.swift
 //  Redux
 //
-//  Created by Leonid-user on 14.09.2025.
-//
 import Combine
 import Foundation
 import os
@@ -13,10 +11,8 @@ public final class ImprovedStoreV2<State: Equatable & Sendable>: @unchecked Send
     private let actionSubject = PassthroughSubject<Action, Never>()
     private let reducer: (State, Action) -> State
 
-    // 1. Single recursive lock for the entire store
     private let storeLock = NSRecursiveLock()
     
-    // 2. Store data directly (protected by the lock)
     private var internalState: State
     private var internalMiddlewares: [Middleware]
 
@@ -73,7 +69,6 @@ public final class ImprovedStoreV2<State: Equatable & Sendable>: @unchecked Send
         Task { [weak self] in
             guard let self else { return }
             
-            // Snapshot + notify middlewares atomically
             let currentState = storeLock.withLock {
                 let state = self.internalState
                 let middlewares = self.internalMiddlewares
@@ -96,9 +91,6 @@ public final class ImprovedStoreV2<State: Equatable & Sendable>: @unchecked Send
             dispatchThunk: { [weak self] thunk in self?.dispatch(thunk) }
         )
 
-        // Lock only for state mutation — holding lock during send/middleware
-        // can cause deadlock if a subscriber or middleware dispatches back
-        // on a thread that is already waiting for this lock.
         let (stateToSend, isChanged, capturedMiddlewares): (State, Bool, [Middleware]) = storeLock.withLock {
             let oldState = internalState
             let newState = reducer(oldState, action)
@@ -107,7 +99,6 @@ public final class ImprovedStoreV2<State: Equatable & Sendable>: @unchecked Send
             return (changed ? newState : oldState, changed, internalMiddlewares)
         }
 
-        // Notifications and middleware run outside the lock
         if isChanged { stateSubject.send(stateToSend) }
         actionSubject.send(action)
 
@@ -124,7 +115,6 @@ public final class ImprovedStoreV2<State: Equatable & Sendable>: @unchecked Send
 public final class Store<State: Equatable & Sendable>: ObservableObject {
     @Published public private(set) var state: State
 
-    // Forward publishers from ImprovedStoreV2
     public var statePublisher: AnyPublisher<State, Never> {
         store.statePublisher
     }
@@ -148,12 +138,10 @@ public final class Store<State: Equatable & Sendable>: ObservableObject {
         self.store = store
         state = store.getCurrentState()
 
-        // Subscribe to changes and update the @Published state
         cancellable = store.statePublisherForUI
             .sink { [weak self] in self?.state = $0 }
     }
 
-    // Delegate methods
     public func dispatch(_ action: Action) {
         store.dispatch(action)
     }

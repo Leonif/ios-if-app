@@ -2,9 +2,6 @@
 //  AdjustTimeThunk.swift
 //  IFApp
 //
-//  Shifts elapsed time by ±interval. While running, this re-bases fastStartTimestamp
-//  so the count keeps ticking from the adjusted value.
-//
 
 import Foundation
 import Redux

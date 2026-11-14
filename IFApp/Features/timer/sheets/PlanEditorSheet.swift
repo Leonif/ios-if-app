@@ -2,48 +2,20 @@
 //  PlanEditorSheet.swift
 //  IFApp
 //
-//  Top-anchored overlay card with a dimmed backdrop (tap-out to close).
-//
-//  Rebuilt in 1.5.0. The white row that printed "Eating window · 12:00 - 8:00 PM" is
-//  gone: those hours were invented, this app runs on anchors, and the card was also
-//  a card-shaped thing that looked tappable and was not. Duration is the only true
-//  value and it is stated once, in the value line. What replaces it is a row that
-//  does respond — Custom, its own row under the control rather than a fifth segment,
-//  because a segmented control promises immediate choice and a segment that opens a
-//  sales screen instead breaks that promise half a centimetre under "Tap to change".
-//
-//  For someone without Pro the picker still opens and still turns. Only confirming is
-//  locked, and confirming is what opens the offer: a decision to buy should not have
-//  to be made from a description.
-//
 
 import SwiftUI
 
 struct PlanEditorSheet: View {
     let plan: Plan
-    /// Whether a custom length can be confirmed. The picker ignores this — it turns
-    /// either way.
     let isPro: Bool
     let theme: ThemeTokens
-    /// Reports the chosen plan by its length in hours, not by segment position: the
-    /// segments are the four presets, and a plan is no longer a place in that list.
     let onSelect: (Int) -> Void
-    /// Confirming, with the length the sheet is showing. It travels as an argument
-    /// rather than being read back off the store, because until the gate lets it
-    /// through it is not in the store.
     let onDone: (Int) -> Void
     let onClose: () -> Void
     let onSunnah: () -> Void
 
     @State private var pickerOpen = false
 
-    /// What the wheel is showing, or `nil` for "whatever the store says".
-    ///
-    /// The wheel turns a draft and not the plan itself. Dispatching on every detent
-    /// wrote a length into the store before anything had checked the entitlement, so
-    /// a free user who span up to 17, met the offer and walked away was left with a
-    /// plan the app would not fast to — visible in the header, persisted across a
-    /// cold start, and reported to GA4 as a confirmed custom plan.
     @State private var draftHours: Int?
 
     var body: some View {
@@ -59,13 +31,8 @@ struct PlanEditorSheet: View {
         .transition(.opacity)
     }
 
-    /// The plan on screen: the draft while the wheel owns the value, the store's plan
-    /// otherwise. Every part of the card that states the plan reads this one value, so
-    /// the value line, the trailing number and the lit segment cannot disagree.
     private var shown: Plan { draftHours.map(Plan.init(hours:)) ?? plan }
 
-    /// Whether `Done` applies the plan or opens the offer. Asked about what is on
-    /// screen, at the moment of confirming.
     private var canConfirm: Bool { shown.allowed(isPro: isPro) }
 
     private var card: some View {
@@ -99,21 +66,14 @@ struct PlanEditorSheet: View {
 
             SegmentedControl(
                 options: Plan.presets.map(\.ratioLabel),
-                // A custom plan matches no segment, and none is highlighted: leaving
-                // 16:8 lit next to a 17 h value would be a stale answer, not a quiet
-                // one.
                 selectedIndex: Plan.presets.firstIndex(of: shown) ?? -1,
                 theme: theme,
                 onSelect: {
                     pickerOpen = false
-                    // The draft steps aside so the store's answer is the shown one
-                    // again; the dispatch below is unchanged, and this is still the
-                    // one path that writes a plan straight through.
                     draftHours = nil
                     onSelect(Plan.presets[$0].hours)
                 }
             )
-            // The control goes quiet while the picker owns the value.
             .opacity(pickerOpen ? 0.75 : 1)
 
             valueLine
@@ -124,10 +84,6 @@ struct PlanEditorSheet: View {
 
             PrimaryButton(title: strings.PlanEditor.confirm, theme: theme) { onDone(shown.hours) }
                 .padding(.top, 20)
-                // On this one branch the tap opens the offer instead of applying the
-                // plan, and the label cannot say so without lying on every other
-                // branch. The PRO badge on the custom row above is the part that
-                // survives hints being switched off; this only names the destination.
                 .accessibilityHint(canConfirm ? "" : strings.Pro.lockedDestinationHint)
                 .accessibilityIdentifier("plan.done")
         }
@@ -139,8 +95,6 @@ struct PlanEditorSheet: View {
         )
     }
 
-    /// "16h  fast · 8h window" — two durations and no wall clock. The number is
-    /// display type and the rest is body, so they are two views, never one string.
     private var valueLine: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text(strings.Duration.goalHours(shown.hours))
@@ -155,7 +109,7 @@ struct PlanEditorSheet: View {
         }
     }
 
-    // MARK: Custom
+    // MARK: - Custom
 
     private var customRow: some View {
         VStack(spacing: 0) {
@@ -183,8 +137,6 @@ struct PlanEditorSheet: View {
         )
     }
 
-    /// The lock, the value, or a chevron — all in the same trailing box, so the row
-    /// does not resize when Pro turns on.
     @ViewBuilder
     private var trailing: some View {
         if !isPro {
@@ -194,12 +146,6 @@ struct PlanEditorSheet: View {
                 Text(verbatim: "PRO")
                     .font(.hanken(12, .semibold))
                     .tracking(12 * 0.04)
-                    // Caps is a textbook trigger for letter-by-letter speech, so the
-                    // badge said "피-알-오" rather than a product name. The render is
-                    // the accepted mockup and stays; only what it *says* is fixed, and
-                    // it now says what the header control says. Not hidden from
-                    // accessibility instead: this badge is the channel that survives
-                    // hints being switched off (see the confirm button below).
                     .accessibilityLabel(strings.Pro.productName)
             }
             .foregroundColor(theme.deep)
@@ -217,9 +163,6 @@ struct PlanEditorSheet: View {
                 .monospacedDigit()
                 .foregroundColor(theme.deep)
         } else {
-            // `forward`, not `right`: this is a disclosure indicator, so it means "on
-            // ahead", and ahead is leftward in Arabic. `chevron.right` would keep
-            // pointing right after the row mirrored, back into the label.
             Image(systemName: "chevron.forward")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(theme.mut)
@@ -228,13 +171,6 @@ struct PlanEditorSheet: View {
 
     private var hourPicker: some View {
         VStack(spacing: 0) {
-            // `String()`, not `""`: a bare literal in this position is a
-            // `LocalizedStringKey`, and the extractor turns it into a catalog key made
-            // of nothing — ten empty locales nobody can fill or retire. That key has
-            // been deleted by hand three times now (last two: `9c5aab0`, Queue-14) and
-            // came back with the next build each time, because the two places that
-            // emit it were never the ones edited. The `StringProtocol` overload takes
-            // the same empty label and is not extracted. The wheel hides it either way.
             Picker(String(), selection: Binding(get: { shown.hours }, set: { draftHours = $0 })) {
                 ForEach(Array(Plan.range), id: \.self) { hours in
                     Text(strings.Duration.hoursSpelled(hours)).tag(hours)

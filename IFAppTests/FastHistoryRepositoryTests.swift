@@ -2,16 +2,6 @@
 //  FastHistoryRepositoryTests.swift
 //  IFAppTests
 //
-//  The data layer's file behaviour, including the TF-2 quarantine. Every case runs
-//  against a fresh temp directory (`FastHistoryRepository(directory:)`) — never the
-//  test host's Documents, which is shared between runs and would make one test's
-//  leftovers the next test's input.
-//
-//  The TF-2 acceptance list is covered end to end here, including the schemaVersion
-//  read-only mode and the `history_load_failed` reasons. The failure reports are taken
-//  through the same closure the app wires to analytics in `AppDependencies`, so a spy
-//  on it sees exactly what GA4 would.
-//
 
 import XCTest
 @testable import IFApp
@@ -31,16 +21,12 @@ final class FastHistoryRepositoryTests: XCTestCase {
         directory = nil
     }
 
-    /// Every failure the repository reports, in order. The app hands this same closure
-    /// to analytics, so counting on it is counting the events GA4 would receive.
     private var reported: [HistoryLoadFailure] = []
 
     private func makeRepository() -> FastHistoryRepository {
         FastHistoryRepository(directory: directory) { [self] reason in reported.append(reason) }
     }
 
-    /// An envelope written by hand, so the version can be something this build does
-    /// not have. `JSONEncoder` on `Envelope` would always stamp the current one.
     private func writeEnvelope(schemaVersion: Int, records: [FastRecord]) {
         let recordsJSON = records.map {
             """
@@ -76,14 +62,11 @@ final class FastHistoryRepositoryTests: XCTestCase {
         try? Data(contentsOf: directory.appendingPathComponent(name))
     }
 
-    /// First launch: no file is not a failure, and nothing is written just by looking.
     func testLoadAllOnEmptyDirectoryReturnsEmptyAndWritesNothing() {
         XCTAssertEqual(makeRepository().loadAll(), [])
         XCTAssertEqual(files, [], "reading an absent history file must not create one")
     }
 
-    /// The write path survives a round trip through JSON and a second instance —
-    /// i.e. the records come off disk, not out of an in-memory cache.
     func testAppendRoundTripsThroughDisk() {
         let repository = makeRepository()
         let records = (0..<3).map(makeRecord(daysAgo:))
@@ -103,10 +86,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(makeRepository().loadAll(), [records[0], records[2]])
     }
 
-    /// Pins the `-seedHistoryCorrupt` fixture: the bytes it writes really are
-    /// undecodable. If someone edited the fixture into something that happens to parse,
-    /// the seed would go on looking useful while testing nothing — and so would every
-    /// quarantine case below it, which all start from this fixture.
     func testCorruptFixtureFailsToDecode() {
         let repository = makeRepository()
         repository.seedCorruptFile()
@@ -115,10 +94,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(quarantineFiles.count, 1, "a failed decode is what quarantine is for")
     }
 
-    /// TF-2, the case the guard exists for. Before the fix the append put one fresh
-    /// record where the whole history had been and left nothing behind; now the old
-    /// bytes are sitting next to it, byte for byte, and can be pulled out of the
-    /// container.
     func testAppendAfterCorruptFileKeepsTheOldBytesInQuarantine() {
         let repository = makeRepository()
         repository.seedCorruptFile()
@@ -133,8 +108,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertTrue(files.contains("fast-history.json"))
     }
 
-    /// The quarantined copy is evidence, not a working file: once set aside it is never
-    /// touched again by ordinary use.
     func testFurtherWritesLeaveTheQuarantinedCopyAlone() {
         let repository = makeRepository()
         repository.seedCorruptFile()
@@ -149,8 +122,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(bytes(of: quarantined[0]), FastHistoryRepository.corruptFixture)
     }
 
-    /// A repeating failure must not fill the container one launch at a time. Four
-    /// failures, three copies kept.
     func testQuarantineKeepsAtMostThreeCopies() {
         let repository = makeRepository()
         for _ in 0..<4 {
@@ -161,8 +132,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(quarantineFiles.count, 3)
     }
 
-    /// An empty file is what an interrupted first write leaves; there are no records
-    /// under it, so filing it away would only archive emptiness.
     func testEmptyFileIsNotQuarantined() {
         try? Data().write(to: directory.appendingPathComponent("fast-history.json"))
         let repository = makeRepository()
@@ -174,9 +143,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(quarantineFiles, [], "an empty file is a normal first launch")
     }
 
-    /// `replaceAll` is the one write that discards what it reads — wiping the history
-    /// or seeding it. It still has to read first, or it would be the remaining path
-    /// that destroys unreadable bytes silently.
     func testReplaceAllQuarantinesBeforeOverwriting() {
         let repository = makeRepository()
         repository.seedCorruptFile()
@@ -190,9 +156,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
 
     // MARK: - schemaVersion
 
-    /// A file from a newer build: the records this binary can still read come back, and
-    /// nothing goes in. Writing would put them back in today's shape, which is how a
-    /// TestFlight downgrade would quietly cost someone whatever the newer format added.
     func testFutureSchemaReturnsRecordsAndRefusesToWrite() {
         writeEnvelope(schemaVersion: 99, records: [makeRecord(daysAgo: 2), makeRecord(daysAgo: 1)])
         let original = bytes(of: "fast-history.json")
@@ -208,10 +171,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(quarantineFiles, [], "a newer file is not damaged — nothing to quarantine")
     }
 
-    /// The case that decides where the version read goes. Records this build cannot
-    /// parse would fail the envelope decode, and a decode failure is what quarantine
-    /// answers — so reading the version second would file away an intact history the
-    /// newer build is still using. Reading it first is the whole fix.
     func testFutureSchemaWithUnreadableRecordsIsNotQuarantined() {
         let json = #"{"schemaVersion":99,"records":[{"id":"not-a-record"}]}"#
         try? Data(json.utf8).write(to: directory.appendingPathComponent("fast-history.json"))
@@ -225,11 +184,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
 
     // MARK: - test hooks
 
-    /// The suite's baseline wipe, and the reason it cannot be `replaceAll([])`. A flow
-    /// that seeds a future-schema file (H15) leaves the guard closed for the whole
-    /// container, so every later flow's reset silently kept H15's record — H3/H4/H8
-    /// went red on it. `wipeFile` is the hook that overrules the guard, and after it
-    /// the ordinary seeding path works again because the file is current-schema.
     func testWipeFileClearsAFutureSchemaFileThatReplaceAllRefuses() {
         writeEnvelope(schemaVersion: 99, records: [makeRecord(daysAgo: 1)])
         let repository = makeRepository()
@@ -245,9 +199,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(repository.loadAll().count, 1, "and seeding works again after it")
     }
 
-    /// The hook reads before it writes, so it does not cost the quarantine: bytes that
-    /// would have been filed away on an ordinary launch still are, and the failure is
-    /// still reported.
     func testWipeFileStillQuarantinesUndecodableBytes() {
         let repository = makeRepository()
         repository.seedCorruptFile()
@@ -262,7 +213,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
 
     // MARK: - history_load_failed
 
-    /// One event per failed read, with the reason that names what happened.
     func testFailedDecodeIsReportedOnceWithItsReason() {
         let repository = makeRepository()
         repository.seedCorruptFile()
@@ -272,8 +222,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(reported, [.decode], "exactly one report, and it says decode")
     }
 
-    /// Every read reports, deliberately: a `future_schema` on launch and again on the
-    /// next write attempt is what tells a downgrade apart from a one-off.
     func testEveryReadOfANewerFileReports() {
         writeEnvelope(schemaVersion: 99, records: [makeRecord(daysAgo: 1)])
         let repository = makeRepository()
@@ -284,8 +232,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(reported, [.futureSchema, .futureSchema])
     }
 
-    /// Bytes that cannot be read at all, as opposed to bytes that do not decode. They
-    /// go into quarantine the same way — the difference is only what gets reported.
     func testUnreadableFileIsReportedAsUnreadable() throws {
         let fileURL = directory.appendingPathComponent("fast-history.json")
         try Data(#"{"schemaVersion":1,"records":[]}"#.utf8).write(to: fileURL)
@@ -299,9 +245,6 @@ final class FastHistoryRepositoryTests: XCTestCase {
         XCTAssertEqual(quarantineFiles.count, 1, "unreadable bytes are kept, not dropped")
     }
 
-    /// The worst case: unreadable and immovable. Nothing is written from here on —
-    /// the only copy of the history is still sitting where it was, and an append would
-    /// be the thing that finally destroys it.
     func testUnmovableFileReportsQuarantineFailedAndStopsWriting() throws {
         let repository = makeRepository()
         repository.seedCorruptFile()

@@ -1,34 +1,11 @@
 //
-//  strings.swift
+//  Strings.swift
 //  IFApp
-//
-//  Type-safe access to the Localizable.xcstrings String Catalog. Each accessor
-//  resolves the current locale via String(localized:). Add a case here, then add
-//  the matching key + translations in Localizable.xcstrings.
-//
-//  Two key styles live here. Most strings are keyed by their English text, which
-//  is the catalog's source language. Strings whose English wording is expected to
-//  keep moving are keyed symbolically instead - "Editorial.fed",
-//  "About.medicalNote", "Footer.startEating" - with the English in defaultValue.
-//  The reason is not tidiness: rewriting a text key does not edit a string, it
-//  creates a new one, and the ten translations stay behind on the old key looking
-//  merely unfinished. Prefer a symbolic key for anything editorial or legal.
 //
 
 import Foundation
 
 extension Locale {
-    /// The current locale with two things pinned: Western digits and the Gregorian
-    /// calendar.
-    ///
-    /// Digits matter because the app mixes two formatting paths. Durations and dates
-    /// go through `String(format:)` and `HistoryFormat`, which never localise digits,
-    /// so they always read "118". An `Int` interpolated into `String(localized:)` is
-    /// formatted by the locale instead, so in Arabic the same screen rendered "٦"
-    /// beside "118". Pinning the numbering system puts both paths on one system.
-    ///
-    /// The language is left untouched, so translations still resolve normally and
-    /// plural rules still come from the real locale.
     static var latinDigits: Locale {
         var components = Locale.Components(locale: .current)
         components.numberingSystem = Locale.NumberingSystem("latn")
@@ -38,17 +15,6 @@ extension Locale {
 }
 
 extension Date.FormatStyle {
-    /// `Date.FormatStyle` on `Locale.latinDigits`, with the calendar pinned as well.
-    ///
-    /// `DateFormatter` takes its calendar from the locale it is given, so setting
-    /// `f.locale = .latinDigits` is enough there. `Date.FormatStyle` does not: its
-    /// calendar is a separate initialiser argument defaulting to
-    /// `.autoupdatingCurrent`, so passing only `locale:` pins the digits and leaves
-    /// the calendar on whatever the device is set to. On an Arabic device that is
-    /// the Islamic calendar, and the Sunnah settings listed "3 ربيع الآخر، 1448 هـ"
-    /// where the fasts it was scheduling are counted in Gregorian days.
-    ///
-    /// Use this rather than `Date.FormatStyle(locale: .latinDigits)`.
     static var latinDigits: Date.FormatStyle {
         let locale = Locale.latinDigits
         return Date.FormatStyle(locale: locale, calendar: locale.calendar)
@@ -90,14 +56,12 @@ enum strings {
         }
         static var windowClosed: String { String(localized: "Your eating window has closed. Every minute since already counts - continue your fast whenever you’re ready.") }
 
-        /// Editorial shown once the goal is reached (overtime). `hours` = plan goal in hours.
         static func goalReached(_ hours: Int) -> String {
             String(format: String(localized: "Editorial.goalReached",
                                   defaultValue: "You’ve reached your %d-hour goal. From here the fast is typically at its deepest."),
                    hours)
         }
 
-        /// "Autophagy begins in 2h 36m"
         static func beginsIn(_ phase: String, _ when: String) -> String {
             String(format: String(localized: "%@ begins in %@"), phase, when)
         }
@@ -114,23 +78,14 @@ enum strings {
         static var dailyFast: String { String(localized: "Daily fast") }
         static var lastMeal: String { String(localized: "Last meal · ") }
 
-        /// "Closes 8:00 PM" — the caption under the eating-window countdown.
         static func closesAt(_ time: String) -> String {
             String(localized: "Closes \(time)")
         }
 
-        /// Overtime pill in the center, e.g. "Goal 16:00 · +0:24".
-        ///
-        /// Goes through `String(format:)` rather than an interpolated
-        /// `String(localized:)` so a translation can reorder the two arguments with
-        /// `%1$@` / `%2$@` — Arabic needs the goal and the overage the other way
-        /// round. Interpolation binds them by position and gives a locale no way to
-        /// swap them. Same shape as `Editorial.beginsIn` above.
         static func goalOvertime(_ goal: String, _ over: String) -> String {
             String(format: String(localized: "Goal %@ · +%@"), goal, over)
         }
 
-        /// Static phase chip shown in the overtime state.
         static var deepAutophagy: String {
             String(localized: "Timer.deepAutophagy", defaultValue: "Deep autophagy")
         }
@@ -148,86 +103,32 @@ enum strings {
         static var goalStat: String { String(localized: "Goal") }
         static var over: String { String(localized: "Over") }
 
-        /// "Goal · 16h"
         static func goal(_ hours: String) -> String {
             String(localized: "Goal · \(hours)")
         }
 
-        // The primary of the `.complete` card, and the three footer secondaries — each
-        // on its own key now. A footer secondary is defined by the primary beside it,
-        // and one generic verb could not be right next to "Start eating", "Start fast"
-        // and "Continue fasting" at once.
-        //
-        // Named keys, not English source text — the exception `history.streak.unit`
-        // already makes. Keyed by their English text, `Done` here would land on the
-        // plan sheet's button and take the paywall's with it.
-
-        /// The `.complete` primary: opens the eating window. English drops the word
-        /// "window" the other nine locales had already dropped — the stat directly
-        /// above the button says WINDOW OPENS, so the card names it once either way.
         static var startEating: String {
             String(localized: "Footer.startEating", defaultValue: "Start eating")
         }
 
-        /// `.complete`, beside "Start eating": declines the window. Not a postponement —
-        /// `.complete` has no timeout, so the offer stands until the user acts, and this
-        /// tap is what puts it out of reach for the rest of the cycle.
         static var declineWindow: String {
             String(localized: "Footer.declineWindow", defaultValue: "No thanks")
         }
 
-        /// `.eating`, under "Start fast": ends the eating window early, behind the
-        /// `EndEating` confirmation. Names the window rather than saying "Done", which
-        /// read as "close this screen" and was tapped by accident. The key keeps its old
-        /// name so the `eating.skip` flows and the catalogue history stay put.
         static var doneEating: String {
             String(localized: "Footer.doneEating", defaultValue: "End eating window")
         }
 
-        /// `.eatingOver`, beside "Continue fasting": the window has already closed, so
-        /// this defers the next fast rather than skipping anything. "Not now" is true
-        /// here — a fast can be started from idle at any time.
         static var notNowFast: String {
             String(localized: "Footer.notNowFast", defaultValue: "Not now")
         }
 
-        // The consequence slot of the `.complete` footer — mode C of the genre. It
-        // carries exactly one sentence, never none and never two, and which one is
-        // decided by the path the fast ended on, not by muting either of them: a fast
-        // ended short of its goal is the one case where the loss would otherwise be
-        // named nowhere at all.
-
-        /// The missed-goal path: the fast was ended short of the goal, so the day is
-        /// not counted. Named through the streak, because that is what the person
-        /// visibly loses and the term is already fixed in all ten locales. It
-        /// deliberately does *not* say the streak broke — whether it did is the
-        /// streak's business, and this line stays quiet about it. `%@` is the fast's
-        /// length, the existing `%dh %02dm` token (ja renders it 15時間50分).
-        ///
-        /// **The name is wrong and stays wrong on purpose.** `consequenceNearGoal` is
-        /// left over from when the line was gated on the 15-minute near-goal threshold;
-        /// it now shows for every fast that fell short, by any margin. The honest name
-        /// is `consequenceMissedGoal`, and renaming it would touch the key in ten
-        /// locales for a string whose text does not change — a rename is only free
-        /// while it is exact, and this catalogue is edited by a build step that has
-        /// twice rewritten it unasked. The wrong name costs a reader this paragraph;
-        /// a botched rename costs ten translations and a locale gate before submit.
-        /// Rename it in a release that is not six days from one.
         static func consequenceNearGoal(_ duration: String) -> String {
             String(format: String(localized: "Footer.consequenceNearGoal",
                                   defaultValue: "You fasted %@ — today doesn't count toward your streak."),
                    duration)
         }
 
-        /// The ordinary path: leaving the screen closes the record for good. Bound to
-        /// the event, never to a position ("either action below" was false in this very
-        /// layout — `Resume this fast` sits directly under the sentence and is the one
-        /// action that does *not* end the fast — and spatial deixis survives neither
-        /// RTL nor any future reordering of the row).
-        ///
-        /// It holds only while exactly one exit from this screen leaves the fast
-        /// alive. A second such exit re-arbitrates the sentence rather than translating
-        /// around it.
         static var consequenceDefault: String {
             String(localized: "Footer.consequenceDefault",
                    defaultValue: "Leaving this screen ends this fast for good.")
@@ -235,43 +136,19 @@ enum strings {
     }
 
     enum Complete {
-        /// The undo on the result screen. It promises the *fast* back, not the record
-        /// gone — "Undo" would be ambiguous between the two, and the determiner is
-        /// load-bearing: bare "Resume fast" reads as resuming fasting in general.
-        /// Same family as `Reset this fast?` / `Delete this fast?` below.
         static var resumeFast: String { String(localized: "Resume this fast") }
     }
 
-    /// The end-of-fast correction sheet. Its own namespace rather than more of
-    /// `Sheet`, because the two sheets ask about opposite ends of the same fast and
-    /// the distinction is carried by a single adverb in English ("last") that other
-    /// languages have to spell out on the verb — a shared key would be true in
-    /// English and undifferentiated everywhere else.
     enum EndFast {
-        /// The header of the picker states. Deliberately not `Sheet.whenDidYouEat`
-        /// ("When did you last eat?"): at this moment the meal that ended the fast
-        /// *is* the last one, so the old line is not false — it just stops
-        /// distinguishing the two questions.
         static var title: String { String(localized: "When did you eat?") }
         static var hint: String { String(localized: "Your eating window starts from this moment.") }
 
-        /// The near-goal header. It asks rather than states, because at this distance
-        /// from the goal the question is genuinely open.
         static var nearGoalTitle: String { String(localized: "End this fast?") }
 
-        /// The consequence line, in whole minutes and never a duration format. Arabic
-        /// agrees the numeral across six CLDR classes and four of them are reachable
-        /// under a 15-minute threshold, so "0 h 10" is not expressible there at all.
-        /// The subject is the time, never the person: no encouragement in this line,
-        /// in any locale.
         static func minutesLeft(_ minutes: Int) -> String {
             String(localized: "\(minutes) minutes left to your goal", locale: .latinDigits)
         }
 
-        /// The overtime line. The subject is the app's own instrument — the timer —
-        /// and never the person's fast: the line shows precisely when the app is
-        /// *assuming* they have already eaten, so asserting their fast is running
-        /// asserts something it does not know.
         static func timerRanPast(_ duration: String) -> String {
             String(format: String(localized: "The timer has run %@ past your goal"), duration)
         }
@@ -285,25 +162,16 @@ enum strings {
             String(localized: "\(minutes) min ago", locale: .latinDigits)
         }
 
-        /// "Yesterday · goal end" — the caption under the exact-time value when it is
-        /// still sitting where the sheet put it.
         static func goalEndCaption(_ day: String) -> String {
             String(format: String(localized: "%@ · goal end"), day)
         }
 
-        /// The refusal's own header. It does not reuse the picker's: over a body that
-        /// is no longer a picker, "When did you eat?" describes nothing on screen.
         static var refusalTitle: String { String(localized: "That time is taken") }
 
-        /// The refusal names the fast in the way — a refusal that does not say what
-        /// is blocking it is the silent "no" this state replaces. Used when a different
-        /// end time could still clear the clash, so offering to pick one is honest.
         static func refusalReason(_ span: String) -> String {
             String(format: String(localized: "This overlaps a fast you already saved (%@). Pick another time, or open that fast and delete it."), span)
         }
 
-        /// Used when the clash is on this fast's own start: no end clears it, so the
-        /// copy points only at the one real way out instead of promising a re-pick.
         static func refusalReasonUnavoidable(_ span: String) -> String {
             String(format: String(localized: "This fast overlaps one you already saved (%@). To end it, open that fast and delete it."), span)
         }
@@ -319,8 +187,6 @@ enum strings {
         static var keepThisFast: String { String(localized: "Keep this fast") }
     }
 
-    /// The confirmation in front of ending an open eating window early
-    /// (`EndEatingConfirmSheet`), opened from `Footer.doneEating`.
     enum EndEating {
         static var confirmTitle: String {
             String(localized: "EndEating.confirmTitle", defaultValue: "End your eating window now?")
@@ -332,7 +198,6 @@ enum strings {
         static var confirmAction: String {
             String(localized: "EndEating.confirmAction", defaultValue: "End window")
         }
-        /// The safe action, and the bottom one in the sheet.
         static var keepOpen: String {
             String(localized: "EndEating.keepOpen", defaultValue: "Keep it open")
         }
@@ -344,26 +209,12 @@ enum strings {
         static var customLength: String { String(localized: "Custom length") }
         static var customCaption: String { String(localized: "From 1 to 23 hours") }
         static var whenDidYouEat: String { String(localized: "When did you last eat?") }
-        /// No longer drawn: the last-meal card said this in prose above a readout
-        /// that says it in the value. Kept, and kept reaching the extractor, so the
-        /// key holds its place in the catalogue with its ten translations — deleting
-        /// it costs nothing today and ten translations the day the line comes back.
         static var backdateHint: String { String(localized: "We’ll back-date your fast so the timer stays accurate.") }
         static var confirm: String { String(localized: "Confirm") }
-        /// The rule label above the exact-time control of the end-of-fast sheet.
-        /// Lives here rather than in `EndFast` because the last-meal picker used to
-        /// share it; it is now that sheet's alone, but the key is registered and
-        /// translated under this name in all ten locales.
         static var orSetExact: String { String(localized: "OR SET EXACT") }
     }
 
-    /// The plan editor's own strings. It shares the rest of its copy with `Sheet`; this
-    /// one button is separate because it used to share a key with the paywall too, and
-    /// the two say the same English word for opposite reasons.
     enum PlanEditor {
-        /// Applies the plan just chosen. It confirms a choice, so it keeps the Done
-        /// lexeme in every locale — never the OK one, which acknowledges rather than
-        /// decides. Split off the shared `Done`; the other half is `Pro.restoredDone`.
         static var confirm: String {
             String(localized: "PlanEditor.confirm", defaultValue: "Done")
         }
@@ -376,30 +227,23 @@ enum strings {
         static var justNow: String { String(localized: "Just now") }
         static var startingFresh: String { String(localized: "starting fresh") }
 
-        /// "2 days ago" (locale-aware plural)
         static func daysAgo(_ n: Int) -> String { String(localized: "\(n) days ago", locale: .latinDigits) }
 
-        /// "2h 43m in"
         static func noteIn(_ h: Int, _ m: Int) -> String {
             String(format: String(localized: "%dh %02dm in"), h, m)
         }
 
-        /// "Fast counts from 7:00 PM · 2h 40m in"
         static func fastCountsFrom(_ from: String, _ note: String) -> String {
             String(localized: "Fast counts from \(from) · \(note)")
         }
 
-        // MARK: Last-meal picker
+        // MARK: - Last-meal picker
 
         static var chip1h: String { String(localized: "1h", comment: "Meal picker chip: one hour ago") }
         static var chip3h: String { String(localized: "3h", comment: "Meal picker chip: three hours ago") }
         static var chipLastNight: String { String(localized: "Last night") }
         static var setExactTime: String { String(localized: "Set exact time") }
 
-        /// Commits the wheel picker's value. It confirms a choice, so it keeps the
-        /// Done lexeme in every locale — never the OK one, which acknowledges rather
-        /// than decides. Split off the shared `Done` for the same reason
-        /// `PlanEditor.confirm` was.
         static var exactTimeDone: String {
             String(localized: "Meal.exactTimeDone", defaultValue: "Done")
         }
@@ -407,87 +251,58 @@ enum strings {
         static var windowClosedOverline: String { String(localized: "Eating window closed") }
         static var scaleA11yLabel: String { String(localized: "Time since last meal") }
 
-        /// "2h 40m ago, Yesterday at 8:00 PM" — VoiceOver value of the meal scale.
-        /// The pause between the halves is punctuation, and punctuation is per-script:
-        /// ja/zh speak `、`, not an ASCII comma. `ListFormatter` cannot supply it —
-        /// even its narrow width injects a conjunction outside en (de "und", ar "و",
-        /// zh "和", ko "및"), which is wrong for a two-part readout. So the pair is a
-        /// localized template, like every other joined string in this file.
         static func scaleA11yValue(_ relative: String, _ absolute: String) -> String {
             String(localized: "Meal.scaleA11yValue", defaultValue: "\(relative), \(absolute)")
         }
 
-        // The readout is a whole template per shape, never a duration glued to an
-        // "ago": that word leads in de/es/fr/ar and trails in uk/pl/ja/ko.
-
-        /// "40m ago"
         static func agoMinutes(_ m: Int) -> String {
             String(format: String(localized: "%dm ago"), m)
         }
-        /// "2h 40m ago"
         static func agoRelative(_ h: Int, _ m: Int) -> String {
             String(format: String(localized: "%dh %dm ago"), h, m)
         }
-        /// "1d 3h ago"
         static func agoDays(_ d: Int, _ h: Int) -> String {
             String(format: String(localized: "%dd %dh ago"), d, h)
         }
-        /// "Today at 7:50 AM"
         static func todayAt(_ time: String) -> String { String(localized: "Today at \(time)") }
-        /// "Yesterday at 8:00 PM"
         static func yesterdayAt(_ time: String) -> String { String(localized: "Yesterday at \(time)") }
-        /// "Sat 18 Jul at 10:30 AM"
         static func dateAt(_ date: String, _ time: String) -> String {
             String(localized: "\(date) at \(time)")
         }
 
-        /// Ribbon tick label, hours — "3h". Deliberately as short as the tick is wide.
         static func scaleTickHours(_ h: Int) -> String {
             String(format: String(localized: "%dh"), h)
         }
-        /// Ribbon tick label, days — "3d".
         static func scaleTickDays(_ d: Int) -> String {
             String(format: String(localized: "%dd"), d)
         }
     }
 
     enum Duration {
-        /// "13h 04m"
         static func hm(_ h: Int, _ m: Int) -> String {
             String(format: String(localized: "%dh %02dm"), h, m)
         }
-        /// "2h 6m"
         static func hmShort(_ h: Int, _ m: Int) -> String {
             String(format: String(localized: "%dh %dm"), h, m)
         }
-        /// "36m"
         static func minutes(_ m: Int) -> String {
             String(format: String(localized: "%dm"), m)
         }
-        /// "16h"
         static func goalHours(_ h: Int) -> String {
             String(format: String(localized: "%dh"), h)
         }
-        /// Compact whole days for summary aggregates, e.g. "23d". The existing
-        /// short-unit key is shared with the meal scale so all ten locales keep the
-        /// same abbreviation.
         static func daysShort(_ d: Int) -> String {
             String(format: String(localized: "%dd"), d)
         }
-        /// "17 hours" — the hour picker's rows, spelled out. Plural categories live
-        /// in the catalog, never as an `h == 1` here.
         static func hoursSpelled(_ h: Int) -> String {
             String(localized: "\(h) hours", locale: .latinDigits)
         }
-        /// "fast · 8h window" — the trailing half of the plan sheet's value line.
-        /// The leading number is drawn separately, in display type.
         static func planWindowSuffix(_ window: String) -> String {
             String(format: String(localized: "fast · %@ window"), window)
         }
     }
 
     enum Streak {
-        /// Milestone card title, e.g. "7 days in a row".
         static func milestoneTitle(_ days: Int) -> String {
             String(localized: "\(days) days in a row", locale: .latinDigits)
         }
@@ -498,10 +313,6 @@ enum strings {
     enum History {
         static var title: String { String(localized: "History") }
         static var streakOverline: String { String(localized: "Current streak") }
-        /// The same overline once the run is over: it renames the number as past, and
-        /// carries no verdict — the sentence under the number says what happened. The
-        /// short class deliberately ("Streak ended" fills 100% of the slot in Ukrainian,
-        /// with no slack for a retranslation).
         static var lastStreakOverline: String {
             String(localized: "history.streak.lastOverline",
                    defaultValue: "Last streak",
@@ -529,19 +340,7 @@ enum strings {
         static var emptyTitle: String { String(localized: "Your fasts gather here") }
         static var emptyBody: String { String(localized: "Every finished fast is saved with its length, plan and times - so you can look back on the rhythm you are building.") }
         static var emptyCta: String { String(localized: "Start a fast") }
-        /// The empty state's action while a fast is running. It names the destination
-        /// rather than the direction — the nav chevron already means "back", and a
-        /// second "Back" would read as two different ways out.
-        ///
-        /// English source only for now: `loc` is translating it, and until the table
-        /// lands the other nine locales fall back to this.
         static var emptyBackToFast: String { String(localized: "Back to your fast") }
-        /// The note under the counter on the first fasts. It states the *rule* rather
-        /// than the outcome: the old copy ("First one saved. Finish tomorrow's fast and
-        /// your streak begins.") promised the day was banked, and it showed after a fast
-        /// that fell short of the goal too — where nothing was banked at all (F-2). A
-        /// streak day is a goal reached, and that is the one thing worth saying to
-        /// someone who has not built one yet. No reproach: it never says what went wrong.
         static var firstNote: String {
             String(localized: "history.streak.firstFast",
                    defaultValue: "First fast logged. A streak counts the days you reach your goal.",
@@ -552,17 +351,10 @@ enum strings {
                    """)
         }
         static var savedToHistory: String { String(localized: "Saved to your history") }
-        /// The export affordance in the history list. The control is the system
-        /// share glyph and carries no caption, so this is its VoiceOver label — and
-        /// the word is `Export`, without the `CSV` token: the format is named once,
-        /// in the offer's benefit title.
         static var export: String { String(localized: "Export") }
         static var exportTitle: String { String(localized: "History.exportTitle") }
         static var exportCaption: String { String(localized: "History.exportCaption") }
 
-        /// Streak unit beside the big number. The number is drawn separately (display
-        /// type), so the catalog's plural variants carry the word alone — the CLDR
-        /// categories live there, never as a `days == 1` here.
         static func daysInARow(_ days: Int) -> String {
             String(localized: "history.streak.unit",
                    defaultValue: "\(days) days in a row",
@@ -575,12 +367,6 @@ enum strings {
                    """)
         }
 
-        /// The sentence under the counter once the run has ended: it names what the
-        /// number now is, the last goal day, and how the next one starts. The date is
-        /// deliberately labelled as the last completed goal rather than as the day the
-        /// streak "ended": a streak becomes broken only after a later day is missed.
-        /// Without reproach and without a sell — the way back is a goal reached, not a
-        /// purchase.
         static func streakEnded(_ days: Int, lastGoalDate: String?) -> String {
             let date = lastGoalDate
                 .flatMap(Clock.date(forDayKey:))
@@ -600,39 +386,30 @@ enum strings {
                           """)
         }
 
-        /// "Last fast · 16h 24m" — the eating window's link into the history.
         static func lastFast(_ duration: String) -> String {
             String(localized: "Last fast · \(duration)")
         }
 
-        /// "Best 9 · since 12 March"
         static func best(_ count: Int, _ date: String) -> String {
             String(localized: "Best \(count) · since \(date)", locale: .latinDigits)
         }
 
-        /// "9 fasts · 152h" — the month group's aggregate.
         static func groupMeta(_ count: Int, _ hours: String) -> String {
             String(localized: "\(count) fasts · \(hours)", locale: .latinDigits)
         }
 
-        /// "of 16h" — the goal beside a fast that fell short of it.
         static func ofGoal(_ goal: String) -> String {
             String(localized: "of \(goal)")
         }
 
-        /// "Reached Autophagy"
         static func reached(_ phase: String) -> String {
             String(localized: "Reached \(phase)")
         }
 
-        /// VoiceOver label for the history entry point on the main screen.
         static func entryA11y(_ days: Int) -> String {
             String(localized: "Fasting history, current streak \(days) days")
         }
 
-        /// The label while the lost run is still on the pill. VoiceOver gets the word
-        /// the pill is not allowed to spend width on — "last", not "current" — so the
-        /// number is not heard as a run still going.
         static func entryA11yLastStreak(_ days: Int) -> String {
             String(localized: "history.entry.a11yLastStreak",
                    defaultValue: "Fasting history, last streak \(days) days",
@@ -642,8 +419,6 @@ enum strings {
                    """)
         }
 
-        /// The same label with no streak to announce — the pill carries the history
-        /// glyph and no number at all.
         static var entryA11yNoStreak: String { String(localized: "Fasting history") }
     }
 
@@ -654,41 +429,17 @@ enum strings {
         static var eatingEndBody: String { String(localized: "Time to fast. Start whenever you’re ready.") }
     }
 
-    /// The paid tier: the offer screen, the Pro section of the About sheet, and the
-    /// two one-time notices that follow the entitlement going away.
-    ///
-    /// The product name is a literal everywhere it appears and is never templated —
-    /// in Korean the particle that follows it is chosen by its pronunciation, which
-    /// stops being decidable the moment the token becomes a `%@`.
     enum Pro {
         static var productName: String { "IF24\u{00A0}Pro" }
 
-        /// The VoiceOver hint on any control the offer gates: the locked export in
-        /// History, and the plan editor's confirm on the branch where the tap opens the
-        /// offer instead of applying the plan. It says where the tap leads, not what it
-        /// does — the label of each control stays truthful and unchanged.
-        ///
-        /// A hint is never the only carrier: the user can switch hints off, so every
-        /// gated control also names the tier in a channel he cannot suppress.
-        ///
-        /// "the … screen" is load-bearing, not padding: after "opens", a bare product
-        /// name lands in the "application" class in every language Apple ships, so a
-        /// blind user hears "launches the separate IF24 Pro app", concludes it is not
-        /// installed, and does not tap. The non-breaking space inside the token is the
-        /// catalog's rule for it — all 32 occurrences carry it.
         static var lockedDestinationHint: String {
             String(localized: "Pro.lockedDestinationHint",
                    defaultValue: "Opens the IF24\u{00A0}Pro screen")
         }
 
-        // Offer — headline and the framing line under it. The framing line belongs
-        // to whichever benefit leads the list, so it changes with the entry point.
         static var headline: String { String(localized: "One purchase, for good") }
         static var framingCustom: String { String(localized: "Your plan, your number - any length you want, from one hour to twenty-three.") }
         static var framingProtectedDay: String { String(localized: "A missed day stays a missed day - your streak keeps counting from where it was.") }
-        /// The framing for the one door that names a benefit: the locked export row in
-        /// History. It has to say the same thing as the export benefit under it without
-        /// repeating its words — the line above a list is a frame, not its first item.
         static var framingExport: String {
             String(localized: "Pro.framingExport",
                    defaultValue: "Your record is yours - take the whole history out as a file whenever you want it.",
@@ -703,7 +454,6 @@ enum strings {
                    """)
         }
 
-        // Offer — the three benefits.
         static var benefitCustomTitle: String { String(localized: "Custom length") }
         static var benefitCustomBody: String { String(localized: "Any whole hour, not only the four presets.") }
         static var benefitExportTitle: String { String(localized: "History as CSV") }
@@ -711,27 +461,19 @@ enum strings {
         static var benefitFreezeTitle: String { String(localized: "Protected day") }
         static var benefitFreezeBody: String { String(localized: "One missed day a month leaves your streak intact.") }
 
-        // Offer — price block.
         static var oneTimePurchase: String { String(localized: "One-time purchase") }
-        /// The wedge, word for word as it stands in the store's promotional text.
         static var wedge: String { String(localized: "No subscription, no account") }
         static var buy: String { String(localized: "Buy") }
         static var confirming: String { String(localized: "Confirming") }
         static var tryAgain: String { String(localized: "Try again") }
         static var proActiveBadge: String { String(localized: "Pro active · one-time purchase") }
 
-        /// Two keys with the same meaning: the short one is a link in the service
-        /// block, paired with Privacy; the full one is a row and a button. They read
-        /// alike in eight locales and differently in English and Arabic, which is
-        /// exactly what the split exists for — merging them would force the other
-        /// eight to drop a grammatically required object.
         static var restoreShort: String { String(localized: "Restore") }
         static var restoreFull: String { String(localized: "Restore purchases") }
         static var privacyShort: String { String(localized: "Privacy") }
         static var privacyFull: String { String(localized: "Privacy policy") }
         static var close: String { String(localized: "Close") }
 
-        // Offer — states S3…S6.
         static var failedTitle: String { String(localized: "Purchase not completed") }
         static var failedBodyGeneral: String { String(localized: "Something interrupted it before the payment went through. Nothing will be charged.") }
         static var failedBodyNetwork: String { String(localized: "The purchase could not reach the App\u{00A0}Store. Nothing will be charged - try again online.") }
@@ -741,75 +483,32 @@ enum strings {
         static var unverifiedBody: String { String(localized: "Restore first - if Pro is on this Apple\u{00A0}Account it comes straight back.") }
         static var restoredTitle: String { String(localized: "Purchases restored") }
         static var restoredBody: String { String(localized: "Pro is active on this device. Everything below is open now.") }
-        /// S6 after the money changed hands. Separate from `restoredTitle` because a
-        /// purchase and a restore are not the same event to the person in front of
-        /// the screen, and the paid one is the one that was silent until now.
         static var purchasedTitle: String { String(localized: "IF24 Pro is yours") }
-        /// S6 after an Ask to Buy was approved. The app does not name who approved
-        /// it: several locales cannot do that without guessing their gender.
         static var approvedTitle: String { String(localized: "Purchase approved") }
-        /// The body of the paid S6, with the amount in it — a money moment names its
-        /// sum. `%@` is `ProProductInfo.displayPrice`, the store's own string, and it
-        /// arrives here already isolated and already unbreakable (see `paidPrice`).
-        /// The sum deliberately does not end the clause: the Saudi riyal carries a
-        /// full stop inside the currency form itself, and two in a row would land in
-        /// the payment confirmation of the app's largest Arabic market.
         static func purchasedBody(_ displayPrice: String) -> String {
             String(format: String(localized: "Paid %@. One time - nothing renews, nothing to cancel."),
                    paidPrice(displayPrice))
         }
-        /// The same body when the store never answered with a price. Reachable only
-        /// through an Ask to Buy approved in a session that had no product: there is
-        /// no Buy button without a sum, so `.purchased` cannot get here.
         static var purchasedBodyNoPrice: String {
             String(localized: "The purchase went through. The amount is on your App\u{00A0}Store receipt.")
         }
-        /// The amount as it goes into a sentence. Two things happen to it and both
-        /// are the app's job rather than the translator's: it is bidi-isolated, so
-        /// currency and digits do not fly to opposite ends of an Arabic line, and its
-        /// spaces become non-breaking, so "COP 29.900,00" cannot come apart across
-        /// two lines at accessibility sizes. The glyphs are untouched — the sum reads
-        /// character for character as it did in the price block.
         private static func paidPrice(_ displayPrice: String) -> String {
             BidiText.isolate(displayPrice.replacingOccurrences(of: " ", with: "\u{00A0}"))
         }
-        /// The primary of the restored panel — the same full-width slot that carries
-        /// Buy and Restore in the other states, on a screen that still has its title,
-        /// its badge and its check-marks. That is a result panel and not an alert, so
-        /// the locale takes its Done lexeme and not its OK one. Split off the shared
-        /// `Done`; the other half is `PlanEditor.confirm`.
         static var restoredDone: String {
             String(localized: "Pro.restoredDone", defaultValue: "Done")
         }
-        /// Transient answer to a Restore that found nothing. Not a failure and not a
-        /// state of its own: the store answered, the answer was empty. No full stop
-        /// in any of the ten locales.
         static var nothingToRestore: String { String(localized: "No purchases to restore") }
 
-        // About IF24 — the Pro row's four statuses.
-        //
-        // The axis is the state of the entitlement, never the tier, the purchase or
-        // the price. `inactive` is empty in Japanese by decision, not by omission:
-        // the right-hand column of a settings row reads there as "the option you
-        // picked", and every attested candidate said something false.
         static var statusInactive: String { String(localized: "Inactive") }
         static var statusActive: String { String(localized: "Active") }
         static var statusAwaiting: String { String(localized: "Awaiting approval") }
         static var statusUnverified: String { String(localized: "Not checked yet") }
         static var sectionFooter: String { String(localized: "Restoring works on any device signed in to the same Apple\u{00A0}Account.") }
 
-        // Notices — edge 6 and edge 17. One sheet, two moments.
         static var revokedTitle: String { String(localized: "IF24\u{00A0}Pro is no longer active") }
         static var revokedBody: String { String(localized: "Your history stays as it is.") }
-        /// Edge 17 / PW-10. Keyed by its own English text like every other string
-        /// here, and deliberately so: while a key had an empty default, the catalog
-        /// compiler dropped the entry, Foundation handed the key back verbatim, and
-        /// the sheet rendered `pro.notice.goalChanged.title` on screen (PW-7). With
-        /// the English source as the key that failure cannot be built.
         static var goalChangedTitle: String { String(localized: "Your goal changed") }
-        /// `%@` is the spelled-out fallback goal ("16 hours") — the vocabulary the
-        /// custom length was set in, so it compares against the 17 just lost without
-        /// arithmetic.
         static func goalChangedBody(_ goal: String) -> String {
             String(format: String(localized: "Custom lengths need IF24\u{00A0}Pro, so your plan is %@ from now on."), goal)
         }
@@ -818,14 +517,6 @@ enum strings {
     enum About {
         static var title: String { String(localized: "About IF24") }
         static var privacyFooter: String { String(localized: "No IF24 account, no sign-in - IF24 never asks who you are. Your history is kept on this device; how long your fasts run is sent as usage data.") }
-        /// Closes the science section rather than sitting under a commercial row.
-        ///
-        /// On a symbolic key rather than its English text, and deliberately: this is
-        /// the legally heaviest line in the catalog and the most often rewritten, and
-        /// every rewrite of a text key silently detaches the nine translations that
-        /// hang off it. The advice to see a clinician stands BEFORE the examples, and
-        /// the list of who is at risk is open ("especially if…"), not closed - a
-        /// closed list reads as "everyone else is fine".
         static var medicalNote: String {
             String(localized: "About.medicalNote",
                    defaultValue: "IF24 shows estimated phases, not measurements of your body. It is not a medical device and does not give medical advice. Talk to a doctor before changing how you eat - especially if you are pregnant, on medication, managing a condition such as diabetes, have a history of disordered eating, or are under 18.")

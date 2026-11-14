@@ -1,9 +1,6 @@
 //
 //  Actions.swift
-//  HelloWorldReduxTry
-//
-//  Created by LEONID NIFANTIJEV on 17.08.2025.
+//  Redux
 //
 
-// Base action
 public protocol Action {}

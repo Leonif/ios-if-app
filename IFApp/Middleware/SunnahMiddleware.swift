@@ -3,7 +3,6 @@ import Redux
 import UserNotifications
 import UIKit
 
-/// Serial replacement prevents an older async scheduling pass from restoring cancelled reminders.
 final class SunnahMiddleware: Middleware {
     private let repository: SunnahRepositoryProtocol
     private let notifications: NotificationRepositoryProtocol
@@ -49,8 +48,6 @@ final class SunnahMiddleware: Middleware {
         task = Task { [repository, notifications, analytics] in
             await previous?.value
             guard !Task.isCancelled else { return }
-            // One ask for the whole app (see `requestIfUndetermined`). The resolved
-            // action comes back through this middleware and schedules on the answer.
             if requestPermission, await SyncPushStatusThunk.requestIfUndetermined(
                 notifications: notifications, analytics: analytics, dispatch: { dispatch($0) }) {
                 return
@@ -63,10 +60,6 @@ final class SunnahMiddleware: Middleware {
             guard !Task.isCancelled else { return }
             let delivery = SunnahState.Delivery.resolve(
                 enabled: settings.enabled, otherwise: !allowed ? .denied : (success ? .scheduled : .failed))
-            // Upcoming dates are what *was scheduled*, not what the calendar holds.
-            // With the permission refused nothing was written (`replace([])` above), so
-            // the list would be a promise the app cannot keep — the loudest half of
-            // SU-1, where the screen read as configured while no reminder could fire.
             dispatch(SunnahAction.deliveryUpdated(
                 delivery, dates: allowed ? reminders.prefix(3).map(\.fastDate) : []))
         }

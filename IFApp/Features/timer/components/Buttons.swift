@@ -2,17 +2,9 @@
 //  Buttons.swift
 //  IFApp
 //
-//  Shared primary (green) and secondary button shapes used across footer + sheets.
-//
-//  Both keep `labelInset` of horizontal breathing room inside the shape: an English
-//  label ("Reset", "Continue fasting") never comes near the corner radius, but its
-//  German and Ukrainian counterparts ("Zurücksetzen", "Продовжити піст") are half
-//  again as long and would otherwise sit flush against the rounded edge.
-//
 
 import SwiftUI
 
-/// Horizontal breathing room between a button's label and its rounded edge.
 private let labelInset: CGFloat = 14
 
 struct PrimaryButton: View {
@@ -43,15 +35,9 @@ struct SecondaryButton: View {
     let title: String
     let theme: ThemeTokens
     var cornerRadius: CGFloat = 15
-    /// Paired with a primary button, the secondary sizes to its own label rather than
-    /// taking half the row: it starts at `minWidth` and widens for a longer locale,
-    /// leaving the rest to the primary. Left nil, the button fills its container
-    /// (sheets, where it is the only button in the row).
     var minWidth: CGFloat? = nil
     let action: () -> Void
 
-    /// Cap on the content-sized width, so a very long secondary label cannot crowd
-    /// the primary action out of the row — past this the label scales down instead.
     private static let maxContentWidth: CGFloat = 152
 
     var body: some View {
@@ -72,20 +58,10 @@ struct SecondaryButton: View {
                 )
         }
         .buttonStyle(.pressable)
-        // Content-sized only when a floor is given: the nil proposal makes the frame
-        // above resolve to the label's own width inside [minWidth, maxContentWidth].
         .fixedSize(horizontal: minWidth != nil, vertical: false)
     }
 }
 
-/// A text-only action at the bottom of a footer: no fill, no outline. For an exit the
-/// card offers but does not want tapped by accident — it ranks below the bordered
-/// secondary, so it must not look like one.
-///
-/// The label wraps to a second line before it shrinks, and shrinks no further than
-/// 0.94: at the xxLarge ceiling the Ukrainian and French labels outgrow the ~267pt the
-/// footer column leaves, and a scale floor alone would have taken them below the size
-/// the reader asked for.
 struct TertiaryTextButton: View {
     let title: String
     let theme: ThemeTokens
@@ -107,20 +83,6 @@ struct TertiaryTextButton: View {
     }
 }
 
-/// The full-width actions of the consequence sheets, stacked one under the other.
-///
-/// Not `PrimaryButton` with a different number: three of its properties are wrong
-/// here and each for its own reason.
-///
-/// - **No `minimumScaleFactor`.** A label naturally wider than ~153pt at the xxLarge
-///   ceiling renders *below* base size under a floor of 0.7 — someone who turned text
-///   up gets smaller type on the one control that matters, and no automated hunt for
-///   truncation sees it because there is no truncation. The label wraps instead, and
-///   the shape grows with it.
-/// - **`minHeight`, not `height`.** Same reason: a box measured off the English
-///   mock-up overflows in German, and the defect looks like overlap rather than a clip.
-/// - **No drop shadow.** These sit on a sheet card, not over a scrolling screen; the
-///   shadow that lifts the footer's primary off the timer only muddies the edge here.
 struct SheetPrimaryButton: View {
     let title: String
     let theme: ThemeTokens
@@ -142,11 +104,6 @@ struct SheetPrimaryButton: View {
     }
 }
 
-/// The reversible action of the consequence sheets: `Keep this fast`, `Open that
-/// fast`. Drawn on the quiet material rather than as a bordered secondary, which is
-/// what keeps it from reading as a third option in a list of choices — it is the
-/// named form of closing the sheet, the thing the scrim tap does, spelled out. Last
-/// element, no chevron, full width.
 struct QuietActionButton: View {
     let title: String
     let theme: ThemeTokens

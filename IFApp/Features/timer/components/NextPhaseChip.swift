@@ -2,8 +2,6 @@
 //  NextPhaseChip.swift
 //  IFApp
 //
-//  Pill below the editorial, colored by the NEXT phase (handoff-derived colors).
-//
 
 import SwiftUI
 
@@ -21,7 +19,6 @@ struct NextPhaseChip: View {
     }
 }
 
-/// A static phase chip (no countdown) — used in the overtime state for autophagy.
 struct StaticPhaseChip: View {
     let phase: Phase
     let text: String
@@ -32,7 +29,6 @@ struct StaticPhaseChip: View {
     }
 }
 
-/// Shared pill shape colored by a phase color.
 private struct PhaseChipShape: View {
     let color: Color
     let text: String

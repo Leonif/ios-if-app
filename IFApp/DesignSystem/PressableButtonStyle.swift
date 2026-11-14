@@ -2,9 +2,6 @@
 //  PressableButtonStyle.swift
 //  IFApp
 //
-//  iOS replacement for the HTML hover affordance: depress on press only.
-//  ~0.97 scale + slight dim, 0.13s ease-out.
-//
 
 import SwiftUI
 

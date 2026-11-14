@@ -1,8 +1,6 @@
 //
-//  BorderedButtonStyle.swift
+//  Styles.swift
 //  IFApp
-//
-//  Created by Leonid-user on 13.11.2024.
 //
 import SwiftUI
 

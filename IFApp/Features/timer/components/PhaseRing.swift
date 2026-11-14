@@ -2,43 +2,23 @@
 //  PhaseRing.swift
 //  IFApp
 //
-//  The signature element: a 280pt ring whose progress arc is a smooth gradient of
-//  every phase already passed, tipped by a head dot in the current phase color.
-//  When complete, the gradient loops seamlessly through all five phases, and the
-//  ring holds at 100% for the whole overtime — no growth, no head dot. The seal
-//  at twelve o'clock gets its place by a genuine break in the arc, not by a disc
-//  painted over it.
-//
 
 import SwiftUI
 
 struct PhaseRing: View {
-    let progress: Double        // 0...1 (fraction of the goal)
+    let progress: Double
     let currentPhase: Phase
     let isComplete: Bool
     let theme: ThemeTokens
     var diameter: CGFloat = 280
-    /// Diameter of the seal that sits on the ring at twelve o'clock (0 = no seal).
-    /// The track and the looped arc are trimmed open around it, 2pt clear of its
-    /// edge, so nothing is drawn behind it — an opaque disc over the spectrum
-    /// never matched the screen's gradient backdrop, and on the 12h geometry the
-    /// arc read as running straight through the check.
     var sealDiameter: CGFloat = 0
-    /// Whether the arc still has a moving leading edge. A fast in flight does; a fast
-    /// that has been ended does not, and on the result screen the breathing dot read
-    /// as a timer still running over a card that says the fast is over.
     var showsHeadDot: Bool = true
 
     private let lineWidth: CGFloat = 10
     private let sealClearance: CGFloat = 2
 
-    // The stroked Circle's path radius is diameter/2, so the head dot must ride at
-    // that radius to sit centered on the ring line (not inset by half the stroke).
     private var centerRadius: CGFloat { diameter / 2 }
 
-    /// Fraction of the circle cut out on each side of twelve o'clock for the seal.
-    /// Measured on the ring's centreline: half the seal, the clearance, and half
-    /// the stroke, because the round caps reach that far past the trim point.
     private var sealGap: Double {
         guard sealDiameter > 0 else { return 0 }
         let halfExtent = sealDiameter / 2 + sealClearance + lineWidth / 2
@@ -47,22 +27,17 @@ struct PhaseRing: View {
 
     var body: some View {
         ZStack {
-            // Track — opened around the seal too, so no sliver peeks out beside it.
             Circle()
                 .trim(from: sealGap, to: 1 - sealGap)
                 .stroke(theme.ringTrack, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
 
-            // Progress arc
             if isComplete {
                 Circle()
                     .trim(from: sealGap, to: 1 - sealGap)
                     .stroke(loopedGradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                     .rotationEffect(.degrees(-90))
             } else {
-                // Flat caps (like the design's conic arc): a round start cap would
-                // bleed the gradient's wrap colour (ketosis) onto the gold Fed start.
-                // The head dot covers the flat leading edge.
                 Circle()
                     .trim(from: 0, to: max(0.0001, progress))
                     .stroke(progressGradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .butt))
@@ -72,24 +47,12 @@ struct PhaseRing: View {
             }
         }
         .frame(width: diameter, height: diameter)
-        // Pinned left-to-right, like the paywall's spinner. Progress runs clockwise
-        // from twelve o'clock in every locale — the handoff says rings do not mirror
-        // — but "not mirrored" is not what RTL gives a view that says nothing: the
-        // arc and the head dot are drawn by two different mechanisms, and RTL turns
-        // them the two different ways. `rotationEffect` has its angle negated, so the
-        // -90° that puts the start of the arc at twelve o'clock becomes +90° and puts
-        // it at six; `offset(x:)` is mirrored, so the dot lands where a mirrored ring
-        // would put it. The two disagreed by half a turn, and Arabic drew a filled arc
-        // in the bottom-left with the marker at ten o'clock and a dead sector between
-        // them — the main graphic of the main screen giving two answers to "how far
-        // along am I".
         .environment(\.layoutDirection, .leftToRight)
         .animation(.easeOut(duration: 0.3), value: progress)
     }
 
-    // MARK: Gradients
+    // MARK: - Gradients
 
-    /// Quarter-boundary stops up to the head, tipped with the current phase color.
     private var progressGradient: AngularGradient {
         let boundaries: [(Double, Phase)] = [(0, .fed), (0.25, .sugar), (0.5, .fat), (0.75, .ketosis)]
         var stops = boundaries
@@ -99,7 +62,6 @@ struct PhaseRing: View {
         return AngularGradient(gradient: Gradient(stops: stops), center: .center)
     }
 
-    /// Full-circle 6-stop loop so the seam at the top blends smoothly.
     private var loopedGradient: AngularGradient {
         AngularGradient(
             gradient: Gradient(stops: [
@@ -114,21 +76,18 @@ struct PhaseRing: View {
         )
     }
 
-    // MARK: Head dot
+    // MARK: - Head dot
 
     private var headDot: some View {
         let theta = progress * 2 * .pi
         let x = centerRadius * sin(theta)
         let y = -centerRadius * cos(theta)
-        // Position animates with progress on the wrapper; the breathing pulse lives
-        // on the inner view so the two animations don't fight.
         return BreathingDot(color: currentPhase.color, isDark: theme.isDark)
             .offset(x: x, y: y)
             .animation(.easeOut(duration: 0.3), value: progress)
     }
 }
 
-/// The ring's head dot, softly breathing to hint that progress is moving.
 private struct BreathingDot: View {
     let color: Color
     let isDark: Bool

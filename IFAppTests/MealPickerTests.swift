@@ -2,76 +2,46 @@
 //  MealPickerTests.swift
 //  IFAppTests
 //
-//  Guards the property the last-meal picker exists to have: the answer means the
-//  same thing a minute later as it did when it was given.
-//
-//  It did not, and the way it failed is worth writing down, because the shape of the
-//  bug is what the state shape is now chosen against. The picker used to store the
-//  moment — "today, 23:00" — and re-derive the distance from it on every read. Cross
-//  midnight with the sheet open, or simply leave a seeded value sitting there, and
-//  "today 23:00" is an hour and a half into the *future*. The distance came back
-//  negative, the clamp floored it at zero, and the screen said "Just now" over a fast
-//  that would start at the moment of the tap. The user's answer was gone and nothing
-//  on screen admitted it.
-//
-//  Storing the distance removes the failure rather than guarding it: there is no
-//  re-derivation to go wrong. These tests are what keeps that true if anyone puts
-//  the moment back.
-//
 
 import XCTest
 @testable import IFApp
 
 final class MealPickerTests: XCTestCase {
 
-    // MARK: The midnight crossing
+    // MARK: - The midnight crossing
 
-    /// 23:00 yesterday, read at 00:30. The distance is an hour and a half, and the
-    /// clock time it resolves to is still 23:00 — on the previous day.
     func testMomentAcrossMidnightLandsOnYesterdayAtTheSameClockTime() {
         let moment = MealMath.moment(minutesAgo: 90, nowMinuteOfDay: 30)
         XCTAssertEqual(moment.ateDay, 1)
         XCTAssertEqual(moment.ateMin, 23 * 60)
     }
 
-    /// The regression itself. The same answer is read twice, ten minutes apart, with
-    /// midnight in between; the wall-clock moment it names must not move.
-    ///
-    /// Before the fix this could not even be expressed — the state held the moment,
-    /// so "the same answer" after midnight was a different answer.
     func testTheSameAnswerNamesTheSameMomentOnBothSidesOfMidnight() {
         var state = MealState()
-        // 23:50, answering "an hour ago" — so 22:50.
         state.set(minutesAgo: 60, chip: -1, via: .ribbon)
         let before = MealMath.moment(minutesAgo: state.minutesAgo, nowMinuteOfDay: 23 * 60 + 50)
         XCTAssertEqual(before.ateDay, 0)
         XCTAssertEqual(before.ateMin, 22 * 60 + 50)
 
-        // Ten minutes later it is 00:00 the next day. Nothing was touched, so the
-        // answer is still "60 minutes before the moment it is read".
         let after = MealMath.moment(minutesAgo: state.minutesAgo, nowMinuteOfDay: 0)
         XCTAssertEqual(after.ateDay, 1, "the meal is now on the previous calendar day")
         XCTAssertEqual(after.ateMin, 23 * 60, "and an hour before the new midnight")
         XCTAssertEqual(state.minutesAgo, 60, "the stored answer itself never moved")
     }
 
-    /// A distance longer than the day it is read in must count whole days back, not
-    /// wrap inside one. Three days and two hours, read at 01:00.
     func testMomentCountsWholeDaysBackRatherThanWrapping() {
         let moment = MealMath.moment(minutesAgo: 3 * 1440 + 120, nowMinuteOfDay: 60)
         XCTAssertEqual(moment.ateDay, 4)
         XCTAssertEqual(moment.ateMin, 23 * 60)
     }
 
-    /// Exactly on a midnight boundary — the case floor division gets wrong when it
-    /// is written as truncating division.
     func testMomentOnAnExactMidnightBoundary() {
         let moment = MealMath.moment(minutesAgo: 60, nowMinuteOfDay: 60)
         XCTAssertEqual(moment.ateDay, 0, "01:00 minus an hour is still today")
         XCTAssertEqual(moment.ateMin, 0)
     }
 
-    // MARK: The domain, clamped in one place
+    // MARK: - The domain, clamped in one place
 
     func testDistanceIsNeverNegative() {
         XCTAssertEqual(MealMath.clamped(-1), 0)
@@ -84,8 +54,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(MealMath.clamped(90_000), 7 * 1440)
     }
 
-    /// The clamp is on the way *into* the state, not only on the way out of it, so
-    /// there is no reachable state that holds a value outside the domain.
     func testStateCannotHoldAValueOutsideTheDomain() {
         var state = MealState()
         state.set(minutesAgo: -500, chip: -1, via: .exact)
@@ -94,7 +62,7 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.minutesAgo, MealScale.maxMinutes)
     }
 
-    // MARK: A fast never starts after it is started
+    // MARK: - A fast never starts after it is started
 
     func testFastStartIsNeverInTheFuture() {
         let now = 1_760_000_000.0
@@ -108,31 +76,22 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(MealMath.fastStart(minutesAgo: 90, now: now), now - 5400)
     }
 
-    /// Both screens that turn a meal into a fast start go through one function, so
-    /// the floor cannot be present on one path and missing on the other.
     func testFastStartFloorHoldsAtTheFarEndOfTheDomainToo() {
         let now = 1_760_000_000.0
         XCTAssertEqual(MealMath.fastStart(minutesAgo: 99_999, now: now),
                        now - Double(MealScale.maxMinutes) * 60)
     }
 
-    // MARK: The scale
+    // MARK: - The scale
 
-    /// One minute everywhere: the drum snaps to any minute across the whole domain, so
-    /// a round clock time like 20:50 is reachable instead of falling between two coarse
-    /// ticks — the miss the banded scale had far from now (owner, 24.08).
     func testSnapIsOneMinuteAcrossTheWholeDomain() {
         for m in [1, 42, 137, 730, 731, 4319, 6000, MealScale.maxMinutes - 1] {
             XCTAssertEqual(MealScale.snap(m), m, "minute \(m) should land on itself")
         }
-        // The VoiceOver adjustment stays coarse — a minute at a time would be thousands
-        // of swipes — and is uniform now that there are no bands.
         XCTAssertEqual(MealScale.step(at: 0), 15)
         XCTAssertEqual(MealScale.step(at: MealScale.maxMinutes), 15)
     }
 
-    /// Position is a straight pitch mapping: one minute is `pitch` points everywhere,
-    /// which is what lets fling momentum carry reach without the step coarsening.
     func testPositionIsLinearInMinutes() {
         XCTAssertEqual(MealScale.position(ofMinutes: 0), 0)
         XCTAssertEqual(MealScale.position(ofMinutes: 1), MealScale.pitch)
@@ -140,8 +99,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(MealScale.position(ofMinutes: MealScale.maxMinutes), MealScale.length)
     }
 
-    /// Position and snapping are inverses on the grid, in every band — otherwise the
-    /// marker and the value disagree somewhere along the strip.
     func testPositionAndSnapAreInversesOnEveryStep() {
         for minutes in MealScale.stepMinutes {
             XCTAssertEqual(MealScale.snappedMinutes(atPosition: MealScale.position(ofMinutes: minutes)),
@@ -156,7 +113,7 @@ final class MealPickerTests: XCTestCase {
                        MealScale.maxMinutes, "dragging past the end holds at seven days")
     }
 
-    // MARK: Which control answered
+    // MARK: - Which control answered
 
     func testEachControlReportsItself() {
         var state = MealState()
@@ -174,8 +131,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.inputMethod, .exact)
     }
 
-    /// Scrubbing back to zero is not an answer, it is a return to "now" — reporting
-    /// it as a ribbon answer would count back-dates that did not happen.
     func testScrubbingBackToNowReportsAsUntouched() {
         var state = MealState()
         state.set(minutesAgo: 120, chip: -1, via: .ribbon)
@@ -184,8 +139,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertTrue(state.isFresh)
     }
 
-    /// The window-close default is the app's own value and says so, so the analytics
-    /// can tell it apart from a chip the user actually tapped.
     func testTheSeededValueIsMarkedAsSeeded() {
         var state = MealState()
         state.set(minutesAgo: 200, chip: -1, via: .seeded)
@@ -193,8 +146,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.inputMethod.rawValue, "seeded")
     }
 
-    /// The raw values are a GA4 dimension's vocabulary — renaming one silently
-    /// splits a year of reports in two.
     func testInputMethodVocabularyIsFixed() {
         XCTAssertEqual(MealInputMethod.chip.rawValue, "chip")
         XCTAssertEqual(MealInputMethod.ribbon.rawValue, "ribbon")
@@ -202,7 +153,7 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(MealInputMethod.untouched.rawValue, "untouched")
     }
 
-    // MARK: The reducer
+    // MARK: - The reducer
 
     func testSeedDoesNotOverwriteAnAnswerAlreadyGiven() {
         var state = mealReducer(state: MealState(), action: MealAction.chipPicked(
@@ -226,13 +177,8 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.inputMethod, .untouched)
     }
 
-    // MARK: Dismiss = cancel
+    // MARK: - Dismiss = cancel
 
-    /// The blocker itself. Open the sheet over an untouched picker, tap a chip, then
-    /// dismiss instead of confirming: nothing may survive the dismiss. Before the fix
-    /// the chip's value stayed applied, the pill read "Fast counts from Yesterday at
-    /// 9:01 PM", and the next tap on the primary started a fast a day back — already
-    /// in overtime, with a goal that could no longer be reached.
     func testDismissingThePickerPutsTheAnswerBack() {
         var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
         state = mealReducer(state: state, action: MealAction.chipPicked(idx: MealChip.lastNight.rawValue,
@@ -245,9 +191,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.inputMethod, .untouched)
     }
 
-    /// A dismiss must not be a `cleared` in disguise. Opened over the seeded
-    /// window-close time, dismissing keeps the seed — the value the app put there
-    /// was not the user's to lose by tapping the scrim.
     func testDismissingOverASeededValueKeepsTheSeed() {
         var state = mealReducer(state: MealState(), action: MealAction.initialized(minutesAgo: 240))
         state = mealReducer(state: state, action: MealAction.pickerOpened)
@@ -259,8 +202,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.chipIdx, -1)
     }
 
-    /// Confirming is the other door out, and it keeps what was chosen: the restore
-    /// point exists for the dismiss path and must never be applied behind a confirm.
     func testConfirmingKeepsTheAnswerTheSheetWasClosedOn() {
         var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
         state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 315))
@@ -270,10 +211,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.inputMethod, .ribbon)
     }
 
-    /// A confirm spends the way back, so a dismiss that arrives after it cannot undo
-    /// a committed answer. Nothing dispatches that pair today; the next way of closing
-    /// this sheet somebody adds would, and it would silently revert a started fast —
-    /// which is the bug this whole pair of cases exists to stop, one door further on.
     func testADismissAfterAConfirmCannotUndoTheCommittedAnswer() {
         var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
         state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 315))
@@ -283,8 +220,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.minutesAgo, 315, "the confirmed answer stands")
     }
 
-    /// Two sessions in a row: the second dismiss goes back to what the *second* open
-    /// saw, not to the state before the first one.
     func testASecondOpenTakesAFreshRestorePoint() {
         var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
         state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 120))
@@ -295,8 +230,6 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.minutesAgo, 120)
     }
 
-    /// A dismiss with no open before it changes nothing — the restore point is spent
-    /// when it is used, so a stray dispatch cannot resurrect an old answer.
     func testASpentRestorePointIsNotReused() {
         var state = mealReducer(state: MealState(), action: MealAction.pickerOpened)
         state = mealReducer(state: state, action: MealAction.scrubbed(minutesAgo: 120))
@@ -308,22 +241,16 @@ final class MealPickerTests: XCTestCase {
         XCTAssertEqual(state.minutesAgo, 300, "no restore point, so nothing to put back")
     }
 
-    // MARK: "Last night"
+    // MARK: - "Last night"
 
-    /// One rule for all twenty-four hours: the most recent 9 PM that has passed.
     func testLastNightIsTheMostRecentEveningThatHasPassed() {
-        // 03:00 — last night was six hours ago.
         XCTAssertEqual(PickMealChipThunk.lastNightMinutesAgo(nowMinuteOfDay: 3 * 60), 6 * 60)
-        // 14:00 — seventeen hours back to yesterday evening.
         XCTAssertEqual(PickMealChipThunk.lastNightMinutesAgo(nowMinuteOfDay: 14 * 60), 17 * 60)
     }
 
-    /// Just after 9 PM the nearest past evening is tonight, minutes ago, and calling
-    /// that "last night" would be nonsense — so it steps back a day.
     func testLastNightStepsBackWhenTonightHasOnlyJustBecomeEvening() {
         XCTAssertEqual(PickMealChipThunk.lastNightMinutesAgo(nowMinuteOfDay: 21 * 60 + 10),
                        10 + 1440)
-        // And half an hour past the floor it is a normal, short "last night".
         XCTAssertEqual(PickMealChipThunk.lastNightMinutesAgo(nowMinuteOfDay: 21 * 60 + 40), 40)
     }
 }

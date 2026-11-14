@@ -2,24 +2,18 @@
 //  RingCenter.swift
 //  IFApp
 //
-//  The three center states that sit inside the PhaseRing: idle (Start), active
-//  (elapsed + phase), and complete (check + final duration).
-//
 
 import SwiftUI
 
-/// "H:MM" from an elapsed interval (e.g. 13h24m -> "13:24").
 private func hourMinute(_ elapsed: TimeInterval) -> String {
     let total = max(0, Int(elapsed))
     return String(format: "%d:%02d", total / 3600, (total / 60) % 60)
 }
 
-/// ":SS" seconds suffix for the live elapsed readout (e.g. ":07").
 private func secondsSuffix(_ elapsed: TimeInterval) -> String {
     String(format: ":%02d", max(0, Int(elapsed)) % 60)
 }
 
-/// A small accent dot that softly pulses to signal a live, running fast.
 private struct LiveDot: View {
     let color: Color
     @State private var dimmed = false
@@ -65,9 +59,6 @@ struct RingCenterActive: View {
     let phase: Phase
     let theme: ThemeTokens
 
-    /// Big H:MM with a small, dimmed :SS suffix in one baseline-aligned run, so the
-    /// whole readout scales as a unit (via minimumScaleFactor) and never touches the
-    /// ring on narrow devices or at two-digit hours.
     private var elapsedNumerals: AttributedString {
         var hm = AttributedString(hourMinute(elapsed))
         hm.font = Typography.timerNumerals
@@ -84,7 +75,7 @@ struct RingCenterActive: View {
                 LiveDot(color: theme.accent)
                 Text(strings.Timer.elapsedCaption)
                     .font(.hanken(12, .semibold))
-                    .overlineTracking(1.9)           // ~.16em at 12pt (LTR only)
+                    .overlineTracking(1.9)
                     .foregroundColor(theme.mut)
             }
 
@@ -106,13 +97,11 @@ struct RingCenterActive: View {
     }
 }
 
-/// "16:00" from a goal length in hours (H:MM).
 private func goalHourMinute(_ goalSeconds: TimeInterval) -> String {
     let total = max(0, Int(goalSeconds))
     return String(format: "%d:%02d", total / 3600, (total / 60) % 60)
 }
 
-/// Overtime past the goal: "0:24" under an hour (M:SS), "2:14" past one (H:MM).
 private func overtimeLabel(_ over: TimeInterval) -> String {
     let total = max(0, Int(over))
     return total < 3600
@@ -120,8 +109,6 @@ private func overtimeLabel(_ over: TimeInterval) -> String {
         : String(format: "%d:%02d", total / 3600, (total / 60) % 60)
 }
 
-/// The goal-reached / overtime center: the fast keeps ticking past the goal, so the
-/// numerals stay live while a pill shows how far past the goal the user now is.
 struct RingCenterGoalReached: View {
     let elapsed: TimeInterval
     let goalSeconds: TimeInterval
@@ -164,17 +151,8 @@ struct RingCenterGoalReached: View {
     }
 }
 
-/// The result centre. The check is the app's only picture of "the goal was taken",
-/// so it is drawn for a fast that took it and for no other — a fast ended on its
-/// fifth minute used to close the ring and collect the same mark as a sixteen-hour
-/// one, which is the single claim the release's What's New sells. The fast that fell
-/// short keeps the label and the numerals; what it was is already said in words on
-/// the card below ("today doesn't count toward your streak"), so nothing is added
-/// here to say it a second time.
 struct RingCenterComplete: View {
     let elapsed: TimeInterval
-    /// Whether the fast reached its goal. Asked of `PhaseProgress`, which is where
-    /// that predicate lives, rather than recomputed from `elapsed` here.
     let goalReached: Bool
     let theme: ThemeTokens
 

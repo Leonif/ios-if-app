@@ -10,7 +10,6 @@ func mealReducer(state: MealState, action: Action) -> MealState {
 
     switch action as? MealAction {
     case let .initialized(minutesAgo):
-        // Only while nothing has been chosen: a seed must never overwrite an answer.
         if newState.isFresh {
             newState.set(minutesAgo: minutesAgo, chip: -1, via: .seeded)
         }

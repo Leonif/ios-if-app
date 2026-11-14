@@ -2,23 +2,17 @@
 //  Theme.swift
 //  IFApp
 //
-//  Design tokens for the two themes — Light "Mist" and Dark "Immersive" —
-//  transcribed from the design handoff. Resolve with the environment colorScheme:
-//    let theme = ThemeTokens.resolve(colorScheme)
-//
 
 import SwiftUI
 
 struct ThemeTokens {
     let isDark: Bool
 
-    // Text
     let ink: Color
     let sec: Color
     let mut: Color
     let faint: Color
 
-    // Surfaces / lines
     let surface: Color
     let surfaceLine: Color
     let cardShadow: Color
@@ -27,32 +21,18 @@ struct ThemeTokens {
     let secLine: Color
     let iconCircle: Color
     let iconStroke: Color
-    /// The quiet fill — the material the handoff gives to "this has weight, and it
-    /// is not an action". A rank of its own rather than a reuse of `secBg` or
-    /// `iconCircle`: those two are white-on-white and a green wash, and neither
-    /// carries `ink` at the contrast this rank owes. The Pro control in the header is
-    /// its first caller; the reversible-action surfaces of the consequence sheets are
-    /// drawn on it too and land next, which is why it is a token and not a colour
-    /// spelled out inside one view.
     let surfaceQuiet: Color
-    /// The hairline that keeps a control drawn on `surfaceQuiet` from dissolving into
-    /// the sheet behind it. Its own value rather than `surfaceLine`: the quiet fill
-    /// sits almost on top of the sheet colour, so the edge it needs is lighter than
-    /// the one a card draws against the app background, and reusing the card's would
-    /// have redrawn a button as a panel.
     let surfaceQuietLine: Color
     let sheetBg: Color
     let segTrack: Color
     let segActive: Color
     let segActiveShadow: Color
 
-    // Brand green (single primary, same role both themes)
     let accent: Color
     let deep: Color
     let primaryButtonBg: Color
     let primaryButtonText: Color
 
-    // Phase-reactive background base + the screen backdrop tint blend
     let backgroundBase: Color
 
     static let light = ThemeTokens(
@@ -113,15 +93,12 @@ struct ThemeTokens {
         scheme == .dark ? .dark : .light
     }
 
-    /// Primary-button drop shadow color (button bg at 0.32 light / 0.45 dark).
     var buttonShadow: Color {
         primaryButtonBg.opacity(isDark ? 0.45 : 0.32)
     }
 
-    // MARK: Phase-derived colors
+    // MARK: - Phase-derived colors
 
-    /// The screen background, tinted by the current phase color.
-    /// Light: PALE = mix(phase, white, 0.86); Dark: DGLOW = mix(phase, base, 0.80).
     func phaseBackground(_ phaseColor: Color) -> RadialGradient {
         if isDark {
             let dglow = phaseColor.mix(backgroundBase, 0.80)
@@ -142,14 +119,8 @@ struct ThemeTokens {
         }
     }
 
-    // MARK: Eating window
+    // MARK: - Eating window
 
-    /// The open eating window's backdrop. The window is a pause between fasts, not a
-    /// stage of one: the phase timeline is deliberately absent from this state, so a
-    /// phase-derived tint would be inconsistent with it. Neutral green instead.
-    ///
-    /// Deliberately its own value rather than a reuse of `historyBackground` — two
-    /// different things that happen to land on the same green today.
     var eatingWindowBackground: RadialGradient {
         RadialGradient(
             colors: [Color(hex: isDark ? "#151C17" : "#E9EEE6"), backgroundBase],
@@ -159,10 +130,8 @@ struct ThemeTokens {
         )
     }
 
-    // MARK: History screen
+    // MARK: - History screen
 
-    /// The history backdrop. Same treatment as the timer's phase tint, but neutral
-    /// green — history has no active phase to react to.
     var historyBackground: RadialGradient {
         RadialGradient(
             colors: [Color(hex: isDark ? "#151C17" : "#E9EEE6"), backgroundBase],
@@ -172,57 +141,46 @@ struct ThemeTokens {
         )
     }
 
-    /// Backdrop of an expanded record's detail panel.
     var historyDetailBg: Color {
         isDark ? .whiteAlpha(0.04) : Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.055)
     }
 
-    /// The hairline ghost rings in the empty state.
     var historyGhostLine: Color {
         isDark ? .whiteAlpha(0.13) : Color(.sRGB, red: 78/255, green: 90/255, blue: 70/255, opacity: 0.16)
     }
 
-    /// The phase name under a record's plan pill — the phase color pulled toward
-    /// the text color so it reads as a label, not as a second accent.
     func historyPhaseLabel(_ phase: Color) -> Color {
         isDark ? phase.mix(.white, 0.38) : phase.mix(Color(hex: "#2A2A26"), 0.34)
     }
 
-    // MARK: Last-meal scale
+    // MARK: - Last-meal scale
 
-    /// Ordinary snap-step ticks on the last-meal ribbon.
     var scaleTickMinor: Color {
         isDark ? .whiteAlpha(0.16) : Color(.sRGB, red: 78/255, green: 90/255, blue: 70/255, opacity: 0.22)
     }
 
-    /// Hour and day ticks — the ones the eye counts by.
     var scaleTickMajor: Color {
         isDark ? .whiteAlpha(0.34) : Color(.sRGB, red: 78/255, green: 90/255, blue: 70/255, opacity: 0.42)
     }
 
-    /// The midnight rule: the only calendar mark on an otherwise relative scale.
     var scaleTickDayBreak: Color {
         isDark
             ? Color(.sRGB, red: 133/255, green: 185/255, blue: 124/255, opacity: 0.55)
             : Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.50)
     }
 
-    /// Selected quick-chip fill.
     var chipSelectedBg: Color {
         isDark
             ? Color(.sRGB, red: 133/255, green: 185/255, blue: 124/255, opacity: 0.16)
             : Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.14)
     }
 
-    /// Selected quick-chip border. Fill + border weight + text color together, so the
-    /// selection survives color blindness.
     var chipSelectedBorder: Color {
         isDark
             ? Color(.sRGB, red: 133/255, green: 185/255, blue: 124/255, opacity: 0.48)
             : Color(.sRGB, red: 110/255, green: 139/255, blue: 106/255, opacity: 0.45)
     }
 
-    /// Next-phase chip colors (dot/text/bg/border) derived from the named phase color.
     func chip(for next: Color) -> (dot: Color, text: Color, bg: Color, border: Color) {
         if isDark {
             return (

@@ -2,13 +2,6 @@
 //  CompleteStatePersistenceTests.swift
 //  IFAppTests
 //
-//  Queue card 24: the result screen ("complete" — fast ended, eating window not yet
-//  opened) has to survive iOS unloading the app on it. It is carried entirely by
-//  `stagedElapsed` and `fastEndTimestamp`, which were never stored, so a cold start
-//  there relaunched into idle and the eating window — and its closing push — never
-//  came. These tests pin both halves: the repository keeps the two values, and the
-//  reducer leaves them in exactly the states that should outlive a relaunch.
-//
 
 import XCTest
 import Redux
@@ -45,14 +38,12 @@ final class CompleteStatePersistenceTests: XCTestCase {
                   freezeSpentMonth: timer.freezeSpentMonth)
     }
 
-    /// A running 16h fast that started at `start`.
     private func running(start: Double = 1_000_000) -> TimerState {
         TimerState(fastStartTimestamp: start, goalHours: 16, isRunning: true)
     }
 
-    // MARK: Repository
+    // MARK: - Repository
 
-    /// The defect itself: end a fast, persist, reload — the result screen is still there.
     func testEndedFastRoundTripsThroughDefaults() {
         let repo = TimerPersistenceRepository(defaults: defaults)
         let ended = timerReducer(state: running(),
@@ -67,8 +58,6 @@ final class CompleteStatePersistenceTests: XCTestCase {
         XCTAssertEqual(loaded.fastEndTimestamp, 1_058_000)
     }
 
-    /// Installs from before 1.5.2 have neither key. Absent must read as "nothing
-    /// ended", or an update would put every idle install on a result screen.
     func testMissingKeysReadAsNothingEnded() {
         defaults.set(false, forKey: "is_running")
         let loaded = TimerPersistenceRepository(defaults: defaults).load()
@@ -76,7 +65,7 @@ final class CompleteStatePersistenceTests: XCTestCase {
         XCTAssertEqual(loaded.fastEndTimestamp, 0)
     }
 
-    // MARK: Reducer — every way off the result screen clears what was persisted
+    // MARK: - Reducer — every way off the result screen clears what was persisted
 
     private var complete: TimerState {
         timerReducer(state: running(),
@@ -104,8 +93,6 @@ final class CompleteStatePersistenceTests: XCTestCase {
         XCTAssertEqual(resumed.fastEndTimestamp, 0)
     }
 
-    /// After a reset has been persisted over a result screen, the next launch is idle —
-    /// the stored zeroes overwrite the stored ending rather than leaving it behind.
     func testResetPersistedOverAnEndingRelaunchesIdle() {
         let repo = TimerPersistenceRepository(defaults: defaults)
         save(complete, to: repo)
@@ -116,10 +103,8 @@ final class CompleteStatePersistenceTests: XCTestCase {
         XCTAssertEqual(loaded.fastEndTimestamp, 0)
     }
 
-    // MARK: How long a restored result screen is held
+    // MARK: - How long a restored result screen is held
 
-    /// A 16:8 fast confirmed to have ended at `end`: its window would close 8h later,
-    /// and the result screen is held for 24h past that.
     private func restored(end: Double = 2_000_000) -> TimerState {
         TimerState(fastStartTimestamp: 0, goalHours: 16, isRunning: false,
                    stagedElapsed: 57_600, fastEndTimestamp: end, hasCelebrated: true)
@@ -134,7 +119,6 @@ final class CompleteStatePersistenceTests: XCTestCase {
         XCTAssertEqual(kept, state)
     }
 
-    /// At the horizon exactly it goes — the same `>=` the closed-window screen uses.
     func testResultScreenFallsToIdleAtTheHorizon() {
         let idle = restored().droppingLapsedEnding(at: 2_000_000 + horizon, plan: plan)
         XCTAssertEqual(idle.stagedElapsed, 0)
@@ -145,7 +129,6 @@ final class CompleteStatePersistenceTests: XCTestCase {
         XCTAssertFalse(idle.isEating)
     }
 
-    /// The window length is the plan's: an 18:6 ending lapses two hours sooner.
     func testHorizonFollowsThePlansWindow() {
         let state = restored()
         let at = 2_000_000 + 6.0 * 3600 + 24 * 3600
@@ -153,8 +136,6 @@ final class CompleteStatePersistenceTests: XCTestCase {
         XCTAssertEqual(state.droppingLapsedEnding(at: at, plan: Plan(hours: 18)).stagedElapsed, 0)
     }
 
-    /// Only the result screen is aged: a running fast and an open window are not
-    /// touched however old their numbers look.
     func testOnlyTheResultScreenIsAged() {
         let far = 9_999_999_999.0
         var fast = running()
@@ -164,25 +145,20 @@ final class CompleteStatePersistenceTests: XCTestCase {
         XCTAssertEqual(eating.droppingLapsedEnding(at: far, plan: plan), eating)
     }
 
-    /// Ended with no confirmed moment: nothing to measure from, so it is not kept.
     func testEndingWithoutAnAnchorIsCleared() {
         var state = restored()
         state.fastEndTimestamp = 0
         XCTAssertEqual(state.droppingLapsedEnding(at: 0, plan: plan).stagedElapsed, 0)
     }
 
-    /// The closed-window screen and the result screen share one horizon.
     func testClosedWindowHorizonBoundary() {
         XCTAssertFalse(TimerState.closedWindowHasLapsed(closedAt: 100, now: 100 + 24 * 3600 - 1))
         XCTAssertTrue(TimerState.closedWindowHasLapsed(closedAt: 100, now: 100 + 24 * 3600))
     }
 
-    /// One definition of idle: a lapsed result screen dropped at launch lands on
-    /// exactly the state `.reset` leaves — including the window fields the first copy
-    /// of that rule forgot.
     func testLapsedEndingLandsOnTheSameIdleAsReset() {
         var state = restored()
-        state.eatingStartTimestamp = 1_234   // stray value only `withoutCycle` clears
+        state.eatingStartTimestamp = 1_234
         state.streakCount = 5
         state.completedSessionsCount = 7
         let dropped = state.droppingLapsedEnding(at: 9_999_999_999, plan: plan)

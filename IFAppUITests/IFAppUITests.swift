@@ -2,11 +2,6 @@
 //  IFAppUITests.swift
 //  IFAppUITests
 //
-//  Click-through UI test for the fasting flow. Launches with "-uitestReset" for a
-//  clean idle state, then drives idle -> active -> end, attaching a screenshot at
-//  each state. Run per locale to eyeball localized layout:
-//    xcodebuild test -scheme IFAppUITests -testLanguage de -testRegion DE ...
-//
 
 import XCTest
 
@@ -16,11 +11,8 @@ final class IFAppUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    /// idle -> Start -> active -> End fast -> idle, screenshotting each state.
     func testFastingClickThrough() throws {
         let app = XCUIApplication()
-        // Start fast asks for notification permission on a fresh install; the
-        // system dialog would cover the screen and break the drive-through.
         app.launchArguments += ["-uitestReset", "-suppressPushPrompt"]
         app.launch()
 
@@ -38,7 +30,6 @@ final class IFAppUITests: XCTestCase {
 
         endFast.tap()
 
-        // Ending a fast stages the elapsed time and lands on the "complete" screen.
         let reset = app.buttons["timer.reset"]
         XCTAssertTrue(reset.waitForExistence(timeout: 5),
                       "Reset button should appear on the complete screen")
@@ -51,8 +42,6 @@ final class IFAppUITests: XCTestCase {
         attach(app, "4-idle-again")
     }
 
-    /// An elapsed eating window (16:8 → 8h window, seeded 8h+2min ago) lands on the
-    /// window-closed screen; Continue fasting chains a new fast backdated to the close.
     func testEatingOverContinue() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-seedEatingElapsed", "28920"]
@@ -71,7 +60,6 @@ final class IFAppUITests: XCTestCase {
         attach(app, "eating-over-continued")
     }
 
-    /// Skip on the window-closed screen drops back to idle.
     func testEatingOverSkip() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-seedEatingElapsed", "28920"]
@@ -87,10 +75,8 @@ final class IFAppUITests: XCTestCase {
         attach(app, "eating-over-skipped")
     }
 
-    /// A window that closed ≥24h ago times out to plain idle, not the chain screen.
     func testEatingOverTimeout() throws {
         let app = XCUIApplication()
-        // 8h window + 25h past the close.
         app.launchArguments += ["-seedEatingElapsed", String(28800 + 25 * 3600)]
         app.launch()
 
@@ -101,7 +87,6 @@ final class IFAppUITests: XCTestCase {
         attach(app, "eating-over-timeout-idle")
     }
 
-    /// Force-shows the streak milestone card (with a seeded 3-day streak) and closes it.
     func testStreakMilestone() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-seedStreak", "3", "-showStreakMilestone"]
@@ -119,8 +104,6 @@ final class IFAppUITests: XCTestCase {
                       "Milestone card should close after Keep going")
     }
 
-    /// A seeded 3-day streak renders the header streak pill, which is also the way
-    /// into the history.
     func testStreakBadge() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-seedStreak", "3"]
@@ -131,8 +114,6 @@ final class IFAppUITests: XCTestCase {
         attach(app, "streak-badge")
     }
 
-    /// No records yet: there is nowhere to go, so the header carries no pill at all.
-    /// The entry point arrives with the first finished fast.
     func testHistoryNoEntryWithoutRecords() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-uitestReset"]
@@ -145,8 +126,6 @@ final class IFAppUITests: XCTestCase {
         attach(app, "history-no-entry")
     }
 
-    /// Records but a broken streak: the pill stays, showing "History" instead of a
-    /// zero, and still opens the screen.
     func testHistoryEntryWithoutStreak() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-seedHistory", "5"]
@@ -162,8 +141,6 @@ final class IFAppUITests: XCTestCase {
                       "The pill should open the history")
     }
 
-    /// A seeded week of fasts: the summary card and the rows render, and a record
-    /// expands in place.
     func testHistorySeeded() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-seedHistory", "7", "-seedStreak", "6", "-seedLastGoalDate", "1"]
@@ -187,8 +164,6 @@ final class IFAppUITests: XCTestCase {
                       "Back should return to the timer screen")
     }
 
-    /// The data shapes the layout has to survive: across midnight, past 40 hours,
-    /// short of the goal, and two in one day.
     func testHistoryEdgeCases() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-seedHistoryEdge", "-seedStreak", "4", "-seedLastGoalDate", "1"]
@@ -200,7 +175,6 @@ final class IFAppUITests: XCTestCase {
         attach(app, "history-edge")
     }
 
-    /// Opens the redesigned Scientific Sources screen and screenshots it.
     func testSources() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-uitestReset"]

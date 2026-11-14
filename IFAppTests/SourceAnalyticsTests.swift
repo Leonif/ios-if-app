@@ -2,24 +2,6 @@
 //  SourceAnalyticsTests.swift
 //  IFAppTests
 //
-//  The reading funnel. Before these three events the Sources screen reported only
-//  that the list had been opened: which paper was read, whether anybody went on to
-//  the paper itself, and whether the reader was closed at the end or at the top were
-//  all invisible, and the four titles could not be told apart at all.
-//
-//  Two things here are worth a test rather than a reading of the middleware.
-//
-//  The identifier has to be the catalog index, and it has to survive as text: the
-//  four papers are read as a distribution, which means sorting by the dimension, and
-//  a number logged as a number arrives in GA4's numeric field with the dimension left
-//  `(not set)`. Same trap that cost `goal_hours` a month.
-//
-//  And `source_original_opened` must fire for the paper's own link and for nothing
-//  else. `OpenExternalLinkThunk` — the mechanism behind the button — also opens the
-//  privacy policy and the system Settings, so the event hangs off a lifecycle action
-//  dispatched at the one call site, not off the thunk. The last test states that as a
-//  rule: a thunk passing through the analytics middleware leaves no event behind.
-//
 
 import XCTest
 import Redux
@@ -38,9 +20,6 @@ final class SourceAnalyticsTests: XCTestCase {
         }
     }
 
-    /// The thunk takes its repository from the container, which is registered at app
-    /// launch and not in a test bundle. Handed one explicitly, it can be built here
-    /// without the launch path.
     private struct LinksStub: ExternalLinkRepositoryProtocol {
         @MainActor func open(_ url: URL) async {}
     }
@@ -51,10 +30,8 @@ final class SourceAnalyticsTests: XCTestCase {
         middleware.handle(action: action, state: AppState(), dispatch: noDispatch)
     }
 
-    // MARK: The funnel
+    // MARK: - The funnel
 
-    /// List opened, article opened, original followed — the three steps, in order, and
-    /// the two that name a paper naming the same one.
     func testTheWholeFunnelIsCountableEndToEnd() {
         let repo = RepoSpy()
         let middleware = AnalyticsMiddleware(repo: repo)
@@ -69,9 +46,6 @@ final class SourceAnalyticsTests: XCTestCase {
         XCTAssertEqual(repo.articles(of: "source_original_opened"), ["01"])
     }
 
-    /// One event per opening, and each one carrying its own paper: with four titles in
-    /// the list, an event that could not tell them apart would answer none of the
-    /// questions it exists for.
     func testEachArticleReportsItself() {
         let repo = RepoSpy()
         let middleware = AnalyticsMiddleware(repo: repo)
@@ -83,7 +57,7 @@ final class SourceAnalyticsTests: XCTestCase {
         XCTAssertEqual(repo.articles(of: "source_article_opened"), ["00", "01", "02", "03"])
     }
 
-    // MARK: Closing the reader
+    // MARK: - Closing the reader
 
     func testClosingReportsWhetherTheEndWasReached() {
         let repo = RepoSpy()
@@ -100,8 +74,6 @@ final class SourceAnalyticsTests: XCTestCase {
         XCTAssertEqual(closed.map { $0.parameters["reached_end"] as? String }, ["true", "false"])
     }
 
-    /// The flag is text. It is a `Bool` at the call site, and a `Bool` bridges to
-    /// `NSNumber` — logged as it stands, the breakdown comes back empty.
     func testReachedEndTravelsAsTextNotAsABool() {
         let parameters = AnalyticsEvent
             .sourceArticleClosed(articleID: 0, reachedEnd: true).parameters
@@ -109,9 +81,6 @@ final class SourceAnalyticsTests: XCTestCase {
         XCTAssertTrue(parameters["article"] is String)
     }
 
-    /// No parameter carries a title or a URL. The titles are localized — ten
-    /// vocabularies in one dimension — and the URL is the one value the event is
-    /// required not to carry.
     func testNoEventCarriesATitleOrAURL() {
         let values = [
             AnalyticsEvent.sourceArticleOpened(articleID: 0),
@@ -128,11 +97,8 @@ final class SourceAnalyticsTests: XCTestCase {
         XCTAssertFalse(values.contains(article.url.absoluteString))
     }
 
-    // MARK: The other users of the external-link thunk
+    // MARK: - The other users of the external-link thunk
 
-    /// The privacy policy and the system Settings go out through the same thunk as the
-    /// paper's link. Nothing about that thunk produces an event — which is what keeps
-    /// `source_original_opened` counting papers and only papers.
     func testOpeningAnExternalLinkOnItsOwnReportsNothing() {
         let repo = RepoSpy()
         let middleware = AnalyticsMiddleware(repo: repo)

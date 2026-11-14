@@ -2,8 +2,6 @@
 //  HistoryReducer.swift
 //  IFApp
 //
-//  Pure and synchronous. Writes only to HistoryState.
-//
 
 import Redux
 

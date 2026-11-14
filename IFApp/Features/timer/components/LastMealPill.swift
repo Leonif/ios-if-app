@@ -2,15 +2,12 @@
 //  LastMealPill.swift
 //  IFApp
 //
-//  Idle entry to the log-meal flow. Shows the chosen last-meal value; when a past
-//  time is chosen, a sub-line shows what the fast will count from.
-//
 
 import SwiftUI
 
 struct LastMealPill: View {
-    let valueText: String           // "Just now" or e.g. "7:00 PM"
-    let subline: String?            // "Fast counts from 7:00 PM · 2h 40m in"
+    let valueText: String
+    let subline: String?
     let theme: ThemeTokens
     let onTap: () -> Void
 

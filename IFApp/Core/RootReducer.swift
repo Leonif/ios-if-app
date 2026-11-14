@@ -2,8 +2,6 @@
 //  RootReducer.swift
 //  IFApp
 //
-//  Pure, synchronous. Delegates each substate to its feature reducer.
-//
 
 import Redux
 

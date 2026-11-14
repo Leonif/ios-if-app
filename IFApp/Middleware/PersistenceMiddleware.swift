@@ -2,8 +2,6 @@
 //  PersistenceMiddleware.swift
 //  IFApp
 //
-//  Persists the timer substate after every timer action. Lives the whole app lifecycle.
-//
 
 import Redux
 
@@ -41,10 +39,6 @@ final class PersistenceMiddleware: Middleware {
         case is PlanAction:
             repo.savePlanHours(app.planState.plan.hours)
         case is ProAction:
-            // Written from the reduced state, not from the action that spends it, for
-            // the same reason the timer above is: *when* the one-time offer counts as
-            // spent is the reducer's rule and belongs in one place. A second copy of
-            // it here would keep compiling while quietly not persisting a show.
             if app.proState.autoOfferShown { offer.markOfferShown() }
         default:
             break

@@ -2,26 +2,13 @@
 //  AboutIF24View.swift
 //  IFApp
 //
-//  What used to be the Scientific Sources sheet. The papers are still here, but they
-//  are no longer what the sheet is about: the order of the sections changes its
-//  class, from a science note to the app's own document. Pro first — status, the way
-//  into the offer, and Restore — then privacy, then the research, with the medical
-//  note closing the science section rather than sitting under a commercial row.
-//
-//  Restore lives in the first section a person looks in after changing phone. That is
-//  the whole reason this sheet was rebuilt instead of a settings screen being added.
-//
 
 import SwiftUI
 
-/// What the Pro row's right-hand column says. The axis is the state of the
-/// entitlement — never the tier, the purchase, or the price.
 enum ProRowStatus: Equatable {
     case inactive
     case active
     case awaitingApproval
-    /// Nothing has been checked yet. Gating behaves as free here, but the row never
-    /// says "inactive": caution earns a lock, not a claim.
     case notCheckedYet
 
     var label: String {
@@ -33,46 +20,25 @@ enum ProRowStatus: Equatable {
         }
     }
 
-    /// Active is the one state with nothing to open — the offer must not appear for
-    /// someone who already owns it, so the row loses its chevron and takes a check.
     var opensOffer: Bool { self != .active }
 }
 
 struct AboutIF24View: View {
     let status: ProRowStatus
-    /// Restore ran from this sheet and found nothing. Where the status itself moved,
-    /// that is the feedback; where it did not, this line is.
     let showsNothingToRestore: Bool
     let onOpenOffer: () -> Void
     let onRestore: () -> Void
     let onPrivacy: () -> Void
-    /// The second door into the Sunnah reminders screen. Until it existed the
-    /// release's one free headline feature was reachable only by tapping the pencil
-    /// inside the plan pill — a control whose whole promise is that it edits the plan.
     let onSunnah: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme
-    /// The reader left for the paper itself: which article, and where to. The article
-    /// travels with it because the funnel is counted per paper, and because the URL is
-    /// the one thing the event must not carry.
     let onOpenSource: (Int, URL) -> Void
-    /// The reader was opened on an article, and closed again — the two ends of "is any
-    /// of this read". The closing call also carries whether the foot of the article
-    /// was ever on screen.
     let onOpenArticle: (Int) -> Void
     let onCloseArticle: (Int, Bool) -> Void
-    /// The sheet is presented, so it starts a fresh environment and does not inherit
-    /// the root's `dynamicTypeSize` ceiling — the accessibility sizes reach this view
-    /// for real, and one slot has to know it.
     @Environment(\.dynamicTypeSize) private var typeSize
 
     @State private var selectedSource: SourceArticle?
-    /// The article the reader is on, kept past the dismissal: `onDismiss` runs after
-    /// `selectedSource` has been cleared, and the closing report has to name the
-    /// article it closed.
     @State private var readingArticleID: Int?
-    /// The foot of the open article has been on screen. Reset when a reader opens, not
-    /// when one closes — the next reading must not inherit the last one's answer.
     @State private var readerReachedEnd = false
     private var sources: [SourceArticle] { SourceArticle.all }
 
@@ -90,11 +56,6 @@ struct AboutIF24View: View {
                 proSection(theme)
                 caption(strings.Pro.sectionFooter, theme)
 
-                // No overline of its own: the row's own label is the name of the
-                // thing, and a heading above it would only repeat that name. It sits
-                // above Privacy rather than below the research because this sheet is
-                // ordered by what a person came here to do, and the science is the
-                // reading matter at the end.
                 sunnahSection(theme)
 
                 overline(strings.Pro.privacyShort, theme)
@@ -113,15 +74,10 @@ struct AboutIF24View: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 24)
-            // Clears the sheet's grabber: at 10pt the title read as pinned to the top
-            // edge, under the handle rather than below it (#67).
             .padding(.top, 28)
             .padding(.bottom, 28)
         }
         .background(theme.sheetBg.ignoresSafeArea())
-        // `onDismiss` rather than an `onDisappear` inside the reader: it is the one
-        // hook that fires exactly once per reading, for the close button and for the
-        // swipe alike, and the closing report is meant to be countable one-to-one.
         .sheet(item: $selectedSource, onDismiss: reportReaderClosed) { article in
             SourceArticleView(
                 article: article,
@@ -131,13 +87,10 @@ struct AboutIF24View: View {
         }
     }
 
-    // MARK: Sections
+    // MARK: - Sections
 
     private func proSection(_ theme: ThemeTokens) -> some View {
         groupCard(theme) {
-            // Active is a statement, not a door. Rendered as a plain row rather than a
-            // disabled button: a disabled button greys its whole content, and the one
-            // place a paying customer sees their own state would arrive dimmed.
             if status.opensOffer {
                 Button(action: onOpenOffer) {
                     proRow(theme)
@@ -154,25 +107,6 @@ struct AboutIF24View: View {
             Button(action: onRestore) {
                 HStack {
                     if showsNothingToRestore {
-                        // Same rule as on the offer up to the app's own type ceiling:
-                        // this line does not wrap. The slot here is the narrower one —
-                        // 287pt on a 375pt device, not the offer's — and at xxLarge
-                        // German (106.5%) and Ukrainian (102.7%) run past it. Shrinking
-                        // is the honest way out there: the line is transient and the
-                        // alternative is an ellipsis in the middle of a sentence. Only
-                        // those two locales ever engage it (.939 and .973), and the
-                        // floor stays clear of ko and ja.
-                        //
-                        // Above the ceiling the same floor buys nothing. This sheet is
-                        // presented, so it does not inherit the root cap and really does
-                        // render at the accessibility sizes; there `nothingToRestore`
-                        // needs about .78 of the slot at accessibility1 and far less
-                        // higher up, so a 0.9 floor hands back exactly the ellipsis it
-                        // was chosen to avoid — measured at AX5 in de, ar and ja.
-                        // Wrapping costs one line of card height for the two and a half
-                        // seconds the line is up, and at these sizes the Restore label
-                        // it replaces is already three lines tall, so there is no
-                        // single-line height left to protect.
                         Text(strings.Pro.nothingToRestore)
                             .font(.hanken(16, .medium))
                             .foregroundColor(theme.mut)
@@ -195,21 +129,6 @@ struct AboutIF24View: View {
         }
     }
 
-    /// Label and status side by side while both fit on one line, stacked when they
-    /// do not — the same move the system Settings rows make, and for the same reason.
-    ///
-    /// It is a layout answer to what looks like a copy problem, and it has to be:
-    /// the status values are the shortest attested forms their languages have. At
-    /// xxLarge — inside the app's own Dynamic Type ceiling, so no accessibility
-    /// setting is needed to reach it — `Awaiting approval` already runs past the slot
-    /// in four locales (de, es, pl, fr), and at the accessibility sizes Ukrainian
-    /// `Неактивний` follows. Squeezed in the side-by-side layout a single long word
-    /// has nowhere to break and splits mid-word against the chevron; given the row's
-    /// full width it simply sits on its own line.
-    ///
-    /// Gating this on `isAccessibilitySize` would have missed the four locales that
-    /// break first, which is why the switch is "does it fit", not "how large is the
-    /// text".
     private func proRow(_ theme: ThemeTokens) -> some View {
         ViewThatFits(in: .horizontal) {
             sideBySideRow(theme)
@@ -220,9 +139,6 @@ struct AboutIF24View: View {
         .contentShape(Rectangle())
     }
 
-    /// The preferred shape. Both texts are pinned to one line at their natural width
-    /// so that `ViewThatFits` measures what they really need — a text allowed to wrap
-    /// "fits" any width at all, and the fallback would never be chosen.
     private func sideBySideRow(_ theme: ThemeTokens) -> some View {
         HStack(spacing: 12) {
             rowLabel(theme)
@@ -239,9 +155,6 @@ struct AboutIF24View: View {
         }
     }
 
-    /// Label over value, both against the leading edge, chevron still trailing. The
-    /// status gets the row's whole width here, so it wraps between words instead of
-    /// inside one.
     private func stackedRow(_ theme: ThemeTokens) -> some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
@@ -263,7 +176,6 @@ struct AboutIF24View: View {
             .foregroundColor(theme.ink)
     }
 
-    /// Active is the one status that also carries a mark.
     @ViewBuilder
     private func activeCheck(_ theme: ThemeTokens) -> some View {
         if status == .active {
@@ -275,8 +187,6 @@ struct AboutIF24View: View {
         }
     }
 
-    /// In Japanese the value is empty by decision — the slot then hides rather than
-    /// rendering an empty `Text`, and the row's height does not move.
     @ViewBuilder
     private func statusText(_ theme: ThemeTokens, alignment: TextAlignment) -> some View {
         if !status.label.isEmpty {
@@ -297,8 +207,6 @@ struct AboutIF24View: View {
                     Text(SunnahStrings.title)
                         .font(.hanken(16, .medium))
                         .foregroundColor(theme.ink)
-                        // The longest of the free rows in German and Ukrainian: it
-                        // wraps rather than shrinking, and the row grows with it.
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
                     chevron(theme)
@@ -341,7 +249,6 @@ struct AboutIF24View: View {
                     onOpenArticle(source.id)
                 } label: {
                     HStack(spacing: 12) {
-                        // Localized editorial titles lead to an offline reader.
                         Text(source.title)
                             .font(.hanken(15))
                             .lineSpacing(15 * 0.15)
@@ -362,16 +269,13 @@ struct AboutIF24View: View {
         }
     }
 
-    /// One report per reading. The stored article is cleared with it, so a dismissal
-    /// that arrives without a reading behind it — there is no known one, and that is
-    /// the point — stays silent instead of repeating the last article.
     private func reportReaderClosed() {
         guard let articleID = readingArticleID else { return }
         readingArticleID = nil
         onCloseArticle(articleID, readerReachedEnd)
     }
 
-    // MARK: Pieces
+    // MARK: - Pieces
 
     private func overline(_ text: String, _ theme: ThemeTokens) -> some View {
         Text(text)
@@ -406,11 +310,6 @@ struct AboutIF24View: View {
             .padding(.horizontal, 16)
     }
 
-    /// `forward`, not `right`. A disclosure indicator points on ahead, and ahead is
-    /// leftward in Arabic; the absolute glyph would stay aimed right after the row
-    /// mirrored, back at the label it is supposed to lead away from. `ExternalLinkArrow`
-    /// below is mirrored by hand for the opposite reason — `arrow.up.right` has no
-    /// semantic twin to switch to.
     private func chevron(_ theme: ThemeTokens) -> some View {
         Image(systemName: "chevron.forward")
             .font(.system(size: 13, weight: .medium))
@@ -418,9 +317,6 @@ struct AboutIF24View: View {
     }
 }
 
-/// `arrow.up.right`, mirrored by hand. SF Symbols leaves this one pointing the same
-/// way in a right-to-left layout, and an outbound arrow that points into the text is
-/// the one glyph on the sheet whose direction carries meaning.
 private struct ExternalLinkArrow: View {
     let color: Color
     @Environment(\.layoutDirection) private var layoutDirection

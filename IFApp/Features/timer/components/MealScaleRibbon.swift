@@ -2,20 +2,11 @@
 //  MealScaleRibbon.swift
 //  IFApp
 //
-//  The last-meal scrubber: a strip of time longer than the screen, running under a
-//  fixed marker. It is a real timeline, so midnights are drawn on it — which is why
-//  "I ate at ten last night" is a scroll past one marked line instead of a separate
-//  date control the user has to notice.
-//
-//  Geometry lives in `MealScale`; this file only draws it and reads the finger.
-//
 
 import SwiftUI
 
 struct MealScaleRibbon: View {
     let minutesAgo: Int
-    /// Injected clock — the midnight rules are the one part of the ribbon that is
-    /// calendar-aware, and they have to know what time it is now to be placed.
     let nowMinuteOfDay: Int
     let theme: ThemeTokens
     let a11yLabel: String
@@ -27,20 +18,13 @@ struct MealScaleRibbon: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    /// Where the marker sits on the strip, in points from "now". Continuous: the
-    /// strip slides under the finger while the *value* clicks from tick to tick.
     @State private var offset: CGFloat = 0
     @State private var dragAnchor: CGFloat? = nil
-    /// Finger travel already consumed this drag, so each frame adds only its own delta
-    /// — the strip is moved incrementally because the gain applied to that delta
-    /// changes with finger speed and an absolute anchor+translation cannot carry it.
     @State private var lastTranslation: CGFloat = 0
     @State private var reported: Int = -1
     @State private var lastHaptic: TimeInterval = 0
     @State private var wasAtEdge = false
 
-    // Layer geometry, from the handoff. Distances are measured up from the block's
-    // bottom edge, which is where the ticks stand.
     private let tickBaseline: CGFloat = 19
     private let minorHeight: CGFloat = 10
     private let hourHeight: CGFloat = 17
@@ -48,26 +32,12 @@ struct MealScaleRibbon: View {
     private let dayBreakHeight: CGFloat = 28
     private let endCapHeight: CGFloat = 26
     private let dayRowTop: CGFloat = 0
-    /// 43 in the table, 40 as drawn — the mockups put the label row three points
-    /// higher, which is what keeps the labels clear of the tick line.
     private let labelRowTop: CGFloat = 40
     private let fadeWidth: CGFloat = 28
-    /// How far above and below the drawn block the strip still answers to a finger.
-    /// The ticks are 60pt tall and the gesture used to live on exactly that box, so a
-    /// thumb that landed ten points high did nothing at all — no movement, no
-    /// feedback, nothing to say it had missed.
-    ///
-    /// Uneven because the room is uneven, not as a preference. Above the strip is the
-    /// readout's gap, which nothing else claims. Below it is the sheet's tight gap and
-    /// then the 44pt collar of "Set exact time" — and a grab zone reaching into that
-    /// collar would swallow taps meant for the button, trading one dead area for
-    /// another.
     private let grabSlackTop: CGFloat = 10
     private let grabSlackBottom: CGFloat = 6
 
     private var blockHeight: CGFloat { dynamicTypeSize.isAccessibilitySize ? 68 : 60 }
-    /// +1 when the past runs left (LTR), -1 when it runs right (Arabic): the ribbon
-    /// mirrors with the text, so "drag back" and "read back" are the same direction.
     private var dirSign: CGFloat { layoutDirection == .rightToLeft ? -1 : 1 }
 
     var body: some View {
@@ -79,31 +49,20 @@ struct MealScaleRibbon: View {
             .frame(width: width, height: blockHeight)
             .overlay(marker)
             .overlay(edgeFade)
-            // The grab zone is an overlay rather than a taller frame on purpose: an
-            // overlay is laid out against its parent and may overflow it, so the
-            // strip answers to a finger outside its own box without any of the
-            // measured spacing around it moving.
             .overlay(
                 Color.clear
                     .frame(height: blockHeight + grabSlackTop + grabSlackBottom)
-                    // An overlay is centred on its parent, so an uneven reach needs
-                    // the half-difference put back by hand.
                     .offset(y: (grabSlackBottom - grabSlackTop) / 2)
                     .contentShape(Rectangle())
                     .gesture(drag(width: width))
             )
         }
         .frame(height: blockHeight)
-        // The tick labels are markings, not prose: at large text sizes they would
-        // collide, and everything they say is repeated in the readout above at full
-        // size. The single deliberate Dynamic Type exemption in this sheet.
         .dynamicTypeSize(.large)
         .accessibilityIdentifier("meal.ribbon")
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(a11yLabel)
         .accessibilityValue(a11yValue)
-        // The adjustable trait comes with the action below — VoiceOver then offers
-        // swipe up/down, one snap step of the current band at a time.
         .accessibilityAdjustableAction { direction in
             let step = MealScale.step(at: minutesAgo)
             let target = direction == .increment ? minutesAgo + step : minutesAgo - step
@@ -111,8 +70,6 @@ struct MealScaleRibbon: View {
         }
         .onAppear { offset = MealScale.position(ofMinutes: minutesAgo) }
         .onChange(of: minutesAgo) { _, new in
-            // Chips and the exact-time picker move the value from outside; the strip
-            // rides over to meet it. Skipped mid-drag, where the finger is in charge.
             guard dragAnchor == nil else { return }
             let target = MealScale.position(ofMinutes: new)
             guard abs(target - offset) > 0.5 else { return }
@@ -124,7 +81,7 @@ struct MealScaleRibbon: View {
         }
     }
 
-    // MARK: Gesture
+    // MARK: - Gesture
 
     private func drag(width: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 1)
@@ -132,15 +89,8 @@ struct MealScaleRibbon: View {
                 if dragAnchor == nil {
                     dragAnchor = offset
                     lastTranslation = 0
-                    // Warm the taptic engine before the first step passes, otherwise
-                    // that click arrives late and the track starts ragged.
                     onFeedback(.begin)
                 }
-                // Velocity-adaptive gain. A slow, aiming finger moves the strip less
-                // than 1:1 so a value can be landed on; a fast sweep runs at full gain
-                // so twelve hours is still one gesture. Flat sensitivity cannot do both
-                // — reach and precision pull opposite ways on a linear strip, and at 30
-                // minutes to 6pt the aiming end read as twitchy (owner, 23.08).
                 let delta = value.translation.width - lastTranslation
                 lastTranslation = value.translation.width
                 let raw = offset + dirSign * delta * scrubGain(speed: abs(value.velocity.width))
@@ -149,14 +99,6 @@ struct MealScaleRibbon: View {
             }
             .onEnded { value in
                 dragAnchor = nil
-                // Drum momentum: a hard flick coasts as far as the system's own throw
-                // projection implies and decelerates into the settle — that is what
-                // "spin harder, get there faster" needs across a one-minute scale, and
-                // the landing is clamped to the strip anyway, so there is no ceiling to
-                // impose. Below a deliberate-placement speed the lift carries NO inertia
-                // at all: a careful set stays on the minute the finger left, instead of
-                // being nudged one over by the projection (owner, 24.08 — "micro change
-                // on lifting the finger").
                 let releaseSpeed = abs(value.velocity.width)
                 let rawInertia = value.predictedEndTranslation.width - value.translation.width
                 let inertia = releaseSpeed < 90
@@ -171,8 +113,6 @@ struct MealScaleRibbon: View {
                 if reduceMotion {
                     offset = settled
                 } else {
-                    // Longer coast, longer settle: a hard fling decelerates like a wheel
-                    // instead of teleporting, while a small nudge stays crisp.
                     let travel = abs(settled - offset)
                     let dur = min(0.7, max(0.22, Double(travel) / 2600))
                     withAnimation(.easeOut(duration: dur)) { offset = settled }
@@ -183,19 +123,12 @@ struct MealScaleRibbon: View {
 
     private func hardStop(_ p: CGFloat) -> CGFloat { max(0, min(MealScale.length, p)) }
 
-    /// Drag-to-strip gain as a function of finger speed (pt/s). A careful, slow finger
-    /// gets 0.45 — the strip trails it, so a 30-minute tick takes real travel to cross
-    /// and the value can be aimed. A committed sweep or fling gets the full 1.0, so
-    /// reach is untouched and twelve hours stays one gesture. Between the two it eases
-    /// linearly, so there is no gear-change to feel mid-drag.
     private func scrubGain(speed: CGFloat) -> CGFloat {
         let lo: CGFloat = 250, hi: CGFloat = 1400
         let t = min(1, max(0, (speed - lo) / (hi - lo)))
         return 0.45 + t * (1.0 - 0.45)
     }
 
-    /// Resistance past either end, capped at 40pt of give — enough to feel the wall
-    /// without letting it read as a broken scroll.
     private func rubberBand(_ p: CGFloat) -> CGFloat {
         if p < 0 { return -min(40, -p * 0.35) }
         if p > MealScale.length { return MealScale.length + min(40, (p - MealScale.length) * 0.35) }
@@ -208,8 +141,6 @@ struct MealScaleRibbon: View {
         if mins != reported {
             reported = mins
             onScrub(mins)
-            // No taptic queue behind a fling: above ~900pt/s the steps arrive faster
-            // than the engine can separate them, and it turns into a buzz.
             let now = Date().timeIntervalSince1970
             if !fast && now - lastHaptic > 0.045 {
                 lastHaptic = now
@@ -220,13 +151,10 @@ struct MealScaleRibbon: View {
         wasAtEdge = atEdge
     }
 
-    // MARK: Marker
+    // MARK: - Marker
 
     private var marker: some View {
         let dragging = dragAnchor != nil
-        // The stem stands on the tick line and is 34 tall; the dot caps it. Measured
-        // off the mockups rather than off the table in §4, which puts both 4pt lower
-        // and would leave the stem floating above the ticks.
         let stemBottom = blockHeight - tickBaseline
         let stemCenterY = stemBottom - 17 - blockHeight / 2
         let dotCenterY = stemBottom - 34 - blockHeight / 2
@@ -266,12 +194,11 @@ struct MealScaleRibbon: View {
         .allowsHitTesting(false)
     }
 
-    // MARK: Drawing
+    // MARK: - Drawing
 
     private func draw(in ctx: GraphicsContext, size: CGSize) {
         let center = size.width / 2
         let baselineY = size.height - tickBaseline
-        // A little past the edges so a tick never pops into view mid-slide.
         let reach = size.width / 2 + MealScale.pitch * 4
 
         func screenX(_ position: CGFloat) -> CGFloat {
@@ -286,9 +213,6 @@ struct MealScaleRibbon: View {
         for idx in lowIdx...highIdx {
             let minutes = MealScale.stepMinutes[idx]
             let kind = MealScale.tick(at: minutes)
-            // The strip snaps every minute, but drawing a mark on every one would be a
-            // grey smear at this pitch — minor marks are thinned to every fifth minute,
-            // which the eye reads as a ruler while the value still lands on any minute.
             if kind == .minor && minutes % 5 != 0 { continue }
             let x = screenX(CGFloat(idx) * MealScale.pitch)
             let height: CGFloat
@@ -308,7 +232,6 @@ struct MealScaleRibbon: View {
             }
         }
 
-        // The hard end of the domain, drawn as a wall rather than left to fade out.
         if highIdx == MealScale.stepMinutes.count - 1 {
             let x = screenX(MealScale.length)
             ctx.fill(Path(CGRect(x: x - 1, y: baselineY - endCapHeight, width: 2, height: endCapHeight)),
@@ -322,7 +245,6 @@ struct MealScaleRibbon: View {
                                screenX: (CGFloat) -> CGFloat) {
         var daysBack = 1
         while true {
-            // Local midnight `daysBack - 1` days ago, expressed as a distance.
             let minutes = nowMinuteOfDay + (daysBack - 1) * 1440
             if minutes > MealScale.maxMinutes { break }
             guard minutes > 0 else { daysBack += 1; continue }
@@ -332,8 +254,6 @@ struct MealScaleRibbon: View {
                     Path(CGRect(x: x - 0.75, y: baselineY - dayBreakHeight, width: 1.5, height: dayBreakHeight)),
                     with: .color(theme.scaleTickDayBreak)
                 )
-                // The name sits on the older side of the rule — it labels the day the
-                // rule opens, which in a right-to-left layout is the other side.
                 draw(label: MealMath.shortDayLabel(daysAgo: daysBack),
                      at: CGPoint(x: x - dirSign * 5, y: dayRowTop + 7),
                      in: ctx, font: .hanken(10.5, .bold), color: theme.deep,

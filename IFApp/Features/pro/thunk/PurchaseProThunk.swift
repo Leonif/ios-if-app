@@ -2,10 +2,6 @@
 //  PurchaseProThunk.swift
 //  IFApp
 //
-//  The Buy button, end to end: mark the attempt, run Apple's sheet, report how it
-//  ended. The four endings are separate actions rather than one with a flag, because
-//  they lead to four different states of the offer screen.
-//
 
 import Redux
 

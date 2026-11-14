@@ -2,15 +2,6 @@
 //  EndEatingConfirmSheet.swift
 //  IFApp
 //
-//  Confirmation in front of ending an open eating window early. Built as a bottom
-//  sheet for the same reason as ResetConfirmSheet: on iOS 26 the system
-//  `.confirmationDialog` renders as a popover that hides the `.cancel` button.
-//
-//  Why it exists at all: the footer button ended the window on the tap, and it sits
-//  full width directly under "Start fast", where a label like "Done" read as "close
-//  this screen". Ending the window also drops its closing push, so a mis-tap cost the
-//  one reminder the window was there to deliver.
-//
 
 import SwiftUI
 
@@ -21,8 +12,6 @@ struct EndEatingConfirmSheet: View {
     let onConfirm: () -> Void
     let onDismiss: () -> Void
 
-    // Same structure as ResetConfirmSheet: the stack always exists and only its
-    // children come and go, each on its own transition.
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .bottom) {
@@ -67,8 +56,6 @@ struct EndEatingConfirmSheet: View {
             .padding(.top, 6)
             .accessibilityIdentifier("endEating.confirm")
 
-            // Last on purpose: the finger that just tapped the footer button sits low
-            // on the screen, and a second tap from it has to land on the safe action.
             PrimaryButton(title: strings.EndEating.keepOpen, theme: theme, action: onDismiss)
                 .accessibilityIdentifier("endEating.keepOpen")
         }

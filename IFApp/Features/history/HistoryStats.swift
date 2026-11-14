@@ -2,23 +2,11 @@
 //  HistoryStats.swift
 //  IFApp
 //
-//  Every number on the history screen is a pure function of the full record array,
-//  computed at render. No incremental counters: a running `total += duration` is
-//  what makes deletion expensive and lets the displayed totals drift from the data.
-//  At a few thousand records this is microseconds.
-//
-//  A future paywall may hide *rows* beyond a window — it must never narrow the
-//  input here. Totals that shrink the day a paywall lands read as a bug, or worse,
-//  as something taken away.
-//
 
 import Foundation
 
-/// One month's worth of records, newest month first.
 struct HistoryMonthGroup: Identifiable, Equatable {
-    /// "2026-07" — stable across locales, used only as identity.
     let id: String
-    /// First day of the month, for the localized header title.
     let month: Date
     let records: [FastRecord]
 
@@ -27,9 +15,6 @@ struct HistoryMonthGroup: Identifiable, Equatable {
     }
 }
 
-/// One of the seven calendar days in the summary strip, oldest first. Carrying the
-/// date with the flag lets the UI label each dot instead of presenting seven
-/// anonymous circles whose direction and meaning have to be guessed.
 struct HistoryDay: Identifiable, Equatable {
     let date: Date
     let reachedGoal: Bool
@@ -38,31 +23,14 @@ struct HistoryDay: Identifiable, Equatable {
 
 struct HistoryStats: Equatable {
     let fastsCount: Int
-    /// Every fast added up, in seconds — not in whole hours, and the difference is
-    /// visible on screen. Truncated to hours the sum printed *below* the longest fast
-    /// it contains: one 16h 01m fast gave "TOTAL 16h · LONGEST 16h 01m", side by side
-    /// on the same card, which is arithmetic that cannot be true. Minutes really are
-    /// noise on an aggregate of many fasts — the month headers still drop them, and
-    /// they are a different scope with nothing beside them to contradict — but an
-    /// aggregate that reads smaller than its own largest member is worse than noise.
-    /// The direction of the fix is forced: the longest fast cannot give up its minutes,
-    /// because those minutes are the personal best.
     let total: TimeInterval
     let longest: TimeInterval
-    /// Longest run of consecutive goal days found in the history.
     let bestStreak: Int
-    /// When the history begins — the "since" in "Best 9 · since 12 March".
     let since: Date?
-    /// Goal reached on each of the last 7 local days, oldest first.
     let lastSevenDays: [HistoryDay]
 
     static func compute(records: [FastRecord], now: Date = Date()) -> HistoryStats {
         let goalDays = Set(records.compactMap(\.goalDayKey))
-        // Rows in history are dated by the day the fast started. The seven-day strip
-        // must use that same visible date: an overnight fast that starts Tuesday and
-        // crosses its goal Wednesday otherwise lights Wednesday while the matching
-        // row says Tuesday. Streak accounting intentionally keeps using `goalDayKey`
-        // above, because it records the actual day on which the goal was crossed.
         let historyGoalDays = Set(records.compactMap { record in
             record.goalReached ? Clock.dayKey(record.startDate) : nil
         })
@@ -77,32 +45,10 @@ struct HistoryStats: Equatable {
         )
     }
 
-    /// Whether the summary card may greet the reader as a beginner.
-    ///
-    /// The card holds two numbers that come from different stores: the streak counter
-    /// lives in the timer's persisted defaults and shipped in 1.4.4, the records live
-    /// in a file and shipped in 1.4.5, and nothing backfilled one from the other.
-    /// Counting only records, the card welcomed everyone who updated from 1.4.4 as a
-    /// first-timer while a four-day streak stood above the sentence (TF-1).
-    ///
-    /// So the note is gated on both: it appears while the history is short *and* the
-    /// counter claims nothing the records cannot account for. That keeps the ordinary
-    /// first fast — one record, streak of one — exactly as it was, and it takes the
-    /// raw counter rather than `displayed(at:)` on purpose: a streak that lapsed
-    /// yesterday displays as 0, and it is still not the streak of a beginner.
     static func showsFirstNote(fastsCount: Int, streakCount: Int) -> Bool {
         fastsCount <= 2 && streakCount <= fastsCount
     }
 
-    /// Records grouped by the month they *started* in — the row shows its start date,
-    /// so a fast crossing a month boundary belongs to the month the user sees on it.
-    ///
-    /// The month is a Gregorian one (`Clock.gregorian`), like every other day the app
-    /// counts and like the header `HistoryFormat.monthTitle` prints. Taking it from
-    /// `Calendar.current` instead put an Arabic device on the Hijri calendar: the
-    /// bucket key became a Hijri month and its first day, rendered back through the
-    /// Gregorian formatter, landed in the previous Gregorian month — September
-    /// records under "أغسطس 2026" (SU-6).
     static func monthGroups(records: [FastRecord]) -> [HistoryMonthGroup] {
         let calendar = Clock.gregorian
         let sorted = records.sorted { $0.startTimestamp > $1.startTimestamp }
@@ -127,9 +73,8 @@ struct HistoryStats: Equatable {
         }
     }
 
-    // MARK: Streak math
+    // MARK: - Streak math
 
-    /// The longest chain of consecutive calendar days present in the set.
     private static func longestRun(of dayKeys: Set<String>) -> Int {
         guard !dayKeys.isEmpty else { return 0 }
         let sorted = dayKeys.sorted()
@@ -142,7 +87,6 @@ struct HistoryStats: Equatable {
         return best
     }
 
-    /// Seven flags, oldest first: did a fast reach its goal on that local day.
     private static func lastSeven(goalDays: Set<String>, now: Date) -> [HistoryDay] {
         let calendar = Clock.gregorian
         return (0..<7).reversed().map { daysAgo in

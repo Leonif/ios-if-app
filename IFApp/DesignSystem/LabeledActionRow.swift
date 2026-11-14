@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Shared label/caption geometry for actions in the plan editor and history.
-/// The caller owns its button, background, state and trailing affordance.
 struct LabeledActionRow<Trailing: View>: View {
     let title: String
     let caption: String

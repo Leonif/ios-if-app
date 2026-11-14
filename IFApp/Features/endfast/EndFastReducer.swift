@@ -2,8 +2,6 @@
 //  EndFastReducer.swift
 //  IFApp
 //
-//  Pure and synchronous. Writes only to EndFastState.
-//
 
 import Foundation
 import Redux
@@ -37,9 +35,6 @@ func endFastReducer(state: EndFastState, action: Action) -> EndFastState {
         newState.conflictUnavoidable = unavoidable
 
     case .refusalWithdrawn:
-        // The choice survives on purpose: the person is being sent back to change
-        // one thing, and handing them a reset picker would make them re-enter the
-        // part that was fine.
         newState.conflict = nil
         newState.conflictUnavoidable = false
 
@@ -53,10 +48,6 @@ func endFastReducer(state: EndFastState, action: Action) -> EndFastState {
     return newState
 }
 
-/// Clamped rather than rejected: a control that refuses to move is the silent "no"
-/// the refusal state exists to replace. The bounds are the fast's own start plus a
-/// minute at one end and the present moment at the other, so a value outside them is
-/// not a choice the sheet can express at all.
 private func clamp(_ value: Double, _ low: Double, _ high: Double) -> Double {
     min(max(value, low), max(low, high))
 }

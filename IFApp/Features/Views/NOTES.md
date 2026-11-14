@@ -1,0 +1,42 @@
+# Views - notes for agents
+
+Why the About IF24 sheet and the source reader are the way they are. Read the section of a file before editing it; an edit that changes or cancels a point below updates the point in the same commit.
+
+## AboutIF24View.swift
+
+- `AboutIF24View` — the app's own document, not a science note: the order of the sections sets its class. Pro first (status, the way into the offer, Restore), then Sunnah, then privacy, then the research, with the medical note closing the science section rather than sitting under a commercial row. Restore lives in the first section a person looks in after changing phone — the reason this sheet exists instead of a settings screen.
+- `ProRowStatus` — what the Pro row's right-hand column says. The axis is the state of the entitlement — never the tier, the purchase or the price.
+- `ProRowStatus.notCheckedYet` — nothing checked yet. Gating behaves as free, but the row never says "inactive": caution earns a lock, not a claim.
+- `ProRowStatus.opensOffer` — active is the one state with nothing to open: the offer must not appear for someone who already owns it, so the row loses its chevron and takes a check. This is the About door's own guard (see `proReducer` in `Features/pro/NOTES.md`).
+- `AboutIF24View.showsNothingToRestore` — restore ran from this sheet and found nothing. Where the status moved, that is the feedback; where it did not, this line is.
+- `AboutIF24View.onSunnah` — the second door into the Sunnah reminders screen. Without it the free headline feature was reachable only through the pencil inside the plan pill — a control whose whole promise is that it edits the plan.
+- `AboutIF24View.onOpenSource` — the reader left for the paper itself. The article id travels because the funnel is counted per paper; the URL is the one thing the event must not carry.
+- `AboutIF24View.onOpenArticle` / `.onCloseArticle` — the two ends of "is any of this read"; the closing call carries whether the foot of the article was ever on screen.
+- `AboutIF24View.typeSize` — the sheet is presented, so it starts a fresh environment and does not inherit the root's `dynamicTypeSize` ceiling (`AppFlowView.body`): accessibility sizes reach this view for real, and one slot has to know it.
+- `AboutIF24View.readingArticleID` — kept past the dismissal: `onDismiss` runs after `selectedSource` has been cleared, and the closing report has to name the article it closed.
+- `AboutIF24View.readerReachedEnd` — reset when a reader opens, not when one closes: the next reading must not inherit the last one's answer.
+- `AboutIF24View.body` — `sunnahSection` has no overline: the row's label is the name of the thing and a heading would repeat it. It sits above Privacy, not below the research, because the sheet is ordered by what a person came to do and the science is the reading matter at the end.
+- `AboutIF24View.body` — top padding 28 clears the sheet's grabber: at 10pt the title read as pinned under the handle rather than below it.
+- `AboutIF24View.body` — `.sheet(item:onDismiss:)` — `onDismiss` rather than an `onDisappear` inside the reader: it is the one hook that fires exactly once per reading, for the close button and the swipe alike, and the closing report must be countable one-to-one.
+- `AboutIF24View.proSection(_:)` — active is a statement, not a door: rendered as a plain row rather than a disabled button, because a disabled button greys its whole content and the one place a paying customer sees their own state would arrive dimmed. Accessibility ids `about.pro`, `about.restore`.
+- `AboutIF24View.proSection(_:)` — `nothingToRestore` line — same rule as the offer up to the app's type ceiling: it does not wrap. The slot here is narrower (287pt on a 375pt device), and at xxLarge German (106.5%) and Ukrainian (102.7%) run past it; shrinking is the honest way out for a transient line versus an ellipsis mid-sentence. Only those two locales engage it (.939 and .973), and the 0.9 floor stays clear of ko and ja. Above the ceiling the floor buys nothing: this sheet really renders at the accessibility sizes (it is presented), where the line needs about .78 of the slot at accessibility1 and less higher up, so a 0.9 floor hands back the ellipsis (measured at AX5 in de, ar and ja). There it wraps — one line of card height for two and a half seconds, and the Restore label it replaces is already three lines tall at those sizes.
+- `AboutIF24View.proRow(_:)` — label and status side by side while both fit on one line, stacked when they do not, as system Settings rows do. A layout answer to what looks like a copy problem, and it has to be: the status values are the shortest attested forms in their languages. At xxLarge — inside the app's own ceiling — `Awaiting approval` already overruns the slot in de, es, pl and fr, and at accessibility sizes Ukrainian `Неактивний` follows. Squeezed side by side, a single long word splits mid-word against the chevron; given the row's full width it sits on its own line. The switch is "does it fit", not `isAccessibilitySize`, which would miss the four locales that break first.
+- `AboutIF24View.sideBySideRow(_:)` — both texts are pinned to one line at natural width so `ViewThatFits` measures what they really need: a text allowed to wrap "fits" any width, and the fallback would never be chosen.
+- `AboutIF24View.stackedRow(_:)` — label over value against the leading edge, chevron still trailing; the status gets the row's whole width and wraps between words instead of inside one.
+- `AboutIF24View.activeCheck(_:)` — active is the one status that also carries a mark.
+- `AboutIF24View.statusText(_:alignment:)` — in Japanese the value is empty by decision; the slot then hides rather than rendering an empty `Text`, and the row's height does not move. Accessibility id `about.pro.status`.
+- `AboutIF24View.sunnahSection(_:)` — the longest of the free rows in German and Ukrainian: it wraps rather than shrinking, and the row grows with it. Accessibility id `about.sunnah`.
+- `AboutIF24View.sourcesSection(_:)` — localized editorial titles lead to an offline reader (`SourceArticleView`). Accessibility id `about.source.<id>`.
+- `AboutIF24View.reportReaderClosed()` — one report per reading. The stored article is cleared with it, so a dismissal with no known reading behind it stays silent instead of repeating the last article.
+- `AboutIF24View.chevron(_:)` — `chevron.forward`, not `chevron.right`: a disclosure indicator points ahead, and ahead is leftward in Arabic; the absolute glyph would stay aimed right after the row mirrored, back at the label it leads away from.
+- `ExternalLinkArrow` — `arrow.up.right` mirrored by hand: SF Symbols leaves it pointing the same way in right-to-left layout, and an outbound arrow pointing into the text is the one glyph whose direction carries meaning.
+
+## SourceArticleView.swift
+
+- `SourceArticle` — bundled editorial content: reading never requires a network connection.
+- `ArticleFootOffsetKey` — how far the foot of the article sits below the top of the reader's visible area. A preference rather than an `onChange` inside the `GeometryReader`: the reader closure is not re-run for a position that moves without a size changing, so an observer there never hears the scroll (measured: silent all the way to the bottom).
+- `SourceArticleView.onReachedEnd` — called once per reading; whoever presents the reader keeps the answer and spends it when the sheet closes.
+- `SourceArticleView.reportedEnd` — `onReachedEnd` already spent: scrolling back up and down again is the same reading.
+- `SourceArticleView.body` — the viewport height is read from the enclosing `GeometryReader`, not measured into state: the foot's position is compared against it on every scroll, and a second measurement landing in `@State` is a second update with its own ordering — the comparison would run against a height of zero that has not arrived yet.
+- `SourceArticleView.body` — `SourceReaderStrings.editorial` — the medical disclaimer rides inside the editorial line and stays a quiet signature: presence and legibility are what the note is for, not volume.
+- `SourceArticleView.endMarker` — a one-point marker at the foot of the article; when it enters the visible part of the scroll view the end has been seen. That is the whole "read or merely opened" signal, at the cost of one invisible row rather than a rebuilt layout or a scroll observer. An article shorter than the sheet reports immediately, and rightly: its end is on screen from the first frame.

@@ -2,27 +2,18 @@
 //  NotificationRepository.swift
 //  IFApp
 //
-//  Thin wrapper over NotificationManager so thunks depend on a protocol, not a singleton.
-//
 
 import Foundation
 import UserNotifications
 
 protocol NotificationRepositoryProtocol {
-    /// Makes scheduled pushes appear while the app is in the foreground. Called once
-    /// at launch, before any notification can be delivered.
     func enableForegroundPresentation()
-    /// Shows the system permission dialog and returns once the user has answered.
     @discardableResult
     func requestAuthorization() async -> Bool
-    /// The current notification authorization status.
     func authorizationStatus() async -> UNAuthorizationStatus
-    /// One-time cleanup of the legacy fixed daily reminders on existing installs.
     func removeLegacyDailyReminders()
-    /// Schedule (replacing any existing) the goal-reached push `seconds` from now.
     func scheduleGoalNotification(after seconds: TimeInterval)
     func cancelGoalNotification()
-    /// Schedule (replacing any existing) the eating-window-closed push `seconds` from now.
     func scheduleEatingEndNotification(after seconds: TimeInterval)
     func cancelEatingEndNotification()
 }

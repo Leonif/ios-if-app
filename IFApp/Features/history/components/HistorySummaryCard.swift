@@ -2,42 +2,20 @@
 //  HistorySummaryCard.swift
 //  IFApp
 //
-//  What the history adds up to: the streak, the last seven days, and three totals.
-//  The card is what makes the screen feel like something worth keeping, so its
-//  numbers always come from the whole history — never from whatever slice of rows
-//  happens to be on screen.
-//
-//  It reveals itself in stages. At zero records it isn't shown at all (a wall of
-//  zeroes reads as a reproach to a beginner); the dots arrive at three records and
-//  the best-streak line at seven, so nothing on screen is ever an empty promise.
-//
 
 import SwiftUI
 
 struct HistorySummaryCard: View {
-    /// The streak as one of its three states, projected in `StreakStatus.display(at:)`
-    /// — the same value the header pill draws, so the number and the sentence under it
-    /// can never come from two different readings of the same counter.
     let display: StreakDisplay
     let stats: HistoryStats
-    /// Passed in rather than derived here: the rule needs the streak counter as well
-    /// as the record count, and it is stated once in `HistoryStats.showsFirstNote`.
     let showsFirstNote: Bool
     let theme: ThemeTokens
 
     @Environment(\.locale) private var locale
 
-    /// The number in the counter: the live run, or the one that ended — read off the
-    /// projection, never re-derived here. Both are the persisted counter, never
-    /// `bestStreak`, which is recounted from the rows and can be smaller than the run
-    /// just lost (the same split as TF-1).
     private var streak: Int { display.count }
     private var hasEnded: Bool { display.hasEnded }
 
-    /// CJK writes a counter solid against its counter word — "6일 연속", never
-    /// "6 일 연속" — while the Latin and Cyrillic locales need the space ("6 днів
-    /// поспіль"). The number and the unit are two `Text`s here (the number is display
-    /// type), so the space is the stack's, and it has to follow the locale.
     private var counterSpacing: CGFloat {
         switch locale.language.languageCode?.identifier {
         case "ja", "ko", "zh": return 0
@@ -45,14 +23,7 @@ struct HistorySummaryCard: View {
         }
     }
 
-    /// Under three records the dots would be mostly empty — hide them until there
-    /// is a rhythm to show.
     private var showsDots: Bool { stats.fastsCount >= 3 }
-    /// The best-streak line needs a week of history before it says anything — and it
-    /// must not say something the number above it contradicts. `bestStreak` is counted
-    /// from the records, the current streak from the carried-over counter, so after an
-    /// update from 1.4.4 "Best 3" could sit under "20 days in a row" (TF-1, same split
-    /// as the first-fast note).
     private var showsBest: Bool {
         stats.fastsCount >= 7 && stats.bestStreak > 0 && stats.bestStreak >= streak
     }
@@ -61,9 +32,6 @@ struct HistorySummaryCard: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 0) {
-                    // The overline is what re-labels the number as past. The sentence
-                    // below carries the fact that the run ended; up here it would cost
-                    // the slot its slack in Ukrainian for nothing.
                     Text((hasEnded ? strings.History.lastStreakOverline
                                    : strings.History.streakOverline).uppercased())
                         .font(.hanken(11, .semibold))
@@ -71,16 +39,9 @@ struct HistorySummaryCard: View {
                         .foregroundColor(theme.mut)
 
                     HStack(alignment: .firstTextBaseline, spacing: counterSpacing) {
-                        // `Text("\(streak)")` would take the LocalizedStringKey path and
-                        // let the locale format the integer — Arabic-Indic "٦" beside the
-                        // Western "118" of the totals below. `String(_: Int)` is always
-                        // Western, like every other number on the screen.
                         Text(verbatim: String(streak))
                             .font(.bricolage(40))
                             .monospacedDigit()
-                            // Drained of accent once the run is over, exactly as the pill
-                            // drains it: the number is still the person's, but it is no
-                            // longer a number going anywhere.
                             .foregroundColor(hasEnded ? theme.mut : theme.ink)
                         Text(strings.History.daysInARow(streak))
                             .font(.hanken(14.5, .semibold))
@@ -102,9 +63,6 @@ struct HistorySummaryCard: View {
                 }
             }
 
-            // The three branches of the text slot are exclusive, and the ended run
-            // comes first: it is the only one of them that says something the reader
-            // does not already know from the number above it.
             if hasEnded {
                 Text(strings.History.streakEnded(streak, lastGoalDate: display.lastGoalDate))
                     .font(.hanken(14, .medium))
@@ -117,10 +75,6 @@ struct HistorySummaryCard: View {
                     .foregroundColor(theme.deep)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 9)
-                    // No identifier of its own: SwiftUI folds the card's leaves under
-                    // the container's `history.summary`, so one here never resolves —
-                    // an assert on it passed in both directions and proved nothing.
-                    // H12 matches `history.summary` plus the note's text instead.
             } else if showsBest, let since = stats.since {
                 Text(strings.History.best(stats.bestStreak, HistoryFormat.sinceDate(since)))
                     .font(.hanken(13, .medium))
@@ -137,8 +91,6 @@ struct HistorySummaryCard: View {
             HStack(spacing: 0) {
                 stat(strings.History.statFasts, "\(stats.fastsCount)", theme.ink)
                 divider
-                // Aggregates show scale rather than stopwatch precision: minutes stay
-                // in the rows, while the card rounds to hours and then days.
                 stat(strings.History.statTotal, HistoryFormat.summaryDuration(stats.total), theme.deep)
                 divider
                 stat(strings.History.statLongest, HistoryFormat.summaryDuration(stats.longest), theme.ink)
@@ -157,9 +109,6 @@ struct HistorySummaryCard: View {
         .accessibilityIdentifier("history.summary")
     }
 
-    /// One of the three totals. Labels truncate inside their own third rather than
-    /// wrapping — German runs long here ("Am längsten") and a wrapped label would
-    /// shift the row's baseline.
     private func stat(_ label: String, _ value: String, _ valueColor: Color) -> some View {
         VStack(spacing: 4) {
             Text(label.uppercased())
@@ -183,8 +132,6 @@ struct HistorySummaryCard: View {
     }
 }
 
-/// Seven days, oldest first. A missed day is an unfilled ring, not a cross — the
-/// gap is a fact, not a verdict.
 struct StreakDots: View {
     let days: [HistoryDay]
     let theme: ThemeTokens

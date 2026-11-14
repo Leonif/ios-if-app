@@ -44,7 +44,6 @@ final class SunnahScheduleTests: XCTestCase {
         let ny = TimeZone(identifier: "America/New_York")!
         let reminders = SunnahSchedule.reminders(settings: SunnahSettings(weekly: true),
             now: date("2026-10-31T12:00:00Z"), timeZone: ny, limit: 1)
-        // New York falls back Nov 1; Sunday 20:00 is Monday 01:00 UTC.
         XCTAssertEqual(reminders.first?.fireDate, date("2026-11-02T01:00:00Z"))
     }
 

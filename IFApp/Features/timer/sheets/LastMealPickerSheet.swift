@@ -2,31 +2,16 @@
 //  LastMealPickerSheet.swift
 //  IFApp
 //
-//  The key flow: back-date a fast. Two thirds of everyone who starts a fast comes
-//  through here.
-//
-//  The question the user is answering is "how long ago", so that is the control:
-//  one ribbon covering the whole domain, four presets for the common answers, and
-//  the clock time demoted to a caption that follows from the choice. There is no
-//  date control any more — the day is a consequence, not an input.
-//
-//  The readout sits *above* the ribbon on purpose: a finger on the ribbon covers
-//  the bottom third of the sheet, and that is precisely when the value matters.
-//
 
 import SwiftUI
 
 struct LastMealPickerSheet: View {
     let minutesAgo: Int
-    /// Minute-of-day of "now", injected by the flow — the ribbon's midnight rules
-    /// need it, and the reducer must never read a clock itself.
     let nowMinuteOfDay: Int
-    let readout: String              // "2h 40m ago"
-    let absoluteLabel: String        // "Yesterday at 8:00 PM"
-    /// Set only when the sheet was opened from the closed eating window, where the
-    /// value was put there by the app rather than chosen by the user.
+    let readout: String
+    let absoluteLabel: String
     let overline: String?
-    let selectedChip: Int            // -1 = none
+    let selectedChip: Int
     let theme: ThemeTokens
     let onChip: (MealChip) -> Void
     let onScrub: (Int) -> Void
@@ -41,15 +26,6 @@ struct LastMealPickerSheet: View {
 
     private var atLimit: Bool { minutesAgo >= MealScale.maxMinutes }
 
-    // The card's vertical rhythm, in two values instead of the five it grew into
-    // (14/18/19/9/6). Five gaps inside one card is not a rhythm, it is five
-    // decisions nobody can hold in their head — and the density the owner called
-    // "heavy" is read off this stack, not off the ribbon.
-    //
-    // `section` separates the things that answer different questions: the heading,
-    // the shortcuts, the value, the strip. `tight` binds what belongs to the strip
-    // and the two buttons under it. Gaps are measured to the *boxes*, so the 44pt
-    // collar around "Set exact time" counts as its edge, not the text inside it.
     private let sectionGap: CGFloat = 16
     private let tightGap: CGFloat = 8
 
@@ -63,9 +39,6 @@ struct LastMealPickerSheet: View {
                 .padding(.horizontal, 18)
                 .padding(.bottom, 20)
         }
-        // The card sits 20pt off the physical bottom edge, as drawn: the Confirm
-        // button still clears the home indicator by 30pt, and honouring the safe area
-        // on top of that would push the sheet a third of the way up the screen.
         .ignoresSafeArea(.container, edges: .bottom)
         .transition(.opacity)
         .sheet(isPresented: $showExactPicker) { exactTimeSheet }
@@ -78,15 +51,6 @@ struct LastMealPickerSheet: View {
                 .frame(width: 38, height: 4)
                 .padding(.bottom, sectionGap)
 
-            // The explanatory subtitle used to stand here ("We'll back-date your fast
-            // so the timer stays accurate"). It said in prose what the readout below
-            // says in the value itself, cost a text block and ~25pt of a card the
-            // owner called heavy, and wrapped to two lines in German — so the sheet
-            // was tallest exactly where the words were most redundant.
-            //
-            // `Sheet.backdateHint` stays in the catalogue with its ten translations.
-            // It is not the string that was wrong, only its place on this card, and a
-            // key deleted here is ten translations to buy back if it returns.
             Text(strings.Sheet.whenDidYouEat)
                 .font(.bricolage(20))
                 .foregroundColor(theme.ink)
@@ -118,15 +82,6 @@ struct LastMealPickerSheet: View {
                     .accessibilityIdentifier("meal.limitNote")
             }
 
-            // A 13pt collar around the label lifts a one-line text link to a 44pt tap
-            // target, and that target is part of the layout — the handoff measures the
-            // 12pt above and the 6pt below to the edges of the 44pt box, not to the
-            // text.
-            // The ribbon snaps to 5-minute steps counted from now, so a round clock
-            // time like 19:50 falls between two ticks and cannot be landed on the
-            // strip — the exact wheel is the only path to it. As a faint text link it
-            // read as fine print and got missed (owner, 23.08); a bordered capsule
-            // with a clock glyph makes it the second, deliberate way in.
             Button {
                 exactDate = Date().addingTimeInterval(-Double(minutesAgo) * 60)
                 showExactPicker = true
@@ -164,11 +119,9 @@ struct LastMealPickerSheet: View {
         )
     }
 
-    // MARK: Chips
+    // MARK: - Chips
 
     private var chips: some View {
-        // Not an equal four-way split: "Last night" is one word in English and three
-        // in Polish, and equal shares would crop it. The row wraps instead.
         ChipFlowLayout(spacing: 8) {
             ForEach(MealChip.allCases, id: \.rawValue) { chip in
                 let isSelected = chip.rawValue == selectedChip
@@ -182,9 +135,6 @@ struct LastMealPickerSheet: View {
                         .background(
                             Capsule()
                                 .fill(isSelected ? theme.chipSelectedBg : theme.secBg)
-                                // strokeBorder, not stroke: a 1.5pt selected border
-                                // drawn on the centre line would make the selected chip
-                                // 1.5pt taller than its neighbours.
                                 .overlay(
                                     Capsule().strokeBorder(
                                         isSelected ? theme.chipSelectedBorder : theme.secLine,
@@ -219,7 +169,7 @@ struct LastMealPickerSheet: View {
         }
     }
 
-    // MARK: Readout
+    // MARK: - Readout
 
     private var readoutBlock: some View {
         VStack(spacing: 0) {
@@ -231,17 +181,9 @@ struct LastMealPickerSheet: View {
                     .foregroundColor(theme.mut)
                     .padding(.bottom, 6)
             }
-            // The question is "when did you eat", so the clock time is the answer and
-            // leads (owner, 23.08): a person who "started at 19:50" thinks in the time,
-            // not in a "20m ago" duration. The duration drops to the caption — still
-            // there for whoever reads the strip that way, no longer the headline.
             Text(absoluteLabel)
                 .font(.bricolage(34))
                 .monospacedDigit()
-                // The system's own numeric roll: each digit that actually changed
-                // slides, the rest hold still. Duration is kept under the ribbon's
-                // 45ms haptic throttle, so a fast scrub still lands on the value
-                // instead of queueing a backlog of animations.
                 .contentTransition(.numericText())
                 .animation(reduceMotion ? nil : .snappy(duration: 0.12), value: absoluteLabel)
                 .foregroundColor(theme.ink)
@@ -255,26 +197,18 @@ struct LastMealPickerSheet: View {
                 .foregroundColor(theme.sec)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-                // 5pt in the handoff is a CSS margin between line boxes; Bricolage's
-                // descender space already accounts for most of it here.
                 .padding(.top, 2)
         }
         .frame(maxWidth: .infinity)
-        // Read as one sentence; two separate elements would make VoiceOver announce
-        // the duration and the clock time as unrelated facts.
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("meal.readout")
     }
 
-    // MARK: Exact time
+    // MARK: - Exact time
 
     private var exactTimeSheet: some View {
         NavigationStack {
             DatePicker(
-                // `String()`, not `""` — see the same call in `PlanEditorSheet`: a bare
-                // literal here is a `LocalizedStringKey` and the extractor writes it
-                // into the catalog as a key made of nothing. `.labelsHidden()` below
-                // takes care of the label itself; this takes care of the catalog.
                 String(),
                 selection: $exactDate,
                 in: Date().addingTimeInterval(-Double(MealScale.maxMinutes) * 60)...Date(),
@@ -297,8 +231,6 @@ struct LastMealPickerSheet: View {
     }
 }
 
-/// A wrapping row: each chip takes the width of its own label and the row breaks
-/// when the next one no longer fits.
 private struct ChipFlowLayout: Layout {
     let spacing: CGFloat
 
@@ -332,9 +264,6 @@ private struct ChipFlowLayout: Layout {
                 y += rowHeight + spacing
                 rowHeight = 0
             }
-            // No manual mirroring: SwiftUI already resolves a Layout's placement
-            // against the layout direction, so an Arabic row fills from the right on
-            // its own.
             view.place(at: CGPoint(x: bounds.minX + used, y: y), proposal: ProposedViewSize(size))
             used += size.width + spacing
             rowHeight = max(rowHeight, size.height)

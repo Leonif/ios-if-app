@@ -2,12 +2,6 @@
 //  ResumeFastTests.swift
 //  IFAppTests
 //
-//  TF-3: undoing "End fast" from the result screen. The one thing the acceptance
-//  criteria single out is that the undo restores the goal *this fast* was pinned to,
-//  not the plan as it stands now — reusing `StartFastThunk` would have compiled and
-//  quietly rewritten it, so the test seeds a plan that disagrees with the pinned goal
-//  and would catch exactly that.
-//
 
 import XCTest
 import Redux
@@ -15,8 +9,6 @@ import Redux
 
 final class ResumeFastTests: XCTestCase {
 
-    /// A finished fast waiting on the result screen: two hours staged, pinned to an
-    /// 18h goal, while the plan the user has *selected* is 16h.
     private func completeState(stagedElapsed: TimeInterval = 7200,
                                pinnedGoalHours: Double = 18,
                                planHours: Int = 16,
@@ -54,10 +46,8 @@ final class ResumeFastTests: XCTestCase {
 
     private final class Box { var actions: [Action] = [] }
 
-    // MARK: The pinned goal
+    // MARK: - The pinned goal
 
-    /// The acceptance criterion, at the reducer: undo puts the fast back without
-    /// touching the goal it runs to. `.started` would have overwritten it.
     func testUndoKeepsThePinnedGoal() {
         let before = completeState().timerState
         let after = timerReducer(state: before,
@@ -69,10 +59,6 @@ final class ResumeFastTests: XCTestCase {
         XCTAssertEqual(after.stagedElapsed, 0)
     }
 
-    /// Reaching the goal is what counts a session and moves the streak; ending a fast
-    /// is not, so undoing an ending must leave all three alone. `hasCelebrated` is in
-    /// the list because clearing it would replay the goal moment on a resumed overtime
-    /// fast, and the replay is what would double-count the other two.
     func testUndoDoesNotTouchStreakOrCompletionCounters() {
         let before = completeState().timerState
         let after = timerReducer(state: before,
@@ -84,12 +70,8 @@ final class ResumeFastTests: XCTestCase {
         XCTAssertTrue(after.hasCelebrated, "a resumed overtime fast must not celebrate twice")
     }
 
-    // MARK: The shared start rule
+    // MARK: - The shared start rule
 
-    /// Where a fast put in flight has its start is one definition, used by both the
-    /// start path and the undo. Asserted on `TimerState` rather than through either
-    /// caller, because the point of the rule living there is that neither caller owns
-    /// it (invariant 8).
     func testStartTimestampCarriesTheStagedElapsed() {
         let staged = completeState(stagedElapsed: 7200).timerState
 
@@ -101,10 +83,8 @@ final class ResumeFastTests: XCTestCase {
                        "nothing staged means the fast starts now")
     }
 
-    // MARK: The thunk
+    // MARK: - The thunk
 
-    /// It dispatches the undo, and specifically not a start — the distinction the
-    /// whole thunk exists for.
     func testThunkDispatchesUndoAndNeverStart() async {
         let actions = await dispatched(from: completeState())
 
@@ -113,12 +93,10 @@ final class ResumeFastTests: XCTestCase {
         guard case let .stopUndone(startTimestamp)? = actions.compactMap({ $0 as? TimerAction }).first else {
             return XCTFail("expected a .stopUndone")
         }
-        // The count picks up where it left off rather than restarting from zero.
         let elapsedAfterResume = Date().timeIntervalSince1970 - startTimestamp
         XCTAssertEqual(elapsedAfterResume, 7200, accuracy: 2)
     }
 
-    /// The record written by the ending goes with it.
     func testThunkDeletesTheRecordTheEndingWrote() async {
         let justWritten = record(duration: 7200)
         let older = record(duration: 16 * 3600)
@@ -131,9 +109,6 @@ final class ResumeFastTests: XCTestCase {
         XCTAssertEqual(deleted, [justWritten.id])
     }
 
-    /// A fast too short to be written (under `HistoryMiddleware.minimumDuration`) still
-    /// reaches the result screen. Deleting "the newest record" there would throw away
-    /// the user's *previous* fast, so nothing is deleted.
     func testThunkDeletesNothingWhenTheEndingWroteNoRecord() async {
         let older = record(duration: 16 * 3600)
         let actions = await dispatched(from: completeState(stagedElapsed: 30, records: [older]))
@@ -142,8 +117,6 @@ final class ResumeFastTests: XCTestCase {
                        "no record was written for a 30-second fast, so none may be deleted")
     }
 
-    /// Nothing to undo while a fast is running: the action does not exist in `.active`,
-    /// and a stray dispatch must not restart the clock.
     func testThunkIsInertWhileAFastIsRunning() async {
         var state = completeState()
         state.timerState.isRunning = true

@@ -48,6 +48,8 @@
 
 **Область действия — `IFApp/`** (принято 07.08.2026). `IFAppTests/`, `IFAppUITests/` и пакет `Redux/` под инварианты не подпадают.
 
+Раздел «Комментарии в коде и `NOTES.md`» ниже — не инвариант и имеет свою область (весь Swift-код, включая тесты).
+
 **Одно исключение, названное явно (18.08.2026):** пункт 11 смотрит на `IFApp.xcodeproj/project.pbxproj` — это единственный объект вне `IFApp/`, и расширение сделано ровно на один файл и один таргет, с доводом на месте. Молчание про остальное содержимое `.xcodeproj` остаётся молчанием и разрешением не является: расширять область может владелец, а не тот, кому удобно процитировать соседний пункт.
 
 Записано потому, что до этого область выводилась из того, куда смотрят грепы, а не из текста правил, — и молчание уже один раз было прочитано как разрешение: `FastHistoryRepository(directory:)` конструируется в тестах напрямую, и обоснованием служило «`IFAppTests/` вне области грепов инварианта». Вывод верный, довод — нет: узкая область грепа есть свойство проверки, а проза пункта 3 говорит «нигде, кроме `AppDependencies`». Тот же разрыв «правило шире проверки», который дважды давал ложный ноль (истории промаха в пунктах 1 и 2), только с обратным знаком — здесь он давал ложное разрешение.
@@ -76,11 +78,11 @@
 
 **Зачем.** На этом стоит три вещи сразу. `AppStoreFactory` восстанавливает состояние из персиста, и в редьюсер время при этом не попадает. С 14.09.2026 (Queue-24) бутстрап читает часы **один раз**, `Clock.now()` в `AppStoreFactory.make()`: восстановленный экран результата держится, только пока окно, которое он открыл бы, не вышло за горизонт закрытого окна. Решение принимает чистая `TimerState.droppingLapsedEnding(at:plan:)`, момент ей передаётся аргументом, так что это впрыск времени по тому же образцу, что в тханках, а не чтение часов состоянием. Редьюсер и начальный стор «который час» по-прежнему не спрашивают. `UITestSeed` подменяет время офсетами timestamp'ов и потому не нуждается в fake-часах — Maestro-флоу доезжает до «16 часов поста» за секунду. И пост, пересёкший полночь, зачисляется в тот день, когда цель реально была достигнута, а не в тот, когда редьюсер случайно проснулся. Редьюсер, дёрнувший `Date()`, ломает всё три и делает баг невоспроизводимым: он зависит от того, в какую секунду вызвался редьюсер, а редьюсер вызывается на каждый экшен.
 
-**Тонкость — обязательна к прочтению.** `Features/timer/TimerReducer.swift:70` вызывает `Clock.isDayBefore(last, dayKey)`. Это **не** нарушение: функция сравнивает две строки-ключа дня и часов не читает. Правило запрещает *чтение текущего времени* (`Date()`, `Clock.now()`, `Clock.dayKey()` и `Clock.minuteOfDay()` без аргумента), а не любое упоминание `Clock`. Не «чините» этот вызов и не выводите из него, что часы в редьюсере допустимы.
+**Тонкость — обязательна к прочтению.** `Features/timer/TimerReducer.swift:49` вызывает `Clock.isDayBefore(last, dayKey)`. Это **не** нарушение: функция сравнивает две строки-ключа дня и часов не читает. Правило запрещает *чтение текущего времени* (`Date()`, `Clock.now()`, `Clock.dayKey()` и `Clock.minuteOfDay()` без аргумента), а не любое упоминание `Clock`. Не «чините» этот вызов и не выводите из него, что часы в редьюсере допустимы.
 
-**Следуют:** 9 case'ов несут инъецированное время — `TimerAction.started(startTimestamp:)` `:15`, `.stopped(elapsed:)` `:18`, `.stopUndone(startTimestamp:)` `:27`, `.reset(elapsed:)` `:32`, `.timeAdjusted` `:34`, `.goalCelebrated(dayKey:)` `:39`, `.eatingStarted(startTimestamp:)` `:41` (`Features/timer/TimerAction.swift`); `MealAction.initializedToNow(minuteOfDay:)`, `.quickChip(nowMinuteOfDay:)` (`Features/meal/MealAction.swift:12,16`). Все 7 редьюсеров — 0 обращений к часам.
+**Следуют:** 10 case'ов несут инъецированное время — `TimerAction.started(startTimestamp:)` `:10`, `.stopped(elapsed:)` `:11`, `.stopUndone(startTimestamp:)` `:12`, `.reset(elapsed:)` `:13`, `.timeAdjusted` `:14`, `.goalCelebrated(dayKey:)` `:15`, `.eatingStarted(startTimestamp:)` `:16` (`Features/timer/TimerAction.swift`); `EndFastAction.opened(…earliest:latest:)` `:9`, `.chipPicked(timestamp:latest:)` `:14`, `.timeStepped(byMinutes:latest:)` `:15` (`Features/endfast/EndFastAction.swift`). Все 8 редьюсеров фич (включая `sunnahReducer`, `Features/sunnah/SunnahState.swift:39`) и `RootReducer` — 0 обращений к часам.
 
-Счёт был 7, стал 9 (пересчёт 07.08.2026): `.stopUndone` добавлен дев-циклом 1.5.x, а `.reset(elapsed:)` несёт инъецированное время с самого начала и в прошлый счёт просто не попал — его собственный doc-комментарий в `TimerAction.swift` объясняет, почему `elapsed` едет в экшене. Ошибка счёта, не изменение правила.
+Счёт был 7, стал 9 (пересчёт 07.08.2026): `.stopUndone` добавлен дев-циклом 1.5.x, а `.reset(elapsed:)` несёт инъецированное время с самого начала и в прошлый счёт просто не попал — его пункт в `Features/timer/NOTES.md` (раздел `TimerAction.swift`) объясняет, почему `elapsed` едет в экшене. Ошибка счёта, не изменение правила. Пересчёт 14.11.2026: 9 → 10. `MealAction` из счёта ушёл: с 27.07.2026 (`24b2a5e`, лента вместо степперов) его case'ы несут расстояние `minutesAgo`, а не момент, то есть времени не несут по построению (`Features/meal/NOTES.md`, второй пункт `MealState`); в пересчёт 07.08 он попал по инерции. Вошли три case'а `EndFastAction` (IF-5, 18.08.2026). Редьюсеров 8, а не 7: `sunnahReducer` живёт в `SunnahState.swift`, и глоб `*Reducer.swift` его не видит. Ошибка счёта, не изменение правила.
 
 **Нарушают:** 0.
 
@@ -101,7 +103,8 @@ grep -rnE "Date\(\)|Clock\.(now|dayKey|minuteOfDay)\(\)|UUID\(\)|Locale\.current
   IFApp/Features/meal/MealState.swift IFApp/Features/ui/UIState.swift \
   IFApp/Features/history/HistoryState.swift IFApp/Features/history/FastRecord.swift \
   IFApp/Features/pro/ProState.swift IFApp/Features/pro/Pro.swift \
-  IFApp/Features/phase/Phase.swift
+  IFApp/Features/phase/Phase.swift \
+  IFApp/Features/sunnah/SunnahState.swift IFApp/Features/endfast/EndFastState.swift
 ```
 Список файлов здесь — снимок замыкания на дату, а не сам критерий: новое поле в подсостоянии его расширяет, и пересобирать список надо от `AppState`, а не дописывать в глоб. Должно быть пусто. Под правило **не** подпадают: `Clock.isDayBefore`, `Clock.dayKey(someDate)` и `Clock.goalDayKey(fastStart:goalHours:)` — все три считают от переданного аргумента, а не от текущего момента.
 
@@ -115,7 +118,7 @@ grep -rnE "Date\(\)|Clock\.(now|dayKey|minuteOfDay)\(\)|UUID\(\)|Locale\.current
 
 Редьюсер — чистая синхронная функция: `var newState = state` → switch → `return`. Никакой персистентности, сети, пушей, аналитики, StoreKit.
 
-**Зачем.** Редьюсер вызывается на **каждый** экшен, а его результат сравнивается на равенство (`ImprovedStoreV2.swift:105`). Эффект внутри выполнится непредсказуемое число раз и в непредсказуемый момент: запись в историю продублируется, пуш перепланируется на каждый тик, а в GA4 приедет, что пользователь трижды начал один пост. Отлаживается это только по проду.
+**Зачем.** Редьюсер вызывается на **каждый** экшен, а его результат сравнивается на равенство (`ImprovedStoreV2.swift:97`). Эффект внутри выполнится непредсказуемое число раз и в непредсказуемый момент: запись в историю продублируется, пуш перепланируется на каждый тик, а в GA4 приедет, что пользователь трижды начал один пост. Отлаживается это только по проду.
 
 **Что считается побочным эффектом.** Всё, что меняет мир за пределами возвращаемого состояния или читает его: вызов репозитория, UIKit-побочка (хаптика, открытие URL), системные API и синглтоны (`UNUserNotificationCenter`, `UIApplication.shared`, `AppStore`, `UserDefaults`, `FileManager`), аналитика, планирование отложенной работы (`DispatchQueue.asyncAfter`, `Task {}`, таймеры). **Не только репозитории** — см. историю промаха ниже.
 
@@ -151,11 +154,11 @@ grep -rnE "Date\(\)|Clock\.(now|dayKey|minuteOfDay)\(\)|UUID\(\)|Locale\.current
 
 | # | Эффект | Где |
 |---|---|---|
-| 2.1 | Хаптика `UINotificationFeedbackGenerator().notificationOccurred(.success)` | `Flows/timer/TimerFlowView.swift:1028` |
-| 2.2 | Хаптика `UIImpactFeedbackGenerator(style: .light).impactOccurred()` | `Flows/history/HistoryFlowView.swift:325` |
-| 2.4 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + 1.6)` | `Flows/timer/TimerFlowView.swift:1048` |
-| 2.5 | Подмена делегата чужого рекогнайзера — `gesture.delegate = self`, `gesture.isEnabled = true` | `Flows/history/HistoryFlowView.swift:367-368` (`InteractivePopGesture.Host`, объявлен `:349`, монтируется `:100`) |
-| 2.6 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + autoOfferDelay)` — `scheduleAutoOffer`, T1' | `Flows/timer/TimerFlowView.swift:772` |
+| 2.1 | Хаптика `UINotificationFeedbackGenerator().notificationOccurred(.success)` | `Flows/timer/TimerFlowView.swift:670` |
+| 2.2 | Хаптика `UIImpactFeedbackGenerator(style: .light).impactOccurred()` | `Flows/history/HistoryFlowView.swift:272` |
+| 2.4 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + 1.6)` | `Flows/timer/TimerFlowView.swift:688` |
+| 2.5 | Подмена делегата чужого рекогнайзера — `gesture.delegate = self`, `gesture.isEnabled = true` | `Flows/history/HistoryFlowView.swift:293-294` (`InteractivePopGesture.Host`, объявлен `:281`, монтируется `:75`) |
+| 2.6 | Планирование отложенного диспатча `DispatchQueue.main.asyncAfter(… + autoOfferDelay)` — `scheduleAutoOffer`, T1' | `Flows/timer/TimerFlowView.swift:481` |
 
 **Номера строк пересняты 18.08.2026 на `HEAD` `b24be30`.** Все пять адресов проверены грепом по дереву: 738→822, 303→311, 758→842, 345-346→353-354 (объявление 327→331, монтирование 89→95), 576→624. Сами позиции не менялись — только адреса; сдвинули их коммиты IF-5 после `a76cf55`, который был последним пересчётом. Расхождение нашёл `architect` на ревью 18.08.2026 — оно уже было в `HEAD` и к правке, на которой всплыло, отношения не имеет.
 
@@ -177,7 +180,7 @@ grep -rnE "Date\(\)|Clock\.(now|dayKey|minuteOfDay)\(\)|UUID\(\)|Locale\.current
 
 Номер строки здесь — удобство поиска, а не идентификатор. Когда дерево движется, в документ идёт пометка «номер плывёт», а не свежее на вид число; ссылка проставляется после того, как правки приняты.
 
-**2.3 закрылось само** (учёт 06.08.2026): `Features/Views/SourcesView.swift` удалён в дев-цикле 1.5.0, а с ним и `UIApplication.shared.open(url)` — ссылку теперь открывает `@Environment(\.openURL)`, и **только во `Flows/`**: `Flows/pro/AboutFlowView.swift:38` (объявление) и `:53`, `Flows/pro/PaywallFlowView.swift:53` (объявление) и `:86` (номера пересняты 11.09.2026). `Features/Views/AboutIF24View.swift` из списка ушёл — он больше ничего не открывает сам, а отдаёт URL наружу замыканиями (`onPrivacy` `:48`, `onOpenSource` `:51`), то есть встал ровно так, как требует инвариант 4. Греп пункта ловит `UIApplication.shared`, а `openURL` не ловит; подпадает ли эта форма под пункт — вопрос к `architect`, здесь снят только факт.
+**2.3 закрылось само** (учёт 06.08.2026): `Features/Views/SourcesView.swift` удалён в дев-цикле 1.5.0, а с ним и `UIApplication.shared.open(url)` — ссылку теперь открывает `@Environment(\.openURL)`, и **только во `Flows/`**: `Flows/pro/AboutFlowView.swift:31` (объявление) и `:46`, `Flows/pro/PaywallFlowView.swift:33` (объявление) и `:60` (номера пересняты 11.09.2026). `Features/Views/AboutIF24View.swift` из списка ушёл — он больше ничего не открывает сам, а отдаёт URL наружу замыканиями (`onPrivacy` `:31`, `onOpenSource` `:35`), то есть встал ровно так, как требует инвариант 4. Греп пункта ловит `UIApplication.shared`, а `openURL` не ловит; подпадает ли эта форма под пункт — вопрос к `architect`, здесь снят только факт.
 
 **Ни одно из пяти в починку не отправлено** — все требуют решения, а не механического переноса, потому что привязаны к кадру или к жизненному циклу экрана, а мидлвара срабатывает на экшене:
 
@@ -223,11 +226,11 @@ grep -rnE "UI(Impact|Notification|Selection)FeedbackGenerator|UIApplication\.sha
 
 **Следуют:** 9 мидлвар, 8 тханков, 3 бутстрап-точки. Регистрация одна — `Core/AppDependencies.swift`.
 
-Пересобрано грепом 14.09.2026 (IF-24, рабочее дерево) — 32 вызова `container.inject` в 20 файлах (33-е совпадение — строка примера в шапке `Core/Container.swift`). До того — 18.08.2026: 25 в 17 файлах. Отстал не один `AppStoreFactory` (там было 6, а не 4, ещё до IF-24): `SunnahMiddleware` и `OpenExternalLinkThunk` появились в 1.5.2 и в список не попали, номера строк у пяти файлов уехали. Все новые — в разрешённых местах.
+Пересобрано грепом 14.09.2026 (IF-24, рабочее дерево) — 32 вызова `container.inject` в 20 файлах (33-е совпадение тогда — строка примера в шапке `Core/Container.swift`; пример теперь пункт `Container` в `Core/NOTES.md`, и греп по `*.swift` его не видит). До того — 18.08.2026: 25 в 17 файлах. Отстал не один `AppStoreFactory` (там было 6, а не 4, ещё до IF-24): `SunnahMiddleware` и `OpenExternalLinkThunk` появились в 1.5.2 и в список не попали, номера строк у пяти файлов уехали. Все новые — в разрешённых местах.
 
-- **Мидлвары** (`IFApp/Middleware/`, 12 вызовов в 9 файлах): `PersistenceMiddleware.swift:14,15`, `StreakMiddleware.swift:15`, `SunnahMiddleware.swift:14,15,16`, `NotificationMiddleware.swift:16`, `StoreMiddleware.swift:22`, `DiagnosticsMiddleware.swift:23`, `HistoryMiddleware.swift:27`, `ReviewMiddleware.swift:32`, `AnalyticsMiddleware.swift:43`
-- **Тханки** (10 вызовов в 8 файлах): `Features/timer/thunk/StartFastThunk.swift:18,19`, `Features/timer/thunk/ScheduleNotificationsThunk.swift:16`, `Features/ui/SyncPushStatusThunk.swift:20,21`, `Features/ui/OpenExternalLinkThunk.swift:8`, `Features/history/thunk/ExportHistoryThunk.swift:19`, `Features/pro/thunk/PurchaseProThunk.swift:15`, `Features/pro/thunk/RestorePurchasesThunk.swift:15`, `Features/pro/thunk/RefreshEntitlementThunk.swift:16`
-- **Бутстрап** (10 вызовов в 3 файлах): `Core/AppStoreFactory.swift:17,20,28,31,46,47,49`, `Core/UITestSeed.swift:177,232`, `Core/AppDependencies.swift:33`
+- **Мидлвары** (`IFApp/Middleware/`, 12 вызовов в 9 файлах): `PersistenceMiddleware.swift:12,13`, `StreakMiddleware.swift:12`, `SunnahMiddleware.swift:13,14,15`, `NotificationMiddleware.swift:12`, `StoreMiddleware.swift:13`, `DiagnosticsMiddleware.swift:14`, `HistoryMiddleware.swift:16`, `ReviewMiddleware.swift:16`, `AnalyticsMiddleware.swift:17`
+- **Тханки** (10 вызовов в 8 файлах): `Features/timer/thunk/StartFastThunk.swift:13,14`, `Features/timer/thunk/ScheduleNotificationsThunk.swift:11`, `Features/ui/SyncPushStatusThunk.swift:14,15`, `Features/ui/OpenExternalLinkThunk.swift:8`, `Features/history/thunk/ExportHistoryThunk.swift:12`, `Features/pro/thunk/PurchaseProThunk.swift:11`, `Features/pro/thunk/RestorePurchasesThunk.swift:11`, `Features/pro/thunk/RefreshEntitlementThunk.swift:11`
+- **Бутстрап** (10 вызовов в 3 файлах): `Core/AppStoreFactory.swift:11,14,17,20,27,28,30`, `Core/UITestSeed.swift:83,106`, `Core/AppDependencies.swift:26`
 
 **Список пересобран 07.08.2026 — устарел состав, не только номера.** Значилось 6 мидлвар и 2 тханка, фактически 8 и 7. Разошлось не сегодня: `StoreMiddleware` и четыре тханка (`StartFastThunk`, `ExportHistoryThunk`, `PurchaseProThunk`, `RestorePurchasesThunk`, `RefreshEntitlementThunk`) инжектят зависимости с дев-циклов 1.4.x-1.5.0, а `DiagnosticsMiddleware` добавлен сегодня. Все — в разрешённых местах, нарушений среди них нет; расходился учёт, а не код.
 
@@ -255,11 +258,11 @@ grep -rn "UserDefaults" IFApp/Flows IFApp/Features --include='*.swift'
 
 **Зачем.** Компонент, дотянувшийся до стора, нельзя отрендерить в SwiftUI-превью и нельзя поставить на второй экран — он тащит за собой всё состояние приложения. Его перерисовка перестаёт быть предсказуемой: она зависит уже не от входных пропсов, а от того, что там в сторе. И хендофф из Claude Design перестаёт ложиться 1:1 — dev вынужден затаскивать стор в вёрстку, чтобы собрать макет.
 
-**Следуют:** 7 объявлений — `IFAppApp.swift:22`, `Flows/app/AppFlowView.swift:20`, `Flows/timer/TimerFlowView.swift:161`, `Flows/history/HistoryFlowView.swift:44`, `Flows/pro/PaywallFlowView.swift:43`, `Flows/pro/AboutFlowView.swift:36`, `Flows/sunnah/SunnahFlowView.swift:6` (номера пересняты 11.09.2026, до того — 22.08.2026 и 07.08.2026; считается объявление поля, инициализаторы тех же типов идут следом и отдельными объявлениями не считаются). Было 4, затем 6; два флоу пейвола добавились в дев-цикле 1.5.0, `Flows/sunnah/SunnahFlowView.swift` — в 1.5.2, все три лежат в `Flows/` и правилу соответствуют — счёт вырос, нарушений не прибавилось. Счёт 6 держался в документе и после того, как флоу Sunnah появился: пункт не пересматривали, потому что дифф, который его завёл, не трогал стор явно. Все 23 компонента и шторки принимают значения + замыкания (`FooterCard`, `RingCenter`, `TimerHeader`, `PlanEditorSheet`, `LastMealPickerSheet`, `HistoryRow`, `StreakBadge`, …).
+**Следуют:** 7 объявлений — `IFAppApp.swift:20`, `Flows/app/AppFlowView.swift:18`, `Flows/timer/TimerFlowView.swift:116`, `Flows/history/HistoryFlowView.swift:31`, `Flows/pro/PaywallFlowView.swift:26`, `Flows/pro/AboutFlowView.swift:29`, `Flows/sunnah/SunnahFlowView.swift:6` (номера пересняты 11.09.2026, до того — 22.08.2026 и 07.08.2026; считается объявление поля, инициализаторы тех же типов идут следом и отдельными объявлениями не считаются). Было 4, затем 6; два флоу пейвола добавились в дев-цикле 1.5.0, `Flows/sunnah/SunnahFlowView.swift` — в 1.5.2, все три лежат в `Flows/` и правилу соответствуют — счёт вырос, нарушений не прибавилось. Счёт 6 держался в документе и после того, как флоу Sunnah появился: пункт не пересматривали, потому что дифф, который его завёл, не трогал стор явно. Все 23 компонента и шторки принимают значения + замыкания (`FooterCard`, `RingCenter`, `TimerHeader`, `PlanEditorSheet`, `LastMealPickerSheet`, `HistoryRow`, `StreakBadge`, …).
 
 **Нарушают:** 0.
 
-**Известная дыра — см. открытый вопрос F.** `Core/AppStoreFactory.swift:106` регистрирует `Store<AppState>` в контейнере, и никто его оттуда не инжектит. Это готовый механизм бесшумного обхода: `let store: Store<AppState> = container.inject()` внутри компонента скомпилируется и заработает, а грепы ниже его не поймают. Решение за владельцем.
+**Известная дыра — см. открытый вопрос F.** `Core/AppStoreFactory.swift:75` регистрирует `Store<AppState>` в контейнере, и никто его оттуда не инжектит. Это готовый механизм бесшумного обхода: `let store: Store<AppState> = container.inject()` внутри компонента скомпилируется и заработает, а грепы ниже его не поймают. Решение за владельцем.
 
 **Как проверить.** Расширено доаудитом 26.07.2026: `Store` — это `ObservableObject`, поэтому SwiftUI даёт к нему ещё два пути помимо явного объявления типа.
 
@@ -274,7 +277,7 @@ grep -rn "container.inject" IFApp --include='*.swift' | grep "Store<"
 
 ### 5. Числа и даты **на экране** форматируются одним определением — `Locale.latinDigits`
 
-Любой `DateFormatter`, чей результат виден на экране, берёт локаль из `Locale.latinDigits` (`Shared/Localization/Strings.swift:32-37`). Целое число, попадающее в `Text`, идёт через `Text(verbatim: String(n))`, а не через `Text("\(n)")`.
+Любой `DateFormatter`, чей результат виден на экране, берёт локаль из `Locale.latinDigits` (`Shared/Localization/Strings.swift:9-14`). Целое число, попадающее в `Text`, идёт через `Text(verbatim: String(n))`, а не через `Text("\(n)")`.
 
 **Область — отображаемый текст.** Правило про то, что видит глаз на одном экране. Оно **не** распространяется на:
 
@@ -283,21 +286,21 @@ grep -rn "container.inject" IFApp --include='*.swift' | grep "Store<"
 
 **Зачем.** Уже стрельнуло: на одном экране в арабском стояли рядом «٦» и «118». Причина структурная — `String(format:)` цифры не локализует никогда, а `Int`, интерполированный в `String(localized:)`, локализует всегда. Без единой точки пиннинга каждое новое место форматирования — это лотерея, и заметна она только на арабской локали, то есть в самом конце цикла или в сторе. Второе, что пиннит `latinDigits`, — григорианский календарь: без него `ar_SA` отрисует в истории даты хиджры, тогда как стрик, семидневные точки и все day-key считаются по григорианским дням, и список начнёт описывать другие дни, чем цифры над ним.
 
-**Следуют:** канон — `Shared/Localization/Strings.swift:32` (`Locale.latinDigits`) и `:52` (`Date.FormatStyle.latinDigits`, заведён 11.09.2026 — см. ниже). Потребители: `Features/history/HistoryFormat.swift:23` (→ 6 форматтеров), `Features/meal/MealMath.swift:74` и `:167` (`dayFormatter`), `Flows/timer/TimerFlowView.swift:1075` (`clockTime`), `Features/endfast/EndFastMath.swift:154` (`clock`) и `:163` (`weekday`) — оба заведены IF-5 18.08.2026 и локаль пиннят, пункт 5 соблюдён; то, что тело форматтера при этом четвёртое в дереве, — вопрос пункта 8 (нарушение 8.8), а не этого, Int-принимающие аксессоры в `Strings.swift` (`:266`, `:283`, `:359`, `:453`, `:465`, `:554`, `:571`, `:576`), и `Features/timer/components/StreakBadge.swift:94` + `Features/history/components/HistorySummaryCard.swift:78` (`Text(verbatim: String(...))`, причина расписана в комментариях на месте). Номера пересняты 22.08.2026: `TimerFlowView` 829 → 918, `EndFastMath` 137 → 156 и 147 → 165, `StreakBadge` 66 → 94, `HistorySummaryCard` 64 → 78 — сдвиг от дев-цикла 19-21.08, значения не менялись. Предыдущая пересъёмка 07.08.2026: `MealMath` 45 → 74 и `TimerFlowView` 782 → 829 (дифф IF-4, 18.08.2026).
+**Следуют:** канон — `Shared/Localization/Strings.swift:9` (`Locale.latinDigits`) и `:18` (`Date.FormatStyle.latinDigits`, заведён 11.09.2026 — см. ниже). Потребители: `Features/history/HistoryFormat.swift:9` (→ 6 форматтеров), `Features/meal/MealMath.swift:45` и `:103` (`dayFormatter`), `Flows/timer/TimerFlowView.swift:710` (`clockTime`), `Features/endfast/EndFastMath.swift:94` (`clock`) и `:102` (`weekday`) — оба заведены IF-5 18.08.2026 и локаль пиннят, пункт 5 соблюдён; то, что тело форматтера при этом четвёртое в дереве, — вопрос пункта 8 (нарушение 8.8), а не этого, Int-принимающие аксессоры в `Strings.swift` (`:148`, `:161`, `:230`, `:297`, `:306`, `:370`, `:393`, `:397`), и `Features/timer/components/StreakBadge.swift:48` + `Features/history/components/HistorySummaryCard.swift:42` (`Text(verbatim: String(...))`, причина — в `Features/timer/NOTES.md`, раздел `StreakBadge.swift`, и `Features/history/NOTES.md`, раздел `HistorySummaryCard.swift`). Номера пересняты 22.08.2026: `TimerFlowView` 829 → 918, `EndFastMath` 137 → 156 и 147 → 165, `StreakBadge` 66 → 94, `HistorySummaryCard` 64 → 78 — сдвиг от дев-цикла 19-21.08, значения не менялись. Предыдущая пересъёмка 07.08.2026: `MealMath` 45 → 74 и `TimerFlowView` 782 → 829 (дифф IF-4, 18.08.2026).
 
 **Номера пересняты в третий раз 11.09.2026, уже на `2bdcf62`** (первая пересъёмка этого дня стояла на `f753774` и устарела к вечеру того же дня): `TimerFlowView` 980 → 1000 (`clockTime`), `MealMath` 45 → 66 и `Strings.swift` 25-30 → 32-37 в формулировке правила, `entryA11y` 257-259 → 590-592. Значения не менялись.
 
 **Номера пересняты снова 11.09.2026 (ревью диффа Queue-14).** `Strings.swift` 25 → 32 и Int-аксессоры 156/192/204/275/280 → 266/283/359/453/465/554/571/576 — файл вырос на локализации `Sunnah` / `SourceReader`, аксессоров стало восемь; `TimerFlowView` 918 → 980 (сдвиг от этого диффа); `EndFastMath` 156 → 154 и 165 → 163. Значения не менялись.
 
-**`Date.FormatStyle.latinDigits` — второе тело канона, а не второе определение** (заведено 11.09.2026, дифф Queue-14). `Date.FormatStyle` берёт календарь **не** из локали: это отдельный аргумент инициализатора со своим дефолтом `.autoupdatingCurrent`, поэтому `Date.FormatStyle(locale: .latinDigits)` пиннил цифры и оставлял календарь устройства — на арабском это хиджра, и список ближайших постов Sunnah печатал «3 ربيع الآخر، 1448 هـ» для расписания, считаемого по григорианским суткам. Новый аксессор собирается **из** `Locale.latinDigits` и её же календаря (`Strings.swift:52-55`), то есть правило про одно определение не задето, а закрыт путь, на котором оно не работало. Гард — `IFAppTests/DateFormatStyleTests.swift` (4 теста, включая проверку самой ловушки). Единственное место `Date.FormatStyle` в дереве — `Features/sunnah/SunnahSettingsView.swift:72` (было `:43`; сдвиг от диффа SU-1 того же дня, значение не менялось).
+**`Date.FormatStyle.latinDigits` — второе тело канона, а не второе определение** (заведено 11.09.2026, дифф Queue-14). `Date.FormatStyle` берёт календарь **не** из локали: это отдельный аргумент инициализатора со своим дефолтом `.autoupdatingCurrent`, поэтому `Date.FormatStyle(locale: .latinDigits)` пиннил цифры и оставлял календарь устройства — на арабском это хиджра, и список ближайших постов Sunnah печатал «3 ربيع الآخر، 1448 هـ» для расписания, считаемого по григорианским суткам. Новый аксессор собирается **из** `Locale.latinDigits` и её же календаря (`Strings.swift:18-21`), то есть правило про одно определение не задето, а закрыт путь, на котором оно не работало. Гард — `IFAppTests/DateFormatStyleTests.swift` (4 теста, включая проверку самой ловушки). Единственное место `Date.FormatStyle` в дереве — `Features/sunnah/SunnahSettingsView.swift:108`.
 
 **Новые Int-аксессоры IF-4 идут вторым законным путём.** `Meal.agoMinutes` / `agoRelative` / `agoDays` / `scaleTickHours` / `scaleTickDays` в `Strings.swift` собраны через `String(format:)`, а не через интерполяцию в `String(localized:)`. `locale: .latinDigits` им поэтому не нужен и не передаётся: `String(format:)` цифры не локализует никогда — это тот самый путь, который в разделе «Зачем» назван безопасным. Записано, чтобы следующий прогон не завёл на них ложное нарушение по грепу «Int-аксессор без locale».
 
 **Три позиции пересняты 17.08.2026, при ревью диффа IF-10** (RTL/ar; дерево остановлено перед коммитом). `HistoryFormat` 22 → 23: шапка файла выросла на строку при выносе изолята в `BidiText`. `clockTime` 697 → 782: `TimerFlowView` рос дев-циклами 1.5.x, и позиция была устаревшей ещё до этого диффа — то есть промах не диффа, а того, что при снятии 17.08 по пункту 2 остальные пункты не пересматривались. Значения не менялись, только позиции.
 
-**Нарушают: 0.** Обе позиции закрыты и **закоммичены** — сверено на `HEAD` 05.08.2026: `Features/meal/MealMath.swift:66` (`timeLabel`, был `f.locale = .current`) и `Flows/timer/TimerFlowView.swift:1075` (`clockTime`, собирал latn-локаль инлайном; адреса обоих пересняты 11.09.2026) — обе теперь `f.locale = .latinDigits`.
+**Нарушают: 0.** Обе позиции закрыты и **закоммичены** — сверено на `HEAD` 05.08.2026: `Features/meal/MealMath.swift:39` (`timeLabel`, был `f.locale = .current`) и `Flows/timer/TimerFlowView.swift:710` (`clockTime`, собирал latn-локаль инлайном; адреса обоих пересняты 11.09.2026) — обе теперь `f.locale = .latinDigits`.
 
-**Решение 26.07.2026: `entryA11y` — не нарушение.** `Shared/Localization/Strings.swift:590-592` интерполирует `Int` в `String(localized:)` без `locale: .latinDigits`, тогда как все остальные Int-принимающие аксессоры файла локаль передают (список в «Следуют» выше; адреса пересняты 11.09.2026, было `:257-259` и `:155`, `:193`, `:197`, `:239`, `:244`). Доаудит вынес это в нарушения; владелец и `dev` независимо решили иначе, и по одной причине: `entryA11y` — VoiceOver-метка. Для арабского скринридера локальные цифры и есть правильное поведение, а исходное правило речь от изображения не отличало. Поэтому сужена **область правила** (см. выше), а не заведено исключение из списка: исключение следующий прогон нашёл бы снова и снова поднял бы тот же вопрос.
+**Решение 26.07.2026: `entryA11y` — не нарушение.** `Shared/Localization/Strings.swift:409-411` интерполирует `Int` в `String(localized:)` без `locale: .latinDigits`, тогда как все остальные Int-принимающие аксессоры файла локаль передают (список в «Следуют» выше; адреса пересняты 11.09.2026, было `:257-259` и `:155`, `:193`, `:197`, `:239`, `:244`). Доаудит вынес это в нарушения; владелец и `dev` независимо решили иначе, и по одной причине: `entryA11y` — VoiceOver-метка. Для арабского скринридера локальные цифры и есть правильное поведение, а исходное правило речь от изображения не отличало. Поэтому сужена **область правила** (см. выше), а не заведено исключение из списка: исключение следующий прогон нашёл бы снова и снова поднял бы тот же вопрос.
 
 Признак, по которому отличать: строка попадает в `accessibilityLabel` / `accessibilityValue` и никогда не рендерится как `Text` → правило не применяется.
 
@@ -322,13 +325,13 @@ grep -rn 'Text("' IFApp --include='*.swift' | grep '\\('
 
 **Зачем.** Продолжение инварианта 1 с другого конца. Как только вью считает время сам, момент фиксации привязывается к кадру перерисовки, а не к действию пользователя. `TimerFlowView` перерисовывается посекундно (`TimelineView`), при смене темы, при возврате из фона и при каждом обновлении пропсов — и на границе полуночи это значит, что «цель достигнута» может зачесться в другой день, чем тот, когда пользователь на неё смотрел. Диагностируется такое только по жалобе «стрик сбросился сам».
 
-**Следуют: 14 тханков** (список пересобран от вывода грепа целиком 11.09.2026) — `StartFastThunk:29`, `ResumeFastThunk:33`, `AdjustTimeThunk:23`, `ResetFastThunk:19`, `StartEatingThunk:14`, `ContinueFastingThunk:18`, `ConfirmLastMealThunk:17`, `PickMealChipThunk:18`, `SetExactMealTimeThunk:19`, `SeedLastMealFromWindowCloseThunk:21`, `OpenEndFastThunk:24`, `EndFastPickThunk:25`, `ConfirmEndFastThunk:25` и `ExportHistoryThunk:30` — последний читает часы не ради payload, а ради имени файла выгрузки, и стоит в списке потому, что грепом он неотличим от остальных.
+**Следуют: 14 тханков** (список пересобран от вывода грепа целиком 11.09.2026) — `StartFastThunk:24`, `ResumeFastThunk:19`, `AdjustTimeThunk:20`, `ResetFastThunk:14`, `StartEatingThunk:11`, `ContinueFastingThunk:14`, `ConfirmLastMealThunk:14`, `PickMealChipThunk:15`, `SetExactMealTimeThunk:15`, `SeedLastMealFromWindowCloseThunk:13`, `OpenEndFastThunk:15`, `EndFastPickThunk:14`, `ConfirmEndFastThunk:16` и `ExportHistoryThunk:23` — последний читает часы не ради payload, а ради имени файла выгрузки, и стоит в списке потому, что грепом он неотличим от остальных.
 
 **Счёт вырос с 8 не от нового правила, а потому что список отстал на два дев-цикла.** Прошлая версия была снята 18.08.2026 (IF-4) и с тех пор: `StopFastThunk` **удалён** в IF-5 (`a6c04e6`, 18.08.2026) — то есть строка списка три недели указывала на несуществующий файл, — а вместе с фичей end-fast пришли три тханка (`OpenEndFastThunk`, `EndFastPickThunk`, `ConfirmEndFastThunk`), которых в нём не было ни разу. Ту же дыру пункт 8 уже ловил у себя (8.2 ссылалась на исчезнувший `StopFastThunk`), и это тот же механизм: измерение переносится из версии в версию как факт, пока кто-нибудь не прогонит греп целиком.
 
 **Нарушают: 0.** Правило было принято с известным долгом в две позиции; обе закрыты и **закоммичены** — сверено на `HEAD` 05.08.2026. `Clock.dayKey()` под `goalCelebrated` ушёл в `Features/timer/thunk/CelebrateGoalThunk.swift`, `MealMath.dayAndMinute` под `MealAction.initialized` — в `Features/meal/thunk/SeedLastMealFromWindowCloseThunk.swift`. В `Flows/` часов, идущих в payload, не осталось.
 
-**Не нарушают: 8 позиций** — `TimerFlowView.swift:136` (`currentScreenState`), `:153` (`offerPhaseColor`), `:213` (фолбэк `screen(theme:now:)` вне `TimelineView`), `:321` (фон), `:333` (`nowMinute` для рендера), `:834` (`Clock.minuteOfDay()` под открытую шторку — на месте написано, почему: в экшен едет дистанция, а не момент), `:874` (`Clock.now()` в `EndFastSheet` как аргумент отображения) и `HistoryFlowView.swift:247` (`streak.display(at:)`). Все восемь — чтение часов для отображения, а не для payload.
+**Не нарушают: 8 позиций** — `TimerFlowView.swift:99` (`currentScreenState`), `:108` (`offerPhaseColor`), `:148` (фолбэк `screen(theme:now:)` вне `TimelineView`), `:210` (фон), `:222` (`nowMinute` для рендера), `:532` (`Clock.minuteOfDay()` под открытую шторку — почему, записано в `Flows/NOTES.md`, раздел `TimerFlowView.swift`, пункт `TimerFlowView.overlays(theme:)`: в экшен едет дистанция, а не момент), `:558` (`Clock.now()` в `EndFastSheet` как аргумент отображения) и `HistoryFlowView.swift:205` (`streak.display(at:)`). Все восемь — чтение часов для отображения, а не для payload.
 
 Адреса пересняты 11.09.2026 на `2bdcf62`; сам состав не менялся. Список пересобран 22.08.2026 по выводу грепа целиком: прошлая версия (`108`, `125`, `165`, `248`, `260`, `541` + `HistoryFlowView:223`) была снята 07.08.2026 и с тех пор устарела вся. Пересобирать надо от вывода грепа целиком, а не подправлять номера — предыдущая версия списка уже один раз оказалась не только сдвинутой, но и неполной.
 
@@ -344,13 +347,13 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 
 Два тханка, задиспатченных подряд, **не упорядочены**. Если эффект B зависит от завершения A, они обязаны быть одним тханком.
 
-**Зачем.** Уже стрельнуло гонкой планирования пуша. `ImprovedStoreV2.dispatch(_ thunk:)` (`Redux/Sources/Redux/ImprovedStoreV2.swift:72-91`) оборачивает выполнение в неструктурированный `Task {}` — между двумя тханками нет ни очереди, ни happens-before. Свойство неочевидно: сигнатура `dispatch` выглядит синхронной, и код читается как последовательность. Поэтому наступать на это будут снова, если не записать.
+**Зачем.** Уже стрельнуло гонкой планирования пуша. `ImprovedStoreV2.dispatch(_ thunk:)` (`Redux/Sources/Redux/ImprovedStoreV2.swift:68-86`) оборачивает выполнение в неструктурированный `Task {}` — между двумя тханками нет ни очереди, ни happens-before. Свойство неочевидно: сигнатура `dispatch` выглядит синхронной, и код читается как последовательность. Поэтому наступать на это будут снова, если не записать.
 
-**Место, где это уже проявилось:** `IFAppApp.swift:28-29` — `ScheduleNotificationsThunk()` и `SyncPushStatusThunk()` диспатчатся подряд; второй читает статус авторизации уведомлений, который первый запрашивает. Результат зависит от того, успел ли пользователь ответить на системный диалог.
+**Место, где это уже проявилось:** `IFAppApp.swift:27-28` — `ScheduleNotificationsThunk()` и `SyncPushStatusThunk()` диспатчатся подряд; второй читает статус авторизации уведомлений, который первый запрашивает. Результат зависит от того, успел ли пользователь ответить на системный диалог.
 
 **Следуют:** тханки, которым нужна последовательность, делают её внутри себя — `ConfirmLastMealThunk` (5 диспатчей по порядку внутри одного `execute`), `ContinueFastingThunk`, `ResetFastThunk`, `StartEatingThunk`.
 
-**Нарушают:** 1 — `IFAppApp.swift:28-29` (известный долг; починка требует продуктового решения о том, что делать с диалогом авторизации, поэтому пункт зафиксирован, а не отправлен в `dev` автоматически).
+**Нарушают:** 1 — `IFAppApp.swift:27-28` (известный долг; починка требует продуктового решения о том, что делать с диалогом авторизации, поэтому пункт зафиксирован, а не отправлен в `dev` автоматически).
 
 **Как проверить:** глазами при ревью. Признак — два и более `dispatch(SomeThunk())` подряд в одном блоке. Это не автоматически нарушение: независимые тханки диспатчить подряд можно. Вопрос, который надо задать: «читает ли второй то, что пишет первый».
 
@@ -378,23 +381,23 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 **Следуют** (одно определение, много вызовов):
 
 - `Features/phase/Phase.swift` — `PhaseProgress.compute` единственная считает фазу, долю и границу следующей фазы; вызывается из `TimerFlowView` (фон, экран), `FastRecord.reachedPhase`, `AnalyticsMiddleware`
-- `Features/history/HistoryStats.swift` — все агрегаты истории, с прямо записанной в шапке причиной (никаких инкрементальных счётчиков)
+- `Features/history/HistoryStats.swift` — все агрегаты истории, с записанной причиной (никаких инкрементальных счётчиков; `Features/history/NOTES.md`, раздел `HistoryStats.swift`)
 - `Features/meal/MealMath.swift` — `minutesAgo`, `clamped`, `fastStart` и подписи; вызывается из `TimerFlowView`, `ConfirmLastMealThunk`, `ContinueFastingThunk`, `SeedLastMealFromWindowCloseThunk`, `SetExactMealTimeThunk`. `fastStart(minutesAgo:now:)` и `clamped` заведены 18.08.2026 (IF-4): старт поста от залогированного приёма пищи был выписан формулой в обоих тханках, и копии уже разъехались — пол «не начинать пост в будущем» стоял только на одном пути. Домен теперь клампится в одном месте, и через него проходит каждый способ ввода (лента, чип, точное время, сид). **Единственная позиция пункта 8, у которой есть регрессионный гард:** `IFAppTests/MealPickerTests.swift` проверяет и саму формулу, и её пол, и то, что кламп стоит на входе в состояние. Гард держит определение, а не число вызовов — разъехаться сведённые места он не помешает, если кто-то выпишет формулу заново рядом; от этого по-прежнему защищает только ревью
-- `Features/history/FastRecord.swift` — `duration`, `goalFraction`, `isExtended` выведены на записи, с записанной причиной («кэшированное пришлось бы синхронизировать при удалении»)
-- `Features/endfast/EndFastMath.swift:69` — `resolve(_:now:selected:)`: что значит нажатый чип. Единственное раскрытие `EndFastChipOffset` в момент; зовут `EndFastMath.chips:56` (чтобы построить подпись) и `EndFastPickThunk:26` (чтобы записать значение), поэтому чип не может сказать одно, а выставить другое. **Заведено 18.08.2026 (IF-5), проверено по сути:** второго тела арифметики смещения в дереве нет, включая `EndFastReducer` и `EndFastSheet`
-- `Features/endfast/EndFastState.swift:47,64,68,71` — пороги шторки (`nearGoalThresholdMinutes`, `overtimeNeutralThreshold`, `minimumFastDuration`, `stepMinutes`) как именованные константы, а не литералы по месту вызова (номера пересняты 11.09.2026, до того — 22.08.2026). Общая константа — это половина дела: предикат о ней тоже имеет одно определение, и это отдельный пункт 12
-- `Features/meal/MealState.swift:68` — `set(minutesAgo:chip:via:)`: единственная точка изменения ответа «когда ел». Все четыре способа ввода (лента, чип, точное время, сид) идут через неё, поэтому кламп и учёт `inputMethod` не могут разъехаться между ними (IF-4)
-- `Core/Clock.swift:52` — `dayKey`, `:71` `daysBetween`, `:78` `isDayBefore`, `:84` `nextDay` — календарная арифметика **по day-key**. Календарь, которым она считает, с 11.09.2026 назван один раз — `Core/Clock.swift:35` (`Clock.gregorian`, вычисляемый, таймзона `.current`); его же зовут `HistoryStats.monthGroups` и `HistoryStats.lastSeven` (дифф SU-6: до него оба брали `Calendar.current`, и на арабском устройстве это `islamic-umm-al-qura` — сутки такое переживают, месяцы нет). Это не второе тело `Locale.latinDigits`: та пиннит календарь **показа**, `Clock.gregorian` — календарь **счёта**, и связывать арифметику с локалью отображения значило бы завести обратную зависимость. Оба конца закрыты тестами: показ — `IFAppTests/DateFormatStyleTests.swift`, счёт — `IFAppTests/HistoryStatsTests.swift`. Формулировка «единственная арифметика календарных дней» снята 18.08.2026: с IF-5 те же сутки считаются и от timestamp'ов (`EndFastMath.daysBefore`), см. нарушение 8.10
-- `Features/plan/PlanState.swift:9` — `plan` как канонический доступ к плану
-- `Features/timer/TimerState.swift:83` — `StreakStatus.displayed(at:)` (закоммичено, сверено 07.08.2026; номер переснят 18.08.2026)
-- `Features/timer/TimerState.swift:218` — `resolvedGoalHours(planHours:)`: что считается «целью текущего цикла»
-- `Features/timer/TimerState.swift:230` — `startTimestamp(at:)`: куда попадает старт поста, запускаемого при накопленном `stagedElapsed`. Зовут `StartFastThunk:29` и `ResumeFastThunk:33` (заведено 07.08.2026, см. ниже)
-- `Features/timer/TimerState.swift:248` — `eatingEndTimestamp(plan:)`: когда закроется пищевое окно. Зовут `NotificationMiddleware:56`, `ContinueFastingThunk:26`, `ConfirmLastMealThunk:32`, `SeedLastMealFromWindowCloseThunk:17`, `TimerFlowView:80`
-- `Features/timer/TimerState.swift:255` — `windowEndTimestamp(openedAt:plan:)`: арифметика «окно, открытое в момент X, закроется в Y». Тело `eatingEndTimestamp` зовёт её же; второй вызывающий — `droppingLapsedEnding` для окна, которое экран результата ещё не открыл (Queue-24, 14.09.2026)
-- `Features/timer/TimerState.swift:266` — `closedWindowHasLapsed(closedAt:now:)`: вышло ли закрытое окно за горизонт. Зовут `TimerFlowView:124` (`.eatingOver` → `.idle`) и `droppingLapsedEnding`. До Queue-24 горизонт был литералом `24 * 3600` по месту в `TimerFlowView`; порог и предикат о нём — пункт 12
-- `Features/timer/TimerState.swift:283` — `droppingLapsedEnding(at:plan:)`: сколько живёт восстановленный с диска экран результата. Зовёт один бутстрап, `Core/AppStoreFactory.swift:80-81`
-- `Features/timer/TimerState.swift:299` — `withoutCycle()`: что остаётся от состояния, когда цикла больше нет. Зовут `TimerReducer` (`.reset`, `:46`) и `droppingLapsedEnding`. Заведено по находке `architect` на ревью `94e3355`: обнуление было выписано дважды, и копии уже разошлись — бутстрап не чистил `eatingStartTimestamp`
-- `Features/plan/Plan.swift:46` — `windowHours`: **почему** окно такой длины (остаток суток). Отделено от арифметики «когда закроется» сознательно — правило и его применение живут врозь
+- `Features/history/FastRecord.swift` — `duration`, `goalFraction`, `isExtended` выведены на записи, с записанной причиной («кэшированное пришлось бы синхронизировать при удалении»; `Features/history/NOTES.md`, раздел `FastRecord.swift`)
+- `Features/endfast/EndFastMath.swift:37` — `resolve(_:now:selected:)`: что значит нажатый чип. Единственное раскрытие `EndFastChipOffset` в момент; зовут `EndFastMath.chips:27` (чтобы построить подпись) и `EndFastPickThunk:15` (чтобы записать значение), поэтому чип не может сказать одно, а выставить другое. **Заведено 18.08.2026 (IF-5), проверено по сути:** второго тела арифметики смещения в дереве нет, включая `EndFastReducer` и `EndFastSheet`
+- `Features/endfast/EndFastState.swift:22,24,26,28` — пороги шторки (`nearGoalThresholdMinutes`, `overtimeNeutralThreshold`, `minimumFastDuration`, `stepMinutes`) как именованные константы, а не литералы по месту вызова (номера пересняты 11.09.2026, до того — 22.08.2026). Общая константа — это половина дела: предикат о ней тоже имеет одно определение, и это отдельный пункт 12
+- `Features/meal/MealState.swift:23` — `set(minutesAgo:chip:via:)`: единственная точка изменения ответа «когда ел». Все четыре способа ввода (лента, чип, точное время, сид) идут через неё, поэтому кламп и учёт `inputMethod` не могут разъехаться между ними (IF-4)
+- `Core/Clock.swift:30` — `dayKey`, `:38` `daysBetween`, `:44` `isDayBefore`, `:48` `nextDay` — календарная арифметика **по day-key**. Календарь, которым она считает, с 11.09.2026 назван один раз — `Core/Clock.swift:16` (`Clock.gregorian`, вычисляемый, таймзона `.current`); его же зовут `HistoryStats.monthGroups` и `HistoryStats.lastSeven` (дифф SU-6: до него оба брали `Calendar.current`, и на арабском устройстве это `islamic-umm-al-qura` — сутки такое переживают, месяцы нет). Это не второе тело `Locale.latinDigits`: та пиннит календарь **показа**, `Clock.gregorian` — календарь **счёта**, и связывать арифметику с локалью отображения значило бы завести обратную зависимость. Оба конца закрыты тестами: показ — `IFAppTests/DateFormatStyleTests.swift`, счёт — `IFAppTests/HistoryStatsTests.swift`. Формулировка «единственная арифметика календарных дней» снята 18.08.2026: с IF-5 те же сутки считаются и от timestamp'ов (`EndFastMath.daysBefore`), см. нарушение 8.10
+- `Features/plan/PlanState.swift:7` — `plan` как канонический доступ к плану
+- `Features/timer/TimerState.swift:31` — `StreakStatus.displayed(at:)` (закоммичено, сверено 07.08.2026; номер переснят 18.08.2026)
+- `Features/timer/TimerState.swift:94` — `resolvedGoalHours(planHours:)`: что считается «целью текущего цикла»
+- `Features/timer/TimerState.swift:98` — `startTimestamp(at:)`: куда попадает старт поста, запускаемого при накопленном `stagedElapsed`. Зовут `StartFastThunk:24` и `ResumeFastThunk:19` (заведено 07.08.2026, см. ниже)
+- `Features/timer/TimerState.swift:102` — `eatingEndTimestamp(plan:)`: когда закроется пищевое окно. Зовут `NotificationMiddleware:45`, `ContinueFastingThunk:17`, `ConfirmLastMealThunk:22`, `SeedLastMealFromWindowCloseThunk:12`, `TimerFlowView:50`
+- `Features/timer/TimerState.swift:106` — `windowEndTimestamp(openedAt:plan:)`: арифметика «окно, открытое в момент X, закроется в Y». Тело `eatingEndTimestamp` зовёт её же; второй вызывающий — `droppingLapsedEnding` для окна, которое экран результата ещё не открыл (Queue-24, 14.09.2026)
+- `Features/timer/TimerState.swift:112` — `closedWindowHasLapsed(closedAt:now:)`: вышло ли закрытое окно за горизонт. Зовут `TimerFlowView:91` (`.eatingOver` → `.idle`) и `droppingLapsedEnding`. До Queue-24 горизонт был литералом `24 * 3600` по месту в `TimerFlowView`; порог и предикат о нём — пункт 12
+- `Features/timer/TimerState.swift:116` — `droppingLapsedEnding(at:plan:)`: сколько живёт восстановленный с диска экран результата. Зовёт один бутстрап, `Core/AppStoreFactory.swift:51-52`
+- `Features/timer/TimerState.swift:125` — `withoutCycle()`: что остаётся от состояния, когда цикла больше нет. Зовут `TimerReducer` (`.reset`, `:34`) и `droppingLapsedEnding`. Заведено по находке `architect` на ревью `94e3355`: обнуление было выписано дважды, и копии уже разошлись — бутстрап не чистил `eatingStartTimestamp`
+- `Features/plan/Plan.swift:21` — `windowHours`: **почему** окно такой длины (остаток суток). Отделено от арифметики «когда закроется» сознательно — правило и его применение живут врозь
 
 **Адреса пересняты 11.09.2026 на `2bdcf62`** (карточка Queue-14): `TimerFlowView` 96 → 105, 866 → 886, 891 → 911, 980-990 → 1000-1010, 995 → 1015, 70 → 80; `ConfirmEndFastThunk` 41 → 48; `EndFastState` 60 → 64, 64 → 68, 67 → 71 и doc-комментарий 50-59 → 49-63. Значения и состав таблицы не менялись.
 
@@ -402,27 +405,27 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 
 | # | Что задвоено | Где |
 |---|---|---|
-| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **3 определения** (было 4) | `Flows/timer/TimerFlowView.swift:108` · `Features/timer/thunk/AdjustTimeThunk.swift:24-26` · `Features/timer/thunk/ResetFastThunk.swift:20-22` |
-| 8.4 | Предикат «цель достигнута» `elapsed ≥ goalHours × 3600` — **3 определения** | `Features/phase/Phase.swift:88-93` (`PhaseProgress.isComplete`) · `Features/history/FastRecord.swift:27` (`goalReached`) · `Features/endfast/thunk/ConfirmEndFastThunk.swift:48` (`qualifies`) |
-| 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:67-70` · `Flows/timer/TimerFlowView.swift:1088` |
-| 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела, включая doc-комментарий** | `Features/timer/components/RingCenter.swift:116` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:986` (`overtimeShort`) |
-| 8.8 | Настенные часы «9:10 AM»: `DateFormatter` + `.latinDigits` + `.short` / `.none` — **4 тела** | `Features/history/HistoryFormat.swift:58-63` (`time`) · `Features/meal/MealMath.swift:66-77` (`timeLabel`) · `Features/endfast/EndFastMath.swift:154-160` (`clock`) · `Flows/timer/TimerFlowView.swift:1075-1085` (`clockTime`) |
-| 8.9 | Название дня по расстоянию: `0 → Today`, `1 → Yesterday`, `n → n days ago` — **2 тела на одних и тех же ключах** | `Features/meal/MealMath.swift:57-63` (`dateLabel`) · `Features/endfast/EndFastMath.swift:115-123` (`dayCaption`) |
-| 8.10 | Целые календарные сутки между двумя моментами (календарём, не делением на 86400) — **2 тела, с одинаковым DST-обоснованием в комментарии** | `Core/Clock.swift:71-75` (`daysBetween`, от day-key) · `Features/endfast/EndFastMath.swift:145-150` (`daysBefore`, от timestamp) |
-| 8.11 | Как пишется диапазон одного `FastRecord` — **2 тела, уже разъехавшиеся** | `Features/history/HistoryFormat.swift:80-86` (`rowSubline`: стрелка, зеркалится по `isRTL`) · `Features/endfast/EndFastMath.swift:186-190` (`recordSpan`: дефис, направление не учитывается) |
-| 8.12 | Предложение «таймер шёл дальше»: `strings.EndFast.timerRanPast(strings.Duration.hm(total / 3600, (total / 60) % 60))` — **2 идентичные целые строки** | `Flows/timer/TimerFlowView.swift:954` (`editorial`, `.goalReached` за порогом) · `Features/timer/sheets/EndFastSheet.swift:144` (`overtimeLine`, S3) |
+| 8.2 | Прошедшее время `isRunning ? now − fastStart : stagedElapsed` — **3 определения** (было 4) | `Flows/timer/TimerFlowView.swift:77` · `Features/timer/thunk/AdjustTimeThunk.swift:21-23` · `Features/timer/thunk/ResetFastThunk.swift:15-17` |
+| 8.4 | Предикат «цель достигнута» `elapsed ≥ goalHours × 3600` — **3 определения** | `Features/phase/Phase.swift:61-67` (`PhaseProgress.isComplete`) · `Features/history/FastRecord.swift:17` (`goalReached`) · `Features/endfast/thunk/ConfirmEndFastThunk.swift:29` (`qualifies`) |
+| 8.6 | Формат «13h 24m» — **2 идентичных тела** | `Features/history/HistoryFormat.swift:50-53` · `Flows/timer/TimerFlowView.swift:719` |
+| 8.7 | Формат овертайма «0:24 / 2:14» — **2 идентичных тела** | `Features/timer/components/RingCenter.swift:105` (`overtimeLabel`) · `Flows/timer/TimerFlowView.swift:643` (`overtimeShort`) |
+| 8.8 | Настенные часы «9:10 AM»: `DateFormatter` + `.latinDigits` + `.short` / `.none` — **4 тела** | `Features/history/HistoryFormat.swift:42-48` (`time`) · `Features/meal/MealMath.swift:39-49` (`timeLabel`) · `Features/endfast/EndFastMath.swift:94-100` (`clock`) · `Flows/timer/TimerFlowView.swift:710-717` (`clockTime`) |
+| 8.9 | Название дня по расстоянию: `0 → Today`, `1 → Yesterday`, `n → n days ago` — **2 тела на одних и тех же ключах** | `Features/meal/MealMath.swift:31-37` (`dateLabel`) · `Features/endfast/EndFastMath.swift:73-81` (`dayCaption`) |
+| 8.10 | Целые календарные сутки между двумя моментами (календарём, не делением на 86400) — **2 тела**; DST-обоснование записано только у `Clock.daysBetween` (`Core/NOTES.md`, раздел `Clock.swift`), у `daysBefore` его не было | `Core/Clock.swift:38-42` (`daysBetween`, от day-key) · `Features/endfast/EndFastMath.swift:87-92` (`daysBefore`, от timestamp) |
+| 8.11 | Как пишется диапазон одного `FastRecord` — **2 тела, уже разъехавшиеся** | `Features/history/HistoryFormat.swift:67-73` (`rowSubline`: стрелка, зеркалится по `isRTL`) · `Features/endfast/EndFastMath.swift:114-118` (`recordSpan`: дефис, направление не учитывается) |
+| 8.12 | Предложение «таймер шёл дальше»: `strings.EndFast.timerRanPast(strings.Duration.hm(total / 3600, (total / 60) % 60))` — **2 идентичные целые строки** | `Flows/timer/TimerFlowView.swift:622` (`editorial`, `.goalReached` за порогом) · `Features/timer/sheets/EndFastSheet.swift:120` (`overtimeLine`, S3) |
 
 **8.2 уменьшилось на одно определение.** `StopFastThunk` исчез в IF-5 (`a6c04e6`), его заменил `ConfirmEndFastThunk`, который прошедшее время **не** выводит: он берёт подтверждённый конец из шторки и считает `end − start` под гардом `timer.isRunning`. Это другое правило, а не четвёртая копия того же. Строка таблицы, ссылавшаяся на несуществующий файл, — то, ради чего этот заход и был назначен.
 
 **8.12 — тот самый случай, ради которого уточнялась граница, и он же вторая половина нарушения 12.1.** Экран и шторка отвечают на один вопрос — «как приложение говорит, что таймер шёл дальше цели, и каким числом», — и отвечают двумя байт-в-байт одинаковыми строками в двух файлах. Каждая половина строки определена один раз: ключ живёт в `Strings.swift`, разбор часов и минут — в `Duration.hm`. Задвоено то, как из них собирается ответ.
 
-Это не гипотетический риск: **эти две поверхности уже расходились**, и история записана в doc-комментарии у самой константы (`Features/endfast/EndFastState.swift:49-63`) — главный экран хвалил пост на 41-м часу, пока шторка под той же кнопкой предлагала его исправить. Тогда разошлись потому, что константу читало только одно место. Сегодня константу читают оба, но и предикат (12.1), и сборка предложения (8.12) написаны дважды, то есть починили пример, а не механизм. Обе позиции лежат в одной паре мест и чинятся одной правкой.
+Это не гипотетический риск: **эти две поверхности уже расходились**, а механизм расхождения описан у самой константы (`Features/endfast/NOTES.md`, пункт `EndFastState.overtimeNeutralThreshold`) — главный экран хвалил пост на 41-м часу, пока шторка под той же кнопкой предлагала его исправить. Тогда разошлись потому, что константу читало только одно место. Сегодня константу читают оба, но и предикат (12.1), и сборка предложения (8.12) написаны дважды, то есть починили пример, а не механизм. Обе позиции лежат в одной паре мест и чинятся одной правкой.
 
 **8.11 был наблюдением, стал нарушением.** В прошлом проходе он записан как «локале-зависимый разделитель диапазона, которого `loc` не видит». Сплошной проход показал, что дело хуже формулировки: `recordSpan` и `rowSubline` описывают **один и тот же объект** — сохранённый пост, — и уже расходятся. В `ar` строка истории переворачивает стрелку, а строка отказа в шторке склеивает концы дефисом в исходном порядке. Тест пункта 8 («может ли одно место остаться со старым правилом и продолжить компилироваться») даёт «да», причём оно уже осталось.
 
 **8.8 / 8.9 / 8.10 — не про инвариант 5.** Все четыре форматтера 8.8 берут `Locale.latinDigits`, то есть пункт 5 соблюдён; задвоено то, из чего форматтер собирается, а это область пункта 8. Разводить их важно, чтобы починка 8.8 не читалась как починка 5: свести четыре тела в одно можно, ничего не меняя в поведении.
 
-**`Duration.hm(total / 3600, (total / 60) % 60)` по месту — 5 сайтов, и в таблицу попал только один из них.** Позиции: `HistoryFormat:69`, `EndFastMath:174` (`previewValue`), `EndFastSheet:144`, `TimerFlowView:954`, `TimerFlowView:1090` (номера `TimerFlowView` пересняты 11.09.2026, дифф Queue-14). Сам разбор секунд остаётся дешёвой арифметикой на месте, а формат определён один раз — в `strings.Duration.hm`; по уточнённой границе это по-прежнему **не** нарушение, и четыре из пяти сайтов ни во что не внесены. Нарушением стала одна пара (8.12), и не потому, что в ней есть деление, а потому, что две её строки совпадают **целиком**, включая строковый ключ: задвоен ответ, а не вычисление. Формулировка «спорно, решает владелец», стоявшая здесь до 22.08.2026, снята — граница проведена, и проведена так, чтобы этот счёт можно было воспроизвести грепом.
+**`Duration.hm(total / 3600, (total / 60) % 60)` по месту — 5 сайтов, и в таблицу попал только один из них.** Позиции: `HistoryFormat:52`, `EndFastMath:111` (`previewValue`), `EndFastSheet:120`, `TimerFlowView:622`, `TimerFlowView:721` (номера `TimerFlowView` пересняты 11.09.2026, дифф Queue-14). Сам разбор секунд остаётся дешёвой арифметикой на месте, а формат определён один раз — в `strings.Duration.hm`; по уточнённой границе это по-прежнему **не** нарушение, и четыре из пяти сайтов ни во что не внесены. Нарушением стала одна пара (8.12), и не потому, что в ней есть деление, а потому, что две её строки совпадают **целиком**, включая строковый ключ: задвоен ответ, а не вычисление. Формулировка «спорно, решает владелец», стоявшая здесь до 22.08.2026, снята — граница проведена, и проведена так, чтобы этот счёт можно было воспроизвести грепом.
 
 **Номера 8.6 и 8.7 пересняты снова 18.08.2026, при ревью диффа IF-4:** `TimerFlowView` 794 → 836 (`hoursMinutes`) и 705 → 752 (`overtimeShort`) — сдвиг от этого диффа, `HistoryFormat` и `RingCenter` не двигались, оба задвоения на месте. Предыдущая пересъёмка:
 
@@ -430,9 +433,9 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 
 **Три позиции закрыты (учёт 07.08.2026).**
 
-- **8.1** (момент закрытия пищевого окна, было 5 определений) — сведено к `Features/plan/Plan.swift:46` (`windowHours` — почему окно такой длины) плюс `Features/timer/TimerState.swift:235` (`eatingEndTimestamp(plan:)` — когда оно закроется). Правило записано один раз, арифметика отделена от него. Греп `24 - .*fastHours` пуст.
+- **8.1** (момент закрытия пищевого окна, было 5 определений) — сведено к `Features/plan/Plan.swift:21` (`windowHours` — почему окно такой длины) плюс `Features/timer/TimerState.swift:102` (`eatingEndTimestamp(plan:)` — когда оно закроется). Правило записано один раз, арифметика отделена от него. Греп `24 - .*fastHours` пуст.
 - **8.5** (план по индексу с фолбэком, было 3 копии) — исчезло вместе с `Plan(rawValue:)`, когда `Plan` стал value type. Греп `Plan(rawValue:` пуст.
-- **8.3** (день зачисления достигнутой цели, было 2 расходящихся определения) — **оба места давно зовут `Clock.goalDayKey`**: `CelebrateGoalThunk.swift:22` и `FastRecord.swift:56`. Сегодняшний дев-цикл тут ни при чём — сверено по `git show HEAD`, в коммите уже так. Значит строка висела в таблице устаревшей как минимум с 06.08, и предыдущие два прогона `architect` её не перепроверили: измерение переносилось из версии в версию как факт. **Пересчитывать надо каждую строку таблицы, а не только те, которых касался дифф** — иначе документ накапливает вымышленные нарушения, а они дороже пропущенных: по ним заводят работу, которой нет.
+- **8.3** (день зачисления достигнутой цели, было 2 расходящихся определения) — **оба места давно зовут `Clock.goalDayKey`**: `CelebrateGoalThunk.swift:14` и `FastRecord.swift:40`. Сегодняшний дев-цикл тут ни при чём — сверено по `git show HEAD`, в коммите уже так. Значит строка висела в таблице устаревшей как минимум с 06.08, и предыдущие два прогона `architect` её не перепроверили: измерение переносилось из версии в версию как факт. **Пересчитывать надо каждую строку таблицы, а не только те, которых касался дифф** — иначе документ накапливает вымышленные нарушения, а они дороже пропущенных: по ним заводят работу, которой нет.
 
 **Поправка учёта 05.08.2026 (сохранена).** 8.2 значилось как 3 определения — фактически 4, четвёртое (`ResetFastThunk`) в первом замере не попало в выборку.
 
@@ -442,7 +445,7 @@ grep -n "Clock\.\|Date()" IFApp/Flows/*/*.swift
 
 Место выбрано верно, и это стоит зафиксировать, потому что напрашивался другой вариант. Правило не принадлежит ни старту, ни откату: `stagedElapsed` попадает в состояние двумя разными путями (забэкдейченный последний приём пищи до старта и отменённое завершение), и оба приводят к одной арифметике. Положить его в `StartFastThunk` и звать оттуда из `ResumeFastThunk` значило бы объявить один из двух путей главным — и следующий третий путь пришёл бы к тому, кто ближе, а не к тому, кто прав. На состоянии оно стоит рядом с `resolvedGoalHours(planHours:)` и `eatingEndTimestamp(plan:)`, у которых та же форма: правило о состоянии, `now` аргументом, инвариант 1 не задет.
 
-**Случай, породивший правило** — расхождение стрика между `TimerScreenProps.displayedStreak(at:)` и `HistoryFlowView.displayedStreak`. Починка `dev`: обе проекции сведены на `StreakStatus.displayed(at:)` (`Features/timer/TimerState.swift:22`). Закоммичено, сверено на `HEAD` 05.08.2026.
+**Случай, породивший правило** — расхождение стрика между `TimerScreenProps.displayedStreak(at:)` и `HistoryFlowView.displayedStreak`. Починка `dev`: обе проекции сведены на `StreakStatus.displayed(at:)` (`Features/timer/TimerState.swift:31`). Закоммичено, сверено на `HEAD` 05.08.2026.
 
 **Как проверить.** Граф точнее грепа: `codegraph impact` на предполагаемое каноническое определение показывает, кто им пользуется; места, которые считают то же самое и в списке не появляются, — кандидаты в нарушители. Дополнительно по формулам-константам домена:
 ```
@@ -459,7 +462,7 @@ grep -rn "startOfDay" IFApp --include='*.swift'                # 8.10: ожид�
 grep -rn "Duration.hm(" IFApp --include='*.swift'              # 8.12: одинаковые целые строки, не сам вызов
 ```
 
-**Слепое пятно грепа, за которое уже заплачено — `-i` в строке про `goalHours` стоит не для красоты** (найдено 22.08.2026). Паттерн без `-i` не видит `app.activeGoalHours * 3600`, потому что в имени поля буква заглавная: `activeGoalHours`. Два сайта — `Features/endfast/thunk/OpenEndFastThunk.swift:26` и `Features/endfast/thunk/ConfirmEndFastThunk.swift:48` — были невидимы для проверки пункта 8 всё время, что она существует, причём второй из них **стоит в таблице как нарушение 8.4**: строка в документе была, а проверка, которая должна была её найти, молчала. Это третий по счёту случай одного класса в этом файле (истории промаха пунктов 1 и 2): проза правила шире паттерна, и ноль по паттерну доказывает только то, что не встретилось перечисленных форм. Здесь он не дал даже этого — форма встретилась и не была перечислена.
+**Слепое пятно грепа, за которое уже заплачено — `-i` в строке про `goalHours` стоит не для красоты** (найдено 22.08.2026). Паттерн без `-i` не видит `app.activeGoalHours * 3600`, потому что в имени поля буква заглавная: `activeGoalHours`. Два сайта — `Features/endfast/thunk/OpenEndFastThunk.swift:17` и `Features/endfast/thunk/ConfirmEndFastThunk.swift:29` — были невидимы для проверки пункта 8 всё время, что она существует, причём второй из них **стоит в таблице как нарушение 8.4**: строка в документе была, а проверка, которая должна была её найти, молчала. Это третий по счёту случай одного класса в этом файле (истории промаха пунктов 1 и 2): проза правила шире паттерна, и ноль по паттерну доказывает только то, что не встретилось перечисленных форм. Здесь он не дал даже этого — форма встретилась и не была перечислена.
 
 ---
 
@@ -473,7 +476,7 @@ grep -rn "Duration.hm(" IFApp --include='*.swift'              # 8.12: один�
 
 **Под пункт не подпадает** (важно, иначе следующий прогон заведёт ложное нарушение):
 
-- **Сигнал о пользователе, а не об интерфейсе.** `IFAppApp.swift:84-103` (гейт PIPL) читает `SKPaymentQueue.storefront`, `Locale.current.region` и `Locale.preferredLanguages` — намеренно список предпочтений пользователя, а не то, что разрешил бандл. Подстановка локализации бандла сломала бы гейт: пользователь из материкового Китая с устройством на английском перестал бы голосовать. Это другой вопрос, у него другой правильный источник.
+- **Сигнал о пользователе, а не об интерфейсе.** `IFAppApp.swift:52-64` (гейт PIPL) читает `SKPaymentQueue.storefront`, `Locale.current.region` и `Locale.preferredLanguages` — намеренно список предпочтений пользователя, а не то, что разрешил бандл. Подстановка локализации бандла сломала бы гейт: пользователь из материкового Китая с устройством на английском перестал бы голосовать. Это другой вопрос, у него другой правильный источник.
 - **Пункт 5.** `Locale.latinDigits` пиннит цифры и календарь — другое свойство и другая причина. Пункты соседние, но не пересекаются.
 
 **Зачем.** Два вреда, и оба тихие.
@@ -482,27 +485,27 @@ grep -rn "Duration.hm(" IFApp --include='*.swift'              # 8.12: один�
 
 Второй: пока источник не назван, каждое новое место выбирает его заново, и выбор определяется соседним кодом. Так и вышло — механизмов сегодня **четыре**, и последний добавлен в дев-цикле 1.5.x. Два экрана отвечают на один вопрос из разных источников, а расхождение видно только тому, кто читает приложение на этом языке, то есть в самом конце цикла или в сторе. Это тот же вред, что у пункта 8, с той разницей, что пункт 8 требует одного определения и молчит о том, какой источник верен: свести четыре тела на `Locale.current` — значит соблюсти пункт 8 и оставить дефект. Поэтому пункт держит обе половины сразу — источник и единственность.
 
-**Следуют: 1.** `Shared/Localization/SiteLinks.swift:32` (`Bundle.main.preferredLocalizations.first`). Аргумент, почему именно этот источник, написан там же, в шапке `:16-20`, и прямо называет два других неверными для этой цели.
+**Следуют: 1.** `Shared/Localization/SiteLinks.swift:16` (`Bundle.main.preferredLocalizations.first`). Аргумент, почему именно этот источник, записан в `Shared/NOTES.md`, раздел `SiteLinks.swift` (пункт `SiteLinks.privacyPolicy`), и прямо называет два других неверными для этой цели.
 
 **Нарушают: 4.**
 
 | # | Где | Чем читает | Что решает |
 |---|---|---|---|
-| 9.1 | `DesignSystem/Typography.swift:34` | `Locale.current.language.languageCode` | гасить ли положительный трекинг в корейском |
-| 9.2 | `DesignSystem/Typography.swift:50` | `Locale.current.language.languageCode` | гасить ли отрицательный трекинг в корейском |
-| 9.3 | `Features/endfast/EndFastMath.swift:197` | `Locale.current.language.languageCode` | волнистое тире вместо дефиса в японском диапазоне |
-| 9.4 | `Features/history/components/HistorySummaryCard.swift:42` | `@Environment(\.locale).language.languageCode` | пробел между счётчиком и счётным словом в CJK |
+| 9.1 | `DesignSystem/Typography.swift:23` | `Locale.current.language.languageCode` | гасить ли положительный трекинг в корейском |
+| 9.2 | `DesignSystem/Typography.swift:36` | `Locale.current.language.languageCode` | гасить ли отрицательный трекинг в корейском |
+| 9.3 | `Features/endfast/EndFastMath.swift:121` | `Locale.current.language.languageCode` | волнистое тире вместо дефиса в японском диапазоне |
+| 9.4 | `Features/history/components/HistorySummaryCard.swift:20` | `@Environment(\.locale).language.languageCode` | пробел между счётчиком и счётным словом в CJK |
 
 **9.4 — четвёртый механизм, которого прошлый разбор не увидел.** Вопрос на доске говорил «три способа» и считал 1 против 4; фактически способов четыре, а класс — пять позиций. `@Environment(\.locale)` из них ближе всех к правильному: он переопределяется в превью и тестах, чего глобальный `Locale.current` не умеет. Нарушением он остаётся по второй половине пункта — это второе тело проверки на CJK, и оно может разъехаться с остальными. Где определение будет опираться на локаль окружения — свойство самого определения, а не повод оставить проверку на месте вызова.
 
-**Что чинить (работа `dev`, карта IF-26).** Завести единственное определение в `IFApp/Shared/Localization/` рядом с `SiteLinks` — что считается языком интерфейса, — и провести через него `Typography.swift:34`, `:50`, `EndFastMath.swift:197`, `HistorySummaryCard.swift:42`. Имя и форма — за `dev`. `IFAppApp.swift:84-103` не трогать.
+**Что чинить (работа `dev`, карта IF-26).** Завести единственное определение в `IFApp/Shared/Localization/` рядом с `SiteLinks` — что считается языком интерфейса, — и провести через него `Typography.swift:23`, `:36`, `EndFastMath.swift:121`, `HistorySummaryCard.swift:20`. Имя и форма — за `dev`. `IFAppApp.swift:52-64` не трогать.
 
 **Как проверить.**
 ```
 grep -rnE 'Locale\.current\.language|Locale\.preferredLanguages|preferredLocalizations|Environment\(\\\.locale\)' \
   IFApp --include='*.swift'
 ```
-Ожидаем ровно два адреса кода: единственное определение в `Shared/Localization/` и гейт PIPL в `IFAppApp.swift`. Строки-комментарии рядом с определением (сегодня `SiteLinks.swift:16-17`) греп тоже даёт — они не считаются. Всё остальное — нарушение.
+Ожидаем ровно два адреса кода: единственное определение в `Shared/Localization/` и гейт PIPL в `IFAppApp.swift`. Обоснование источника живёт в `Shared/NOTES.md` (раздел `SiteLinks.swift`), и греп по `*.swift` его не видит. Всё остальное — нарушение.
 
 ---
 
@@ -530,17 +533,17 @@ grep -rnE 'Locale\.current\.language|Locale\.preferredLanguages|preferredLocaliz
 
 | # | Где | Что |
 |---|---|---|
-| 10.1 | `IFApp/Debug/DebugScreen.swift:33` | `Section("Environment")` |
-| 10.2 | `IFApp/Debug/DebugScreen.swift:46` | `Button("Copy report")` |
-| 10.3 | `IFApp/Debug/DebugScreen.swift:47` | `Toggle("Floating button")` |
-| 10.4 | `IFApp/Debug/DebugScreen.swift:53` | `Text("Off leaves the shake …")` |
-| 10.5 | `IFApp/Debug/DebugScreen.swift:55` | `Section("Journal — last \(Self.tailLines) lines")` |
-| 10.6 | `IFApp/Debug/DebugScreen.swift:61` | `navigationTitle("Diagnostics")` |
-| 10.7 | `IFApp/Debug/DebugScreen.swift:65` | `Button("Close")` |
-| 10.8 | `Features/timer/sheets/LastMealPickerSheet.swift:273` | `DatePicker("", …)` — пустой ключ (номер переснят 11.09.2026, было 246) |
-| 10.9 | `Features/timer/sheets/PlanEditorSheet.swift:231` | `Picker("", …)` — пустой ключ (номер переснят 11.09.2026, было 229) |
+| 10.1 | `IFApp/Debug/DebugScreen.swift:22` | `Section("Environment")` |
+| 10.2 | `IFApp/Debug/DebugScreen.swift:35` | `Button("Copy report")` |
+| 10.3 | `IFApp/Debug/DebugScreen.swift:36` | `Toggle("Floating button")` |
+| 10.4 | `IFApp/Debug/DebugScreen.swift:42` | `Text("Off leaves the shake …")` |
+| 10.5 | `IFApp/Debug/DebugScreen.swift:44` | `Section("Journal — last \(Self.tailLines) lines")` |
+| 10.6 | `IFApp/Debug/DebugScreen.swift:50` | `navigationTitle("Diagnostics")` |
+| 10.7 | `IFApp/Debug/DebugScreen.swift:54` | `Button("Close")` |
+| 10.8 | `Features/timer/sheets/LastMealPickerSheet.swift:212` | `DatePicker("", …)` — пустой ключ (номер переснят 11.09.2026, было 246) |
+| 10.9 | `Features/timer/sheets/PlanEditorSheet.swift:174` | `Picker("", …)` — пустой ключ (номер переснят 11.09.2026, было 229) |
 
-Шапка `DebugScreen.swift:9-10` уже заявляет «not localised on purpose» — намерение верное, механизма под ним нет. Пункт даёт механизм.
+`Debug/NOTES.md`, раздел `DebugScreen.swift`, уже заявляет «not localised on purpose» — намерение верное, механизма под ним нет. Пункт даёт механизм.
 
 **Что чинить (работа `dev`).** 10.1-10.7 — обернуть текст дебаг-экрана так, чтобы экстрактор его не видел (`Text(verbatim:)` и метки-`Text(verbatim:)` в `Section` / `Button` / `Toggle` / `navigationTitle`). 10.8 и 10.9 — перейти на инициализатор с меткой и отдать ему `Text(verbatim: "")` либо `EmptyView()`; поведение не меняется, метка и так скрыта. Изменений в каталоге не требуется: на `HEAD` он уже чист.
 
@@ -565,10 +568,10 @@ grep -rnE 'Locale\.current\.language|Locale\.preferredLanguages|preferredLocaliz
 |---|---|---|
 | 10.10 | `Eating window` | Мёртвый: `String(localized: "Eating window")` в дереве нет. Переведён на 9 локалей |
 | 10.11 | `Tap to change` | Мёртвый: чтения нет. Переведён на 9 локалей |
-| 10.12 | `Inactive` / `ja` | Читается (`Strings.swift:740`, `statusInactive`; номер переснят 11.09.2026), но японское значение — пустая строка при `state: translated`. Открыто и на 11.09.2026 — работа `loc` |
+| 10.12 | `Inactive` / `ja` | Читается (`Strings.swift:503`, `statusInactive`; номер переснят 14.11.2026), но японское значение — пустая строка при `state: translated`. Открыто и на 11.09.2026 — работа `loc` |
 | 10.13 | `Last 7 days` | Мёртвый: чтения нет с `48c85f0` (Queue-14, «Explain weekly goal dots»), который убрал место отрисовки и оставил ключ. Переведён на 9 локалей. Внесено 14.09.2026 — нашёл разбор второй половины при ревью диффа Queue-24, сам дифф ключ не трогал |
 
-**Происхождение двух мёртвых ключей названо в самом коде, и это стоит прочесть**: шапка `Features/timer/sheets/PlanEditorSheet.swift:7-13` описывает, что в 1.5.0 переписан белый ряд, который печатал «Eating window · 12:00 - 8:00 PM», и текст «Tap to change» под ним. Экран переписали, ключи остались. То есть механизм, который правило описывает, уже сработал один раз в полном объёме — от удаления места отрисовки до перевода мёртвого текста на девять языков, — и не был замечен ничем.
+**Происхождение двух мёртвых ключей, и это стоит прочесть.** В 1.5.0 карточку `Features/timer/sheets/PlanEditorSheet.swift` переписали: убрали белый ряд, который печатал «Eating window · 12:00 - 8:00 PM», и текст «Tap to change» под ним. Экран переписали, ключи остались. В коде эта история не записана — `Features/timer/NOTES.md`, раздел `PlanEditorSheet.swift`, объясняет только, почему ряда нет (без истории правки, раздел «Комментарии в коде и `NOTES.md`»); источник — этот абзац и `git log` файла. То есть механизм, который правило описывает, уже сработал один раз в полном объёме — от удаления места отрисовки до перевода мёртвого текста на девять языков, — и не был замечен ничем.
 
 **Что чинить (работа `dev` и `loc`).** 10.10, 10.11 и 10.13 — удалить ключи из каталога целиком; чтений нет, поведение не меняется. 10.12 — это работа `loc`, а не `dev`: строку надо перевести, а не удалить, потому что читающий её экран существует.
 
@@ -669,7 +672,7 @@ EOF
 
 Разница видна на том, что находится грепом. Изменение **порога** находится по имени константы за секунду. Изменение **правила о пороге** — стало `>` вместо `>=`, порог начал зависеть от плана, появилась гистерезисная зона, сравнивать стали не от той величины — не находится ничем: каждое тело по отдельности компилируется, по отдельности корректно, и разъезжаются они молча. Ровно этот класс дал `fail` на ревью 21.08.2026: `dev` выписал «цель достигнута» формулой, и это была бы **четвёртая** копия предиката, у которого уже три тела (нарушение 8.4).
 
-**Образец, как выглядит соблюдение, в дереве есть — с него и начинать.** `Features/endfast/EndFastMath.swift:140`:
+**Образец, как выглядит соблюдение, в дереве есть — с него и начинать.** `Features/endfast/EndFastMath.swift:83`:
 
 ```swift
 static func isNearGoal(secondsLeft: Double) -> Bool {
@@ -677,26 +680,26 @@ static func isNearGoal(secondsLeft: Double) -> Bool {
 }
 ```
 
-Порог рядом, предикат назван, вызывающий (`OpenEndFastThunk:40`) не знает ни про округление вверх, ни про то, что отрицательный остаток — не «близко к цели».
+Порог рядом, предикат назван, вызывающий (`OpenEndFastThunk:24`) не знает ни про округление вверх, ни про то, что отрицательный остаток — не «близко к цели».
 
 **Следуют: 6** (все именованные пороги дерева, кроме одного — замер 22.08.2026, шестой добавлен 14.09.2026; адреса пересняты 11.09.2026 на `2bdcf62`: `TimerFlowView` 612 → 632, `EndFastState` 60 → 64, `TimerFlowView` 862 → 882 в таблице ниже):
 
-- `Features/endfast/EndFastMath.swift:140` — `isNearGoal(secondsLeft:)` для `nearGoalThresholdMinutes`; единственное тело, зовёт `OpenEndFastThunk:40`
-- `Flows/timer/TimerFlowView.swift:667` — `consequenceLine` спрашивает `PhaseProgress.compute(...).isComplete` вместо того, чтобы выписать порог цели. Это и есть починка после `fail` 21.08.2026, и она стоит здесь как образец, а не как история
-- `Features/meal/thunk/PickMealChipThunk.swift:39` — `MealChip.lastNightFloor` читается в сравнении ровно один раз
-- `Middleware/HistoryMiddleware.swift:65` — `minimumDuration`, одно сравнение; второе упоминание (`ResumeFastThunk:49`) — комментарий, не код
-- `Features/pro/Pro.swift:68` — `minimumGoalFraction`, одно сравнение, и оно стоит внутри того же типа, где объявлена константа
-- `Features/timer/TimerState.swift:262` — `closedWindowHorizon`, одно сравнение внутри `closedWindowHasLapsed(closedAt:now:)` (`:266`). Зовут `TimerFlowView:124` и `droppingLapsedEnding`. Заведено Queue-24 (14.09.2026): до того горизонт был литералом в `TimerFlowView`, а экран результата получил тот же горизонт вторым вызовом, а не вторым сравнением
+- `Features/endfast/EndFastMath.swift:83` — `isNearGoal(secondsLeft:)` для `nearGoalThresholdMinutes`; единственное тело, зовёт `OpenEndFastThunk:24`
+- `Flows/timer/TimerFlowView.swift:430` — `consequenceLine` спрашивает `PhaseProgress.compute(...).isComplete` вместо того, чтобы выписать порог цели. Это и есть починка после `fail` 21.08.2026, и она стоит здесь как образец, а не как история
+- `Features/meal/thunk/PickMealChipThunk.swift:30` — `MealChip.lastNightFloor` читается в сравнении ровно один раз
+- `Middleware/HistoryMiddleware.swift:50` — `minimumDuration`, одно сравнение; второе упоминание — пункт `ResumeFastThunk.justRecorded(_:)` в `Features/timer/NOTES.md`, не код
+- `Features/pro/Pro.swift:26` — `minimumGoalFraction`, одно сравнение, и оно стоит внутри того же типа, где объявлена константа
+- `Features/timer/TimerState.swift:110` — `closedWindowHorizon`, одно сравнение внутри `closedWindowHasLapsed(closedAt:now:)` (`:112`). Зовут `TimerFlowView:91` и `droppingLapsedEnding`. Заведено Queue-24 (14.09.2026): до того горизонт был литералом в `TimerFlowView`, а экран результата получил тот же горизонт вторым вызовом, а не вторым сравнением
 
 **Нарушают: 1.**
 
 | # | Порог | Тела предиката |
 |---|---|---|
-| 12.1 | `EndFastState.overtimeNeutralThreshold` (`Features/endfast/EndFastState.swift:64`) | `Features/endfast/thunk/OpenEndFastThunk.swift:44` (`-secondsLeft >= …`) · `Flows/timer/TimerFlowView.swift:950` (`over >= …`) |
+| 12.1 | `EndFastState.overtimeNeutralThreshold` (`Features/endfast/EndFastState.swift:24`) | `Features/endfast/thunk/OpenEndFastThunk.swift:28` (`-secondsLeft >= …`) · `Flows/timer/TimerFlowView.swift:618` (`over >= …`) |
 
 Оба места отвечают на один вопрос — «пост зашёл в овертайм так далеко, что подбадривать больше нельзя» — и записывают его двумя разными выражениями от двух разных величин (`-secondsLeft` и `over`), что само по себе уже требует держать в голове, почему это одно и то же.
 
-**Эти две поверхности уже расходились, и об этом написано у самой константы.** Doc-комментарий `EndFastState.swift:49-63` рассказывает, как главный экран продолжал говорить «каждая минута теперь — более глубокая аутофагия» на 41-м часу, пока шторка под той же кнопкой предлагала пост исправить. Причина тогда была в том, что константу читало только одно место из двух. Починили чтением константы обоими — то есть починили **пример**, а механизм оставили: предикат по-прежнему написан дважды, и следующее расхождение придёт не в числе, а в знаке или в величине, от которой считают.
+**Эти две поверхности уже расходились** (механизм — `Features/endfast/NOTES.md`, пункт `EndFastState.overtimeNeutralThreshold`): главный экран продолжал говорить «каждая минута теперь — более глубокая аутофагия» на 41-м часу, пока шторка под той же кнопкой предлагала пост исправить. Причина тогда была в том, что константу читало только одно место из двух. Починили чтением константы обоими — то есть починили **пример**, а механизм оставили: предикат по-прежнему написан дважды, и следующее расхождение придёт не в числе, а в знаке или в величине, от которой считают.
 
 Вторая половина той же пары — нарушение 8.12: предложение, которое печатается, когда предикат истинен, собрано двумя одинаковыми строками. Обе позиции чинятся одной правкой: именованный предикат рядом с константой по образцу `isNearGoal`, и одно определение фразы за ним.
 
@@ -707,7 +710,7 @@ grep -rn "overtimeNeutralThreshold\|nearGoalThresholdMinutes\|minimumFastDuratio
 ```
 Список констант пересобирается от объявлений, а не дописывается: `grep -rn "static let .*Threshold\|static let .*Floor\|static let .*Horizon\|static let minimum\|static let maximum" IFApp --include='*.swift'`.
 
-Критерий: **два и более чтения в операторе сравнения** (`>=`, `>`, `<=`, `<`) — нарушение; одно чтение в сравнении плюс сколько угодно вызовов предиката — соблюдение. Чтение константы **не** в сравнении под пункт не подпадает — это использование значения, а не решение о пороге: `OpenEndFastThunk:59` (`earliest: fastStartTimestamp + minimumFastDuration`) и `ConfirmEndFastThunk:30` (граница в `min`/`max`) законны оба.
+Критерий: **два и более чтения в операторе сравнения** (`>=`, `>`, `<=`, `<`) — нарушение; одно чтение в сравнении плюс сколько угодно вызовов предиката — соблюдение. Чтение константы **не** в сравнении под пункт не подпадает — это использование значения, а не решение о пороге: `OpenEndFastThunk:40` (`earliest: fastStartTimestamp + minimumFastDuration`) и `ConfirmEndFastThunk:18` (граница в `min`/`max`) законны оба.
 
 ---
 
@@ -727,17 +730,17 @@ View, в которой положение элементов определяе
 
 | Где | Пин | Что задано углом |
 |---|---|---|
-| `Features/timer/components/PhaseRing.swift:60` | `:60` | `trim` + `rotationEffect(-90°)` + головная точка через `sin`/`cos` (`:95-96`) |
-| `Features/timer/components/GoalCelebration.swift:35` | `:35` | праздничный оборот, `rotationEffect(-90 + sweepAngle)` (`:64`) |
-| `Features/timer/components/StreakBadge.swift:87` | `:87` | дуга серии; пин стоит на кольце, **не** на строке — счётчик рядом читается по направлению языка |
-| `Features/history/components/PhaseRingMini.swift:55` | `:55` | мини-кольцо строки истории |
-| `Features/pro/PaywallView.swift:561` | `:561` | спиннер покупки, `rotationEffect(.degrees(angle))` |
+| `Features/timer/components/PhaseRing.swift:50` | `:50` | `trim` + `rotationEffect(-90°)` + головная точка через `sin`/`cos` (`:83-84`) |
+| `Features/timer/components/GoalCelebration.swift:26` | `:26` | праздничный оборот, `rotationEffect(-90 + sweepAngle)` (`:53`) |
+| `Features/timer/components/StreakBadge.swift:46` | `:46` | дуга серии; пин стоит на кольце, **не** на строке — счётчик рядом читается по направлению языка |
+| `Features/history/components/PhaseRingMini.swift:41` | `:41` | мини-кольцо строки истории |
+| `Features/pro/PaywallView.swift:454` | `:454` | спиннер покупки, `rotationEffect(.degrees(angle))` |
 
 `StreakBadge` стоит в этом списке как образец **области** пина: он поставлен на 22pt-кольцо, а не на ряд вокруг него. Пин, поднятый на экран, сломал бы направление чтения всему, что на нём есть.
 
 **Нарушают: 0.** Пункт заводится на нуле — как и пункт 11, он не про починку сегодняшнего дерева, а про то, чтобы **шестое** кольцо не приехало с тем же дефектом. Четыре из пяти позиций получили свой пин 21.08.2026, то есть до этой даты правило нарушали четыре места из пяти, и ни одно из них не было замечено ничем, кроме специального прохода `ux` по арабской локали.
 
-**Три из пяти позиций несут причину в комментарии на месте** (`PhaseRing:53-59`, `PhaseRingMini:52-54`, `GoalCelebration:32-34`), и это не украшение: `PhaseRingMini` прямо пишет, что до починки «никогда не зеркалится в RTL» было **заявлено в шапке файла и не обеспечено ничем**. Заявление в шапке — не механизм; пункт даёт механизм.
+**Три из пяти позиций несут записанную причину** (`Features/timer/NOTES.md`, разделы `PhaseRing.swift` и `GoalCelebration.swift`; `Features/history/NOTES.md`, раздел `PhaseRingMini.swift`), и это не украшение: у `PhaseRingMini` до починки «никогда не зеркалится в RTL» было **заявлено в шапке файла и не обеспечено ничем** — пункт `PhaseRingMini.body` теперь называет механизмом сам пин. Заявление в шапке — не механизм; пункт даёт механизм.
 
 **Как проверить.**
 ```
@@ -766,20 +769,20 @@ grep -rnE "cos\(|sin\(" IFApp --include='*.swift'
 
 **Следуют: 2.**
 
-- `Features/endfast/EndFastState.swift` — образцовая форма. Подсостояние шторки **и есть** `pending`: `endTimestamp` живёт в нём, `.opened` его заводит, чипы и степпер правят его, `.closed` чистит целиком (`EndFastReducer.swift:44-45`, `newState = EndFastState()`). Подтверждённое значение лежит в `TimerState` и не трогается ничем, кроме `ConfirmEndFastThunk`
-- `Features/timer/sheets/PlanEditorSheet.swift:46` — `@State private var draftHours: Int?`, и `shown` (`:64`) читает `draftHours ?? plan`. Черновик локальный, в стор он попадает только через `confirmPlan` (`Flows/timer/TimerFlowView.swift:793`). Форма та же, слой другой — и это ровно то, о чём молчит абзац выше
+- `Features/endfast/EndFastState.swift` — образцовая форма. Подсостояние шторки **и есть** `pending`: `endTimestamp` живёт в нём, `.opened` его заводит, чипы и степпер правят его, `.closed` чистит целиком (`EndFastReducer.swift:41-42`, `newState = EndFastState()`). Подтверждённое значение лежит в `TimerState` и не трогается ничем, кроме `ConfirmEndFastThunk`
+- `Features/timer/sheets/PlanEditorSheet.swift:19` — `@State private var draftHours: Int?`, и `shown` (`:34`) читает `draftHours ?? plan`. Черновик локальный, в стор он попадает только через `confirmPlan` (`Flows/timer/TimerFlowView.swift:491`). Форма та же, слой другой — и это ровно то, о чём молчит абзац выше
 
 **Нарушают: 1.**
 
 | # | Где | Что не так |
 |---|---|---|
-| 14.1 | `Features/meal/MealState.swift:53,79-97` | Подтверждённый ответ правится сразу, а на выходе восстанавливается из `restorePoint`, снятого при открытии (`markPickerOpened` → `revertToRestorePoint`) |
+| 14.1 | `Features/meal/MealState.swift:13,29-43` | Подтверждённый ответ правится сразу, а на выходе восстанавливается из `restorePoint`, снятого при открытии (`markPickerOpened` → `revertToRestorePoint`) |
 
 **14.1 — известный долг, и он сознательно не отправлен в починку сейчас. Решение `architect`, владелец делегировал его прямо** («сказати, чи чіпаємо наявну реалізацію зараз, чи лишаємо її як таку, що правилу відповідає по суті»).
 
-**По результату реализация правилу соответствует:** выход мимо Confirm возвращает ровно то, что было при открытии, `revertToRestorePoint` тратит точку возврата, а `pickerDismissed` с пустой точкой — no-op, то есть устаревший ответ воскресить нельзя. Это разобрано и записано в самом файле (`MealState.swift:41-52`), проверено ревью и смоуком, и закрыто регрессионным тестом `IFAppTests/MealPickerTests.swift`.
+**По результату реализация правилу соответствует:** выход мимо Confirm возвращает ровно то, что было при открытии, `revertToRestorePoint` тратит точку возврата, а `pickerDismissed` с пустой точкой — no-op, то есть устаревший ответ воскресить нельзя. Это разобрано и записано в `Features/meal/NOTES.md` (раздел `MealState.swift`, пункт `MealState.restorePoint`), проверено ревью и смоуком, и закрыто регрессионным тестом `IFAppTests/MealPickerTests.swift`.
 
-**Не соответствует форма, и цена перевода названа честно.** Текущая раскладка выбрана не по небрежности: комментарий `MealState.swift:43-47` объясняет, что лента, показание и **пилюля за скримом** читают одно значение, и именно это позволяет пилюле оставаться правдивой, пока шторка поднята. Под пунктом 14 это выражается тем, что поверхности читают `pending ?? confirmed` — то же поведение, чистая форма, — но это правка экрана, который владелец на этой неделе принимал по видео (карточка 37) и который только что прошёл blocker-цикл.
+**Не соответствует форма, и цена перевода названа честно.** Текущая раскладка выбрана не по небрежности: пункт `MealState.restorePoint` в `Features/meal/NOTES.md` объясняет, что лента, показание и **пилюля за скримом** читают одно значение, и именно это позволяет пилюле оставаться правдивой, пока шторка поднята. Под пунктом 14 это выражается тем, что поверхности читают `pending ?? confirmed` — то же поведение, чистая форма, — но это правка экрана, который владелец на этой неделе принимал по видео (карточка 37) и который только что прошёл blocker-цикл.
 
 **Вывод: долг, а не работа.** До сабмита 27.08 пять дней; поведение починено, отревьюено и проверено смоуком; выигрыш от перевода — не исправление дефекта, а закрытие класса. Класс закрыт записью пункта: следующая шторка получит форму из правила, а не из ближайшего примера, и это была главная причина заводить пункт вообще. Перевод `MealState` — работа для окна после 1.5.1, и до тех пор **строка 14.1 остаётся в таблице**, чтобы её не пришлось переоткрывать.
 
@@ -794,6 +797,36 @@ grep -rn "restorePoint\|snapshot\|revert\|rollback" IFApp --include='*.swift'
 **Про перезапуск здесь ничего не сказано намеренно:** `MealState` не персистится (в `PersistenceMiddleware` его нет), так что «убить приложение с открытой шторкой» сегодня не различает эти две формы. Пункт про форму, а не про восстановление после смерти процесса.
 
 ---
+
+## Комментарии в коде и `NOTES.md` (правило, решение владельца 14.11.2026, IF-86)
+
+Код читает владелец, поэтому в Swift-файлах комментариев нет. Контекст между агентами — «почему так» — живёт рядом с кодом, в `NOTES.md` папки.
+
+**В коде остаётся только:**
+- файловая шапка ровно из четырёх строк (`//`, `//  Имя.swift`, `//  <таргет>` — `IFApp`, `Redux`, `IFAppTests`, `IFAppUITests`, `//`) — без описания файла, `Created by`, `Copyright`;
+- `// MARK: -`;
+- директивы тулов (`swiftlint:`, `swiftformat:`, `periphery:`);
+- `// TODO: IF-N` с ключом карточки.
+
+Всё остальное — `//`, `///`, блочные комментарии, закомментированный код — в Swift не пишется. Подсказки переводчику — аргумент `comment:` в `String(localized:…)` (`Shared/Localization/Strings.swift`) и поле `comment` в `Localizable.xcstrings` — это код и данные, а не комментарии, и правилом не затрагиваются.
+
+**Где `NOTES.md`:** одна на папку фичи или слоя — `IFApp/Features/<фича>/`, `IFApp/Flows/`, `IFApp/<слой>/` (`Data`, `Core`, `Middleware`, `Analytics`, `Shared`, `DesignSystem`, `Debug`, `Extensions`), корень `IFApp/`, `Redux/`, `IFAppTests/`, `IFAppUITests/`. Для файла действует ближайшая `NOTES.md` вверх по дереву.
+
+**Формат `NOTES.md`** (английский, как код и коммиты):
+- раздел `## Имя.swift`, внутри — пункт на символ: каждый пункт **начинается** с символа, «`Тип.член` — почему»; для выражения без своего символа (ветка внутри `body`) — «`Тип.член` — метка — почему», символ всё равно первым, чтобы пункт находился грепом по имени;
+- привязка к символу, не к номеру строки: номер уезжает от первой же правки;
+- только то, чего не видно из кода и что останется правдой, пока код не изменится: неочевидное решение, ограничение платформы или SDK, инвариант соседнего кода, контракт с внешним потребителем (имя события аналитики, launch-аргумент теста);
+- не пишется пересказ кода и история правки («теперь», «раньше было», номера `IF-N` / `Queue-N`) — это тело коммита.
+
+**Порядок работы агента:** перед правкой файла прочитать его `NOTES.md`; правка, которая меняет или отменяет записанное «почему», обновляет пункт тем же коммитом; удалённый символ — удалённый пункт.
+
+**`NOTES.md` не попадает в сборку.** Группы `IFApp` и `IFAppTests` синхронизируются с диском (`PBXFileSystemSynchronizedRootGroup`), и любой `.md` внутри них уходит в бандл ресурсом, а одинаковые имена из разных папок ломают сборку («Multiple commands produce»). Поэтому каждая `NOTES.md` (и `IFApp/README.md`) прописана в `membershipExceptions` соответствующего таргета в `project.pbxproj` — новая заводится туда же тем же коммитом.
+
+**Область — весь Swift-код репозитория**, включая `IFAppTests/`, `IFAppUITests/` и `Redux/`: правило про то, кто читает файл, а не про устройство приложения, поэтому исключение для тестов из раздела «Инварианты» здесь не действует.
+
+**Ссылки из этого файла** на «почему» конкретного кода ведут в `NOTES.md` (`Features/timer/NOTES.md`, раздел `PhaseRing.swift`), а не на строки комментариев.
+
+**Как проверить в диффе:** `//`, `///` и `/*` в любом месте добавленной Swift-строки (кроме URL и строковых литералов) — только из списка «остаётся»; изменённый или удалённый символ, у которого есть пункт в `NOTES.md`, — пункт обновлён в том же диффе; новая `NOTES.md` — есть в `membershipExceptions`.
 
 ## Диагностика и логи (факт, не правило)
 
@@ -819,7 +852,7 @@ xcrun simctl get_app_container <UDID> simple-L.if-app.com data
 
 Оговорка по `environment`: на голом симуляторе `AppTransaction.shared` бросает и поле показывает `unavailable`. Это не поломка — просто там нет чека. Значение проверяется только на TestFlight-сборке.
 
-`Debug/` живёт вне Redux сознательно: экран читает StoreKit напрямую, потому что это факты о среде, а не состояние приложения, и прогонять диагностические экшены через редьюсер значило бы растить продуктовую машину состояний ради дебаг-инструмента. Шейк ловит `UIWindow.motionEnded` и постит нотификацию — first-responder-ловушка конкурировала бы за роль с текстовым полем в редакторе плана.
+`Debug/` живёт вне Redux сознательно: экран читает StoreKit напрямую, потому что это факты о среде, а не состояние приложения, и прогонять диагностические экшены через редьюсер значило бы растить продуктовую машину состояний ради дебаг-инструмента. Шейк ловит `UIWindow.motionEnded` и постит нотификацию — first-responder-ловушке пришлось бы соперничать за эту роль с любым элементом в фокусе, а окну соперничать не с кем.
 
 **Формат.** Время `HH:mm:ss.SSS` (локаль пришпилена к `en_US_POSIX`; инвариант 5 сюда не относится — на экран это не попадает), дальше `action` / `thunk` / `===`. Под каждым экшеном — вторая строка с дайджестом состояния:
 
@@ -858,6 +891,7 @@ xcrun simctl get_app_container <UDID> simple-L.if-app.com data
 | `-seedHistoryCorrupt` / `-seedHistoryFutureSchema` | кладёт в `Documents/fast-history.json` заведомо недекодируемые байты / конверт схемы, которой эта сборка не знает (ветка `readOnly` гарда TF-2) | `Core/UITestSeed.swift` + `Data/FastHistoryRepository.swift` |
 | `-seedStore` + семейство `-seedStore…` | подставляет `StubStoreRepository` вместо StoreKit — разбор ниже, в разделе «Локальный магазин» | `Core/AppDependencies.swift`, `Data/StubStoreRepository.swift` |
 | `-showReviewPrompt` | шторка отзыва сразу | `IFAppApp.init` |
+| `-suppressPushPrompt` | не показывает системный запрос на уведомления: UI-тесты жмут Start fast, и алерт перекрыл бы экран (`Features/ui/NOTES.md`, пункт `SyncPushStatusThunk.promptSuppressed`) | `Features/ui/SyncPushStatusThunk.swift` |
 | `-dumpFontMetrics` + `-dumpFontMetricsSizes` / `-dumpFontMetricsStyle` | печатает реальную кривую `UIFontMetrics` — разбор ниже | `Debug/FontMetricsDump.swift` |
 
 **Почему `#if DEBUG`, а не «юзер всё равно не передаст».** `-uitestReset` до 07.08.2026 компилировался в релизный бинарник (TF-6). Реализованного пути эксплуатации у него нет, но это деструктивный хук — он стирает историю целиком, — и в сторовой сборке ему нечего делать по тому же признаку, по которому там нет `StubStoreRepository`. Гейт compile-time; гейтить по окружению нельзя по той же причине, что и диагностику: App Review гоняет приложение в sandbox.
@@ -921,7 +955,7 @@ xcodebuild test -project IFApp.xcodeproj -scheme IFAppUITests ...   # XCUITest �
 
 Третья схема не заводилась намеренно: разделение «`IFApp` — юниты, `IFAppUITests` — UI» уже есть, а Maestro через `xcodebuild test` не ходит вовсе, так что `maestro-flows/run.sh` этого не касается.
 
-**`IFAppTests/MealPickerTests.swift`** (заведён 18.08.2026, IF-4; 24 теста). Гард под форму состояния пикера последнего приёма пищи, а не под фичу: состояние держит **расстояние**, а не момент, и тесты закрывают ровно то, что от этого зависит — переход через полночь (тот же ответ называет тот же момент по обе стороны от неё), кламп домена на входе в состояние, `MealMath.fastStart` как единственную формулу старта поста вместе с её полом, и словарь `MealInputMethod` как фиксированный вокабуляр GA4-измерения.
+**`IFAppTests/MealPickerTests.swift`** (заведён 18.08.2026, IF-4; 29 тестов на 14.11.2026). Гард под форму состояния пикера последнего приёма пищи, а не под фичу: состояние держит **расстояние**, а не момент, и тесты закрывают ровно то, что от этого зависит — переход через полночь (тот же ответ называет тот же момент по обе стороны от неё), кламп домена на входе в состояние, `MealMath.fastStart` как единственную формулу старта поста вместе с её полом, и словарь `MealInputMethod` как фиксированный вокабуляр GA4-измерения.
 
 Почему это стоит юнита, а не флоу: исходный дефект воспроизводится только сменой суток при открытой шторке — из Maestro такое не поставить, а на симуляторе это ручной перевод часов. Тот же признак, по которому под TF-2 заводился весь юнит-таргет: дефект существует, а экранного пути к нему нет.
 
@@ -1157,7 +1191,7 @@ Logging event: origin, name, params: app, fast_stopped, {
 
 Отдельно, вне вопроса о типах и потому — решение `analytics`, а не следствие этой правки: `stage` в `fast_stopped` **перестал быть локализованной строкой** (`Phase.analyticsValue`, фиксированный ASCII), то есть запрет на его регистрацию из `metrics.md`, застережение 22, устарел. Из строковых параметров не зарегистрированы также `theme`, `source`, `reason`, `product`.
 
-**`end_backdated_minutes` проверен по коду 19.08.2026** (находка `analytics`, блокер 1.5.1). В `AnalyticsEvent.swift:175` он собирается как `code(backdatedMinutes, width: 4)`, а `code` возвращает `String(format:)` — то есть на провод уходит строка вида `0000`/`0045`, и `AnalyticsClient` её не трогает: `parameters` объявлен `[String: Any]` и отдаётся в `Analytics.logEvent` как есть. Со стороны кода риска `(not set)` нет — история `goal_hours` здесь не повторится. Единственный оставшийся риск — **на стороне консоли**: если параметр зарегистрировать специальным *показателем*, а не *измерением*, столбец будет пустым, потому что показатель читает числовое поле, а значение строковое. Регистрация — действие владельца, пункт 3 выше.
+**`end_backdated_minutes` проверен по коду 19.08.2026** (находка `analytics`, блокер 1.5.1). В `AnalyticsEvent.swift:95` он собирается как `code(backdatedMinutes, width: 4)`, а `code` возвращает `String(format:)` — то есть на провод уходит строка вида `0000`/`0045`, и `AnalyticsClient` её не трогает: `parameters` объявлен `[String: Any]` и отдаётся в `Analytics.logEvent` как есть. Со стороны кода риска `(not set)` нет — история `goal_hours` здесь не повторится. Единственный оставшийся риск — **на стороне консоли**: если параметр зарегистрировать специальным *показателем*, а не *измерением*, столбец будет пустым, потому что показатель читает числовое поле, а значение строковое. Регистрация — действие владельца, пункт 3 выше.
 
 **Грабли.**
 
@@ -1420,16 +1454,16 @@ missing compliance и привязка билда впервые случатс�
 
 ### A. `Date()` напрямую vs `Clock.now()`
 
-`Core/Clock.swift:5` в шапке заявляет: «the one place that reads wall-clock time for thunks». Код с этим не согласен, счёт почти пополам:
+`Clock` задумывался как единственное место, где тханки читают время (пункт `Clock` в `Core/NOTES.md`, раздел `Clock.swift`, прямо говорит, что код этому не следует). Счёт почти пополам:
 
 Пересчёт 07.08.2026 — счёт по-прежнему почти пополам, 6 файлов против 6:
 
-- **Через `Clock`**: `ContinueFastingThunk:18`, `ConfirmLastMealThunk:17`, `PickMealChipThunk:18`, `SetExactMealTimeThunk:19`, `SeedLastMealFromWindowCloseThunk:21`, `ExportHistoryThunk:28`, `NotificationMiddleware:40`
-- **Напрямую `Date()`**: `StartFastThunk:29`, `StopFastThunk:16`, `AdjustTimeThunk:23`, `ResetFastThunk:19`, `StartEatingThunk:14`, `ResumeFastThunk:33`, `ReviewMiddleware:44,52`
+- **Через `Clock`**: `ContinueFastingThunk:14`, `ConfirmLastMealThunk:14`, `PickMealChipThunk:15`, `SetExactMealTimeThunk:15`, `SeedLastMealFromWindowCloseThunk:13`, `ExportHistoryThunk:23`, `NotificationMiddleware:31`
+- **Напрямую `Date()`**: `StartFastThunk:24`, `StopFastThunk:16`, `AdjustTimeThunk:20`, `ResetFastThunk:14`, `StartEatingThunk:11`, `ResumeFastThunk:19`, `ReviewMiddleware:31,38`
 
 Развилка не рассасывается: с прошлого замера в каждую сторону добавилось по паре мест (`ResumeFastThunk` — сегодня, напрямую), а `HistoryMiddleware` из списка ушёл — он часов больше не читает. Ни один из двух способов не вытесняет другой, и выбор автора продолжает определяться соседним кодом.
 
-Развилка настоящая: `Clock.now()` сегодня — это буквально `Date()` в обёртке, никакой подмены он не даёт, так что дисциплина ради дисциплины ничего не купит. **Два разных решения:** либо `Clock` становится обязательным и получает смысл (точка подмены времени в тестах — тогда `UITestSeed` перестаёт быть единственным способом попасть в поздние состояния), либо шапку файла надо переписать, потому что она обещает несуществующее правило.
+Развилка настоящая: `Clock.now()` сегодня — это буквально `Date()` в обёртке, никакой подмены он не даёт, так что дисциплина ради дисциплины ничего не купит. **Два разных решения:** либо `Clock` становится обязательным и получает смысл (точка подмены времени в тестах — тогда `UITestSeed` перестаёт быть единственным способом попасть в поздние состояния), либо обёртка признаётся необязательной: пункт `Clock` в `Core/NOTES.md` уже переписан под это (14.11.2026, IF-86) и правила не обещает, так что вторая ветка закрывается записью решения сюда, без правки кода.
 
 Замер 18.08.2026 (IF-27), когда подмену `Clock.now` предложили как средство от флоу, зависящих от часов хоста: прямых `Date()` в `IFApp/` — **32 строки в 16 файлах** (без самой обёртки `Core/Clock.swift`; с ней греп даёт 35 строк в 17; после самой правки IF-27 — 33 в 16, у предупреждения свой `Date()`), и среди них те, что пишут timestamp'ы (`StartFastThunk`, `ResumeFastThunk`, `AdjustTimeThunk`, `ResetFastThunk`) и вью таймера. Подмена только `Clock.now()` дала бы сборку, где пост стартует по поддельному времени, а гард пересечений сравнивает с настоящим, — прибор, который врёт молча, а не отсутствие прибора. Так что первое решение — не «добавить override в `Clock`», а сперва свести к `Clock` все 32 места; пока этого нет, подмену заводить нельзя. Задача IF-27 закрыта на своём слое (сид получил явный якорь `-seedHistoryDaysBack`), развилка осталась открытой.
 
@@ -1437,13 +1471,13 @@ missing compliance и привязка билда впервые случатс�
 
 Из `TimerFlowView` — 36 сырых `dispatch(SomeAction.x)` против 19 `dispatch(SomeThunk())` (пересчитано 22.08.2026; было 26 против 13 — соотношение держится, выросли обе стороны). Различие в целом логичное (тханк там, где надо прочитать состояние или часы), но нигде не записано, поэтому граница держится на вкусе автора.
 
-Отдельная деталь: вью местами диспатчит **пары** экшенов, воспроизводя логику, которая в другом месте живёт в тханке — `TimerFlowView:628-630` и `:977-978` делают `TimerAction.eatingEnded` + `MealAction.cleared`, а `ResetFastThunk:24-25` делает ровно `TimerAction.reset` + `MealAction.cleared` (номера пересняты 22.08.2026, до того — 07.08.2026).
+Отдельная деталь: вью местами диспатчит **пары** экшенов, воспроизводя логику, которая в другом месте живёт в тханке — `TimerFlowView:421-422` и `:635-636` делают `TimerAction.eatingEnded` + `MealAction.cleared`, а `ResetFastThunk:19-20` делает ровно `TimerAction.reset` + `MealAction.cleared` (номера пересняты 22.08.2026, до того — 07.08.2026).
 
 **Выбор:** либо «вью диспатчит один экшен или один тханк, пара — всегда тханк», либо «сырой экшен из вью нормален, пары тоже».
 
 ### C. Токены `Typography` vs `.hanken(n)` напрямую
 
-`DesignSystem/Typography.swift:69-83` определяет 14 семантических токенов (`timerNumerals`, `timerSeconds`, `planRatio`, …). Использований — **6**, все по-прежнему в одном файле `RingCenter.swift`. Остальные **112** мест пишут размер числом: `.hanken(13.5, .bold)` (92) и `.bricolage(…)` (20).
+`DesignSystem/Typography.swift:54-68` определяет 14 семантических токенов (`timerNumerals`, `timerSeconds`, `planRatio`, …). Использований — **6**, все по-прежнему в одном файле `RingCenter.swift`. Остальные **112** мест пишут размер числом: `.hanken(13.5, .bold)` (92) и `.bricolage(…)` (20).
 
 Пересчёт 07.08.2026: было 15 токенов / 5 использований / 72 места числом. Развилка не просто держится — она **расширяется**: за два дев-цикла мест с числом стало на сорок больше, а потребителей таблицы прибавился один. Таблица токенов дрейфует в сторону чистой декорации быстрее, чем в сторону нормы.
 
@@ -1463,7 +1497,7 @@ missing compliance и привязка билда впервые случатс�
 
 ### F. Регистрация `Store<AppState>` в контейнере
 
-`Core/AppStoreFactory.swift:106` регистрирует стор в контейнере. **Никто его оттуда не инжектит.** Регистрация не используется, но существует — и это готовый механизм бесшумного обхода инварианта 4: `let store: Store<AppState> = container.inject()` внутри компонента скомпилируется, заработает и не попадётся греп-проверке из пункта 4.
+`Core/AppStoreFactory.swift:75` регистрирует стор в контейнере. **Никто его оттуда не инжектит.** Регистрация не используется, но существует — и это готовый механизм бесшумного обхода инварианта 4: `let store: Store<AppState> = container.inject()` внутри компонента скомпилируется, заработает и не попадётся греп-проверке из пункта 4.
 
 **Выбор:** убрать регистрацию либо оставить и явно записать её как запрещённую к использованию (тогда проверка пункта 4 должна ловить `container.inject()` с типом `Store<...>`).
 
@@ -1595,7 +1629,7 @@ missing compliance и привязка билда впервые случатс�
 
 ### 26.07.2026 — Dynamic Type ограничен сверху на `xxLarge`
 
-`Flows/app/AppFlowView.swift:69` — `.dynamicTypeSize(...DynamicTypeSize.xxLarge)` (строка пересчитана 06.08.2026, файл вырос: в нём теперь ещё и хост оффера с его тинтом).
+`Flows/app/AppFlowView.swift:41` — `.dynamicTypeSize(...DynamicTypeSize.xxLarge)` (строка пересчитана 06.08.2026, файл вырос: в нём теперь ещё и хост оффера с его тинтом).
 
 **Что держит.** Центр таймера — фиксированный круг 232pt с фиксированным слотом подписи 176×40, кнопки футера тоже фиксированной ширины. `Font.custom` масштабируется системным размером текста, и на больших размерах текст перерастает контейнеры, которые не двигаются: «Закривається о 20:00» обрезается до «Закриваєтьс…» прямо внутри круга.
 
@@ -1623,11 +1657,11 @@ missing compliance и привязка билда впервые случатс�
 
 **Что выяснилось.** История — это `navigationDestination` внутри `NavigationStack` корня, то есть она лежит **над** таймером. Оверлей, живущий на таймере, рендерится под ней: оффер, вызванный из истории, открылся бы за экраном, с которого его позвали. При этом всё компилируется, а тесты первого входа остаются зелёными — сигнала нет ни от компилятора, ни от сьюта.
 
-**Почему не второй оверлей в истории.** `props.offerOpen` — производная от `ProState.trigger`, одна на приложение; два хоста с условием `if props.offerOpen` смонтировали бы **два** `PaywallFlowView` разом, каждый со своей анимацией входа. Чтобы этого избежать, хосту нужно знать, верхний ли он на стеке, — такого факта в `AppState` нет. Роутить по значению `trigger` нельзя: `Features/pro/Pro.swift:49-61` объявляет его назначением GA4-параметр, а не роутер презентации.
+**Почему не второй оверлей в истории.** `props.offerOpen` — производная от `ProState.trigger`, одна на приложение; два хоста с условием `if props.offerOpen` смонтировали бы **два** `PaywallFlowView` разом, каждый со своей анимацией входа. Чтобы этого избежать, хосту нужно знать, верхний ли он на стеке, — такого факта в `AppState` нет. Роутить по значению `trigger` нельзя: `Features/pro/NOTES.md` (раздел `Pro.swift`, пункт `PaywallTrigger`) объявляет его назначением GA4-параметр, а не роутер презентации.
 
 **Правило (не инвариант — случай в кодовой базе один).** Экран, в который есть вход больше чем с одного флоу, презентуется из **ближайшего общего предка** этих флоу, а не из одного из них. В корне z-порядок и сохранение состояния экрана под оффером получаются конструкцией, а не кодом, который надо тестировать.
 
-**Оговорка — дописано 06.08.2026.** «Получается конструкцией» верно ровно для **push-навигации**: таймер и история лежат в одном `NavigationStack`, поэтому оверлей корня накрывает обе. `sheet` и `fullScreenCover` в это z-пространство не входят — системная презентация живёт над всем хостящим контроллером, и оверлей предка её не накрывает. Третий вход в оффер — как раз такой: шторка About. Порядок там держится **кодом** — строкой `showSources = false` в `Flows/timer/TimerFlowView.swift:252` (`onChange(of: props.offerOpen)`, номер переснят 22.08.2026), без которой оффер открылся бы под шторкой, с которой его позвали. То есть правило снимает вопрос z-порядка для push и не снимает его для презентаций: презентованный экран обязан закрываться явно, и эта строка — самое хрупкое место конструкции.
+**Оговорка — дописано 06.08.2026.** «Получается конструкцией» верно ровно для **push-навигации**: таймер и история лежат в одном `NavigationStack`, поэтому оверлей корня накрывает обе. `sheet` и `fullScreenCover` в это z-пространство не входят — системная презентация живёт над всем хостящим контроллером, и оверлей предка её не накрывает. Третий вход в оффер — как раз такой: шторка About. Порядок там держится **кодом** — строкой `showSources = false` в `Flows/timer/TimerFlowView.swift:168` (`onChange(of: props.offerOpen)`, номер переснят 22.08.2026), без которой оффер открылся бы под шторкой, с которой его позвали. То есть правило снимает вопрос z-порядка для push и не снимает его для презентаций: презентованный экран обязан закрываться явно, и эта строка — самое хрупкое место конструкции.
 
 **Цена, названная заранее.** Тинт оффера (`offerPhaseColor`) — производная от состояния таймера, и корню она тоже нужна. Копия в корне была бы ровно тем случаем, о котором пункт 8; поэтому определение переехало на `TimerScreenProps` и читается обоими хостами. В экшен `offerOpened` тинт не кладётся: результат чтения часов в аргументе экшена — нарушение пункта 6 буквально.
 
@@ -1655,13 +1689,13 @@ missing compliance и привязка билда впервые случатс�
 
 ### Делегат рекогнайзера подменён целиком, а не проксирован
 
-`Flows/history/HistoryFlowView.swift:331` (`InteractivePopGesture.Host`, номер переснят 22.08.2026). Заведено 07.08.2026. Не нарушение: процитировать нечего, это замечание о форме. Записано потому, что шов разойдётся молча и далеко от места.
+`Flows/history/HistoryFlowView.swift:281` (`InteractivePopGesture.Host`, номер переснят 22.08.2026). Заведено 07.08.2026. Не нарушение: процитировать нечего, это замечание о форме. Записано потому, что шов разойдётся молча и далеко от места.
 
 `Host` становится делегатом `interactivePopGestureRecognizer` целиком и отвечает на два метода из пяти. Оригинального делегата (`_UINavigationInteractiveTransition`) UIKit больше не спрашивает **ни о чём** — остальные методы падают на дефолты протокола, а не на его реализацию.
 
 Сегодня это сходится: единственное известное поведение оригинала — одновременное распознавание — воспроизведено рядом, `shouldRecognizeSimultaneouslyWith` возвращает `false`, и свайп строки с системным жестом не дерутся. Но сходится **совпадением, а не конструкцией**: никто не проверял, что в `shouldReceive`, `shouldRequireFailureOf` и `shouldBeRequiredToFailBy` у оригинала нет поведения, на которое опирается система. На следующей мажорной iOS это ровно тот шов, который разойдётся без всякого сигнала — ни компилятор, ни сьют его не увидят.
 
-Поведение не менялось сознательно (решение владельца 07.08.2026): проксирующий делегат-обёртка стоит заметно дороже, а форсировать его на гипотезе не за чем. Вместо этого факт записан в комментарий на месте — чтобы тот, кто придёт чинить сломавшийся жест, начал отсюда, а не с рекогнайзера.
+Поведение не менялось сознательно (решение владельца 07.08.2026): проксирующий делегат-обёртка стоит заметно дороже, а форсировать его на гипотезе не за чем. Вместо этого факт записан в `Flows/NOTES.md`, раздел `HistoryFlowView.swift` (пункт `InteractivePopGesture.Host.gestureRecognizerShouldBegin(_:)`), — чтобы тот, кто придёт чинить сломавшийся жест, начал отсюда, а не с рекогнайзера.
 
 **Асимметрия займа, найденная тем же разбором, закрыта** — `isEnabled` теперь возвращается вместе с делегатом. Это была вторая половина наблюдения, и она перестала быть верной в тот же день.
 
@@ -1673,5 +1707,5 @@ missing compliance и привязка билда впервые случатс�
 
 Владелец решил не принимать пока — вернуться, если стрельнут:
 
-- **Аналитическое событие логируется только из `AnalyticsMiddleware`.** Сейчас соблюдается на 100%: `AnalyticsRepository.log(_:)` вызывается ровно из `AnalyticsMiddleware` (5 сайтов). `SyncPushStatusThunk:26` вызывает `setUserProperty` — это user property, не событие, и под формулировку не подпадало.
+- **Аналитическое событие логируется только из `AnalyticsMiddleware`.** Сейчас соблюдается на 100%: `AnalyticsRepository.log(_:)` вызывается ровно из `AnalyticsMiddleware` (5 сайтов). `SyncPushStatusThunk:22` вызывает `setUserProperty` — это user property, не событие, и под формулировку не подпадало.
 - **`.font(.system(...))` — только на `Image(systemName:)`, никогда на `Text`.** Сейчас соблюдается на 100%: все 16 из 16 вхождений — на SF Symbols; 77 применений шрифта на тексте идут через `.hanken` / `.bricolage` / `Typography`.

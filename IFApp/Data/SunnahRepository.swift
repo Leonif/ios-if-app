@@ -27,7 +27,6 @@ struct SunnahRepository: SunnahRepositoryProtocol {
         let pending = await center.pendingNotificationRequests()
         let ours = pending.filter { $0.identifier.hasPrefix("sunnah.") }.map(\.identifier)
         center.removePendingNotificationRequests(withIdentifiers: ours)
-        // Leave room for unrelated notifications and the timer's two replaceable pushes.
         let others = pending.count - ours.count
         let capacity = max(0, min(SunnahSchedule.maxReminders, 60 - others))
         guard reminders.count <= capacity else { return false }

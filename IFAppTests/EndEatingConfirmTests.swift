@@ -2,10 +2,6 @@
 //  EndEatingConfirmTests.swift
 //  IFAppTests
 //
-//  Queue card 24: ending an open eating window early now goes through a confirmation.
-//  The sheet's open flag lives in the store like `resetConfirmOpen`; these pin that
-//  opening it ends nothing, and that the window survives until the confirm itself.
-//
 
 import XCTest
 import Redux

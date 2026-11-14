@@ -2,164 +2,45 @@
 //  AnalyticsEvent.swift
 //  IFApp
 //
-//  The product's funnel event catalog. One place to see everything we track,
-//  so the analysis of "where does the user drop off" maps to named events.
-//  Names are snake_case (Firebase convention, <= 40 chars).
-//
-//  **Anything meant to be read as a breakdown travels as text.** A GA4 custom
-//  dimension reads the parameter's *string* field only; a value logged as a number
-//  (or as a `Bool`, which bridges to `NSNumber`) leaves that field empty and every
-//  row of the report comes back `(not set)`. That is not a theory — it cost the
-//  whole `goal_hours` series from 10.07 to 09.08.2026, and GA4 backfills nothing.
-//  A number stays a number only where the question is an average, i.e. where the
-//  definition in the console is a custom *metric*; today that is `duration_seconds`
-//  alone. See `ARCHITECTURE.md`, "Типы параметров GA4".
-//
 
 import Foundation
 
-/// A number on its way into a GA4 dimension: text, zero-padded to a fixed width.
-///
-/// The padding is not decoration. These dimensions are read by the *shape* of the
-/// distribution, which means sorting by the dimension, and string sort puts `9`
-/// after `16` unless the widths match. Values wider than `width` still log
-/// correctly — only their place in the sort degrades, and at that size the number
-/// is an outlier being read one row at a time anyway.
 private func code(_ value: Int, width: Int) -> String {
     String(format: "%0\(width)d", value)
 }
 
 enum AnalyticsEvent {
-    /// App launched / foregrounded into use.
     case appOpened
-    /// User started a fast. `goalHours` = the chosen plan's fasting window.
     case fastStarted(goalHours: Double)
-    /// User ended a fast. `completed` = the fast had reached its goal. `stage` = the
-    /// phase the fast was in, as a stable code (`fed`/`sugar`/`fat`/`ketosis`/
-    /// `autophagy`) — never the displayed label, which differs per locale and makes
-    /// the dimension impossible to group.
     case fastStopped(durationSeconds: Int, completed: Bool, stage: String, backdatedMinutes: Int)
-    /// The user took an ending back from the result screen. No parameters: the one
-    /// question it answers is whether the undo earns its place, and that is a count.
-    ///
-    /// Note for analysis: the `fast_stopped` it undoes has already fired and stays in
-    /// the counters, so cancelled endings have to be subtracted or `fast_stopped` reads
-    /// high.
     case fastStopUndone
-    /// The fast reached its goal (the goal-reached moment fired). `goalHours` = plan window.
     case goalReached(goalHours: Double)
-    /// User reset the timer. `elapsedMinutes` = whole minutes from the start of the
-    /// fast to the reset. That number is the whole point of the event: minutes mean
-    /// the user was fixing a wrong start time, hours mean they abandoned the fast.
-    /// Read as a distribution over buckets, never as an average.
     case fastReset(elapsedMinutes: Int)
-    /// User opened the eating window from the complete screen.
     case eatingWindowStarted
-    /// User started the next fast from the window-closed screen (the chain held).
-    /// Accompanies `fast_started`.
     case fastChained
-    /// User nudged the elapsed time (manual ± correction).
     case timeAdjusted
-    /// The end-fast sheet refused the chosen end because it overlaps a fast already
-    /// saved. `unavoidable` = the clash is on the fast's own start, so no end could
-    /// clear it — the case that used to loop. The split tells us how often a real user
-    /// hits this, and how often it is the dead-end kind, so we know if it needs more.
     case endFastRefused(unavoidable: Bool)
-    /// User confirmed the Last-meal picker. `backdated` = started in the past
-    /// (logged a real meal time) vs fresh "now"; `minutesAgo` = how far back;
-    /// `inputMethod` = which control produced the answer (`MealInputMethod`).
     case lastMealLogged(backdated: Bool, minutesAgo: Int, inputMethod: String)
-    /// User opened the scientific Sources screen.
     case sourcesOpened
-    /// User opened one of the bundled papers in the reader. `article` = the paper's
-    /// index in the catalog, as a fixed-width code. The index and not the title,
-    /// which is localized and would give the dimension ten vocabularies; and not the
-    /// URL, which would make it a list of links rather than of papers. It is also the
-    /// identifier the rows are already addressed by (`about.source.<id>`).
     case sourceArticleOpened(articleID: Int)
-    /// User left the reader for the paper itself. Carries the same `article` code, so
-    /// the funnel — list opened, article opened, original followed — counts end to end
-    /// and per paper rather than in three unrelated totals.
-    ///
-    /// Raised on the reader's own button only. The external-link thunk behind it also
-    /// opens the privacy policy and the system settings, and an event on the thunk
-    /// would count those as papers.
     case sourceOriginalOpened(articleID: Int)
-    /// The reader was closed. `reached_end` = the foot of the article had been on
-    /// screen at least once — the cheapest honest split between read and merely
-    /// opened. An article shorter than the screen counts as reached, because its end
-    /// was indeed seen.
     case sourceArticleClosed(articleID: Int, reachedEnd: Bool)
-    /// User opened the Sunnah reminders screen. `source` = which door
-    /// ("plan_editor" / "about"). The release's one free headline feature had a
-    /// single door until now, and how many people ever find it is the question the
-    /// second door was added to answer — which needs the two counted apart.
     case sunnahOpened(source: String)
-    /// User armed the Sunnah reminders, and whether they can actually be delivered.
-    /// `mode` = which schedule ("weekly" / "white_days" / "both"); `push_allowed` =
-    /// the notification permission was in place when the schedule was written.
-    ///
-    /// The second parameter is not a diagnostic. It measures the cohort who turned
-    /// the feature on and will never hear from it, which is a product fact about the
-    /// permission ask and not a bug report. Raised once per arming, on the answer
-    /// rather than on the tap — the permission is only known after it has been read.
     case sunnahEnabled(mode: String, pushAllowed: Bool)
-    /// User opened the fasting history screen. `source` = which entry point
-    /// ("streak_badge" / "complete_card" / "eating_window").
     case historyOpened(source: String)
-    /// User deleted a record from the history (swipe + confirm).
     case historyRecordDeleted
-    /// The history was handed to the share sheet as a CSV. No parameters at all —
-    /// deliberately, because a parameter would need a custom definition registered in
-    /// GA4 before submit and none of them would change the one decision this event
-    /// exists to inform: whether an import is ever worth building. A cancelled share
-    /// does not fire it.
     case historyExported
-    /// A read of the history file did not produce today's records. `reason` = what
-    /// happened ("unreadable" / "decode" / "future_schema" / "quarantine_failed").
-    ///
-    /// Fires once per failed read, not once per launch: a file that cannot be moved
-    /// aside reports again on every write attempt, and that repetition is the signal.
-    /// The event is expected to be silent forever — it exists to find out whether the
-    /// TF-2 guard ever catches anything before a release changes `FastRecord`'s shape.
     case historyLoadFailed(reason: String)
-    /// The native `requestReview` went out. `trigger` = what caused it
-    /// ("streak_milestone" / "next_open"). Apple may or may not show the panel — but
-    /// the call itself did happen on an active scene, so this counts attempts we
-    /// really made, not attempts we intended.
     case reviewPrompted(trigger: String)
-    /// A streak milestone card was shown. `days` = the threshold (3/7/14/30).
     case streakMilestone(days: Int)
-    /// User picked a fasting plan in the plan editor. `plan` = the ratio label
-    /// ("16:8"), `goalHours` = that plan's fasting window. Pairs with the
-    /// `current_plan` user property, which carries the same value persistently.
     case planSelected(plan: String, goalHours: Int)
-    /// The plan editor was closed, carrying whatever plan the user settled on —
-    /// fired even when nothing was touched, so the plan mix counts off this one.
-    ///
-    /// It no longer contrasts with `plan_selected` as "tried on" against "kept":
-    /// since PW-U1 the wheel turns a draft inside the sheet and writes nothing, so
-    /// a length that was spun to and abandoned produces neither event. Both now fire
-    /// on a plan that got through the gate, and the series before 1.5.1 counted the
-    /// wheel's passing values as well.
     case planConfirmed(plan: String, goalHours: Int)
-    /// The offer screen was shown. `trigger` = which entry point led here
-    /// ("fast_finished" / "plan_custom" / "streak_break" / "manual"). At 20-35 shows a
-    /// month this event is read as a distribution over triggers, never as a rate.
     case paywallShown(trigger: String)
-    /// The offer screen was closed without a purchase.
     case paywallDismissed(trigger: String)
-    /// The Buy button was tapped and Apple's sheet was asked for.
     case purchaseStarted(trigger: String, product: String)
     case purchaseCompleted(trigger: String, product: String)
-    /// The attempt ended without Pro. `reason` = "cancelled" / "network" / "pending"
-    /// / "other" — "pending" is Ask to Buy, which may still be approved later.
     case purchaseFailed(trigger: String, reason: String)
-    /// Restore purchases brought the entitlement back.
     case restoreCompleted
-    /// The appearance the app is being used in. `dark` = system dark mode.
-    /// Fires on screen appear and on live theme switches — count *users* per
-    /// `theme` value to see which appearance the audience actually uses.
     case themeActive(dark: Bool)
 
     var name: String {
@@ -207,36 +88,18 @@ enum AnalyticsEvent {
             return ["goal_hours": code(Int(goalHours.rounded()), width: 2)]
         case let .fastStopped(durationSeconds, completed, stage, backdatedMinutes):
             return [
-                // The only number left on purpose: `duration_seconds` is not a
-                // breakdown, it is the raw quantity a custom *metric* would average.
                 "duration_seconds": durationSeconds,
                 "duration_hours": code(durationSeconds / 3600, width: 3),
                 "completed": completed ? "true" : "false",
                 "stage": stage,
-                // How far behind the tap the ending was placed. Read as a
-                // distribution: zero is "confirmed as it stood", minutes are a
-                // correction, hours are someone who forgot to stop — the population
-                // the correction sheet exists for, and the one the old `fast_stopped`
-                // silently counted as having fasted that long.
                 "end_backdated_minutes": code(backdatedMinutes, width: 4),
             ]
         case let .fastReset(elapsedMinutes):
             return ["elapsed_minutes": code(elapsedMinutes, width: 4)]
         case let .lastMealLogged(backdated, minutesAgo, inputMethod):
             return [
-                // A string as of the meal-ribbon release, and the condition for that
-                // was named when it was left a number: the flag was broken at the
-                // source, because the sheet seeded `ateMin` on open and so read
-                // `true` after the first open regardless. The ribbon does not seed —
-                // `MealState` holds a distance and starts at zero — so the flag now
-                // says what it claims and can be registered as a dimension.
                 "backdated": backdated ? "true" : "false",
                 "minutes_ago": code(minutesAgo, width: 4),
-                // Which control produced the answer: chip / ribbon / exact, plus
-                // untouched and seeded for the two cases that are none of the three.
-                // The whole point of the ribbon is that it is reachable at any
-                // distance, and this is the only parameter that can show whether it
-                // is actually reached for — so it is a dimension and must be text.
                 "input_method": inputMethod,
             ]
         case let .themeActive(dark):
@@ -252,22 +115,15 @@ enum AnalyticsEvent {
         case let .sunnahOpened(source):
             return ["source": source]
         case let .sourceArticleOpened(articleID), let .sourceOriginalOpened(articleID):
-            // Two digits, like every other number that travels as a dimension: the
-            // catalog is read as a distribution over papers, and string sort keeps
-            // them in catalog order only while the widths match.
             return ["article": code(articleID, width: 2)]
         case let .sourceArticleClosed(articleID, reachedEnd):
             return [
                 "article": code(articleID, width: 2),
-                // Text, like every other flag here: a `Bool` bridges to `NSNumber`
-                // and the dimension comes back `(not set)`.
                 "reached_end": reachedEnd ? "true" : "false",
             ]
         case let .sunnahEnabled(mode, pushAllowed):
             return [
                 "mode": mode,
-                // Text, like every other flag in this catalog: a `Bool` bridges to
-                // `NSNumber` and the dimension comes back `(not set)`.
                 "push_allowed": pushAllowed ? "true" : "false",
             ]
         case let .historyLoadFailed(reason):

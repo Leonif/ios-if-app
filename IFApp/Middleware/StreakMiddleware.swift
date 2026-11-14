@@ -2,9 +2,6 @@
 //  StreakMiddleware.swift
 //  IFApp
 //
-//  Shows the streak milestone card: once per threshold (3/7/14/30), after the
-//  goal-reached moment has settled so it never covers the seal & sweep.
-//
 
 import Redux
 

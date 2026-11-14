@@ -2,17 +2,12 @@
 //  Phase.swift
 //  IFApp
 //
-//  The "Verdant" metabolic phases. Phase + fraction are derived from elapsed time
-//  vs the plan's fast length (the four ring phases occupy quarters of the goal;
-//  Autophagy is the completed/looped state past 100%).
-//
 
 import SwiftUI
 
 enum Phase: Int, CaseIterable {
     case fed, sugar, fat, ketosis, autophagy
 
-    /// Verdant spectrum — ring gradient, timeline bars, center dot.
     var color: Color {
         switch self {
         case .fed: return Color(hex: "#E7C36A")
@@ -33,11 +28,6 @@ enum Phase: Int, CaseIterable {
         }
     }
 
-    /// The value that goes into GA4 (`fast_stopped.stage`). Deliberately not `label`:
-    /// the label is translated, so the same phase arrived as a different value per
-    /// locale and the dimension could not be grouped at all. Stable English codes,
-    /// written out rather than derived from `rawValue`, so reordering the cases
-    /// cannot silently rewrite history.
     var analyticsValue: String {
         switch self {
         case .fed: return "fed"
@@ -48,19 +38,6 @@ enum Phase: Int, CaseIterable {
         }
     }
 
-    /// The value that goes into the exported CSV's `phase` column. Same rule as
-    /// `analyticsValue` — a fixed, unlocalised ASCII literal, never `label` — but a
-    /// **different list**, and deliberately not shared with it.
-    ///
-    /// `analyticsValue` is a GA4 dimension whose values were registered against
-    /// existing data: renaming `fed` to `satiety` there would split one phase across
-    /// two values in every report ever run. The CSV list is the one product wrote
-    /// down (decision 14.2) and it names the metabolic state rather than the ring
-    /// colour. Two of the five even agree by accident; that is not a reason to fold
-    /// them, because a change on either side must not travel to the other.
-    ///
-    /// Wrong values here are worse than wrong values in telemetry: a file that has
-    /// already left the phone cannot be corrected afterwards.
     var exportValue: String {
         switch self {
         case .fed: return "satiety"
@@ -71,18 +48,14 @@ enum Phase: Int, CaseIterable {
         }
     }
 
-    /// The four phases shown on the ring (Autophagy is the completed state).
     static let ringPhases: [Phase] = [.fed, .sugar, .fat, .ketosis]
 }
 
-/// Derived progress snapshot for a given elapsed time and plan goal.
 struct PhaseProgress: Equatable {
-    let fraction: Double        // elapsed / goal, 0...1 (display clamps)
+    let fraction: Double
     let phase: Phase
     let isComplete: Bool
-    /// Phase that begins next (nil once Autophagy is reached).
     let nextPhase: Phase?
-    /// Seconds until the next phase boundary (0 if complete).
     let secondsToNext: TimeInterval
 
     static func compute(elapsed: TimeInterval, goalHours: Double) -> PhaseProgress {
@@ -97,7 +70,7 @@ struct PhaseProgress: Equatable {
         let quarter = goal / 4
         let index = min(3, max(0, Int(raw * 4)))
         let phase = Phase.ringPhases[index]
-        let next = Phase(rawValue: index + 1)   // .sugar/.fat/.ketosis/.autophagy
+        let next = Phase(rawValue: index + 1)
         let nextBoundary = Double(index + 1) * quarter
         return PhaseProgress(
             fraction: max(0, raw),
