@@ -49,7 +49,7 @@ except ImportError as exc:                       # pragma: no cover
 REPO = Path(__file__).resolve().parent.parent
 PROJECT = REPO / "IFApp.xcodeproj"
 SCHEME = "IFApp"
-DEFAULT_PACK = (REPO.parent / "obs-if24-wiki/raw/2026-08-18_store-pack-1.5.1.md")
+DEFAULT_PACK = (REPO.parent / "wiki/raw/2026-08-18_store-pack-1.5.1.md")
 WORK = Path("/tmp/if24-release")
 DEVELOPER_DIR = "/Applications/Xcode.app/Contents/Developer"
 

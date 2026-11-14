@@ -80,7 +80,7 @@ struct IFAppApp: App {
     ///
     /// Owner's decision of 10.08.2026, variant 2 of three (stay in the Chinese
     /// storefront, send nothing from it). Background and the acceptance criterion
-    /// live in `obs-if24-wiki/privacy-label.md`, section (г).
+    /// live in `wiki/privacy-label.md`, section (г).
     private static var looksLikeMainlandChina: Bool {
         // Storefront. StoreKit 2's `Storefront.current` is async, and this answer is
         // needed synchronously before `configureFirebase()` runs, so we read the
