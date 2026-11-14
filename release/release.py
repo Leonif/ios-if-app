@@ -7,7 +7,7 @@
 Steps, each also runnable on its own:
 
     version    create the App Store version if it is not there yet
-    metadata   push What's New and promotional text for all ten locales
+    metadata   push What's New and promotional text for every locale in PACK_TO_ASC
     archive    xcodebuild archive + exportArchive, signed for distribution
     upload     send the .ipa and wait for App Store Connect to finish processing
     attach     bind the processed build to the version
@@ -157,14 +157,24 @@ def step_metadata(client, args, version_id):
         die(f"store pack has locales with no App Store Connect mapping: {unmapped}. "
             "Add them to PACK_TO_ASC in release/asc.py.")
     # And the other direction. A locale in the table but missing from the pack is
-    # simply never written — which, on a draft that starts with ten *empty*
-    # localizations, ships that market a blank What's New. Silent, and exactly the
+    # simply never written — which, on a draft that starts with every existing
+    # localization empty, ships that market a blank What's New. Silent, and exactly the
     # failure the read-back check cannot see.
     uncovered = sorted(set(ascmod.PACK_TO_ASC) - set(pack))
     if uncovered:
         die(f"store pack is missing locales the app ships: {uncovered}. "
             "A draft version starts with every locale empty, so a locale left out "
             "here reaches the store blank.")
+
+    # A locale the listing has never had needs more than this step writes: name
+    # and subtitle live on appInfoLocalizations, keywords, description and
+    # screenshots on the version, and none of them come from the store pack. The
+    # step still creates the version localization — that is what puts the locale
+    # on the version — but says out loud what is left, so a green run is not
+    # mistaken for a submittable one.
+    listing = client.app_info_locales()
+    new_to_store = sorted(ascmod.PACK_TO_ASC[l] for l in pack
+                          if ascmod.PACK_TO_ASC[l] not in listing)
 
     touched = {}
     for pack_locale, fields in sorted(pack.items()):
@@ -176,13 +186,29 @@ def step_metadata(client, args, version_id):
                 f"promo {len(fields['promotionalText'])})")
             client.update_localization(loc["id"], **fields)
         else:
+            new = " — NEW to the store" if asc_locale in new_to_store else ""
             say(f"{tag}: create (whatsNew {len(fields['whatsNew'])}, "
-                f"promo {len(fields['promotionalText'])})")
-            client.create_localization(version_id, asc_locale, **fields)
+                f"promo {len(fields['promotionalText'])}){new}")
+            try:
+                client.create_localization(version_id, asc_locale, **fields)
+            except ascmod.ASCError as exc:
+                die(f"{asc_locale}: could not create the version localization.\n"
+                    f"  Locales before it in this run are already written; "
+                    f"re-running `metadata` is safe, it patches them again.\n{exc}")
         touched[asc_locale] = fields
+
+    def owner_todo():
+        if not new_to_store:
+            return
+        warn(f"new to the store: {', '.join(new_to_store)}. This step wrote only "
+             "What's New and promotional text. Still the owner's, in App Store "
+             "Connect, before Submit:")
+        say("      App Information: name (required), subtitle")
+        say("      the version: keywords, description (required), screenshots")
 
     if client.dry_run:
         ok(f"{len(touched)} locales would be written")
+        owner_todo()
         return
 
     # Read back rather than trust the 200s. A PATCH that lands on the wrong locale
@@ -201,6 +227,7 @@ def step_metadata(client, args, version_id):
     if bad:
         die("metadata verification failed:\n  " + "\n  ".join(bad))
     ok(f"{len(touched)} locales written and read back identical")
+    owner_todo()
 
 
 def _build_numbers(builds) -> list[int]:

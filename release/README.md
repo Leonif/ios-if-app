@@ -39,9 +39,10 @@ refuses to run if the pack's filename does not name the version being released, 
 `--version 1.6.0` cannot silently push 1.5.1's text — the read-back check would not
 have caught that, because it compares what came back against what was sent.
 
-It also refuses a pack that does not cover every locale in `PACK_TO_ASC`. A draft
-version starts with all ten localizations *empty*, so a locale left out of the pack
-reaches the store blank rather than keeping the previous release's text.
+It also refuses a pack that does not cover every locale in `PACK_TO_ASC` (twelve
+since 1.5.3). A draft version starts with every existing localization *empty*, so
+a locale left out of the pack reaches the store blank rather than keeping the
+previous release's text.
 
 Because of that default, a lone clone of `ios-if-app` cannot release without
 `--pack`: the store pack lives in the wiki repo.
@@ -55,7 +56,39 @@ This matters more than it looks. A localization write to a locale that does not
 exist does not fail — it creates a second, unused localization, and the three
 locales you meant to update keep the previous release's text. That is why
 `metadata` reads every locale back after writing and compares it to what it sent.
-A new market means a new row in that table.
+A new market means a new row in that table — and more than that, below.
+
+## A new locale: the pipeline writes two fields, the owner the rest
+
+`en-US` and `es-MX` joined the table in 1.5.3 (IF-75). A locale the listing has
+never had is not in the draft, so `metadata` **creates** its version
+localization instead of patching it, and writes What's New and promotional text
+— nothing else. The rest of a store locale is not in the store pack and the
+pipeline does not upload it:
+
+| Where in App Store Connect | Field | |
+|---|---|---|
+| App Information (`appInfoLocalizations`) | name | required |
+| App Information (`appInfoLocalizations`) | subtitle | |
+| the version | keywords | |
+| the version | description | required |
+| the version | screenshots | |
+
+`metadata` reads the listing's locales first and marks such rows
+`NEW to the store`, then ends with that list, so a green run is not mistaken for
+a submittable locale:
+
+```
+  en-US: create (whatsNew 112, promo 143) — NEW to the store
+  ...
+  !!  new to the store: en-US, es-MX. This step wrote only What's New and
+      promotional text. Still the owner's, in App Store Connect, before Submit:
+        App Information: name (required), subtitle
+        the version: keywords, description (required), screenshots
+```
+
+The marketing pack for a new locale carries those texts too; the owner pastes
+them in. Once a release has gone out with the locale, it is an ordinary one.
 
 ## Version numbers do not touch project.pbxproj
 

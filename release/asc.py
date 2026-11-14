@@ -43,6 +43,12 @@ PACK_TO_ASC = {
     "ja": "ja",
     "ko": "ko",
     "ar": "ar-SA",
+    # Added in 1.5.3 (IF-75). Both are new to the listing, not just to the version:
+    # the pipeline writes their What's New and promotional text, and nothing else.
+    # Name, subtitle, keywords, description and screenshots are the owner's to
+    # fill in App Store Connect — see release/README.md, "A new locale".
+    "en-US": "en-US",
+    "es-MX": "es-MX",
 }
 
 
@@ -162,6 +168,21 @@ class ASC:
                 "data": {"type": "appStoreVersions", "id": version_id}}},
         }}
         return self._request("POST", "/appStoreVersionLocalizations", json=body)
+
+    def app_info_locales(self) -> set[str]:
+        """Locales the listing itself (name, subtitle) exists in.
+
+        Read across every appInfo of the app — the live one and the editable one —
+        so a locale counts as known if either carries it. A locale missing from
+        all of them is new to the store, and the version-level text this pipeline
+        writes is not enough to submit it.
+        """
+        out = set()
+        for info in self.get_all(f"/apps/{APP_ID}/appInfos"):
+            for loc in self.get_all(f"/appInfos/{info['id']}/appInfoLocalizations",
+                                    **{"fields[appInfoLocalizations]": "locale"}):
+                out.add(loc["attributes"]["locale"])
+        return out
 
     # ---- builds -----------------------------------------------------------
 
