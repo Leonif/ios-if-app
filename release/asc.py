@@ -51,6 +51,28 @@ PACK_TO_ASC = {
     "es-MX": "es-MX",
 }
 
+# The screenshot set is foldered the way the marketing set was built: `en` and `es`
+# without a region, three more under the pack's short names. Every value must be a
+# locale of PACK_TO_ASC — release.py refuses a set where the two tables drift apart.
+SHOTS_TO_ASC = {
+    "en": "en-GB",
+    "en-US": "en-US",
+    "es-MX": "es-MX",
+    "uk": "uk",
+    "de": "de-DE",
+    "es": "es-ES",
+    "fr": "fr-FR",
+    "pl": "pl",
+    "ja": "ja",
+    "ko": "ko",
+    "zh-Hans": "zh-Hans",
+    "ar": "ar-SA",
+}
+
+# 6.7" iPhone, 1290x2796. The only display type the pipeline touches: 6.5", 6.9"
+# and iPad sets on the same localization are left as they are.
+SCREENSHOT_DISPLAY_TYPE = "APP_IPHONE_67"
+
 
 class ASCError(RuntimeError):
     """An App Store Connect response that carried an error payload."""
@@ -183,6 +205,84 @@ class ASC:
                                     **{"fields[appInfoLocalizations]": "locale"}):
                 out.add(loc["attributes"]["locale"])
         return out
+
+    # ---- screenshots ------------------------------------------------------
+
+    def screenshot_set(self, loc_id: str, display_type: str = SCREENSHOT_DISPLAY_TYPE):
+        for d in self.get_all(f"/appStoreVersionLocalizations/{loc_id}/appScreenshotSets",
+                              **{"filter[screenshotDisplayType]": display_type}):
+            if d["attributes"]["screenshotDisplayType"] == display_type:
+                return d
+        return None
+
+    def create_screenshot_set(self, loc_id: str,
+                              display_type: str = SCREENSHOT_DISPLAY_TYPE):
+        body = {"data": {
+            "type": "appScreenshotSets",
+            "attributes": {"screenshotDisplayType": display_type},
+            "relationships": {"appStoreVersionLocalization": {
+                "data": {"type": "appStoreVersionLocalizations", "id": loc_id}}},
+        }}
+        return self._request("POST", "/appScreenshotSets", json=body)["data"]
+
+    def screenshots(self, set_id: str) -> list:
+        """The set's screenshots in display order.
+
+        Order is read from the relationship, which is what the store shows; the
+        attributes come from the collection and are joined on id.
+        """
+        order = [d["id"] for d in self.get_all(
+            f"/appScreenshotSets/{set_id}/relationships/appScreenshots")]
+        attrs = {d["id"]: d for d in self.get_all(
+            f"/appScreenshotSets/{set_id}/appScreenshots",
+            **{"fields[appScreenshots]":
+               "fileName,fileSize,sourceFileChecksum,assetDeliveryState"})}
+        return [attrs.get(i, {"id": i, "attributes": {}}) for i in order]
+
+    def screenshot(self, shot_id: str):
+        return self.get(f"/appScreenshots/{shot_id}", **{
+            "fields[appScreenshots]":
+            "fileName,fileSize,sourceFileChecksum,assetDeliveryState"})["data"]
+
+    def delete_screenshot(self, shot_id: str):
+        return self._request("DELETE", f"/appScreenshots/{shot_id}")
+
+    def reserve_screenshot(self, set_id: str, file_name: str, file_size: int):
+        """Step one of three: App Store Connect answers with where to PUT the bytes."""
+        body = {"data": {
+            "type": "appScreenshots",
+            "attributes": {"fileName": file_name, "fileSize": file_size},
+            "relationships": {"appScreenshotSet": {
+                "data": {"type": "appScreenshotSets", "id": set_id}}},
+        }}
+        return self._request("POST", "/appScreenshots", json=body)["data"]
+
+    def upload_parts(self, operations: list, data: bytes):
+        """Step two: PUT each slice to Apple's storage. These URLs are pre-signed
+        and take no API token."""
+        if self.dry_run:
+            print(f"  [dry-run] PUT {len(operations)} part(s), {len(data)} bytes")
+            return
+        for op in operations:
+            chunk = data[op["offset"]:op["offset"] + op["length"]]
+            headers = {h["name"]: h["value"] for h in op.get("requestHeaders") or []}
+            r = requests.request(op["method"], op["url"], headers=headers,
+                                 data=chunk, timeout=120)
+            if r.status_code >= 400:
+                raise ASCError(f"{op['method']} upload part @{op['offset']} -> "
+                               f"{r.status_code}\n{r.text[:900]}")
+
+    def commit_screenshot(self, shot_id: str, md5: str):
+        """Step three: mark the upload done. Apple checks the bytes against md5."""
+        body = {"data": {"type": "appScreenshots", "id": shot_id,
+                         "attributes": {"uploaded": True, "sourceFileChecksum": md5}}}
+        return self._request("PATCH", f"/appScreenshots/{shot_id}", json=body)
+
+    def order_screenshots(self, set_id: str, shot_ids: list):
+        body = {"data": [{"type": "appScreenshots", "id": i} for i in shot_ids]}
+        return self._request(
+            "PATCH", f"/appScreenshotSets/{set_id}/relationships/appScreenshots",
+            json=body)
 
     # ---- builds -----------------------------------------------------------
 

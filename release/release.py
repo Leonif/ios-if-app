@@ -13,6 +13,10 @@ Steps, each also runnable on its own:
     attach     bind the processed build to the version
     status     print where the release currently stands
 
+One more step runs only on its own, never as part of `all`:
+
+    screenshots  replace the 6.7" iPhone screenshot set of every locale
+
 There is no submit step, and adding one is not an oversight to be corrected. The
 owner presses Submit for Review; the pipeline stops one step short of it on
 purpose.
@@ -27,11 +31,13 @@ side — reached through `-allowProvisioningUpdates` and the ASC API key. Verifi
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import plistlib
 import re
 import zipfile
 import shutil
+import struct
 import subprocess
 import sys
 import time
@@ -50,6 +56,14 @@ REPO = Path(__file__).resolve().parent.parent
 PROJECT = REPO / "IFApp.xcodeproj"
 SCHEME = "IFApp"
 DEFAULT_PACK = (REPO.parent / "wiki/raw/2026-08-18_store-pack-1.5.1.md")
+# The screenshot set is not tied to one release the way a store pack is, but the
+# default still is: it was made for 1.5.3, and any other version has to name its
+# set with --shots.
+DEFAULT_SHOTS = (REPO.parent / "wiki/raw/2026-11-15_screenshots-IF-77-final")
+DEFAULT_SHOTS_VERSION = "1.5.3"
+SHOT_SIZE = (1290, 2796)
+SHOT_NAMES = [f"{i:02d}.png" for i in range(1, 6)]
+SHOT_WAIT_SECONDS = 600
 WORK = Path("/tmp/if24-release")
 DEVELOPER_DIR = "/Applications/Xcode.app/Contents/Developer"
 
@@ -109,14 +123,17 @@ def preflight(args):
 
 # --- steps ----------------------------------------------------------------
 
+EDITABLE_STATES = ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED",
+                   "REJECTED", "METADATA_REJECTED", "INVALID_BINARY")
+
+
 def step_version(client, args):
     step(f"App Store version {args.version}")
     v = client.find_version(args.version)
     if v:
         state = v["attributes"]["appStoreState"]
         ok(f"already exists: {v['id']} ({state})")
-        if state not in ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED",
-                         "REJECTED", "METADATA_REJECTED", "INVALID_BINARY"):
+        if state not in EDITABLE_STATES:
             warn(f"state is {state} — metadata may be read-only until it returns "
                  "to PREPARE_FOR_SUBMISSION")
         return v["id"]
@@ -204,7 +221,8 @@ def step_metadata(client, args, version_id):
              "What's New and promotional text. Still the owner's, in App Store "
              "Connect, before Submit:")
         say("      App Information: name (required), subtitle")
-        say("      the version: keywords, description (required), screenshots")
+        say("      the version: keywords, description (required); "
+            "screenshots: release.py screenshots")
 
     if client.dry_run:
         ok(f"{len(touched)} locales would be written")
@@ -423,6 +441,205 @@ def step_attach(client, args, version_id, build_number):
     ok(f"version {args.version} now carries build {build_number}")
 
 
+def png_info(path: Path) -> tuple[int, int, bool]:
+    """(width, height, has alpha) read from the PNG header, no imaging library.
+
+    Alpha is colour type 4 or 6, or a tRNS chunk before the image data — App Store
+    Connect rejects either.
+    """
+    data = path.read_bytes()
+    if data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
+        die(f"{path} is not a PNG")
+    width, height, _, colour = struct.unpack(">IIBB", data[16:26])
+    alpha = colour in (4, 6)
+    pos = 8
+    while pos + 8 <= len(data):
+        length, kind = struct.unpack(">I4s", data[pos:pos + 8])
+        if kind == b"tRNS":
+            alpha = True
+        if kind in (b"IDAT", b"IEND"):
+            break
+        pos += 12 + length
+    return width, height, alpha
+
+
+def load_shots(args) -> dict:
+    """{asc locale: [(path, size, md5), ...] in 01..05 order}, every file checked.
+
+    Nothing here talks to App Store Connect, so it runs in full on a dry run too.
+    """
+    shots_dir = Path(args.shots) if args.shots else DEFAULT_SHOTS
+    if not args.shots and args.version != DEFAULT_SHOTS_VERSION:
+        die(f"the default screenshot set {DEFAULT_SHOTS.name} was made for "
+            f"{DEFAULT_SHOTS_VERSION}, not {args.version}. Name the set for this "
+            "release with --shots, even if it is the same folder.")
+    if not shots_dir.is_dir():
+        die(f"screenshot set not found: {shots_dir}\n"
+            "  The default lives in the wiki repo next to this one. If you are "
+            "working from a lone clone of ios-if-app, pass --shots explicitly.")
+
+    if set(ascmod.SHOTS_TO_ASC.values()) != set(ascmod.PACK_TO_ASC.values()):
+        die("SHOTS_TO_ASC and PACK_TO_ASC in release/asc.py name different "
+            "App Store Connect locales. Fix the tables, not the run.")
+
+    folders = sorted(d.name for d in shots_dir.iterdir() if d.is_dir())
+    unknown = sorted(set(folders) - set(ascmod.SHOTS_TO_ASC))
+    missing = sorted(set(ascmod.SHOTS_TO_ASC) - set(folders))
+    if unknown:
+        die(f"{shots_dir.name} has folders with no App Store Connect mapping: "
+            f"{unknown}. Add them to SHOTS_TO_ASC in release/asc.py.")
+    if missing:
+        die(f"{shots_dir.name} is missing locales the app ships: {missing}.")
+
+    bad, out = [], {}
+    for folder in sorted(ascmod.SHOTS_TO_ASC):
+        pngs = sorted(p.name for p in (shots_dir / folder).glob("*.png"))
+        if pngs != SHOT_NAMES:
+            bad.append(f"{folder}: has {pngs or 'no PNG'}, want exactly "
+                       f"{SHOT_NAMES[0]}..{SHOT_NAMES[-1]}")
+            continue
+        files = []
+        for name in SHOT_NAMES:
+            path = shots_dir / folder / name
+            w, h, alpha = png_info(path)
+            if (w, h) != SHOT_SIZE:
+                bad.append(f"{folder}/{name}: {w}x{h}, want "
+                           f"{SHOT_SIZE[0]}x{SHOT_SIZE[1]}")
+            if alpha:
+                bad.append(f"{folder}/{name}: has an alpha channel")
+            data = path.read_bytes()
+            files.append((path, len(data), hashlib.md5(data).hexdigest()))
+        out[ascmod.SHOTS_TO_ASC[folder]] = files
+    if bad:
+        die("screenshot set failed preflight:\n  " + "\n  ".join(bad))
+    ok(f"{shots_dir.name}: {len(out)} locales x {len(SHOT_NAMES)}, "
+       f"{SHOT_SIZE[0]}x{SHOT_SIZE[1]} PNG, no alpha")
+    return out
+
+
+def _replace_shot_set(client, loc_id: str, asc_locale: str, files) -> str:
+    """Empty the locale's 6.7" set and fill it with `files`. Returns the set id."""
+    shot_set = client.screenshot_set(loc_id)
+    set_id = shot_set["id"] if shot_set else \
+        client.create_screenshot_set(loc_id)["id"]
+    # Emptied first: a set holds at most ten, and a re-run after a half-finished
+    # one must not end up with the old frames plus the new.
+    for old in client.screenshots(set_id):
+        client.delete_screenshot(old["id"])
+
+    ids = []
+    for path, size, md5 in files:
+        data = path.read_bytes()
+        if hashlib.md5(data).hexdigest() != md5:
+            die(f"{path} changed since preflight")
+        shot = client.reserve_screenshot(set_id, f"{asc_locale}-{path.name}", size)
+        client.upload_parts(shot["attributes"]["uploadOperations"], data)
+        client.commit_screenshot(shot["id"], md5)
+        ids.append(shot["id"])
+
+    # Apple processes each image after the commit. Ordering waits for that, so a
+    # FAILED delivery stops here instead of being sorted into place.
+    deadline = time.time() + SHOT_WAIT_SECONDS
+    pending = set(ids)
+    while pending:
+        for shot_id in sorted(pending):
+            state = (client.screenshot(shot_id)["attributes"]
+                     .get("assetDeliveryState") or {})
+            if state.get("state") == "COMPLETE":
+                pending.discard(shot_id)
+            elif state.get("state") == "FAILED":
+                die(f"{asc_locale}: App Store Connect rejected a screenshot: "
+                    f"{state.get('errors')}")
+        if pending and time.time() > deadline:
+            die(f"{asc_locale}: {len(pending)} screenshot(s) not COMPLETE after "
+                f"{SHOT_WAIT_SECONDS // 60} min")
+        if pending:
+            time.sleep(5)
+
+    client.order_screenshots(set_id, ids)
+    return set_id
+
+
+def step_screenshots(client, args):
+    step(f"Screenshots for {args.version} ({ascmod.SCREENSHOT_DISPLAY_TYPE})")
+    shots = load_shots(args)
+
+    # Read-only from here until the plan is printed. The version and its
+    # localizations come from `version` and `metadata`; this step creates neither.
+    blockers, locs = [], {}
+    v = client.find_version(args.version)
+    if not v:
+        blockers.append(f"version {args.version} does not exist in App Store "
+                        "Connect yet. Run `version` and `metadata` first.")
+    else:
+        state = v["attributes"]["appStoreState"]
+        say(f"version {v['id']} ({state})")
+        if state not in EDITABLE_STATES:
+            blockers.append(f"version is {state}; screenshots are read-only "
+                            "until it returns to PREPARE_FOR_SUBMISSION.")
+        locs = client.localizations(v["id"])
+        absent = sorted(set(shots) - set(locs))
+        if absent:
+            blockers.append(f"the version has no localization for {absent}. "
+                            "Run `metadata` first — it creates them.")
+    if blockers and not args.dry_run:
+        die("\n  ".join(blockers))
+
+    for asc_locale, files in sorted(shots.items()):
+        loc = locs.get(asc_locale)
+        shot_set = client.screenshot_set(loc["id"]) if loc else None
+        old = client.screenshots(shot_set["id"]) if shot_set else []
+        where = (f"set {shot_set['id']}" if shot_set
+                 else "new set" if loc else "no localization yet")
+        say(f"{asc_locale}: {where} — replace {len(old)} with {len(files)}")
+        for path, size, md5 in files:
+            say(f"    {path.parent.name}/{path.name}  {size:>9,} B  md5 {md5}")
+
+    if args.dry_run:
+        n = sum(len(f) for f in shots.values())
+        ok(f"{len(shots)} locales, {n} files would be uploaded")
+        for b in blockers:
+            warn(f"a real run would stop here: {b}")
+        return
+
+    done = {}
+    for asc_locale, files in sorted(shots.items()):
+        try:
+            done[asc_locale] = _replace_shot_set(
+                client, locs[asc_locale]["id"], asc_locale, files)
+        except ascmod.ASCError as exc:
+            die(f"{asc_locale}: {exc}\n  Re-running `screenshots` is safe: it "
+                "empties the set and uploads again.")
+        ok(f"{asc_locale}: {len(files)} uploaded")
+
+    # Read back through a fresh lookup of the set, not the ids collected above.
+    step("Screenshots read back")
+    bad = []
+    say(f"{'locale':<8} {'count':>5}  {'order':<20} state")
+    for asc_locale, files in sorted(shots.items()):
+        shot_set = client.screenshot_set(locs[asc_locale]["id"])
+        got = client.screenshots(shot_set["id"]) if shot_set else []
+        names = [(g["attributes"].get("fileName") or "?").rsplit("-", 1)[-1][:2]
+                 for g in got]
+        states = {(g["attributes"].get("assetDeliveryState") or {}).get("state")
+                  for g in got}
+        sums = [g["attributes"].get("sourceFileChecksum") for g in got]
+        say(f"{asc_locale:<8} {len(got):>5}  {' '.join(names):<20} "
+            f"{','.join(sorted(s or '?' for s in states))}")
+        if len(got) != len(files):
+            bad.append(f"{asc_locale}: {len(got)} screenshots, want {len(files)}")
+        if names != [p.name[:2] for p, _, _ in files]:
+            bad.append(f"{asc_locale}: order {names}")
+        if states != {"COMPLETE"}:
+            bad.append(f"{asc_locale}: states {sorted(s or '?' for s in states)}")
+        if sums != [m for _, _, m in files]:
+            bad.append(f"{asc_locale}: checksums differ from the files sent")
+    if bad:
+        die("screenshot verification failed:\n  " + "\n  ".join(bad))
+    ok(f"{len(shots)} locales x {len(SHOT_NAMES)} read back: count, order, "
+       "state and checksum match")
+
+
 def step_status(client, args):
     step(f"Status of {args.version}")
     v = client.find_version(args.version)
@@ -447,10 +664,14 @@ def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("step", choices=["all", "version", "metadata", "archive",
-                                    "upload", "attach", "status"])
+                                    "upload", "attach", "status",
+                                    "screenshots"])
     p.add_argument("--version", required=True, help="marketing version, e.g. 1.5.1")
     p.add_argument("--build", help="build number. Default depends on the step: archive takes the next free, upload reads it from the .ipa, attach takes the one already uploaded")
     p.add_argument("--pack", default=str(DEFAULT_PACK), help="store pack markdown")
+    p.add_argument("--shots", help="screenshot set: one folder per locale with "
+                   f"01.png..05.png (default {DEFAULT_SHOTS.name}, "
+                   f"{DEFAULT_SHOTS_VERSION} only)")
     p.add_argument("--dry-run", action="store_true",
                    help="print every write instead of performing it")
     p.add_argument("--allow-dirty", action="store_true")
@@ -511,6 +732,9 @@ def main():
 
     if args.step in ("all", "attach"):
         step_attach(client, args, version_id, build_number)
+
+    if args.step == "screenshots":
+        step_screenshots(client, args)
 
     print(f"\n  Done. Tree was at {sha}.")
     if args.step == "all" and not args.dry_run:

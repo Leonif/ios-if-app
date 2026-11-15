@@ -13,6 +13,18 @@ Individual steps — `version`, `metadata`, `archive`, `upload`, `attach` — ru
 their own and are safe to repeat. `metadata` overwrites, `attach` rebinds, and
 `version` finds the existing draft instead of creating a second one.
 
+| Step | In `all` | What it does |
+|---|---|---|
+| `version` | yes | creates the App Store version, or finds the draft |
+| `metadata` | yes | What's New and promotional text, every locale, read back |
+| `archive` | yes | `xcodebuild archive` + export, signed for distribution |
+| `upload` | yes | sends the `.ipa`, waits for processing |
+| `attach` | yes | binds the build to the version |
+| `screenshots` | **no** | replaces the 6.7" iPhone screenshots of every locale, read back |
+| `status` | — | read-only: where the release stands |
+
+`screenshots` is left out of `all` on purpose — see "Screenshots" below.
+
 ## There is no submit step
 
 The pipeline stops one step short of Submit for Review, and that is a decision,
@@ -28,7 +40,7 @@ is the whole list. Signing needs no password prompt — see "Signing" below.
 | File | What it is |
 |---|---|
 | `release.py` | The pipeline. Step order, preflight, verification. |
-| `asc.py` | App Store Connect client — JWT auth, versions, localizations, builds. |
+| `asc.py` | App Store Connect client — JWT auth, versions, localizations, screenshots, builds. |
 | `store_pack.py` | Reads What's New and promotional text out of a marketing store pack. |
 | `requirements.txt` | `pip3 install -r release/requirements.txt` — PyJWT, requests, cryptography. |
 
@@ -72,7 +84,7 @@ pipeline does not upload it:
 | App Information (`appInfoLocalizations`) | subtitle | |
 | the version | keywords | |
 | the version | description | required |
-| the version | screenshots | |
+| the version | screenshots | `release.py screenshots` |
 
 `metadata` reads the listing's locales first and marks such rows
 `NEW to the store`, then ends with that list, so a green run is not mistaken for
@@ -84,11 +96,58 @@ a submittable locale:
   !!  new to the store: en-US, es-MX. This step wrote only What's New and
       promotional text. Still the owner's, in App Store Connect, before Submit:
         App Information: name (required), subtitle
-        the version: keywords, description (required), screenshots
+        the version: keywords, description (required);
+      screenshots: release.py screenshots
 ```
 
 The marketing pack for a new locale carries those texts too; the owner pastes
 them in. Once a release has gone out with the locale, it is an ordinary one.
+
+## Screenshots
+
+```sh
+./release/release.py screenshots --version 1.5.3 --dry-run   # plan, writes nothing
+./release/release.py screenshots --version 1.5.3             # do it
+```
+
+Replaces the `APP_IPHONE_67` (6.7", 1290x2796) set of every locale with the
+five frames of a screenshot set. Other display types on the same locale — 6.5",
+6.9", iPad — are not touched.
+
+**The set.** `--shots` is a folder with one subfolder per locale, each holding
+exactly `01.png` .. `05.png`. Folder names follow the marketing set, not App
+Store Connect: `en`, `es`, `de`, `fr`, `ar` land on `en-GB`, `es-ES`, `de-DE`,
+`fr-FR`, `ar-SA`. The table is `SHOTS_TO_ASC` in `asc.py`, and it must name the
+same twelve App Store Connect locales as `PACK_TO_ASC` — the step refuses to run
+if the two drift. The default set (`wiki/raw/2026-11-15_screenshots-IF-77-final`)
+was made for 1.5.3; any other version must name its set with `--shots`, for the
+same reason the store pack is pinned: the read-back would happily confirm last
+release's frames.
+
+**Preflight**, also on a dry run: every locale present, five files each, every
+file a 1290x2796 PNG without alpha (App Store Connect rejects alpha). Then, read
+only: the version exists and is editable, and it has a localization for every
+locale. It does not create either — `version` and `metadata` do, and a missing
+locale stops the run with that hint. A dry run prints the same stop as a warning
+and still shows the plan: per locale the existing set id (or "new set") and how
+many frames it holds, then each file with size and MD5.
+
+**Per locale**, for real: find or create the 6.7" set, delete what is in it,
+then for each frame the three-call upload — `POST appScreenshots` (name, size),
+`PUT` the bytes to the URLs Apple returns, `PATCH uploaded: true` with the MD5.
+It waits up to 10 minutes for every frame to reach `assetDeliveryState`
+`COMPLETE`, then fixes the order 01..05.
+
+**Read back** after all twelve: count, order, state and checksum per locale,
+printed as a table. Anything off fails the run.
+
+**Safe to repeat.** Every run empties the set first, so a run that died halfway
+leaves a locale with fewer frames, and the next run fixes it.
+
+**Not in `all`.** Screenshots change a few times a year, not every release, and
+uploading sixty images re-triggers Apple's processing for nothing. With a default
+set pinned to one version, putting it in `all` would also make every other
+release fail until `--shots` is passed. Run it on its own when the set changes.
 
 ## Version numbers do not touch project.pbxproj
 
