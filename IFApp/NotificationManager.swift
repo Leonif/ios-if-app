@@ -11,6 +11,8 @@ final class NotificationManager {
 
     private let foregroundPresenter = ForegroundPresenter()
 
+    private let requests = DispatchQueue(label: "IFApp.NotificationManager.requests")
+
     private init() {}
 
     func enableForegroundPresentation() {
@@ -65,16 +67,20 @@ final class NotificationManager {
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, seconds), repeats: false)
         let request = UNNotificationRequest(identifier: goalReachedID, content: content, trigger: trigger)
 
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error {
-                print("Notification scheduling error: \(error.localizedDescription)")
+        requests.async {
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error {
+                    print("Notification scheduling error: \(error.localizedDescription)")
+                }
             }
         }
     }
 
     func cancelGoalNotification() {
-        UNUserNotificationCenter.current()
-            .removePendingNotificationRequests(withIdentifiers: [goalReachedID])
+        requests.async {
+            UNUserNotificationCenter.current()
+                .removePendingNotificationRequests(withIdentifiers: [self.goalReachedID])
+        }
     }
 
     // MARK: - Eating-window notification (one local push when the window closes)
@@ -92,21 +98,27 @@ final class NotificationManager {
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, seconds), repeats: false)
         let request = UNNotificationRequest(identifier: eatingEndID, content: content, trigger: trigger)
 
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error {
-                print("Notification scheduling error: \(error.localizedDescription)")
+        requests.async {
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error {
+                    print("Notification scheduling error: \(error.localizedDescription)")
+                }
             }
         }
     }
 
     func cancelEatingEndNotification() {
-        UNUserNotificationCenter.current()
-            .removePendingNotificationRequests(withIdentifiers: [eatingEndID])
+        requests.async {
+            UNUserNotificationCenter.current()
+                .removePendingNotificationRequests(withIdentifiers: [self.eatingEndID])
+        }
     }
 
     func cancelDailyReminders() {
-        UNUserNotificationCenter.current()
-            .removePendingNotificationRequests(withIdentifiers: ["daily_noon_notification", "daily_evening_notification"])
+        requests.async {
+            UNUserNotificationCenter.current()
+                .removePendingNotificationRequests(withIdentifiers: ["daily_noon_notification", "daily_evening_notification"])
+        }
     }
 
     func cancelAllNotifications() {
