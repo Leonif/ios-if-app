@@ -68,7 +68,7 @@ struct TimerFlowView: View {
             if moment { presentRevocationIfNeutral() }
         }
         .onChange(of: props.isEating) { _, isEating in
-            if isEating { scheduleAutoOffer() }
+            if isEating { scheduleEatingWindowSettled() }
         }
         .navigationDestination(isPresented: $showHistory) {
             HistoryFlowView(store: store, source: historySource, focusRecordID: historyFocus,
@@ -371,15 +371,18 @@ struct TimerFlowView: View {
 
     private static let autoOfferDelay: TimeInterval = 0.42
 
-    private func scheduleAutoOffer() {
-        guard props.autoOfferPending, props.currentScreenState() == .eating else { return }
+    private func scheduleEatingWindowSettled() {
+        guard props.currentScreenState() == .eating else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.autoOfferDelay) {
             guard scenePhase == .active,
-                  props.autoOfferPending,
                   props.currentScreenState() == .eating,
                   screenIsClear
             else { return }
-            store.dispatch(ProAction.offerOpened(trigger: .fastFinished))
+            if props.autoOfferPending {
+                store.dispatch(ProAction.offerOpened(trigger: .fastFinished))
+            } else {
+                store.dispatch(AppLifecycleAction.eatingWindowSettled)
+            }
         }
     }
 

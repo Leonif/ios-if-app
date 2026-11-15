@@ -236,7 +236,7 @@ final class ProReducerTests: XCTestCase {
 
     func testAReviewPromptSuppressesTheOfferWithoutSpendingIt() {
         let next = proReducer(state: armed(),
-                              action: AppLifecycleAction.reviewPrompted(trigger: .streakMilestone))
+                              action: AppLifecycleAction.reviewPrompted(trigger: .fastCompleted))
 
         XCTAssertTrue(next.reviewPromptedThisSession)
         XCTAssertFalse(next.autoOfferPending)

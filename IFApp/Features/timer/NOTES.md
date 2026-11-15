@@ -290,7 +290,7 @@ Why the timer feature's code is the way it is. Read the section of a file before
 
 ## StreakMilestoneSheet.swift
 
-- `StreakMilestoneSheet` — "N days in a row" at 3/7/14/30, once per threshold after the goal moment settles; calm editorial, one close button — the native review request may follow its dismissal.
+- `StreakMilestoneSheet` — "N days in a row" at 3/7/14/30, once per threshold after the goal moment settles; calm editorial, one close button.
 - `StreakMilestoneSheet.body` — same overlay mechanics as `ResetConfirmSheet` (always-present stack, independent scrim/sheet transitions, real bottom inset with a home-button minimum, full opacity in travel, hit testing only while open).
 
 ## AdjustTimeThunk.swift

@@ -12,13 +12,14 @@ Why the app's composition root, root state and clock are the way they are. Read 
 ## AppLifecycleAction.swift
 
 - `AppLifecycleAction` — app-level signals that mutate no substate but drive side effects (analytics, review, notifications). Reducers ignore them; middleware reacts.
-- `AppLifecycleAction.appBecameActive` — the scene became active (cold start or return from background). Drives the pending "next open" review fallback; not a funnel event.
+- `AppLifecycleAction.appBecameActive` — the scene became active (cold start or return from background). Its one consumer is `SunnahMiddleware`, which re-syncs the reminders on it; not a funnel event.
 - `AppLifecycleAction.sourceArticleOpened` — `articleID` is the paper's index in `SourceArticle.all`, the same identifier the rows are addressed by.
 - `AppLifecycleAction.sourceOriginalOpened` — dispatched from the reader's "read the original" button and nowhere else. `OpenExternalLinkThunk` also opens the privacy policy and the system Settings, so the event cannot hang off the thunk without counting those as papers.
 - `AppLifecycleAction.sourceArticleClosed` — carries whether the foot of the article had been on screen.
 - `AppLifecycleAction.reviewPrompted` — the native `requestReview` went out on an active scene (Apple may or may not show the panel). Never dispatched when there was no scene to ask on.
 - `AppLifecycleAction.streakMilestone` — a streak milestone (3/7/14/30 days) was reached and its card shown.
 - `AppLifecycleAction.goalScreenSettled` — the goal-reached screen is on display and its moment has finished playing. Sent only from the `goalReached` state; the milestone card hangs off it.
+- `AppLifecycleAction.eatingWindowSettled` — the eating window opened by "Start eating window" is on screen, its card has settled, and nothing covers it. Sent only after `TimerAction.eatingStarted`, and only when the one-time offer was not owed; the review prompt hangs off it.
 - `AppLifecycleAction.pushAuthorizationResolved` — the user just answered the notification permission dialog. Reducers ignore it; it exists so `NotificationMiddleware` re-runs its sync, because the goal push scheduled on `.started` was rejected while the permission did not yet exist. Not a funnel event.
 - `AppLifecycleAction.fastChained` — a fast was started from the window-closed screen: the chain held.
 - `AppLifecycleAction.themeActive` — `dark` is system dark mode; the app follows the system scheme and has no in-app theme toggle.
@@ -26,8 +27,7 @@ Why the app's composition root, root state and clock are the way they are. Read 
 ## ReviewPromptTrigger.swift
 
 - `ReviewPromptTrigger` — what caused a native review request. The raw value is the GA4 `trigger` parameter.
-- `ReviewPromptTrigger.streakMilestone` — right after the streak milestone card was closed.
-- `ReviewPromptTrigger.nextOpen` — fallback: the next app open at least 4h after the 3rd completed goal, when no streak-3 milestone fired.
+- `ReviewPromptTrigger.fastCompleted` — the eating window was opened after a fast that reached its goal, and its card has settled. The only trigger; the older values `streak_milestone` and `next_open` live on only in historical GA4 data, so a funnel spanning versions must read all three.
 
 ## HistoryEntrySource.swift
 
@@ -94,7 +94,6 @@ The launch arguments below are a contract with the Maestro flows in `maestro-flo
 - `UITestSeed.applyIfNeeded(_:)` — `-seedPlanHours N` — N is the plan's length in hours (14/16/18/20, or any custom goal in `Plan.range`). It also re-pins the goal of a seeded in-flight cycle, which is what a fast started on that plan would carry. The name differs from the older `-seedPlan N`, which took a position in the preset list, on purpose: `-seedPlan 3` is a valid hours value too, so a flow left unchanged would seed a plausible 3-hour plan. `-seedPlan` is unrecognised, seeds nothing, and the plan falls back to the default.
 - `UITestSeed.applyIfNeeded(_:)` — `-seedGoalHours N` — pins the running or eating fast's goal independently of the plan. Applied after `-seedElapsed` and `-seedPlanHours` so it overrides both: it is the only way to construct a fast whose pinned goal disagrees with the selected plan, which the "resume restores the pinned goal, not the plan" scenario needs.
 - `UITestSeed.applyIfNeeded(_:)` — `-seedOfferShown 1` — the automatic offer (T1', see `Features/pro/NOTES.md`) has already been spent on this install. Its criterion — shown exactly once, ever, and not again after a dismiss — otherwise needs two qualified fasts inside one launch, and a launch cannot be re-seeded from inside itself. There is deliberately no argument for "armed but not yet shown": the plan to show lives only in the session that finished the fast and is never persisted, so a flow reaches it the way a user does — end a fast past the quality threshold, then open the eating window.
-- `UITestSeed.applyIfNeeded(_:)` — `-seedPendingGoal N` — the 3rd-goal review fallback was armed N seconds ago, so the next open can reach the native request without three real goals. N past `ReviewMiddleware`'s 4h delay makes the request due.
 - `UITestSeed.applyIfNeeded(_:)` — `-seedStreak N` / `-seedLastGoalDate D` — the first sets the counter; the last-goal day defaults to today so the badge renders, and the second moves it D days back (D=1 is yesterday, so crossing a goal extends the streak to N+1).
 - `UITestSeed.applyIfNeeded(_:)` — `-seedFreezeSpent 1` — this calendar month's protected day is already used up. Its criterion, one freeze per calendar month, needs a second missed day in one month, and a single launch cannot produce the first: spending a freeze takes a goal crossed on a day the flow cannot travel to. Without this argument the second-miss branch is reachable from unit tests only.
 - `UITestSeed.applyIfNeeded(_:)` — `-seedFreezeSpent 1` — month charged — the one the app itself would debit for the gap this same seed describes, the month of the missed day, asked of `StreakStatus.freezeMonthCharged(afterGoalOn:)` rather than recomputed, so a seed cannot charge a different month than the rule. Not "the current month": on the 1st and 2nd those differ, and seeding today's would leave the freeze unspent exactly then — a flow green for 29 days a month and red on the other two. With no gap (last goal today or yesterday) there is nothing for a freeze to cover and the argument means today's month. The gap is checked explicitly rather than falling out of a `nil`: `-seedStreak N` alone already writes today into `streak_last_goal_date`, so a fallback keyed on "no last goal" would never run and the month of tomorrow would be charged — next month, on the 31st.

@@ -88,8 +88,9 @@ Why the repositories are the way they are. `UserDefaults` keys and file names be
 
 ## ReviewRepository.swift
 
-- `ReviewRepository` — native review-request persistence plus the StoreKit call. `ReviewMiddleware` gates every call (lifetime cap, once a day, once a launch) and owns the triggers; this repository remembers the gate state and the pending "next open" fallback.
-- `ReviewRepository.requestReview(completion:)` — only a `foregroundActive` scene counts. A request on a scene still `foregroundInactive` — exactly where a cold start sits when the "next open" fallback fires — is dropped by Apple without a trace, and falling back to `scenes.first` would spend a lifetime attempt on it.
+- `ReviewRepository` — native review-request persistence plus the StoreKit call. `ReviewMiddleware` gates every call (lifetime cap, once a day, once a launch) and owns the trigger; this repository remembers the gate state.
+- `ReviewRepository.requestReview(completion:)` — only a `foregroundActive` scene counts. A request on a scene still `foregroundInactive` — exactly where a cold start sits — is dropped by Apple without a trace, and falling back to `scenes.first` would spend a lifetime attempt on it.
+- `ReviewRepository.init(defaults:)` — deletes `review_pending_goal_at`, the key the removed "next open" fallback wrote, so an upgraded install does not carry it; nothing reads it. Runs on every construction: the container registers a factory, and only `ReviewMiddleware` injects this, once per launch — either way removing a missing key is a no-op.
 - `ReviewRepository.maxPrompts` — Apple's own 3-per-365-days limit is opaque, so the app stops asking itself after this many attempts.
 
 ## ReviewRepositoryProtocol.swift
@@ -97,7 +98,6 @@ Why the repositories are the way they are. `UserDefaults` keys and file names be
 - `ReviewRepositoryProtocol.canPrompt()` — not shown today and under the lifetime cap.
 - `ReviewRepositoryProtocol.markPromptShown()` — records a call: once a day, and it counts toward the cap.
 - `ReviewRepositoryProtocol.requestReview(completion:)` — reports `true` only when a `foregroundActive` scene was found and `AppStore.requestReview` was called; Apple still decides whether the panel appears. `false` means nothing was asked, and the caller must not spend an attempt on it.
-- `ReviewRepositoryProtocol.pendingGoalDate()` — the moment of the 3rd completed goal, when the "next open" fallback was armed.
 
 ## StoreRepository.swift
 

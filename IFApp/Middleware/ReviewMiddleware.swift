@@ -8,8 +8,7 @@ import Redux
 
 final class ReviewMiddleware: Middleware {
     private let repo: ReviewRepositoryProtocol
-    private let fallbackGoalCount = 3
-    private let fallbackDelay: TimeInterval = 4 * 3600
+    private static let minCompletedSessions = 2
     private var didRequestReviewThisLaunch = false
     private var isRequestInFlight = false
 
@@ -20,47 +19,29 @@ final class ReviewMiddleware: Middleware {
     func handle<State: Equatable>(thunk: Thunk, state: State) {}
 
     func handle<State: Equatable>(action: Action, state: State, dispatch: DispatchFunction) {
-        if case UIAction.streakMilestoneClosed = action {
-            requestReview(trigger: .streakMilestone, dispatch: dispatch)
-            return
-        }
-
-        if case TimerAction.goalCelebrated = action, let app = state as? AppState {
-            if app.timerState.completedSessionsCount == fallbackGoalCount,
-               app.timerState.streakCount != 3 {
-                repo.setPendingGoal(Date())
-            }
-            return
-        }
-
-        if case AppLifecycleAction.appBecameActive = action {
-            guard let goalAt = repo.pendingGoalDate(),
-                  Date().timeIntervalSince(goalAt) >= fallbackDelay else { return }
-            requestReview(trigger: .nextOpen, dispatch: dispatch) { [repo] didAsk in
-                if didAsk { repo.clearPendingGoal() }
-            }
-        }
+        guard case AppLifecycleAction.eatingWindowSettled = action,
+              let app = state as? AppState,
+              Self.qualifies(app) else { return }
+        requestReview(trigger: .fastCompleted, dispatch: dispatch)
     }
 
-    private func requestReview(trigger: ReviewPromptTrigger,
-                               dispatch: DispatchFunction,
-                               completion: ((Bool) -> Void)? = nil) {
-        guard !didRequestReviewThisLaunch, !isRequestInFlight, repo.canPrompt() else {
-            completion?(false)
-            return
-        }
+    private static func qualifies(_ app: AppState) -> Bool {
+        guard let last = app.historyState.latestRecord,
+              abs(last.endTimestamp - app.timerState.eatingStartTimestamp) < 1,
+              last.goalReached else { return false }
+        return app.timerState.completedSessionsCount >= minCompletedSessions
+    }
+
+    private func requestReview(trigger: ReviewPromptTrigger, dispatch: DispatchFunction) {
+        guard !didRequestReviewThisLaunch, !isRequestInFlight, repo.canPrompt() else { return }
         isRequestInFlight = true
         repo.requestReview { [weak self] didAsk in
             guard let self else { return }
             self.isRequestInFlight = false
-            guard didAsk else {
-                completion?(false)
-                return
-            }
+            guard didAsk else { return }
             self.didRequestReviewThisLaunch = true
             self.repo.markPromptShown()
             dispatch(AppLifecycleAction.reviewPrompted(trigger: trigger))
-            completion?(true)
         }
     }
 }

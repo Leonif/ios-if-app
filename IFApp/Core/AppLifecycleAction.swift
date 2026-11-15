@@ -17,6 +17,7 @@ enum AppLifecycleAction: Action {
     case reviewPrompted(trigger: ReviewPromptTrigger)
     case streakMilestone(days: Int)
     case goalScreenSettled
+    case eatingWindowSettled
     case pushAuthorizationResolved
     case lastMealLogged(backdated: Bool, minutesAgo: Int, inputMethod: String)
     case fastChained

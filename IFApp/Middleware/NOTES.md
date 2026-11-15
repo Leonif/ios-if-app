@@ -47,14 +47,13 @@ Why the side-effect layer is the way it is. Middleware is handed the state after
 
 ## ReviewMiddleware.swift
 
-- `ReviewMiddleware` — calls the native review request at moments of accumulated pride, gated to at most 3 lifetime calls, once a day and once a launch. Two triggers: the streak milestone card was just closed (streak 3/7/14/30); or, as a fallback for the 3rd completed goal without a streak-3, a pending flag is armed and the request goes out on the next app open at least 4h after that goal, so the prompt lands on a fresh session rather than on top of the goal moment.
-- `ReviewMiddleware` — the gates are spent, and `review_prompted` logged, only once the native call has gone out on an active scene. No active scene means nothing was asked: the attempt stays unspent for another time.
-- `ReviewMiddleware.fallbackDelay` — so an open driven by the goal push itself never triggers the prompt.
+- `ReviewMiddleware` — calls the native review request right after a finished fast, gated to at most 3 lifetime calls, once a day and once a launch. One trigger: the user left the result screen through "Start eating window" and the eating window card has settled (`eatingWindowSettled`, which only follows `TimerAction.eatingStarted`). The result has been seen and the task is over — that pause is where the prompt goes.
+- `ReviewMiddleware` — the one-time offer (T1') outranks it: when the offer is owed the view gives it the moment and never sends `eatingWindowSettled`, and the next qualified fast tries again.
+- `ReviewMiddleware` — the gates are spent, and `review_prompted` logged, only once the native call has gone out on an active scene. No active scene means nothing was asked: the attempt stays unspent and the next qualified fast tries again.
+- `ReviewMiddleware.minCompletedSessions` — the first finished fast is too early to ask about the app.
 - `ReviewMiddleware.isRequestInFlight` — a native call is out and its result has not come back; the gates are still unspent, so without this a second action would start a second call.
-- `ReviewMiddleware.handle(action:state:dispatch:)` — `streakMilestoneClosed` — the reward is complete, so the prompt follows the positive moment instead of replacing it.
-- `ReviewMiddleware.handle(action:state:dispatch:)` — `goalCelebrated` — the state is post-reduce, so the counters already include this goal.
-- `ReviewMiddleware.handle(action:state:dispatch:)` — `appBecameActive` — the arming survives a launch that had no active scene to ask on.
-- `ReviewMiddleware.requestReview(trigger:dispatch:completion:)` — the lifetime attempt is spent and the event logged after the call reports it went out on an active scene, never before: there are three attempts in a lifetime, and one burnt on a scene Apple ignores is a prompt the user never saw, counted as shown.
+- `ReviewMiddleware.qualifies(_:)` — the fast behind this eating window earned the prompt: it reached its own goal and is at least the second one. Read from the history, not remembered here, so a `.complete` that survived a cold start still counts. The latest record must be the fast that opened this window: the window is anchored to that fast's confirmed end, and the record carries the same end. A fast too short to be recorded (`HistoryMiddleware.minimumDuration`) leaves an older fast as the latest record, and that one must not speak for it. Whether T1' takes the moment instead is not decided here: the view sends `eatingWindowSettled` only when the offer is not owed.
+- `ReviewMiddleware.requestReview(trigger:dispatch:)` — the lifetime attempt is spent and the event logged after the call reports it went out on an active scene, never before: there are three attempts in a lifetime, and one burnt on a scene Apple ignores is a prompt the user never saw, counted as shown.
 
 ## StoreMiddleware.swift
 

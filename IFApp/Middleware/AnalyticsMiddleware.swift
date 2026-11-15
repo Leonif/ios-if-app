@@ -139,6 +139,7 @@ final class AnalyticsMiddleware: Middleware {
         case let .streakMilestone(days): repo.log(.streakMilestone(days: days))
         case .appBecameActive: break
         case .goalScreenSettled: break
+        case .eatingWindowSettled: break
         case .pushAuthorizationResolved: break
         case let .lastMealLogged(backdated, minutesAgo, inputMethod):
             repo.log(.lastMealLogged(backdated: backdated, minutesAgo: minutesAgo,

@@ -11,6 +11,7 @@ Why the history feature's code is the way it is. Read the section of a file befo
 ## HistoryState.swift
 
 - `HistoryState` — finished fasts, newest first. The whole array lives in state so the screen's aggregates recompute themselves after a delete without any bookkeeping.
+- `HistoryState.latestRecord` — the fast that ended last: the one the eating window card reports and the review prompt qualifies on. By end time rather than array position, so it does not depend on the order the records were loaded in.
 - `HistoryState.exportFile` — the CSV waiting for the share sheet. The sheet is up exactly while this has a value, so the screen cannot be sharing a file that no longer exists. Not persisted: the file lives in the temporary directory, and an export is finished the moment the sheet closes.
 - `HistoryState.isExporting` — transient; never persisted with the user's history.
 - `HistoryState.isExportBusy` — no new export while one is being written or the last one is still up in the share sheet. The button disables on it and `ExportHistoryThunk` refuses on it: one predicate, defined here once.

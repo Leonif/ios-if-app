@@ -11,11 +11,14 @@ struct ReviewRepository: ReviewRepositoryProtocol {
     private enum Key {
         static let lastShown = "review_last_shown"
         static let promptCount = "review_prompt_count"
-        static let pendingGoalAt = "review_pending_goal_at"
+        static let legacyPendingGoalAt = "review_pending_goal_at"
     }
     private let maxPrompts = 3
 
-    init(defaults: UserDefaults = .standard) { self.defaults = defaults }
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        defaults.removeObject(forKey: Key.legacyPendingGoalAt)
+    }
 
     func canPrompt() -> Bool {
         if defaults.integer(forKey: Key.promptCount) >= maxPrompts { return false }
@@ -41,17 +44,5 @@ struct ReviewRepository: ReviewRepositoryProtocol {
             AppStore.requestReview(in: scene)
             completion(true)
         }
-    }
-
-    func pendingGoalDate() -> Date? {
-        defaults.object(forKey: Key.pendingGoalAt) as? Date
-    }
-
-    func setPendingGoal(_ date: Date) {
-        defaults.set(date, forKey: Key.pendingGoalAt)
-    }
-
-    func clearPendingGoal() {
-        defaults.removeObject(forKey: Key.pendingGoalAt)
     }
 }

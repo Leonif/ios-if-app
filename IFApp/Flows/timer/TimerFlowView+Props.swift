@@ -33,9 +33,7 @@ extension TimerFlowView {
             activePlan = state.activePlan
             streak = state.streak
             hasRecords = !state.historyState.records.isEmpty
-            lastFastDuration = state.historyState.records
-                .max(by: { $0.endTimestamp < $1.endTimestamp })?
-                .duration
+            lastFastDuration = state.historyState.latestRecord?.duration
             plan = state.planState.plan
             minutesAgo = state.mealState.minutesAgo
             chipIdx = state.mealState.chipIdx

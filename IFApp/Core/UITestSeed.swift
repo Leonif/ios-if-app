@@ -28,7 +28,6 @@ enum UITestSeed {
         defaults.removeObject(forKey: "plan_idx")
         defaults.removeObject(forKey: "review_last_shown")
         defaults.set(0, forKey: "review_prompt_count")
-        defaults.removeObject(forKey: "review_pending_goal_at")
         defaults.set(false, forKey: "pro_offer_shown")
 
         func intArg(_ name: String) -> Int? {
@@ -60,9 +59,6 @@ enum UITestSeed {
         if let g = intArg("-seedGoalHours") { defaults.set(Double(g), forKey: "goal_hours") }
         if let pc = intArg("-seedPromptCount") { defaults.set(pc, forKey: "review_prompt_count") }
         if let shown = intArg("-seedOfferShown") { defaults.set(shown == 1, forKey: "pro_offer_shown") }
-        if let sec = intArg("-seedPendingGoal") {
-            defaults.set(Date().addingTimeInterval(-Double(sec)), forKey: "review_pending_goal_at")
-        }
         if let s = intArg("-seedStreak") { defaults.set(s, forKey: "streak_count") }
         if intArg("-seedStreak") != nil || intArg("-seedLastGoalDate") != nil {
             let daysAgo = intArg("-seedLastGoalDate") ?? 0

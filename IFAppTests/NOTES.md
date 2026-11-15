@@ -147,12 +147,22 @@ Codes used below: T1' is the paywall spec's automatic-offer trigger and S1-S6 th
 
 ## ReviewMiddlewareTests.swift
 
-- `ReviewMiddlewareTests` — there are three review prompts in a lifetime. Nothing may be spent or logged until the native call reports it actually went out: Apple drops a request that lands on a scene that is not `foregroundActive`, which is exactly where the "next open" fallback lands on a cold start, and spending the attempt up front loses it while the funnel says "shown".
+- `ReviewMiddlewareTests` — the review prompt has one moment: the eating window opened after a finished fast, its card settled (`eatingWindowSettled`, which the view sends only when the one-time offer is not owed). It asks only when that very fast reached its goal and is at least the second one, and the old moments (the milestone card closing, the next open after a 3rd goal) ask nothing.
+- `ReviewMiddlewareTests` — there are three review prompts in a lifetime. Nothing may be spent or logged until the native call reports it actually went out: Apple drops a request that lands on a scene that is not `foregroundActive`, and spending the attempt up front loses it while the funnel says "shown".
 - `ReviewMiddlewareTests.RepoFake.callGoesOut` — what `requestReview` reports back; false means there was no active scene to ask on.
+- `ReviewMiddlewareTests.RepoFake.gatesOpen` — the persisted gates (lifetime cap, once a day); their own behaviour is pinned by `ReviewRepositoryTests`.
 - `ReviewMiddlewareTests.RepoFake.holdsTheAnswer` — the real repository answers through `Task { @MainActor }`, never in the caller's frame. Holding the answer lets a test act in the window where the call is out and its result has not come back; `answerNow()` delivers it the way the main-actor hop eventually would.
 - `ReviewMiddlewareTests.recordingDispatch(into:)` — the middleware's dispatch is where `review_prompted` is born; `AnalyticsMiddleware` only forwards it.
-- `ReviewMiddlewareTests.testAttemptWithoutASceneDoesNotBlockTheNextOneInTheSameLaunch` — a cold start hits both: `onAppear` fires while the scene is still settling, the `scenePhase` change follows once it is active. The first must not consume the once-per-launch gate, or the second — the real one — is blocked.
-- `ReviewMiddlewareTests.testSecondActionWhileACallIsInFlightDoesNotStartASecondCall` — between "asked" and "answered" every gate still reads as open, and both `appBecameActive` and a closed milestone card can land inside it. One call at a time, or one attempt buys two requests.
+- `ReviewMiddlewareTests.settledState(completed:records:)` — the eating window just opened after a 2nd finished fast that took its goal. `records` defaults to that fast plus an older one; the newest record is the one that ended last, wherever it sits in the array. `eatingStartTimestamp` is set to the newest record's end, as `StartEatingThunk` anchors the window to the confirmed end of the fast that just ended.
+- `ReviewMiddlewareTests.testAFastEndedBeforeItsGoalDoesNotAsk` — the latest record decides, even though an older one in the history did reach its goal.
+- `ReviewMiddlewareTests.testTheRecordsOwnGoalIsTheBar` — the goal is the record's own, not the plan selected now: a 13h fast on a 12h goal took it.
+- `ReviewMiddlewareTests.testTheMiddlewareDoesNotJudgeTheOffer` — whether T1' takes the moment is decided by the view on arrival, so the middleware does not look at the offer at all: one decision-maker, and the signal itself means "ask". The view's half is not reachable from a unit test; it is pinned by qa's E8 (offer owed: offer, no panel).
+- `ReviewMiddlewareTests.testAFastTooShortToRecordDoesNotBorrowAnOlderOne` — a fast shorter than a minute is never recorded, so the newest record is an older fast that did reach its goal; it must not speak for the 30-second fast that opened this window.
+- `ReviewMiddlewareTests.testNoOtherActionAsks` — the old moments ask nothing: the milestone card closing, the app opening, the goal itself, and `eatingStarted` on its own, before its card has settled.
+- `ReviewMiddlewareTests.testAttemptWithoutASceneDoesNotBlockTheNextOneInTheSameLaunch` — a call that found no scene does not consume the once-per-launch gate: the next qualified moment in the same launch may still ask.
+- `ReviewMiddlewareTests.testSecondMomentWhileACallIsInFlightDoesNotStartASecondCall` — between "asked" and "answered" every gate still reads as open. One call at a time, or one attempt buys two requests.
+- `ReviewRepositoryTests` — the persisted half of the gates, against a throwaway `UserDefaults` suite.
+- `ReviewRepositoryTests.testTheLegacyPendingGoalKeyIsRemovedOnStart` — the removed "next open" fallback's leftover key is dropped at start.
 
 ## TimerElapsedTests.swift
 

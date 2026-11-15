@@ -1,6 +1,6 @@
 ---
 name: run-if24-simulator
-description: Build, install and drive the IF24 iOS app on a simulator, and seed timer/review state to reach scenarios that would otherwise take 16 hours (goal reached, overtime, review prompt, prompt cap). Use when asked to run, launch, screenshot or manually verify IF24 behaviour on a simulator.
+description: Build, install and drive the IF24 iOS app on a simulator, and seed timer state to reach scenarios that would otherwise take 16 hours (goal reached, overtime, the eating window). Use when asked to run, launch, screenshot or manually verify IF24 behaviour on a simulator.
 ---
 
 # Гонять IF24 на симуляторе
@@ -71,37 +71,21 @@ xcrun simctl launch $SIM $B
 | `has_celebrated` | момент goal-reached уже сыграл для текущего поста (защёлка) |
 | `completed_sessions_count` | сколько постов дошло до цели - гейт промпта (порог 2) |
 | `plan_idx` | план; `1` = 16:8 |
-| `review_prompt_count` | сколько раз показывали шторку (потолок 3) |
+| `review_prompt_count` | сколько раз уходил нативный запрос оценки (потолок 3) |
 | `review_last_shown` | дата последнего показа (не чаще раза в день) |
-| `review_left` | тапнул «оценить» - жёсткий стоп навсегда |
 
 ## 5. Готовые сценарии
 
 Все - в связке «shutdown → PlistBuddy → boot → launch».
 
-**Цель взята, второй пост → должна вылезти шторка (без тапов):**
-```
-start_timestamp = now - 59400   # 16.5ч при цели 16ч
-is_running = true
-has_celebrated = false
-completed_sessions_count = 1    # станет 2 в момент цели
-удалить review_last_shown, review_left; review_prompt_count = 0
-```
-Ожидание: `count` → 2, через ~1.6с после момента появляется «Enjoying IF24?», `review_prompt_count` → 1.
+**Нативный запрос оценки - только тапами, засев plist его не покажет.** Запрос уходит после того, как пищевое окно, открытое через «Start eating window», осело (`eatingWindowSettled`), и только если пост взял цель и он минимум второй. Сценарий - Maestro-флоу с launch-аргументами: `-seedElapsed 61200 -seedCount 1 -seedOfferShown 1 -suppressPushPrompt` → `timer.endFast` → `endFast.confirm` → `timer.startEatingWindow`. Ожидание: нативная панель «Enjoying IF24?», в `Documents/diagnostics.log` - `eatingStarted` → `eatingWindowSettled` → один `reviewPrompted(trigger: fastCompleted)`. `-seedPromptCount 3` - потолок исчерпан, панели нет и `reviewPrompted` в логе нет.
 
-**Потолок исчерпан → цель считаем, шторки нет:**
-```
-... то же, но completed_sessions_count = 2, review_prompt_count = 3
-```
-Ожидание: `count` → 3, шторки нет, `review_prompt_count` остался 3.
-
-**Пост до цели → не считать, не звать:**
+**Пост до цели → не считать:**
 ```
 start_timestamp = now - 7200    # 2ч
-completed_sessions_count = 5    # порог пройден, но цель не взята
-review_prompt_count = 0
+completed_sessions_count = 5    # цель не взята
 ```
-Ожидание: экран `.active`, шторки нет, `count` остался 5.
+Ожидание: экран `.active`, `count` остался 5.
 
 **Живое пересечение цели:** `start_timestamp = now - 57580` - цель наступит через ~20с после запуска, момент сыграет на глазах.
 
@@ -166,7 +150,7 @@ ffmpeg -i /tmp/rec.mp4 -vf "fps=30,select='between(n\,125\,154)',scale=150:-1,ti
 
 **Slow Animations** (Debug-меню симулятора) - разглядеть детали моушена. Это меню самого Simulator.app, ни `simctl`, ни Maestro до него не достают, а кликать по десктопу нельзя. Если действительно нужно - попроси владельца включить пункт руками и напомни выключить обратно. В большинстве случаев хватает разбора видео по кадрам выше.
 
-**Тап по пушу - работа iOS, а не кода апки.** Тот же код-путь (апка открывается на взятой цели → момент → счётчик → шторка) детерминированно покрывается холодным запуском из секции 5 (`has_celebrated=false` + уже перейдённая цель). Видео нужно, когда проверяешь именно моушен или факт баннера.
+**Тап по пушу - работа iOS, а не кода апки.** Тот же код-путь (апка открывается на взятой цели → момент → счётчик) детерминированно покрывается холодным запуском из секции 5 (`has_celebrated=false` + уже перейдённая цель). Видео нужно, когда проверяешь именно моушен или факт баннера.
 
 **Факт доставки читается из лога, скриншот не нужен:**
 
@@ -191,7 +175,6 @@ xcodebuild -project IFApp.xcodeproj -scheme IFApp \
 ```
 
 - `-uitestReset` - стартовать с чистого idle (см. `AppStoreFactory`).
-- `-showReviewPrompt` - показать шторку отзыва сразу (см. `IFAppApp.init`).
 
 ## 8. Логи
 
