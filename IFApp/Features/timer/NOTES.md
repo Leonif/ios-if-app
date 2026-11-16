@@ -113,7 +113,8 @@ Why the timer feature's code is the way it is. Read the section of a file before
 - `EatingFooterCard` — no stats: the countdown above is the hero and already names the closing hour. The window lasts hours, so it gets its own way into history: the fast that just closed is still "today's" and the link opens straight to it; `lastFast` is nil only until the first record exists.
 - `EatingFooterCard` "done eating" — a quiet `TertiaryTextButton` that only asks: ending early also drops the closing push, and a full-width bordered button right under "Start fast" gets tapped as "close this screen".
 - `EatingOverFooterCard` — "Continue fasting" chains the next fast from the Last-meal time; no stats, the count-up is the hero.
-- `CompleteFooterCard` — mode C of the consequence genre, pinned above the home indicator outside the scroll: every point it grows comes out of the scrolling middle, so the budget is one sentence — never none, never two — and nothing else may be added. The history row is deliberately not in the pinned zone: a navigation with no consequence would read as the final step, right under the only reversible action.
+- `CompleteFooterCard` — mode C of the consequence genre, pinned above the home indicator outside the scroll: every point it grows comes out of the scrolling middle, so the consequence budget is one sentence — never none, never two — and no other content may be added; the history row is the one navigation it carries (next point).
+- `CompleteFooterCard` history row — in the card, not in the scrolling middle: the tail of the middle sits under the card at rest (on a 375pt screen there is no free band above it), so a row there is invisible while its accessibility bounds still report it on screen and a tap lands on the card. First, as on `EatingFooterCard`, not last: at the bottom a navigation with no consequence would read as the final step, right under the only reversible action. Its ~32pt come out of the scrolling middle: on SE the card's top edge crosses the counter at rest — the FASTED stat repeats the number, and the middle scrolls. Accessibility id `timer.savedToHistory`.
 - `CompleteFooterCard.consequence` — already arbitrated by the path the fast ended on; which sentence is true is a fact about the fast, not the footer.
 - `CompleteFooterCard.onSkip` — back to idle without opening the window. Not labelled "Reset": here that promises to discard a fast already in the history.
 - `CompleteFooterCard` resume — the undo sits on the same quiet material as the sentence explaining it (warning and way out visibly one family). 50pt tall so the only reversible control is not the one thing below the HIG minimum, and because rank resting on grey does not survive Arabic, where grey semibold reads stronger. No chevron (it goes nowhere); no lead-in like "Ended by mistake?" — that frames the tap as a confession.
@@ -128,9 +129,8 @@ Why the timer feature's code is the way it is. Read the section of a file before
 
 ## HistoryLink.swift
 
-- `HistoryLink` — the chevron is the whole navigation affordance. Lives outside the footer file because it is not only a footer element: on the result screen the row sits in the scrolling middle, outside the pinned zone, where a zero-consequence navigation cannot compete with the card's one reversible action.
-- `HistoryLink.tint` — brand green by default (footer rows); the row under the phase scale takes `mut`: there it is a signpost, not one of the choices.
-- `HistoryLink.minHeight` — footer rows keep a glyph-sized target; the standalone row in the scrolling middle takes the HIG 44. The floor sits on the label with a content shape so the whole row is tappable. Without a floor the target stays the glyphs on purpose: an invisible hot area under a neighbouring control lets a tap a few points low land on the other row.
+- `HistoryLink` — the chevron is the whole navigation affordance.
+- `HistoryLink` target — glyph-sized on purpose: both rows sit in a footer card right above other controls, and an invisible hot area under a neighbouring control lets a tap a few points low land on the other row.
 
 ## LastMealPill.swift
 

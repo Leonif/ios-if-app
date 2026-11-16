@@ -156,9 +156,12 @@ struct CompleteFooterCard: View {
     let onResume: () -> Void
     let onSkip: () -> Void
     let onStartEating: () -> Void
+    let onHistory: () -> Void
 
     var body: some View {
         VStack(spacing: 14) {
+            HistoryLink(title: strings.History.savedToHistory, theme: theme,
+                        identifier: "timer.savedToHistory", action: onHistory)
             HStack(spacing: 0) {
                 Stat(overline: strings.Footer.fasted, value: fasted, valueColor: theme.deep, theme: theme)
                 Rectangle().fill(theme.surfaceLine).frame(width: 1, height: 30)
