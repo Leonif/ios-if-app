@@ -9,8 +9,6 @@ struct HistoryLink: View {
     let title: String
     let theme: ThemeTokens
     let identifier: String
-    var tint: Color? = nil
-    var minHeight: CGFloat? = nil
     let action: () -> Void
 
     var body: some View {
@@ -21,8 +19,7 @@ struct HistoryLink: View {
                     .font(.system(size: 9, weight: .semibold))
             }
             .font(.hanken(13.5, .semibold))
-            .foregroundColor(tint ?? theme.deep)
-            .frame(minHeight: minHeight)
+            .foregroundColor(theme.deep)
             .contentShape(Rectangle())
         }
         .buttonStyle(.pressable)

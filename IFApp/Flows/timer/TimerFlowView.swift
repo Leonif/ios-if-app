@@ -191,13 +191,6 @@ struct TimerFlowView: View {
                                           isComplete: progress.isComplete,
                                           theme: theme)
                                 .padding(.top, 2)
-
-                            if state == .complete {
-                                HistoryLink(title: strings.History.savedToHistory, theme: theme,
-                                            identifier: "timer.savedToHistory",
-                                            tint: theme.mut, minHeight: 44,
-                                            action: { openHistory(from: .completeCard) })
-                            }
                         }
                     }
                 }
@@ -300,7 +293,8 @@ struct TimerFlowView: View {
                 theme: theme,
                 onResume: { store.dispatch(ResumeFastThunk()) },
                 onSkip: { store.dispatch(ResetFastThunk()) },
-                onStartEating: { store.dispatch(StartEatingThunk()) }
+                onStartEating: { store.dispatch(StartEatingThunk()) },
+                onHistory: { openHistory(from: .completeCard) }
             )
         case .eating:
             EatingFooterCard(

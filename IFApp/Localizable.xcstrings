@@ -4263,13 +4263,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24 muestra fases estimadas, no mediciones de tu cuerpo. No es un producto sanitario y no ofrece consejo médico. Consulta a un médico antes de cambiar tu forma de comer, sobre todo si estás embarazada, tomas medicación, tienes una enfermedad como la diabetes, has tenido problemas con la alimentación o tienes menos de 18 años."
+            "value" : "IF24 muestra fases estimadas, no mediciones de tu cuerpo. No es un producto sanitario y no ofrece consejo médico. Consulta a un médico antes de cambiar tu forma de comer, sobre todo si estás embarazada, tomas medicación, tienes una enfermedad como la diabetes, has tenido un trastorno de la conducta alimentaria o tienes menos de 18 años."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24 affiche des phases estimées, pas une mesure de votre corps. Ce n’est pas un dispositif médical et il ne donne pas de conseils médicaux. Consultez un médecin avant de modifier votre alimentation, en particulier si vous êtes enceinte, si vous prenez des médicaments, si vous avez une maladie comme le diabète, si vous avez déjà eu des difficultés avec l’alimentation ou si vous avez moins de 18 ans."
+            "value" : "IF24 affiche des phases estimées, pas une mesure de votre corps. Ce n’est pas un dispositif médical et il ne donne pas de conseils médicaux. Consultez un médecin avant de modifier votre alimentation, en particulier si vous êtes enceinte, si vous prenez des médicaments, si vous avez une maladie comme le diabète, si vous avez déjà eu des troubles du comportement alimentaire ou si vous avez moins de 18 ans."
           }
         },
         "ja" : {
@@ -4281,13 +4281,13 @@
         "ko" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "IF24가 보여주는 단계는 추정치이며, 몸을 측정한 것이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 식습관을 바꾸기 전에 의사와 상의하십시오. 특히 임신 중이거나, 약을 복용 중이거나, 당뇨병 같은 질환을 관리 중이거나, 섭식 문제를 겪은 적이 있거나, 18세 미만이라면 상의하십시오."
+            "value" : "IF24가 보여주는 단계는 추정치이며, 몸을 측정한 것이 아닙니다. IF24는 의료기기가 아니며 의학적 조언을 제공하지 않습니다. 식습관을 바꾸기 전에 의사와 상의하십시오. 특히 임신 중이거나, 약을 복용 중이거나, 당뇨병 같은 질환을 관리 중이거나, 섭식장애를 겪은 적이 있거나, 18세 미만이라면 상의하십시오."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "IF24 pokazuje szacowane fazy, a nie pomiar twojego ciała. Nie jest wyrobem medycznym i nie udziela porad medycznych. Zanim zmienisz sposób odżywiania, skonsultuj się z lekarzem - zwłaszcza jeśli jesteś w ciąży, przyjmujesz leki, masz chorobę taką jak cukrzyca, masz za sobą problemy z odżywianiem lub nie masz jeszcze 18 lat."
+            "value" : "IF24 pokazuje szacowane fazy, a nie pomiar twojego ciała. Nie jest wyrobem medycznym i nie udziela porad medycznych. Zanim zmienisz sposób odżywiania, skonsultuj się z lekarzem - zwłaszcza jeśli jesteś w ciąży, przyjmujesz leki, masz chorobę taką jak cukrzyca, masz za sobą zaburzenia odżywiania lub nie masz jeszcze 18 lat."
           }
         },
         "uk" : {
