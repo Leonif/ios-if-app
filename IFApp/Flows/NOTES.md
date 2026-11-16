@@ -118,6 +118,10 @@ Every helper of a screen is a nested, internal type of that screen in its own `<
 
 - `TimerFlowView.FooterHeightKey` — carries the pinned footer's measured height up to the scroll content that reserves it. A preference rather than a second `GeometryReader` because the two live in different branches of the same `safeAreaInset` composition.
 
+## TimerFlowView+RingAnchorKey.swift
+
+- `TimerFlowView.RingAnchorKey` — publishes the bounds of the timer ring (the 280 pt `PhaseRing` stack) to the app root, where the launch splash lands its logo onto it. `nil` on screens without the ring.
+
 ## HistoryFlowView.swift
 
 - `HistoryFlowView` — what the fasts add up to, then the fasts grouped by month. Pushed from the main screen: history is deeper into the app, not a dialog over it. Months, not weeks: a month is the unit people judge "how am I doing" in and it gives the group header a meaningful aggregate; weekly headers would turn a long history into a picket fence of titles.

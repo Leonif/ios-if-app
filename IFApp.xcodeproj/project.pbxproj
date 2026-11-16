@@ -50,6 +50,7 @@
 				DesignSystem/NOTES.md,
 				Features/endfast/NOTES.md,
 				Features/history/NOTES.md,
+				Features/launch/NOTES.md,
 				Features/meal/NOTES.md,
 				Features/phase/NOTES.md,
 				Features/plan/NOTES.md,

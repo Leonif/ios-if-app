@@ -163,6 +163,7 @@ struct TimerFlowView: View {
                                 }
                                 ringCenter(state: state, elapsed: elapsed, progress: progress, theme: theme)
                             }
+                            .anchorPreference(key: RingAnchorKey.self, value: .bounds) { $0 }
                             .padding(.vertical, 6)
 
                             EditorialSentence(text: editorial(state: state, progress: progress, elapsed: elapsed),

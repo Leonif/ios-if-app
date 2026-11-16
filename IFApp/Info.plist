@@ -16,11 +16,7 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string>LaunchBackground</string>
-		<key>UIImageName</key>
-		<string>LaunchMark</string>
-		<key>UIImageRespectsSafeAreaInsets</key>
-		<false/>
+		<string>LaunchDusk</string>
 	</dict>
 </dict>
 </plist>

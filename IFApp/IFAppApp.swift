@@ -18,6 +18,7 @@ import FirebaseAnalytics
 @main
 struct IFAppApp: App {
     @StateObject private var store: Store<AppState>
+    @State private var showsSplash = !IFAppApp.isUITestLaunch
 
     init() {
         Self.configureFirebase()
@@ -82,13 +83,31 @@ struct IFAppApp: App {
         #endif
     }
 
+    private static var isUITestLaunch: Bool {
+        ProcessInfo.processInfo.arguments.contains {
+            $0.hasPrefix("-seed") || $0.hasPrefix("-uitest") || $0.hasPrefix("-show") || $0 == "-suppressPushPrompt"
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
-            #if DEBUG || DEVELOPMENT
-            AppFlowView(store: store).debugOverlay()
-            #else
-            AppFlowView(store: store)
-            #endif
+            root
+                .overlayPreferenceValue(TimerFlowView.RingAnchorKey.self) { anchor in
+                    if showsSplash {
+                        GeometryReader { proxy in
+                            LaunchSplash(target: anchor.map { proxy[$0] }) { showsSplash = false }
+                        }
+                        .ignoresSafeArea()
+                    }
+                }
         }
+    }
+
+    @ViewBuilder private var root: some View {
+        #if DEBUG || DEVELOPMENT
+        AppFlowView(store: store).debugOverlay()
+        #else
+        AppFlowView(store: store)
+        #endif
     }
 }
