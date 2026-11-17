@@ -47,3 +47,12 @@ Why the tokens, type and shared controls are the way they are. Values come from 
 - `OverlineTracking` — letter-spacing for the uppercase overline labels, suppressed in right-to-left (Arabic) layouts, where positive tracking breaks the connected cursive script and words read as disjointed letters, and in Korean, where 1.92pt at 12pt is 0.16em against a word space of 0.263em — enough of the gap that the eye reads syllable blocks as separate words.
 - `DisplayTracking` — negative letter-spacing on display type, suppressed in Arabic, where tightening pulls a connected script apart, and in Korean, where it closes the gap between a syllable's 받침 and the stem of the next one until the two read as one block.
 - `View.displayTracking(_:_:)` — `em`-relative tracking for display type, e.g. `displayTracking(25, -0.015)`.
+
+## ContentLayout.swift
+
+- `ContentLayout.maxWidth` — 440pt, the width of the widest portrait iPhone, the one cap on how wide content gets: the main screens' content, the floating cards and the bottom sheets all stop at it. No phone in portrait reaches it, so on a phone nothing changes. It bites only where the window is wider than a phone, as on iPhone Duo opened: there a full-width layout turns a button into an 800pt slab and a line of text into one the eye cannot follow back. The value is the phone width rather than a reading measure: anything narrower would change the large iPhones. Backgrounds and scrims are not content and stay full width.
+- `ContentLayout.sheetCornerRadius` — 28pt, the corner of every bottom sheet, applied to all four corners: the bottom pair sits under the display's own rounded corners on a phone and only shows where the card floats.
+
+## View+ContentWidth.swift
+
+- `View.contentWidth()` — caps a block at `maxWidth` and centres it in whatever width it is offered. Applied to the content block inside a scroll view, not to the scroll view: a capped scroll view leaves dead margins a finger cannot scroll from. No safe-area inset is read; centring in the offered width is centring in the safe area, because that is what the framework offers.

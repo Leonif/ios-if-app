@@ -44,6 +44,7 @@ struct PaywallFlowView: View {
                     onPrivacy: { openURL(SiteLinks.privacyPolicy) },
                     onClose: { store.dispatch(ProAction.offerClosed) }
                 )
+                .contentWidth()
                 .id(props.state)
                 .transition(.opacity)
                 .zIndex(1)

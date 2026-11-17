@@ -93,7 +93,7 @@ Why the history feature's code is the way it is. Read the section of a file befo
 
 - `DeleteFastSheet` — a bottom sheet for the same reason as `ResetConfirmSheet`: on iOS 26 the system `.confirmationDialog` renders as a popover that hides the `.cancel` button, leaving only the destructive action on screen.
 - `DeleteFastSheet.sheet(bottomInset:)` — the confirm button is red: destructive, so it does not borrow the app's green primary button.
-- `DeleteFastSheet.sheet(bottomInset:)` — background bleeds past the horizontal safe area too, not only the bottom: the asymmetric safe area on iPhone Duo; reason in `Features/timer/NOTES.md`, `ResetConfirmSheet.sheet(bottomInset:)`.
+- `DeleteFastSheet.sheet(bottomInset:)` — a card capped at `ContentLayout.maxWidth`, centred in the safe area, rounded on all four corners, its background bleeding past the bottom safe area only; reason in `Features/timer/NOTES.md`, `ResetConfirmSheet.sheet(bottomInset:)`.
 
 ## PhaseRingMini.swift
 

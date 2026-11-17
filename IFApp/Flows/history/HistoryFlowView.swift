@@ -120,6 +120,7 @@ struct HistoryFlowView: View {
         .padding(.horizontal, 20)
         .padding(.top, max(0, 14 - topInset))
         .padding(.bottom, 10)
+        .contentWidth()
     }
 
     private func exportButton(theme: ThemeTokens) -> some View {
@@ -200,6 +201,7 @@ struct HistoryFlowView: View {
                 }
             }
             .padding(.horizontal, 20)
+            .contentWidth()
             .padding(.bottom, 24)
         }
     }

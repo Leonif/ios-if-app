@@ -196,6 +196,7 @@ struct TimerFlowView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 24)
+                .contentWidth()
                 .padding(.top, headerTop + headerHeight + headerGap)
                 .padding(.bottom, 12 + footerHeight)
             }
@@ -214,10 +215,12 @@ struct TimerFlowView: View {
                 )
                 .padding(.top, headerTop)
                 .padding(.horizontal, 24)
+                .contentWidth()
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 footer(state: state, elapsed: elapsed, theme: theme)
                     .padding(.horizontal, 24)
+                    .contentWidth()
                     .padding(.bottom, max(insets.bottom, 32))
                     .frame(maxWidth: .infinity)
                     .background(theme.backgroundBase)

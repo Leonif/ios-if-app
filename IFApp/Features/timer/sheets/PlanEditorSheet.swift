@@ -26,6 +26,7 @@ struct PlanEditorSheet: View {
 
             card
                 .padding(.horizontal, 18)
+                .contentWidth()
                 .padding(.top, 70)
         }
         .transition(.opacity)

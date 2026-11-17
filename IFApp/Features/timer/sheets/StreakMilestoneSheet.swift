@@ -51,11 +51,12 @@ struct StreakMilestoneSheet: View {
         .padding(.bottom, max(22, 40 - bottomInset))
         .frame(maxWidth: .infinity)
         .background(
-            UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
+            RoundedRectangle(cornerRadius: ContentLayout.sheetCornerRadius, style: .continuous)
                 .fill(theme.sheetBg)
                 .shadow(color: theme.cardShadow, radius: 24, x: 0, y: -6)
-                .ignoresSafeArea(edges: [.horizontal, .bottom])
+                .ignoresSafeArea(edges: .bottom)
         )
+        .frame(maxWidth: ContentLayout.maxWidth)
     }
 
     private var flameMark: some View {

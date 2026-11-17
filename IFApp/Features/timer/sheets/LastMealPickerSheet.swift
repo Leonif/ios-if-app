@@ -37,6 +37,7 @@ struct LastMealPickerSheet: View {
 
             card
                 .padding(.horizontal, 18)
+                .contentWidth()
                 .padding(.bottom, 20)
         }
         .ignoresSafeArea(.container, edges: .bottom)
