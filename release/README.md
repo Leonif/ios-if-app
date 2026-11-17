@@ -149,6 +149,22 @@ uploading sixty images re-triggers Apple's processing for nothing. With a defaul
 set pinned to one version, putting it in `all` would also make every other
 release fail until `--shots` is passed. Run it on its own when the set changes.
 
+## A release is archived from current-release, nothing else
+
+`archive` and `all` refuse to build unless HEAD is `current-release`, optionally
+with a version bump on top (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` lines in
+`project.pbxproj`, nothing more). They also refuse when the local `current-release`
+is behind `origin`. Every branch of a release is merged into `current-release`
+first; archiving from a feature or an old release branch, or cherry-picking into
+one, is exactly what this check stops. A dirty tree is refused too, even with
+`--allow-dirty`: uncommitted changes would reach the archive past the check.
+`--allow-any-base` skips it and says so in the output. A ready `.ipa` passed with
+`--ipa` is not checked - the check guards archiving, not files built elsewhere.
+
+Why: on 16.11.2026 1.5.3 (3) was archived from the stale `feature/IF-76-release-1.5.3`
+with IF-81 cherry-picked onto it, resubmitted over build 2, and shipped without the
+IF-91 splash that `current-release` already had.
+
 ## Version numbers do not touch project.pbxproj
 
 `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` are passed to `xcodebuild` as

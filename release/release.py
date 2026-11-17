@@ -100,6 +100,52 @@ def git_state():
     return head, sha, dirty
 
 
+RELEASE_BASE = "current-release"
+# The only file a release commit may change on top of current-release: the
+# version bump. 16.11.2026 1.5.3 (3) was archived from a stale release branch with
+# a cherry-pick on it and shipped without the IF-91 splash that current-release had.
+BUMP_FILES = {"IFApp.xcodeproj/project.pbxproj"}
+
+
+def _git(*a):
+    return subprocess.run(["git", "-C", REPO, *a], capture_output=True, text=True)
+
+
+def check_release_base(args):
+    """A release is archived from current-release (plus the version bump), nothing else."""
+    if args.allow_any_base:
+        warn(f"--allow-any-base: NOT checking that HEAD is {RELEASE_BASE}")
+        return
+    if _git("status", "--porcelain").stdout.strip():
+        msg = (f"uncommitted changes would go into the archive unchecked; the "
+               f"{RELEASE_BASE} check needs a clean tree (or --allow-any-base)")
+        if args.dry_run:
+            warn(msg)
+        else:
+            die(msg)
+    if _git("fetch", "-q", "origin", RELEASE_BASE).returncode != 0:
+        die(f"git fetch origin {RELEASE_BASE} failed - cannot check the release base")
+    behind = _git("rev-list", "--count", f"{RELEASE_BASE}..origin/{RELEASE_BASE}").stdout.strip()
+    if behind != "0":
+        die(f"local {RELEASE_BASE} is {behind or '?'} commit(s) behind origin. Pull it first.")
+    if _git("merge-base", "--is-ancestor", RELEASE_BASE, "HEAD").returncode != 0:
+        die(f"HEAD does not contain {RELEASE_BASE}. A release is archived from "
+            f"{RELEASE_BASE} after every branch is merged into it - not from a "
+            "feature or an old release branch, and not with cherry-picks.")
+    changed = set(_git("diff", "--name-only", RELEASE_BASE, "HEAD").stdout.split())
+    extra = sorted(changed - BUMP_FILES)
+    if extra:
+        die(f"HEAD changes more than the version bump on top of {RELEASE_BASE}: "
+            + ", ".join(extra) + f". Merge that work into {RELEASE_BASE} first.")
+    diff = _git("diff", "-U0", RELEASE_BASE, "HEAD", "--", *BUMP_FILES).stdout.splitlines()
+    foreign = [l for l in diff if l[:1] in "+-" and not l.startswith(("+++", "---"))
+               and not re.search(r"\b(MARKETING_VERSION|CURRENT_PROJECT_VERSION) = ", l)]
+    if foreign:
+        die(f"the project file changes more than the version on top of {RELEASE_BASE}: "
+            f"{foreign[0].strip()[:120]}")
+    ok(f"release base: {RELEASE_BASE}" + (" + version bump" if changed else ""))
+
+
 def preflight(args):
     step("Preflight")
     head, sha, dirty = git_state()
@@ -115,6 +161,8 @@ def preflight(args):
                 "Commit them, or pass --allow-dirty if you mean it.")
     else:
         ok("working tree clean")
+    if args.step in ("all", "archive") and not args.ipa:
+        check_release_base(args)
     if not ascmod.KEY_PATH.exists():
         die(f"App Store Connect key not found at {ascmod.KEY_PATH}")
     ok(f"API key {ascmod.KEY_ID}")
@@ -675,6 +723,8 @@ def main():
     p.add_argument("--dry-run", action="store_true",
                    help="print every write instead of performing it")
     p.add_argument("--allow-dirty", action="store_true")
+    p.add_argument("--allow-any-base", action="store_true",
+                   help=f"archive even if HEAD is not {RELEASE_BASE} + version bump")
     p.add_argument("--wait-minutes", type=int, default=45)
     p.add_argument("--ipa", help="skip archiving, upload this .ipa")
     args = p.parse_args()
