@@ -125,6 +125,7 @@ Codes used below: T1' / T2 / T3 / T4 are the offer's trigger rules and S1-S6 the
 
 - `ProNoticeSheet` — one sheet, two things to say after the entitlement goes away: that it is gone (edge 6) and that the next fast runs to a different goal (edge 17). They share a component and never a frame — the second arrives at the next start, possibly days later. A sheet, not an alert, toast or banner: an alert's convention is "we need a decision from you", there is none, so it reads as an error, and it is 238pt wide, which gives Korean three lines at larger type sizes; a toast or banner can swallow the second sentence, which is the entire reason for showing this. No Restore button: after a refund it would return nothing.
 - `ProNoticeSheet.sheet(_:bottomInset:)` — the title is 17/semibold and deliberately not the 25/600 state-headline slot, which overflows in English, Ukrainian, German and Polish at xxLarge. Accessibility ids `proNotice`, `proNotice.close`.
+- `ProNoticeSheet.sheet(_:bottomInset:)` — background bleeds past the horizontal safe area too, not only the bottom: the asymmetric safe area on iPhone Duo; reason in `Features/timer/NOTES.md`, `ResetConfirmSheet.sheet(bottomInset:)`.
 - `ProNoticeSheet.body(_:)` — `.entitlementRevoked` — the cause is never named and no locale mentions money: one key covers both a refund and leaving a Family Sharing group.
 
 ## PaywallView.swift

@@ -19,6 +19,7 @@ struct HistoryFlowView: View {
     @State private var props: Props
     @State private var expandedID: UUID?
     @State private var pendingDelete: FastRecord?
+    @State private var topInset: CGFloat = 0
 
     init(store: Store<AppState>, source: HistoryEntrySource, focusRecordID: UUID? = nil,
          onStartFast: @escaping () -> Void) {
@@ -50,6 +51,7 @@ struct HistoryFlowView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onGeometryChange(for: CGFloat.self, of: { $0.safeAreaInsets.top }, action: { topInset = $0 })
         .background(theme.historyBackground.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
         .background(InteractivePopGesture().frame(width: 0, height: 0))
@@ -116,6 +118,7 @@ struct HistoryFlowView: View {
             Spacer()
         }
         .padding(.horizontal, 20)
+        .padding(.top, max(0, 14 - topInset))
         .padding(.bottom, 10)
     }
 

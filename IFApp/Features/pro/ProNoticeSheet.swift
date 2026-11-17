@@ -55,7 +55,7 @@ struct ProNoticeSheet: View {
             UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
                 .fill(theme.sheetBg)
                 .shadow(color: theme.cardShadow, radius: 24, x: 0, y: -6)
-                .ignoresSafeArea(edges: .bottom)
+                .ignoresSafeArea(edges: [.horizontal, .bottom])
         )
         .accessibilityIdentifier("proNotice")
     }
