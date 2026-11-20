@@ -7,13 +7,10 @@ import Foundation
 import Redux
 
 struct StartFastThunk: Thunk {
-    private let notifications: NotificationRepositoryProtocol
-    private let analytics: AnalyticsRepositoryProtocol
+    private let notifications: NotificationSchedulerProtocol
 
-    init(notifications: NotificationRepositoryProtocol = container.inject(),
-         analytics: AnalyticsRepositoryProtocol = container.inject()) {
+    init(notifications: NotificationSchedulerProtocol = container.inject()) {
         self.notifications = notifications
-        self.analytics = analytics
     }
 
     func execute<State: Equatable>(state: State, dispatch: @escaping (Action) -> Void) async {
@@ -36,7 +33,6 @@ struct StartFastThunk: Thunk {
                                      goalHours: plan.fastHours))
 
         await SyncPushStatusThunk.requestIfUndetermined(notifications: notifications,
-                                                        analytics: analytics,
                                                         dispatch: dispatch)
     }
 }

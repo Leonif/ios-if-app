@@ -7,15 +7,15 @@ import Foundation
 import Redux
 
 final class AnalyticsMiddleware: Middleware {
-    private let repo: AnalyticsRepositoryProtocol
+    private let tracker: AnalyticsTrackerProtocol
     private var reportedPlan: Plan?
     private var reportedEntitlement: Entitlement?
     private var previousPro: ProState?
     private var previousSunnah: SunnahState?
     private var armingAwaitingAnswer = false
 
-    init(repo: AnalyticsRepositoryProtocol = container.inject()) {
-        self.repo = repo
+    init(tracker: AnalyticsTrackerProtocol = container.inject()) {
+        self.tracker = tracker
     }
 
     func handle<State: Equatable>(thunk: Thunk, state: State) {}
@@ -39,7 +39,7 @@ final class AnalyticsMiddleware: Middleware {
         case let ui as UIAction:
             if case .planEditorClosed = ui, let app {
                 let plan = app.planState.plan
-                repo.log(.planConfirmed(plan: plan.analyticsLabel, goalHours: plan.hours))
+                tracker.log(.planConfirmed(plan: plan.analyticsLabel, goalHours: plan.hours))
             }
         case let history as HistoryAction:
             handle(history)
@@ -66,26 +66,26 @@ final class AnalyticsMiddleware: Middleware {
         case let .deliveryUpdated(delivery, _):
             guard armingAwaitingAnswer else { return }
             armingAwaitingAnswer = false
-            repo.log(.sunnahEnabled(mode: settings.analyticsMode,
-                                    pushAllowed: delivery != .denied))
-        case .refresh:
+            tracker.log(.sunnahEnabled(mode: settings.analyticsMode,
+                                       pushAllowed: delivery != .denied))
+        case .refresh, .systemSettingsTapped:
             break
         }
     }
 
     private func handle(_ action: EndFastAction) {
         if case let .refused(_, unavoidable) = action {
-            repo.log(.endFastRefused(unavoidable: unavoidable))
+            tracker.log(.endFastRefused(unavoidable: unavoidable))
         }
     }
 
     private func handle(_ action: HistoryAction) {
         switch action {
         case .deleted:
-            repo.log(.historyRecordDeleted)
+            tracker.log(.historyRecordDeleted)
         case let .exportFinished(shared):
-            if shared { repo.log(.historyExported) }
-        case .recorded, .exportStarted, .exportFailed, .exportPrepared:
+            if shared { tracker.log(.historyExported) }
+        case .recorded, .exportTapped, .exportStarted, .exportFailed, .exportPrepared:
             break
         }
     }
@@ -93,22 +93,22 @@ final class AnalyticsMiddleware: Middleware {
     private func handle(_ action: ProAction, trigger: String) {
         switch action {
         case .offerOpened:
-            repo.log(.paywallShown(trigger: trigger))
+            tracker.log(.paywallShown(trigger: trigger))
         case .offerClosed:
-            repo.log(.paywallDismissed(trigger: trigger))
+            tracker.log(.paywallDismissed(trigger: trigger))
         case .purchaseStarted:
-            repo.log(.purchaseStarted(trigger: trigger, product: ProCatalog.productID))
+            tracker.log(.purchaseStarted(trigger: trigger, product: ProCatalog.productID))
         case .purchaseCompleted:
-            repo.log(.purchaseCompleted(trigger: trigger, product: ProCatalog.productID))
+            tracker.log(.purchaseCompleted(trigger: trigger, product: ProCatalog.productID))
         case .purchasePending:
-            repo.log(.purchaseFailed(trigger: trigger, reason: PurchaseFailure.pending.rawValue))
+            tracker.log(.purchaseFailed(trigger: trigger, reason: PurchaseFailure.pending.rawValue))
         case let .purchaseFailed(reason), let .restoreFailed(reason):
-            repo.log(.purchaseFailed(trigger: trigger, reason: reason.rawValue))
+            tracker.log(.purchaseFailed(trigger: trigger, reason: reason.rawValue))
         case .restoreCompleted:
-            repo.log(.restoreCompleted)
+            tracker.log(.restoreCompleted)
         case .restoreStarted, .restoreFoundNothing, .storeResolved, .entitlementChanged,
              .nothingToRestoreExpired, .noticeShown, .noticeDismissed,
-             .autoOfferArmed, .autoOfferCancelled:
+             .autoOfferArmed, .autoOfferCancelled, .purchaseTapped, .restoreTapped:
             break
         }
     }
@@ -120,72 +120,75 @@ final class AnalyticsMiddleware: Middleware {
     private func reportProStatus(_ entitlement: Entitlement) {
         guard entitlement != reportedEntitlement else { return }
         reportedEntitlement = entitlement
-        repo.setUserProperty(entitlement.analyticsValue, forName: "pro_status")
+        tracker.setUserProperty(entitlement.analyticsValue, forName: "pro_status")
     }
 
     private func handle(_ action: AppLifecycleAction) {
         switch action {
-        case .appOpened: repo.log(.appOpened)
-        case .sourcesOpened: repo.log(.sourcesOpened)
+        case .appOpened: tracker.log(.appOpened)
+        case .sourcesOpened: tracker.log(.sourcesOpened)
         case let .sourceArticleOpened(articleID):
-            repo.log(.sourceArticleOpened(articleID: articleID))
-        case let .sourceOriginalOpened(articleID):
-            repo.log(.sourceOriginalOpened(articleID: articleID))
+            tracker.log(.sourceArticleOpened(articleID: articleID))
+        case let .sourceOriginalOpened(articleID, _):
+            tracker.log(.sourceOriginalOpened(articleID: articleID))
         case let .sourceArticleClosed(articleID, reachedEnd):
-            repo.log(.sourceArticleClosed(articleID: articleID, reachedEnd: reachedEnd))
-        case let .sunnahOpened(source): repo.log(.sunnahOpened(source: source.rawValue))
-        case let .historyOpened(source): repo.log(.historyOpened(source: source.rawValue))
-        case let .reviewPrompted(trigger): repo.log(.reviewPrompted(trigger: trigger.rawValue))
-        case let .streakMilestone(days): repo.log(.streakMilestone(days: days))
+            tracker.log(.sourceArticleClosed(articleID: articleID, reachedEnd: reachedEnd))
+        case let .sunnahOpened(source): tracker.log(.sunnahOpened(source: source.rawValue))
+        case let .historyOpened(source): tracker.log(.historyOpened(source: source.rawValue))
+        case let .reviewPrompted(trigger): tracker.log(.reviewPrompted(trigger: trigger.rawValue))
+        case let .streakMilestone(days): tracker.log(.streakMilestone(days: days))
         case .appBecameActive: break
         case .goalScreenSettled: break
         case .eatingWindowSettled: break
         case .pushAuthorizationResolved: break
+        case let .pushStatusRead(label):
+            tracker.setUserProperty(label, forName: "push_status")
         case let .lastMealLogged(backdated, minutesAgo, inputMethod):
-            repo.log(.lastMealLogged(backdated: backdated, minutesAgo: minutesAgo,
-                                     inputMethod: inputMethod))
+            tracker.log(.lastMealLogged(backdated: backdated, minutesAgo: minutesAgo,
+                                        inputMethod: inputMethod))
         case .fastChained:
-            repo.log(.fastChained)
+            tracker.log(.fastChained)
         case let .themeActive(dark):
-            repo.log(.themeActive(dark: dark))
+            tracker.log(.themeActive(dark: dark))
         }
     }
 
     private func handle(_ action: TimerAction, goalHours: Double) {
         switch action {
         case .started:
-            repo.log(.fastStarted(goalHours: goalHours))
+            tracker.log(.fastStarted(goalHours: goalHours))
         case let .stopped(elapsed, qualifies, backdatedMinutes):
             let phase = PhaseProgress.compute(elapsed: elapsed, goalHours: goalHours).phase
-            repo.log(.fastStopped(
+            tracker.log(.fastStopped(
                 durationSeconds: Int(elapsed),
                 completed: qualifies,
                 stage: phase.analyticsValue,
                 backdatedMinutes: backdatedMinutes
             ))
         case .stopUndone:
-            repo.log(.fastStopUndone)
+            tracker.log(.fastStopUndone)
         case let .reset(elapsed):
-            repo.log(.fastReset(elapsedMinutes: Int(elapsed / 60)))
+            tracker.log(.fastReset(elapsedMinutes: Int(elapsed / 60)))
         case .eatingStarted:
-            repo.log(.eatingWindowStarted)
-        case .eatingEnded:
+            tracker.log(.eatingWindowStarted)
+        case .eatingEnded, .startFastTapped, .resumeTapped, .resetTapped, .startEatingTapped,
+             .continueFastingTapped, .goalMomentStarted:
             break
         case .timeAdjusted:
-            repo.log(.timeAdjusted)
+            tracker.log(.timeAdjusted)
         case .goalCelebrated:
-            repo.log(.goalReached(goalHours: goalHours))
+            tracker.log(.goalReached(goalHours: goalHours))
         }
     }
 
     private func handlePlanSelected(_ plan: Plan) {
         guard plan != reportedPlan else { return }
-        repo.log(.planSelected(plan: plan.analyticsLabel, goalHours: plan.hours))
+        tracker.log(.planSelected(plan: plan.analyticsLabel, goalHours: plan.hours))
         reportCurrentPlan(plan)
     }
 
     private func reportCurrentPlan(_ plan: Plan) {
         reportedPlan = plan
-        repo.setUserProperty(plan.analyticsLabel, forName: "current_plan")
+        tracker.setUserProperty(plan.analyticsLabel, forName: "current_plan")
     }
 }

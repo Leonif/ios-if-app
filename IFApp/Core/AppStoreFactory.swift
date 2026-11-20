@@ -8,7 +8,7 @@ import Redux
 
 enum AppStoreFactory {
     static func make() -> Store<AppState> {
-        let notifications: NotificationRepositoryProtocol = container.inject()
+        let notifications: NotificationSchedulerProtocol = container.inject()
         notifications.enableForegroundPresentation()
 
         let persistence: TimerPersistenceRepositoryProtocol = container.inject()
@@ -60,6 +60,10 @@ enum AppStoreFactory {
             NotificationMiddleware(),
             SunnahMiddleware(),
             StoreMiddleware(),
+            SourcesMiddleware(),
+            TimerMiddleware(),
+            MealMiddleware(),
+            EndFastMiddleware(),
         ]
         #if DEBUG || DEVELOPMENT
         middlewares.insert(DiagnosticsMiddleware(), at: 0)

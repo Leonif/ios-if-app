@@ -41,7 +41,7 @@ func endFastReducer(state: EndFastState, action: Action) -> EndFastState {
     case .closed:
         newState = EndFastState()
 
-    case .none:
+    case .openTapped, .chipTapped, .stepTapped, .confirmTapped, .none:
         break
     }
 

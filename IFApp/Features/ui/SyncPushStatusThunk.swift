@@ -8,23 +8,19 @@ import Redux
 import UserNotifications
 
 struct SyncPushStatusThunk: Thunk {
-    private let notifications: NotificationRepositoryProtocol
-    private let analytics: AnalyticsRepositoryProtocol
+    private let notifications: NotificationSchedulerProtocol
 
-    init(notifications: NotificationRepositoryProtocol = container.inject(),
-         analytics: AnalyticsRepositoryProtocol = container.inject()) {
+    init(notifications: NotificationSchedulerProtocol = container.inject()) {
         self.notifications = notifications
-        self.analytics = analytics
     }
 
     func execute<State: Equatable>(state: State, dispatch: @escaping (Action) -> Void) async {
         let status = await notifications.authorizationStatus()
-        analytics.setUserProperty(Self.label(for: status), forName: "push_status")
+        dispatch(AppLifecycleAction.pushStatusRead(label: Self.label(for: status)))
     }
 
     @discardableResult
-    static func requestIfUndetermined(notifications: NotificationRepositoryProtocol,
-                                      analytics: AnalyticsRepositoryProtocol,
+    static func requestIfUndetermined(notifications: NotificationSchedulerProtocol,
                                       dispatch: @escaping (Action) -> Void) async -> Bool {
         guard !promptSuppressed else { return false }
         guard await notifications.authorizationStatus() == .notDetermined else { return false }
@@ -32,7 +28,7 @@ struct SyncPushStatusThunk: Thunk {
         await notifications.requestAuthorization()
 
         let status = await notifications.authorizationStatus()
-        analytics.setUserProperty(label(for: status), forName: "push_status")
+        dispatch(AppLifecycleAction.pushStatusRead(label: label(for: status)))
         dispatch(AppLifecycleAction.pushAuthorizationResolved)
         return true
     }

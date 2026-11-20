@@ -3,6 +3,7 @@
 //  IFApp
 //
 
+import Foundation
 import Redux
 
 enum MealAction: Action {
@@ -14,4 +15,9 @@ enum MealAction: Action {
     case pickerOpened
     case pickerDismissed
     case pickerConfirmed
+    case chipTapped(MealChip)
+    case scrubFeedbackRequested(MealScrubFeedback)
+    case exactTimeChosen(Date)
+    case confirmTapped
+    case windowClosedShown
 }

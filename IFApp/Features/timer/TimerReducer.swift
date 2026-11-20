@@ -76,7 +76,8 @@ func timerReducer(state: TimerState, action: Action) -> TimerState {
         newState.eatingStartTimestamp = 0
         newState.goalHours = 0
 
-    case .none:
+    case .startFastTapped, .resumeTapped, .resetTapped, .startEatingTapped,
+         .continueFastingTapped, .goalMomentStarted, .none:
         break
     }
 

@@ -23,12 +23,11 @@ struct AboutFlowView: View {
             status: props.status,
             showsNothingToRestore: props.showsNothingToRestore,
             onOpenOffer: { store.dispatch(ProAction.offerOpened(trigger: .manual)) },
-            onRestore: { store.dispatch(RestorePurchasesThunk()) },
+            onRestore: { store.dispatch(ProAction.restoreTapped) },
             onPrivacy: { openURL(SiteLinks.privacyPolicy) },
             onSunnah: onSunnah,
             onOpenSource: { articleID, url in
-                store.dispatch(AppLifecycleAction.sourceOriginalOpened(articleID: articleID))
-                store.dispatch(OpenExternalLinkThunk(url: url))
+                store.dispatch(AppLifecycleAction.sourceOriginalOpened(articleID: articleID, url: url))
             },
             onOpenArticle: {
                 store.dispatch(AppLifecycleAction.sourceArticleOpened(articleID: $0))

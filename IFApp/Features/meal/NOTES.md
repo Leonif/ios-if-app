@@ -5,7 +5,7 @@ Why the last-meal picker's code is the way it is. Read the section of a file bef
 ## MealState.swift
 
 - `MealState` — the picker's single source of truth, and it stores the **distance** the user chose ("forty minutes ago"), not the wall-clock moment it resolves to. The question on screen is "how long ago did you eat"; the ribbon and the chips are distances. Turning a distance into a moment needs "now", and the only correct "now" is the instant the fast actually starts — `ConfirmLastMealThunk`, not the instant the finger left the ribbon. Storing the moment means resolving it early against a clock read somewhere in the view, which is how a picker jumps into the future across midnight: the day offset computed against one "now" and read back against another.
-- `MealState` — keeping the distance also keeps `MealAction` free of time, so the reducer needs no injected clock (invariant 1) and the view has no reason to read one into a payload (invariant 6). `(ateDay, ateMin)` is only how the value is *displayed*, derived on the spot by `MealMath.moment`.
+- `MealState` — keeping the distance also keeps `MealAction`'s facts free of time, so the reducer needs no injected clock (invariant 1) and the view has no reason to read one into a payload (invariant 6). `(ateDay, ateMin)` is only how the value is *displayed*, derived on the spot by `MealMath.moment`.
 - `MealState.minutesAgo` — 0 means "now / starting fresh": the live moment, which stays live however long the sheet is open instead of freezing on the minute it opened.
 - `MealState.chipIdx` — a separate source of truth from the value, -1 = none: landing on 60 minutes by dragging the ribbon is not the same act as tapping "1h", and only the tap lights a pill.
 - `MealState.inputMethod` — carried into `last_meal_logged` so the scale can be retuned against how people actually answer.
@@ -28,18 +28,20 @@ Why the last-meal picker's code is the way it is. Read the section of a file bef
 
 ## MealAction.swift
 
-- `MealAction` — every case carries a distance in minutes and nothing else; no case needs a clock to apply, so the reducer stays pure without one being injected. The moment is resolved once, at confirm, against the clock of that instant.
+- `MealAction` — every fact carries a distance in minutes and nothing else; no fact needs a clock to apply, so the reducer stays pure without one being injected. The moment is resolved once, at confirm, against the clock of that instant.
 - `MealAction.initialized(minutesAgo:)` — a distance the app worked out itself (the window-closed default), applied only while unset. Lights no chip: the value came from the app, not a tap.
 - `MealAction.scrubbed(minutesAgo:)` — drops any chip selection; the ribbon is the source of truth from then on.
 - `MealAction.chipPicked(idx:minutesAgo:)` — sets the value *and* keeps the chip lit.
 - `MealAction.exactTimePicked(minutesAgo:)` — deliberately off the ribbon's snap grid.
 - `MealAction.pickerOpened` — carries no value: it only marks where to come back to if the sheet is dismissed instead of confirmed.
 - `MealAction.pickerDismissed` — the scrim, or anything else that closes the sheet without confirming; puts the answer back as it stood on open. Separate from `cleared` because they mean opposite things: `cleared` says "there is no answer any more", this says "keep the answer you had" — dismissing a sheet opened over a seeded window-close time must not throw the seed away.
+- `MealAction` — `chipTapped`, `scrubFeedbackRequested`, `exactTimeChosen`, `confirmTapped`, `windowClosedShown` — intents: what the person did in the picker, or that the closed-window screen came up with no answer yet. `MealMiddleware` turns each into its thunk, which sends the facts above. `exactTimeChosen` carries the system picker's `Date` as the picker gave it — the answer, not a clock reading — and the reducer never applies it: the thunk turns it into a distance.
 - `MealAction.pickerConfirmed` — changes no value (the answer already stands); it only spends the way back. Without it the snapshot outlives the confirm, and a `pickerDismissed` arriving afterwards — from whatever way of closing the sheet gets added next — would quietly undo a committed answer.
 
 ## MealReducer.swift
 
 - `mealReducer(state:action:)` — `.initialized` applies only while `isFresh`: a seed must never overwrite an answer.
+- `mealReducer(state:action:)` — intents are no-ops: the answer moves only on the fact the thunk sends, so routing a tap through an intent adds no state the picker's revert would have to know about.
 
 ## MealMath.swift
 

@@ -7,9 +7,9 @@ import Foundation
 import Redux
 
 final class NotificationMiddleware: Middleware {
-    private let repo: NotificationRepositoryProtocol
+    private let repo: NotificationSchedulerProtocol
 
-    init(repo: NotificationRepositoryProtocol = container.inject()) {
+    init(repo: NotificationSchedulerProtocol = container.inject()) {
         self.repo = repo
     }
 
@@ -17,6 +17,10 @@ final class NotificationMiddleware: Middleware {
 
     func handle<State: Equatable>(action: Action, state: State, dispatch: DispatchFunction) {
         guard let app = state as? AppState else { return }
+        if case AppLifecycleAction.appOpened = action {
+            dispatch(ScheduleNotificationsThunk())
+            dispatch(SyncPushStatusThunk())
+        }
         switch action {
         case is TimerAction, is PlanAction, is AppLifecycleAction:
             sync(app)

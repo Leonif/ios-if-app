@@ -9,13 +9,8 @@ import Redux
 final class HistoryMiddleware: Middleware {
     private static let minimumDuration: TimeInterval = 60
 
-    private let repo: FastHistoryRepositoryProtocol
     private var previousTimer: TimerState?
     private var previousPlan: Plan = .default
-
-    init(repo: FastHistoryRepositoryProtocol = container.inject()) {
-        self.repo = repo
-    }
 
     func handle<State: Equatable>(thunk: Thunk, state: State) {}
 
@@ -29,8 +24,10 @@ final class HistoryMiddleware: Middleware {
         switch action {
         case let timer as TimerAction:
             record(timer, dispatch: dispatch)
-        case let history as HistoryAction:
-            if case let .deleted(id) = history { repo.delete(id: id) }
+        case let HistoryAction.deleted(id):
+            dispatch(DeleteFastRecordThunk(id: id))
+        case HistoryAction.exportTapped:
+            dispatch(ExportHistoryThunk())
         default:
             break
         }
@@ -57,7 +54,6 @@ final class HistoryMiddleware: Middleware {
             goalHours: goalHours,
             planLabel: Plan(goalHours: goalHours).ratioLabel
         )
-        repo.append(record)
-        dispatch(HistoryAction.recorded(record))
+        dispatch(SaveFastRecordThunk(record: record))
     }
 }

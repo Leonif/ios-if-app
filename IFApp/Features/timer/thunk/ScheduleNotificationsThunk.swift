@@ -6,9 +6,9 @@
 import Redux
 
 struct ScheduleNotificationsThunk: Thunk {
-    private let repo: NotificationRepositoryProtocol
+    private let repo: NotificationSchedulerProtocol
 
-    init(repo: NotificationRepositoryProtocol = container.inject()) {
+    init(repo: NotificationSchedulerProtocol = container.inject()) {
         self.repo = repo
     }
 

@@ -81,7 +81,7 @@ func proReducer(state: ProState, action: Action) -> ProState {
     case .noticeDismissed:
         newState.notice = nil
 
-    case .none:
+    case .purchaseTapped, .restoreTapped, .none:
         break
     }
 

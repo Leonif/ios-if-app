@@ -1,5 +1,5 @@
 //
-//  DiagnosticsLogRepository.swift
+//  DiagnosticsLogger.swift
 //  IFApp
 //
 
@@ -8,7 +8,7 @@
 import Foundation
 import os
 
-final class DiagnosticsLogRepository: DiagnosticsLogRepositoryProtocol {
+final class DiagnosticsLogger: DiagnosticsLoggerProtocol {
     private static let maxBytes = 4 * 1024 * 1024
 
     static var fileURL: URL { documents.appendingPathComponent("diagnostics.log") }
@@ -18,8 +18,8 @@ final class DiagnosticsLogRepository: DiagnosticsLogRepositoryProtocol {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
 
-    private let fileURL = DiagnosticsLogRepository.fileURL
-    private let previousURL = DiagnosticsLogRepository.previousURL
+    private let fileURL = DiagnosticsLogger.fileURL
+    private let previousURL = DiagnosticsLogger.previousURL
     private let queue = DispatchQueue(label: "com.if24.diagnostics")
     private var handle: FileHandle?
 

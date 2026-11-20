@@ -16,4 +16,8 @@ enum EndFastAction: Action {
     case refused(conflict: FastRecord, unavoidable: Bool)
     case refusalWithdrawn
     case closed
+    case openTapped
+    case chipTapped(EndFastChipOffset)
+    case stepTapped(minutes: Int)
+    case confirmTapped
 }

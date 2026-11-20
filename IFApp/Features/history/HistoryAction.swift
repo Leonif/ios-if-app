@@ -10,6 +10,7 @@ enum HistoryAction: Action {
     case recorded(FastRecord)
     case deleted(id: UUID)
 
+    case exportTapped
     case exportStarted
     case exportFailed
     case exportPrepared(file: URL)

@@ -39,8 +39,8 @@ struct PaywallFlowView: View {
                     trigger: props.trigger,
                     theme: theme,
                     showsNothingToRestore: props.showsNothingToRestore,
-                    onBuy: { store.dispatch(PurchaseProThunk()) },
-                    onRestore: { store.dispatch(RestorePurchasesThunk()) },
+                    onBuy: { store.dispatch(ProAction.purchaseTapped) },
+                    onRestore: { store.dispatch(ProAction.restoreTapped) },
                     onPrivacy: { openURL(SiteLinks.privacyPolicy) },
                     onClose: { store.dispatch(ProAction.offerClosed) }
                 )

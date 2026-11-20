@@ -12,18 +12,18 @@ enum AppDependencies {
         container.register(TimerPersistenceRepositoryProtocol.self) {
             TimerPersistenceRepository()
         }
-        container.register(NotificationRepositoryProtocol.self) {
-            NotificationRepository()
+        container.register(NotificationSchedulerProtocol.self) {
+            NotificationScheduler()
         }
         container.register(ReviewRepositoryProtocol.self) {
             ReviewRepository()
         }
-        container.register(AnalyticsRepositoryProtocol.self) {
-            AnalyticsRepository()
+        container.register(AnalyticsTrackerProtocol.self) {
+            AnalyticsTracker()
         }
         container.register(FastHistoryRepositoryProtocol.self) {
             FastHistoryRepository { reason in
-                let analytics: AnalyticsRepositoryProtocol = container.inject()
+                let analytics: AnalyticsTrackerProtocol = container.inject()
                 analytics.log(.historyLoadFailed(reason: reason.rawValue))
             }
         }
@@ -40,8 +40,8 @@ enum AppDependencies {
             return StoreRepository()
         }
         #if DEBUG || DEVELOPMENT
-        let diagnostics = DiagnosticsLogRepository()
-        container.register(DiagnosticsLogRepositoryProtocol.self) { diagnostics }
+        let diagnostics = DiagnosticsLogger()
+        container.register(DiagnosticsLoggerProtocol.self) { diagnostics }
         #endif
     }
 }

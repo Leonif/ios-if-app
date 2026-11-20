@@ -167,9 +167,11 @@ Codes used below: T1' / T2 / T3 / T4 are the offer's trigger rules and S1-S6 the
 
 - `PurchaseProThunk` — the Buy button end to end: mark the attempt, run Apple's sheet, report how it ended. The four endings are separate actions, not one with a flag, because they lead to four different offer states (S6, S4, back to S1, S3). Guards on `isPro`, which is what makes a tap on an owner's open offer do nothing.
 
-## RefreshEntitlementThunk.swift
+## SyncEntitlementThunk.swift
 
-- `RefreshEntitlementThunk` — asks what this install owns and what the product costs in one thunk: it is one round trip, and the answer to "is it owned" depends on whether the store could be reached at all, which is what the product lookup establishes.
+- `SyncEntitlementThunk` — asks what this install owns and what the product costs in one thunk: it is one round trip, and the answer to "is it owned" depends on whether the store could be reached at all, which is what the product lookup establishes.
+- `SyncEntitlementThunk` — then follows every change nobody asked for (an approved Ask to Buy, a purchase on another device, a refund, a family member leaving the group) for as long as the app runs; the thunk never finishes, and the store runs every thunk in its own task, so nothing waits on it. Started once, on `appOpened`, which `IFAppApp.init` dispatches once per process.
+- `SyncEntitlementThunk.execute` — the change stream is opened before the refresh: a change landing during the round trip is buffered and reported after `storeResolved`, so the newer answer is the one that stays.
 
 ## RestorePurchasesThunk.swift
 

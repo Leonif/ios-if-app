@@ -9,9 +9,9 @@ import Foundation
 import Redux
 
 final class DiagnosticsMiddleware: Middleware {
-    private let log: DiagnosticsLogRepositoryProtocol
+    private let log: DiagnosticsLoggerProtocol
 
-    init(log: DiagnosticsLogRepositoryProtocol = container.inject()) {
+    init(log: DiagnosticsLoggerProtocol = container.inject()) {
         self.log = log
     }
 

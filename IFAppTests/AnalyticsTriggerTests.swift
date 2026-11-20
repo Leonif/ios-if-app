@@ -9,7 +9,7 @@ import Redux
 
 final class AnalyticsTriggerTests: XCTestCase {
 
-    private final class RepoSpy: AnalyticsRepositoryProtocol {
+    private final class TrackerSpy: AnalyticsTrackerProtocol {
         var events: [AnalyticsEvent] = []
         func log(_ event: AnalyticsEvent) { events.append(event) }
         func setUserProperty(_ value: String?, forName name: String) {}
@@ -28,41 +28,41 @@ final class AnalyticsTriggerTests: XCTestCase {
     }
 
     func testRestoreFailedWithNoOfferOpenReportsUnknown() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         let state = AppState()
         XCTAssertNil(state.proState.trigger)
 
         send(ProAction.restoreFailed(.network), state: state, to: middleware)
 
-        XCTAssertEqual(repo.lastTrigger, PaywallTrigger.unknown.rawValue)
-        XCTAssertNotEqual(repo.lastTrigger, PaywallTrigger.manual.rawValue)
+        XCTAssertEqual(tracker.lastTrigger, PaywallTrigger.unknown.rawValue)
+        XCTAssertNotEqual(tracker.lastTrigger, PaywallTrigger.manual.rawValue)
     }
 
     func testOfferOpenedFromAPermanentEntryStillReportsManual() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         var state = AppState()
         state.proState.trigger = .manual
 
         send(ProAction.offerOpened(trigger: .manual), state: state, to: middleware)
 
-        XCTAssertEqual(repo.lastTrigger, PaywallTrigger.manual.rawValue)
+        XCTAssertEqual(tracker.lastTrigger, PaywallTrigger.manual.rawValue)
     }
 
     func testTheLockedExportReportsItsOwnDoor() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         var state = AppState()
         state.proState.trigger = .historyExport
 
         send(ProAction.offerOpened(trigger: .historyExport), state: state, to: middleware)
 
-        XCTAssertEqual(repo.lastTrigger, "history_export")
-        XCTAssertNotEqual(repo.lastTrigger, PaywallTrigger.manual.rawValue)
+        XCTAssertEqual(tracker.lastTrigger, "history_export")
+        XCTAssertNotEqual(tracker.lastTrigger, PaywallTrigger.manual.rawValue)
     }
 
     func testTriggerVocabularyIsFixed() {

@@ -15,4 +15,10 @@ enum TimerAction: Action {
     case goalCelebrated(dayKey: String, ownsFreeze: Bool)
     case eatingStarted(startTimestamp: Double)
     case eatingEnded
+    case startFastTapped
+    case resumeTapped
+    case resetTapped
+    case startEatingTapped
+    case continueFastingTapped
+    case goalMomentStarted
 }

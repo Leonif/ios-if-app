@@ -72,7 +72,7 @@ struct TimerFlowView: View {
         }
         .navigationDestination(isPresented: $showHistory) {
             HistoryFlowView(store: store, source: historySource, focusRecordID: historyFocus,
-                            onStartFast: { store.dispatch(StartFastThunk()) })
+                            onStartFast: { store.dispatch(TimerAction.startFastTapped) })
         }
         .toolbar(.hidden, for: .navigationBar)
         .connect(to: store, mapState: { Props(state: $0) }, onPropsChange: { props = $0 })
@@ -249,7 +249,7 @@ struct TimerFlowView: View {
     private func ringCenter(state: TimerScreenState, elapsed: TimeInterval, progress: PhaseProgress, theme: ThemeTokens) -> some View {
         switch state {
         case .idle:
-            RingCenterIdle(theme: theme, onStart: { store.dispatch(StartFastThunk()) })
+            RingCenterIdle(theme: theme, onStart: { store.dispatch(TimerAction.startFastTapped) })
         case .active:
             RingCenterActive(elapsed: elapsed, phase: progress.phase, theme: theme)
         case .goalReached:
@@ -276,7 +276,7 @@ struct TimerFlowView: View {
                 goalAt: clockTime(props.fastStartTimestamp + props.goalHours * 3600),
                 theme: theme,
                 isEndFastEnabled: !props.endFast.isOpen,
-                onEndFast: { store.dispatch(OpenEndFastThunk()) }
+                onEndFast: { store.dispatch(EndFastAction.openTapped) }
             )
         case .goalReached:
             GoalReachedFooterCard(
@@ -286,7 +286,7 @@ struct TimerFlowView: View {
                 theme: theme,
                 isEndFastEnabled: !props.endFast.isOpen,
                 onReset: { store.dispatch(UIAction.resetConfirmOpened) },
-                onEndFast: { store.dispatch(OpenEndFastThunk()) }
+                onEndFast: { store.dispatch(EndFastAction.openTapped) }
             )
         case .complete:
             CompleteFooterCard(
@@ -294,9 +294,9 @@ struct TimerFlowView: View {
                 windowOpens: strings.Meal.now,
                 consequence: consequenceLine(elapsed: elapsed),
                 theme: theme,
-                onResume: { store.dispatch(ResumeFastThunk()) },
-                onSkip: { store.dispatch(ResetFastThunk()) },
-                onStartEating: { store.dispatch(StartEatingThunk()) },
+                onResume: { store.dispatch(TimerAction.resumeTapped) },
+                onSkip: { store.dispatch(TimerAction.resetTapped) },
+                onStartEating: { store.dispatch(TimerAction.startEatingTapped) },
                 onHistory: { openHistory(from: .completeCard) }
             )
         case .eating:
@@ -304,7 +304,7 @@ struct TimerFlowView: View {
                 lastFast: props.lastFastDuration.map(hoursMinutes),
                 theme: theme,
                 onSkip: { store.dispatch(UIAction.endEatingConfirmOpened) },
-                onStartFast: { store.dispatch(StartFastThunk()) },
+                onStartFast: { store.dispatch(TimerAction.startFastTapped) },
                 onHistory: { openHistory(from: .eatingWindow) }
             )
         case .eatingOver:
@@ -314,7 +314,7 @@ struct TimerFlowView: View {
                     store.dispatch(TimerAction.eatingEnded)
                     store.dispatch(MealAction.cleared)
                 },
-                onContinue: { store.dispatch(ContinueFastingThunk()) }
+                onContinue: { store.dispatch(TimerAction.continueFastingTapped) }
             )
         }
     }
@@ -436,11 +436,11 @@ struct TimerFlowView: View {
                 overline: props.currentScreenState() == .eatingOver ? strings.Meal.windowClosedOverline : nil,
                 selectedChip: props.chipIdx,
                 theme: theme,
-                onChip: { store.dispatch(PickMealChipThunk($0)) },
+                onChip: { store.dispatch(MealAction.chipTapped($0)) },
                 onScrub: { store.dispatch(MealAction.scrubbed(minutesAgo: $0)) },
-                onFeedback: { store.dispatch(MealFeedbackThunk($0)) },
-                onExactTime: { store.dispatch(SetExactMealTimeThunk($0)) },
-                onConfirm: { store.dispatch(ConfirmLastMealThunk()) },
+                onFeedback: { store.dispatch(MealAction.scrubFeedbackRequested($0)) },
+                onExactTime: { store.dispatch(MealAction.exactTimeChosen($0)) },
+                onConfirm: { store.dispatch(MealAction.confirmTapped) },
                 onClose: {
                     store.dispatch(MealAction.pickerDismissed)
                     store.dispatch(UIAction.mealPickerClosed)
@@ -453,9 +453,9 @@ struct TimerFlowView: View {
                 state: props.endFast,
                 now: Clock.now().timeIntervalSince1970,
                 theme: theme,
-                onChip: { store.dispatch(EndFastChipThunk(offset: $0)) },
-                onStep: { store.dispatch(EndFastStepThunk(minutes: $0)) },
-                onConfirm: { store.dispatch(ConfirmEndFastThunk()) },
+                onChip: { store.dispatch(EndFastAction.chipTapped($0)) },
+                onStep: { store.dispatch(EndFastAction.stepTapped(minutes: $0)) },
+                onConfirm: { store.dispatch(EndFastAction.confirmTapped) },
                 onKeepFast: { store.dispatch(EndFastAction.closed) },
                 onPickAnotherTime: { store.dispatch(EndFastAction.refusalWithdrawn) },
                 onOpenConflict: { record in
@@ -477,7 +477,7 @@ struct TimerFlowView: View {
             isOpen: props.resetConfirmOpen,
             theme: theme,
             onConfirm: {
-                store.dispatch(ResetFastThunk())
+                store.dispatch(TimerAction.resetTapped)
                 store.dispatch(UIAction.resetConfirmClosed)
             },
             onDismiss: { store.dispatch(UIAction.resetConfirmClosed) }
@@ -532,7 +532,7 @@ struct TimerFlowView: View {
             store.dispatch(MealAction.cleared)
         }
         if state == .eatingOver && props.isMealFresh {
-            store.dispatch(SeedLastMealFromWindowCloseThunk())
+            store.dispatch(MealAction.windowClosedShown)
         }
     }
 
@@ -562,7 +562,7 @@ struct TimerFlowView: View {
             return
         }
 
-        store.dispatch(CelebrateGoalThunk())
+        store.dispatch(TimerAction.goalMomentStarted)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
 
         guard !reduceMotion else {

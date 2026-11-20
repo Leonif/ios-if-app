@@ -15,7 +15,7 @@ struct SunnahFlowView: View {
             onRetry: { store.dispatch(SunnahAction.refresh) },
             onSettings: {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
-                    store.dispatch(OpenExternalLinkThunk(url: url))
+                    store.dispatch(SunnahAction.systemSettingsTapped(url: url))
                 }
             })
             .onAppear { store.dispatch(SunnahAction.refresh) }

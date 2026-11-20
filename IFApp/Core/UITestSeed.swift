@@ -99,7 +99,7 @@ enum UITestSeed {
         guard let conflict = FastRecord.firstOverlap(in: records,
                                                      start: now - Double(elapsed),
                                                      end: now) else { return }
-        let log: DiagnosticsLogRepositoryProtocol = container.inject()
+        let log: DiagnosticsLoggerProtocol = container.inject()
         let stamp = ISO8601DateFormatter()
         log.append("""
             SEED WARNING: the seeded fast (-seedElapsed \(elapsed), \

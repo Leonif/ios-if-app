@@ -1,12 +1,12 @@
 //
-//  NotificationRepository.swift
+//  NotificationScheduler.swift
 //  IFApp
 //
 
 import Foundation
 import UserNotifications
 
-struct NotificationRepository: NotificationRepositoryProtocol {
+struct NotificationScheduler: NotificationSchedulerProtocol {
     func enableForegroundPresentation() {
         NotificationManager.shared.enableForegroundPresentation()
     }

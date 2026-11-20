@@ -5,22 +5,23 @@ Why the app's composition root, root state and clock are the way they are. Read 
 ## AppDependencies.swift
 
 - `AppDependencies.register()` — registers the repositories in the container; called once at launch, before the store is built or any thunk runs.
-- `AppDependencies.register()` — `FastHistoryRepository` — the repository finds a load failure; that a failure is worth an analytics event is decided here, in the composition root, so the file layer stays ignorant of the event catalog. The analytics repository is resolved on the call rather than captured, so registration order does not matter.
+- `AppDependencies.register()` — `FastHistoryRepository` — the repository finds a load failure; that a failure is worth an analytics event is decided here, in the composition root, so the file layer stays ignorant of the event catalog. The analytics tracker is resolved on the call rather than captured, so registration order does not matter.
 - `AppDependencies.register()` — `StoreRepositoryProtocol` — StoreKit's local test configuration lives on the Xcode scheme, so an app launched by `simctl` never has a store to talk to. `-seedStore` puts a scripted `StubStoreRepository` in its place; without the argument the branch is unreachable, and outside DEBUG it does not exist.
-- `AppDependencies.register()` — `DiagnosticsLogRepositoryProtocol` — one shared instance, unlike every other registration. The journal owns an open `FileHandle` positioned at the end of the file; a second instance would open its own handle at the same offset and the two would write over each other's lines. There is more than one reader of the protocol (`DiagnosticsMiddleware` and the seed collision warning in `UITestSeed`), so the sharing is load-bearing.
+- `AppDependencies.register()` — `DiagnosticsLoggerProtocol` — one shared instance, unlike every other registration. The journal owns an open `FileHandle` positioned at the end of the file; a second instance would open its own handle at the same offset and the two would write over each other's lines. There is more than one reader of the protocol (`DiagnosticsMiddleware` and the seed collision warning in `UITestSeed`), so the sharing is load-bearing.
 
 ## AppLifecycleAction.swift
 
 - `AppLifecycleAction` — app-level signals that mutate no substate but drive side effects (analytics, review, notifications). Reducers ignore them; middleware reacts.
 - `AppLifecycleAction.appBecameActive` — the scene became active (cold start or return from background). Its one consumer is `SunnahMiddleware`, which re-syncs the reminders on it; not a funnel event.
 - `AppLifecycleAction.sourceArticleOpened` — `articleID` is the paper's index in `SourceArticle.all`, the same identifier the rows are addressed by.
-- `AppLifecycleAction.sourceOriginalOpened` — dispatched from the reader's "read the original" button and nowhere else. `OpenExternalLinkThunk` also opens the privacy policy and the system Settings, so the event cannot hang off the thunk without counting those as papers.
+- `AppLifecycleAction.sourceOriginalOpened` — dispatched from the reader's "read the original" button and nowhere else, and it is the whole tap: the analytics event hangs off it and `SourcesMiddleware` opens its `url`. `OpenExternalLinkThunk` also opens the system Settings, so the event cannot hang off the thunk without counting that as a paper.
 - `AppLifecycleAction.sourceArticleClosed` — carries whether the foot of the article had been on screen.
 - `AppLifecycleAction.reviewPrompted` — the native `requestReview` went out on an active scene (Apple may or may not show the panel). Never dispatched when there was no scene to ask on.
 - `AppLifecycleAction.streakMilestone` — a streak milestone (3/7/14/30 days) was reached and its card shown.
 - `AppLifecycleAction.goalScreenSettled` — the goal-reached screen is on display and its moment has finished playing. Sent only from the `goalReached` state; the milestone card hangs off it.
 - `AppLifecycleAction.eatingWindowSettled` — the eating window opened by "Start eating window" is on screen, its card has settled, and nothing covers it. Sent only after `TimerAction.eatingStarted`, and only when the one-time offer was not owed; the review prompt hangs off it.
 - `AppLifecycleAction.pushAuthorizationResolved` — the user just answered the notification permission dialog. Reducers ignore it; it exists so `NotificationMiddleware` re-runs its sync, because the goal push scheduled on `.started` was rejected while the permission did not yet exist. Not a funnel event.
+- `AppLifecycleAction.pushStatusRead(label:)` — the notification permission as just read, carried to `AnalyticsMiddleware`, which writes it as the `push_status` user property. A thunk reads the status but does not log it: analytics is written only from middleware.
 - `AppLifecycleAction.fastChained` — a fast was started from the window-closed screen: the chain held.
 - `AppLifecycleAction.themeActive` — `dark` is system dark mode; the app follows the system scheme and has no in-app theme toggle.
 

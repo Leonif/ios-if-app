@@ -14,7 +14,7 @@ func sunnahReducer(state: SunnahState, action: Action) -> SunnahState {
         settings.minuteOfDay = SunnahSettings.clamped(minuteOfDay: settings.minuteOfDay)
         next.settings = settings
         next.delivery = .resolve(enabled: settings.enabled, otherwise: .checking)
-    case .refresh: break
+    case .refresh, .systemSettingsTapped: break
     case .deliveryUpdated(let delivery, let dates):
         next.delivery = delivery
         next.upcoming = dates

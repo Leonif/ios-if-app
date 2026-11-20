@@ -54,7 +54,7 @@ struct DebugScreen: View {
                     Button("Close") { dismiss() }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    ShareLink(item: DiagnosticsLogRepository.fileURL)
+                    ShareLink(item: DiagnosticsLogger.fileURL)
                 }
             }
             .task {
@@ -69,7 +69,7 @@ struct DebugScreen: View {
     }
 
     private static func readTail() -> String {
-        guard let contents = try? String(contentsOf: DiagnosticsLogRepository.fileURL, encoding: .utf8)
+        guard let contents = try? String(contentsOf: DiagnosticsLogger.fileURL, encoding: .utf8)
         else { return "no journal yet" }
         let lines = contents.split(separator: "\n", omittingEmptySubsequences: false)
         return lines.suffix(tailLines).joined(separator: "\n")

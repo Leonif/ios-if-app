@@ -63,6 +63,7 @@ Why the timer feature's code is the way it is. Read the section of a file before
 - `TimerAction.timeAdjusted` — `runningStartTimestamp` is non-nil only while running.
 - `TimerAction.goalCelebrated` — `dayKey` (the day the goal counts toward) is injected so the reducer stays pure and a fast crossing midnight credits the day the goal was reached. `ownsFreeze` rides along for the same reason: the protected day is Pro's, the entitlement lives in `ProState`, and the timer reducer sees only its substate. Read once when the goal lands, so a later purchase or refund cannot re-decide a banked streak.
 - `TimerAction.eatingStarted` — `startTimestamp` = when the window opened.
+- `TimerAction` — `startFastTapped`, `resumeTapped`, `resetTapped`, `startEatingTapped`, `continueFastingTapped`, `goalMomentStarted` — intents: what the person did (or, for the goal moment, that the screen started playing it). They carry nothing and change no state; `TimerMiddleware` turns each into its thunk, and the thunk sends the facts above. Analytics stays silent on them: the event hangs off the fact the thunk sends, so logging the intent as well would count every start twice.
 
 ## TimerReducer.swift
 
@@ -74,6 +75,7 @@ Why the timer feature's code is the way it is. Read the section of a file before
 - `timerReducer` — `.goalCelebrated` streak — a goal the day after the last extends the run; a gap (or the first goal) restarts it at 1, unless Pro's protected day stands in the gap and the month is unspent (run carries on, month charged). Day keys sort chronologically, so a stamp not newer than the last goal (same day again, or an earlier day from a fast back-dated across midnight) leaves the run untouched: it can neither extend nor drag it backwards.
 - `timerReducer` — `.eatingStarted` — clears the finished fast like reset, but into eating. `goalHours` deliberately survives: the window is the rest of the day left over by that fast, so it belongs to that goal.
 - `timerReducer` — `.eatingEnded` — end of the cycle: no goal is held.
+- `timerReducer` — intents (`…Tapped`, `goalMomentStarted`) — no-ops: the change they ask for arrives as the fact their thunk dispatches.
 
 ## Buttons.swift
 

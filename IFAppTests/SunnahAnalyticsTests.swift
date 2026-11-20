@@ -9,7 +9,7 @@ import Redux
 
 final class SunnahAnalyticsTests: XCTestCase {
 
-    private final class RepoSpy: AnalyticsRepositoryProtocol {
+    private final class TrackerSpy: AnalyticsTrackerProtocol {
         var events: [AnalyticsEvent] = []
         func log(_ event: AnalyticsEvent) { events.append(event) }
         func setUserProperty(_ value: String?, forName name: String) {}
@@ -60,79 +60,79 @@ final class SunnahAnalyticsTests: XCTestCase {
     // MARK: - sunnah_opened
 
     func testEachDoorIntoTheScreenReportsItself() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
         let state = AppState()
 
         send(AppLifecycleAction.sunnahOpened(source: .planEditor), state: state, to: middleware)
         send(AppLifecycleAction.sunnahOpened(source: .about), state: state, to: middleware)
 
-        XCTAssertEqual(repo.named("sunnah_opened").compactMap { $0.parameters["source"] as? String },
+        XCTAssertEqual(tracker.named("sunnah_opened").compactMap { $0.parameters["source"] as? String },
                        ["plan_editor", "about"])
     }
 
     // MARK: - sunnah_enabled — the event itself
 
     func testArmingAScheduleReportsTheModeAndThePermission() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         arm(on: middleware)
 
-        let enabled = repo.named("sunnah_enabled")
+        let enabled = tracker.named("sunnah_enabled")
         XCTAssertEqual(enabled.count, 1)
         XCTAssertEqual(enabled.first?.parameters["mode"] as? String, "weekly")
         XCTAssertEqual(enabled.first?.parameters["push_allowed"] as? String, "true")
     }
 
     func testArmingWithNotificationsRefusedReportsThePermissionAsMissing() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         arm(weekly: false, whiteDays: true, answer: .denied, on: middleware)
 
-        let enabled = repo.named("sunnah_enabled")
+        let enabled = tracker.named("sunnah_enabled")
         XCTAssertEqual(enabled.count, 1)
         XCTAssertEqual(enabled.first?.parameters["mode"] as? String, "white_days")
         XCTAssertEqual(enabled.first?.parameters["push_allowed"] as? String, "false")
     }
 
     func testBothSwitchesReportOneEventInTheCombinedMode() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         arm(weekly: true, whiteDays: true, on: middleware)
 
-        XCTAssertEqual(repo.modes(of: "sunnah_enabled"), ["both"])
+        XCTAssertEqual(tracker.modes(of: "sunnah_enabled"), ["both"])
     }
 
     // MARK: - sunnah_enabled — everything that must stay silent
 
     func testARefreshOverASettledScheduleIsSilent() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         send(SunnahAction.refresh, state: settled(.scheduled), to: middleware)
         send(SunnahAction.deliveryUpdated(.scheduled, dates: []),
              state: settled(.scheduled), to: middleware)
 
-        XCTAssertTrue(repo.named("sunnah_enabled").isEmpty)
+        XCTAssertTrue(tracker.named("sunnah_enabled").isEmpty)
     }
 
     func testASecondAnswerToTheSameArmingDoesNotReportTwice() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         arm(on: middleware)
         send(SunnahAction.deliveryUpdated(.scheduled, dates: []),
              state: settled(.scheduled), to: middleware)
 
-        XCTAssertEqual(repo.named("sunnah_enabled").count, 1)
+        XCTAssertEqual(tracker.named("sunnah_enabled").count, 1)
     }
 
     func testMovingTheReminderTimeOnAnArmedScheduleReportsNothingNew() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         arm(on: middleware)
         for _ in 0..<3 {
@@ -143,12 +143,12 @@ final class SunnahAnalyticsTests: XCTestCase {
                  state: settled(.scheduled), to: middleware)
         }
 
-        XCTAssertEqual(repo.named("sunnah_enabled").count, 1)
+        XCTAssertEqual(tracker.named("sunnah_enabled").count, 1)
     }
 
     func testAddingTheSecondScheduleToARunningOneReportsNothingNew() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         arm(weekly: true, on: middleware)
         let both = arming(weekly: true, whiteDays: true)
@@ -156,12 +156,12 @@ final class SunnahAnalyticsTests: XCTestCase {
         send(SunnahAction.deliveryUpdated(.scheduled, dates: []),
              state: settled(.scheduled, weekly: true, whiteDays: true), to: middleware)
 
-        XCTAssertEqual(repo.modes(of: "sunnah_enabled"), ["weekly"])
+        XCTAssertEqual(tracker.modes(of: "sunnah_enabled"), ["weekly"])
     }
 
     func testASecondSwitchFlippedBeforeTheAnswerStillReportsOneArming() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         send(SunnahAction.refresh, state: disarmed, to: middleware)
         let first = arming(weekly: true)
@@ -171,12 +171,12 @@ final class SunnahAnalyticsTests: XCTestCase {
         send(SunnahAction.deliveryUpdated(.scheduled, dates: []),
              state: settled(.scheduled, weekly: true, whiteDays: true), to: middleware)
 
-        XCTAssertEqual(repo.modes(of: "sunnah_enabled"), ["both"])
+        XCTAssertEqual(tracker.modes(of: "sunnah_enabled"), ["both"])
     }
 
     func testSwitchingEverythingOffBeforeTheAnswerCancelsTheArming() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         send(SunnahAction.refresh, state: disarmed, to: middleware)
         let armed = arming()
@@ -184,12 +184,12 @@ final class SunnahAnalyticsTests: XCTestCase {
         send(SunnahAction.settingsChanged(SunnahSettings()), state: disarmed, to: middleware)
         send(SunnahAction.deliveryUpdated(.off, dates: []), state: disarmed, to: middleware)
 
-        XCTAssertTrue(repo.named("sunnah_enabled").isEmpty)
+        XCTAssertTrue(tracker.named("sunnah_enabled").isEmpty)
     }
 
     func testSwitchingOffOneOfTwoSchedulesIsNotAnArming() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         arm(weekly: true, whiteDays: true, on: middleware)
         let halved = arming(weekly: false, whiteDays: true)
@@ -197,30 +197,30 @@ final class SunnahAnalyticsTests: XCTestCase {
         send(SunnahAction.deliveryUpdated(.scheduled, dates: []),
              state: settled(.scheduled, weekly: false, whiteDays: true), to: middleware)
 
-        XCTAssertEqual(repo.modes(of: "sunnah_enabled"), ["both"])
+        XCTAssertEqual(tracker.modes(of: "sunnah_enabled"), ["both"])
     }
 
     func testTurningTheRemindersOffReportsNothing() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         arm(on: middleware)
         send(SunnahAction.settingsChanged(SunnahSettings()), state: disarmed, to: middleware)
         send(SunnahAction.deliveryUpdated(.off, dates: []), state: disarmed, to: middleware)
 
-        XCTAssertEqual(repo.named("sunnah_enabled").count, 1)
+        XCTAssertEqual(tracker.named("sunnah_enabled").count, 1)
     }
 
     func testReArmingTheSameModeAfterSwitchingOffReportsAgain() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         arm(on: middleware)
         send(SunnahAction.settingsChanged(SunnahSettings()), state: disarmed, to: middleware)
         send(SunnahAction.deliveryUpdated(.off, dates: []), state: disarmed, to: middleware)
         arm(on: middleware)
 
-        XCTAssertEqual(repo.modes(of: "sunnah_enabled"), ["weekly", "weekly"])
+        XCTAssertEqual(tracker.modes(of: "sunnah_enabled"), ["weekly", "weekly"])
     }
 
     func testOnlyAnArmedScheduleReachesTheCheckingState() {

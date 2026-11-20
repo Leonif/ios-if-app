@@ -16,7 +16,7 @@ Codes used below: T1' is the paywall spec's automatic-offer trigger and S1-S6 th
 ## AnalyticsTriggerTests.swift
 
 - `AnalyticsTriggerTests` — the `trigger` parameter is what the paid release is read by: how many people came into the offer through each door, and how the home-screen door compares with the permanent ones. That comparison only works while every value means one thing: the fallback for "no offer was open" is `unknown`, and `manual` keeps meaning a permanent entry the user went looking for.
-- `AnalyticsTriggerTests.RepoSpy` — only the parameters matter here; the events' own shape is `AnalyticsEventTests`' business.
+- `AnalyticsTriggerTests.TrackerSpy` — only the parameters matter here; the events' own shape is `AnalyticsEventTests`' business.
 - `AnalyticsTriggerTests.testRestoreFailedWithNoOfferOpenReportsUnknown` — restore is offered in two places, and the one in About IF24 is not behind the offer: no `offerOpened` precedes it, so neither the state nor the middleware's pre-reduce snapshot holds an entry point. Filed under `manual`, such a restore would pad the column the home door is measured against with events that are not entries at all.
 - `AnalyticsTriggerTests.testOfferOpenedFromAPermanentEntryStillReportsManual` — the other half: `manual` is not retired, it keeps its own meaning. The state passed is post-reduce, which is what a middleware sees — the reducer has already recorded the door.
 - `AnalyticsTriggerTests.testTheLockedExportReportsItsOwnDoor` — the offer chooses its lead benefit off the trigger, so the export lock reporting `manual` would open an offer led by the wrong benefit. Asserted against the literal `"history_export"` because the raw string is a GA4 dimension and a rename compiles in silence.
@@ -44,6 +44,11 @@ Codes used below: T1' is the paywall spec's automatic-offer trigger and S1-S6 th
 ## EndEatingConfirmTests.swift
 
 - `EndEatingConfirmTests` — ending an open eating window early goes through a confirmation whose open flag lives in the store, like `resetConfirmOpen`. The tests pin that opening it ends nothing and that the window survives until the confirm itself.
+
+## EndFastMiddlewareTests.swift
+
+- `EndFastMiddlewareTests` — each correction-sheet intent starts exactly one thunk of its own type, with the tap's payload carried over unchanged, and sends no action: the fact comes from the thunk, which reads the clock.
+- `EndFastMiddlewareTests.testFactsRunNothing` — the facts the thunks send come back through the same middleware; one that started a thunk again would loop.
 
 ## FastHistoryRepositoryTests.swift
 
@@ -79,6 +84,16 @@ Codes used below: T1' is the paywall spec's automatic-offer trigger and S1-S6 th
 - `HistoryStatsTests.testGoalDotUsesTheHistoryRowsStartDayForAnOvernightFast` — a Tuesday-evening fast reaches a 16-hour goal on Wednesday, but its history row is filed and labelled Tuesday; the dot must follow the row, or two parts of one screen contradict each other. The 19:25 start and 18h17m length put the goal past midnight on purpose.
 - `HistoryStatsTests.record(duration:)` — fixed start, because the totals care only how long a fast ran, not when.
 - `HistoryStatsTests.testTotalNeverRendersBelowTheLongestFastItContains` — the card prints TOTAL and LONGEST side by side; a sum truncated to whole hours can print below the single fast it is made of (one 16h 01m fast reading "TOTAL 16h · LONGEST 16h 01m"). Asserted on the rendered strings, not the numbers: the numbers agree either way, the two granularities are what can disagree.
+
+## IntentAnalyticsTests.swift
+
+- `IntentAnalyticsTests.testTapIntentsLogNothing` — a tap intent is not a funnel step: the attempt it starts reports itself (`purchase_started`, `history_exported` on a share that went through, `fast_started` off the timer's `.started`). An event on the tap as well would count every attempt twice.
+- `IntentAnalyticsTests.testReadTheOriginalLogsOnce` — the one intent that is also an event: carrying the URL must not change how many times it is counted.
+
+## MealMiddlewareTests.swift
+
+- `MealMiddlewareTests` — each last-meal intent starts exactly one thunk of its own type, with the chip, the haptic kind or the picked date carried over unchanged, and sends no action.
+- `MealMiddlewareTests.testFactsRunNothing` — the same loop guard as the other intent middlewares; `scrubbed` especially, since it arrives once per snap step.
 
 ## MealPickerTests.swift
 
@@ -172,6 +187,11 @@ Codes used below: T1' is the paywall spec's automatic-offer trigger and S1-S6 th
 - `TimerElapsedTests.testClosedWindowFallsToIdleAtTheHorizon` — the same `>=` boundary `CompleteStatePersistenceTests` pins for the result screen.
 - `TimerElapsedTests.testGoalReachedFollowsThePlanPassedIn` — overtime is decided by the plan the caller passes, which must be `AppState.activePlan`.
 
+## TimerMiddlewareTests.swift
+
+- `TimerMiddlewareTests` — each timer intent starts exactly one thunk of its own type and sends no action: the thunk is where the fact comes from, so an action sent here as well would reach the reducer and analytics twice.
+- `TimerMiddlewareTests.testOtherTimerActionsRunNothing` — the facts the thunks send come back through the same middleware; one that started a thunk again would loop.
+
 ## SourceAnalyticsTests.swift
 
 - `SourceAnalyticsTests` — the reading funnel: which paper was read, whether anyone went on to the paper itself, and whether the reader was closed at the end or at the top. The identifier is the catalog index and travels as text — the papers are read as a distribution, sorted by the dimension, and a number logged as a number leaves the dimension `(not set)`.
@@ -179,7 +199,11 @@ Codes used below: T1' is the paywall spec's automatic-offer trigger and S1-S6 th
 - `SourceAnalyticsTests.testEachArticleReportsItself` — with four titles in the list, an event that could not tell them apart would answer none of the questions it exists for.
 - `SourceAnalyticsTests.testReachedEndTravelsAsTextNotAsABool` — a `Bool` at the call site bridges to `NSNumber`; logged as it stands, the breakdown comes back empty.
 - `SourceAnalyticsTests.testNoEventCarriesATitleOrAURL` — the titles are localized (ten vocabularies in one dimension), and the URL is the one value the event is required not to carry.
-- `SourceAnalyticsTests.testOpeningAnExternalLinkOnItsOwnReportsNothing` — `OpenExternalLinkThunk` also opens the privacy policy and system Settings, so `source_original_opened` hangs off a lifecycle action dispatched at the one call site, not off the thunk. A thunk passing through the analytics middleware must leave no event behind, or the event stops counting papers and only papers.
+- `SourceAnalyticsTests.testOpeningAnExternalLinkOnItsOwnReportsNothing` — `OpenExternalLinkThunk` also opens the system Settings, so `source_original_opened` hangs off the reader's own intent, not off the thunk. A thunk passing through the analytics middleware must leave no event behind, or the event stops counting papers and only papers.
+
+## SourcesMiddlewareTests.swift
+
+- `SourcesMiddlewareTests.testReadTheOriginalOpensThePapersURL` — the URL is read off the dispatched thunk by reflection: it is private to the thunk, and widening it for a test would change the thunk's API.
 
 ## StreakFreezeTests.swift
 
@@ -223,6 +247,8 @@ Codes used below: T1' is the paywall spec's automatic-offer trigger and S1-S6 th
 - `SunnahMiddlewareTests.Repository.replace(_:)` — sleeps after starting a non-empty write to model an in-flight write: cancellation alone does not undo it, so disabling has to wait for the older write and then clear it.
 - `SunnahMiddlewareTests.testDeniedPermissionClearsRequestsAndReportsDenied` — a refusal delivers no dates: the upcoming list is what was scheduled, and with the permission denied nothing was. Otherwise the screen prints fasting dates under a green switch while no reminder can fire. The expectation is fulfilled inside the recorder's `Task`, so the assertion cannot read the recorder before the value lands in it.
 - `SunnahMiddlewareTests.testGrantedPermissionStillDeliversUpcomingDates` — the control for the case above: the check is about the refusal, not about the dates having gone away.
+
+- `SunnahMiddlewareTests.testSettingsTapOpensTheSystemSettingsAndSchedulesNothing` — the tap must not start a scheduling pass; the short wait gives a pass that was wrongly started the time to reach the repository.
 
 ## SunnahScheduleTests.swift
 

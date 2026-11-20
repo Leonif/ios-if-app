@@ -1,9 +1,9 @@
 //
-//  AnalyticsRepository.swift
+//  AnalyticsTracker.swift
 //  IFApp
 //
 
-struct AnalyticsRepository: AnalyticsRepositoryProtocol {
+struct AnalyticsTracker: AnalyticsTrackerProtocol {
     private let client: AnalyticsClient
 
     init(client: AnalyticsClient = DefaultAnalyticsClient()) {

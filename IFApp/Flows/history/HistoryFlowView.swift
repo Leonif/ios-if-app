@@ -126,7 +126,7 @@ struct HistoryFlowView: View {
     private func exportButton(theme: ThemeTokens) -> some View {
         Button(action: {
             if props.isPro {
-                store.dispatch(ExportHistoryThunk())
+                store.dispatch(HistoryAction.exportTapped)
             } else {
                 store.dispatch(ProAction.offerOpened(trigger: .historyExport))
             }

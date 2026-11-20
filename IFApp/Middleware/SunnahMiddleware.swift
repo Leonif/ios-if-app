@@ -5,17 +5,14 @@ import UIKit
 
 final class SunnahMiddleware: Middleware {
     private let repository: SunnahRepositoryProtocol
-    private let notifications: NotificationRepositoryProtocol
-    private let analytics: AnalyticsRepositoryProtocol
+    private let notifications: NotificationSchedulerProtocol
     private var task: Task<Void, Never>?
     private var observers: [NSObjectProtocol] = []
 
     init(repository: SunnahRepositoryProtocol = container.inject(),
-         notifications: NotificationRepositoryProtocol = container.inject(),
-         analytics: AnalyticsRepositoryProtocol = container.inject()) {
+         notifications: NotificationSchedulerProtocol = container.inject()) {
         self.repository = repository
         self.notifications = notifications
-        self.analytics = analytics
     }
     deinit {
         task?.cancel()
@@ -34,6 +31,9 @@ final class SunnahMiddleware: Middleware {
         }
         var requestPermission = false
         switch action {
+        case let SunnahAction.systemSettingsTapped(url):
+            dispatch(OpenExternalLinkThunk(url: url))
+            return
         case SunnahAction.settingsChanged:
             repository.save(app.sunnahState.settings)
             requestPermission = app.sunnahState.settings.enabled
@@ -45,11 +45,11 @@ final class SunnahMiddleware: Middleware {
         let settings = app.sunnahState.settings
         let previous = task
         previous?.cancel()
-        task = Task { [repository, notifications, analytics] in
+        task = Task { [repository, notifications] in
             await previous?.value
             guard !Task.isCancelled else { return }
             if requestPermission, await SyncPushStatusThunk.requestIfUndetermined(
-                notifications: notifications, analytics: analytics, dispatch: { dispatch($0) }) {
+                notifications: notifications, dispatch: { dispatch($0) }) {
                 return
             }
             let status = await notifications.authorizationStatus()

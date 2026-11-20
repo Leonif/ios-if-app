@@ -4,7 +4,7 @@ Why the history feature's code is the way it is. Read the section of a file befo
 
 ## HistoryAction.swift
 
-- `HistoryAction.recorded` — dispatched by `HistoryMiddleware`, which owns the write; the reducer only mirrors the saved record into state.
+- `HistoryAction.recorded` — dispatched by `SaveFastRecordThunk` after the write, so state never shows a record the store has not saved; the reducer only mirrors it.
 - `HistoryAction.exportFailed` — releases the control for a retry; the export lifecycle cases are transient.
 - `HistoryAction.exportFinished` — `shared` is false when the user backed out of the share sheet. Only `true` is an export that happened: cancelling is not an event.
 
@@ -77,6 +77,14 @@ Why the history feature's code is the way it is. Read the section of a file befo
 
 - `ExportHistoryThunk` — a thunk for both reasons at once: the clock is read for the file name's date, and the write is a side effect, so neither may happen in the view or the reducer.
 - `ExportHistoryThunk.execute(state:dispatch:)` — the empty-history guard is the second one, not the first: the export row does not exist on an empty history.
+
+## SaveFastRecordThunk.swift
+
+- `SaveFastRecordThunk` — the write of a finished fast. Whether a fast is written, and with what, is decided in `HistoryMiddleware`; repositories are reached only from thunks (`ARCHITECTURE.md`, invariant 17).
+
+## DeleteFastRecordThunk.swift
+
+- `DeleteFastRecordThunk` — removes a fast from the store on `HistoryAction.deleted`. The reducer has already dropped it from state; this only makes the removal survive a relaunch.
 
 ## HistoryEmptyState.swift
 

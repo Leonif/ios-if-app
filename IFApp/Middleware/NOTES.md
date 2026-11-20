@@ -27,17 +27,27 @@ Why the side-effect layer is the way it is. Middleware is handed the state after
 - `DiagnosticsMiddleware` — writes the action stream to the diagnostics journal. Logging is a side effect, so it lives in a middleware rather than in the store or the views (invariant 2), and it is the only place that decides what a diagnostic line looks like. It is inserted first in the middleware list so that if a later middleware throws or wedges, the action that led there is already on disk. Compiled out outside DEBUG and DEVELOPMENT.
 - `DiagnosticsMiddleware.digest(_:)` — the fields a failing flow is decided by, on one line. Deliberately not the whole `AppState`: a dump of every substate on every action is unreadable when it is needed, and the history array alone would bury the sequence. What is here is what the state machine in `test-scenarios.md` branches on — whether a cycle is in flight, which goal it runs to, and what the entitlement machinery is doing.
 
+## EndFastMiddleware.swift
+
+- `EndFastMiddleware` — runs the correction sheet's thunks for its intents: "End fast" opens the sheet, a chip or a step moves the choice, the primary button confirms it. The payload of the tap (the chip's offset, the step's minutes) travels in the intent unchanged and the thunk still reads the clock itself, so the moment is resolved when the thunk runs, as it was when the view dispatched it. No other middleware matches `is EndFastAction`, and `AnalyticsMiddleware` logs only `.refused`, so the intents reach nothing else.
+
 ## HistoryMiddleware.swift
 
-- `HistoryMiddleware` — the single place a finished fast is written. Here rather than in the thunks so every ending follows one rule: End fast from active or overtime writes a record; Reset discards the fast and writes nothing, which is what the reset confirm sheet promises.
+- `HistoryMiddleware` — the single place that decides a finished fast is written; the write itself is `SaveFastRecordThunk`, and a delete is `DeleteFastRecordThunk` (repositories only from thunks, `ARCHITECTURE.md` invariant 17). The decision lives here rather than in the ending thunks so every ending follows one rule: End fast from active or overtime writes a record; Reset discards the fast and writes nothing, which is what the reset confirm sheet promises.
 - `HistoryMiddleware.previousTimer` — the timer state before the action being handled. The fast being ended is already gone from the post-reduce state, so the record is built from this snapshot.
+- `HistoryMiddleware.handle(action:state:dispatch:)` — `.exportTapped` — the export row's tap; the Pro gate stays in the view (a free user's tap opens the offer instead), so the intent only ever means "write the file". The thunk refuses an empty or busy history itself, so nothing is checked twice here.
 - `HistoryMiddleware.minimumDuration` — shorter than a minute is a mis-tap, not a fast.
 - `HistoryMiddleware.record(_:dispatch:)` — `.stopped` — trusts the thunk's `elapsed`: it already resolved the clock once. Every other timer action returns: `.reset` discards the fast, and the rest never end a running fast.
 - `HistoryMiddleware.record(_:dispatch:)` — `goalHours` — the goal the fast actually ran to, pinned at its start, so a plan change (or a lost entitlement) part-way through cannot relabel it afterwards.
 
+## MealMiddleware.swift
+
+- `MealMiddleware` — runs the last-meal picker's thunks for its intents: a chip, the ribbon's haptic cue, the exact time from the system picker, the confirm, and the closed window that seeds the picker. The haptic cue comes once per snap step while scrubbing; it is still one thunk per cue, as it was from the view, and the intent changes no state, so the store publishes nothing for it. The ribbon's own value stays the plain `scrubbed` action (see `Flows/NOTES.md`, `onScrub`). No other middleware matches `is MealAction`.
+
 ## NotificationMiddleware.swift
 
 - `NotificationMiddleware` — keeps the two timer pushes in sync with the timer: the goal-reached push while a fast runs and the eating-window-closed push while a window is open. Re-syncs on every `TimerAction`, `PlanAction` and `AppLifecycleAction`, so anything that can move a deadline or the running state is covered, launch included.
+- `NotificationMiddleware.handle(action:state:dispatch:)` — `appOpened` — the two launch thunks are about notifications (clearing the legacy daily reminders and reporting `push_status`), so they start here, next to the other notification work, rather than in `StoreMiddleware`, which owns StoreKit. They are independent and their order does not matter: the cleanup only removes two pending requests by identifier and asks nothing, and the status report only reads the permission.
 - `NotificationMiddleware.sync(_:)` — each push is scheduled while its deadline is ahead and cancelled otherwise; idempotent, so it is safe on every relevant action. Uses the goal of the cycle in flight (`activeGoalHours`), not the plan setting: a plan change mid-fast must not move a push that belongs to a fast already under way.
 
 ## PersistenceMiddleware.swift
@@ -55,10 +65,14 @@ Why the side-effect layer is the way it is. Middleware is handed the state after
 - `ReviewMiddleware.qualifies(_:)` — the fast behind this eating window earned the prompt: it reached its own goal and is at least the second one. Read from the history, not remembered here, so a `.complete` that survived a cold start still counts. The latest record must be the fast that opened this window: the window is anchored to that fast's confirmed end, and the record carries the same end. A fast too short to be recorded (`HistoryMiddleware.minimumDuration`) leaves an older fast as the latest record, and that one must not speak for it. Whether T1' takes the moment instead is not decided here: the view sends `eatingWindowSettled` only when the offer is not owed.
 - `ReviewMiddleware.requestReview(trigger:dispatch:)` — the lifetime attempt is spent and the event logged after the call reports it went out on an active scene, never before: there are three attempts in a lifetime, and one burnt on a scene Apple ignores is a prompt the user never saw, counted as shown.
 
+## SourcesMiddleware.swift
+
+- `SourcesMiddleware` — opens the paper behind the reader's "read the original" button. The intent is a lifecycle action because the reader has no state of its own, and the analytics event hangs off the same action, so the event and the opened link cannot drift apart.
+
 ## StoreMiddleware.swift
 
-- `StoreMiddleware` — owns the two things about the store that outlive any one screen: the entitlement read at launch, and the listener for changes nobody asked for (an approved Ask to Buy, a purchase on another device, a refund, a family member leaving the group). The listener has to run whenever the app does, not while some screen is up: a refund can land on the idle timer and the offer screen may never be opened. Middleware is the only thing with that lifetime and a dispatch.
-- `StoreMiddleware.startListening(dispatch:)` — idempotent: `appOpened` is dispatched once per launch, but a second one must not leave two listeners racing to report the same transaction.
+- `StoreMiddleware` — starts everything that talks to the store and calls the store itself nowhere (invariant 17). On `appOpened` it starts `SyncEntitlementThunk`, which outlives any one screen: a refund can land on the idle timer and the offer screen may never be opened.
+- `StoreMiddleware.handle(action:state:dispatch:)` — `purchaseTapped`, `restoreTapped` — the Buy and Restore taps (the offer screen and the About sheet) start their attempts here: one owner for everything that talks to the store. The thunks dispatch their own `purchaseStarted` / `restoreStarted`, so these intents are not the start of the attempt and analytics stays silent on them.
 
 ## StreakMiddleware.swift
 
@@ -67,5 +81,12 @@ Why the side-effect layer is the way it is. Middleware is handed the state after
 ## SunnahMiddleware.swift
 
 - `SunnahMiddleware` — replacement is serial (each pass awaits the previous task) so an older async scheduling pass cannot restore reminders a newer one cancelled.
+- `SunnahMiddleware.handle(action:state:dispatch:)` — `systemSettingsTapped` — the refusal's way out to iOS Settings. It returns before the scheduling pass: opening Settings changes nothing yet, and the permission is re-read when the app becomes active again.
 - `SunnahMiddleware.handle(action:state:dispatch:)` — `requestIfUndetermined` — one permission ask for the whole app; the resolved action comes back through this middleware and schedules on the answer.
 - `SunnahMiddleware.handle(action:state:dispatch:)` — `deliveryUpdated` dates — the upcoming dates are what was scheduled, not what the calendar holds. With the permission refused nothing was written (`replace([])`), so a list would be a promise the app cannot keep: a screen that reads as configured while no reminder can fire.
+
+## TimerMiddleware.swift
+
+- `TimerMiddleware` — runs the timer's thunks for the timer screen's intents: start, resume, reset, start eating, continue fasting, and the goal moment. One intent per thunk; the three start buttons (idle ring, eating card, history's empty state) share `startFastTapped`, because analytics counts the start off `.started` and never knew which button it came from. Each thunk reads the state as it did before: the intents change nothing in any reducer, so the state the thunk is handed is the one it would have been handed from the view.
+- `TimerMiddleware` — the intents are `TimerAction` cases, so every middleware matching `is TimerAction` sees them too: `PersistenceMiddleware` saves the unchanged timer and `NotificationMiddleware` re-syncs the two pushes. Both are idempotent, so the extra pass is harmless; `HistoryMiddleware` records only on `.stopped`.
+

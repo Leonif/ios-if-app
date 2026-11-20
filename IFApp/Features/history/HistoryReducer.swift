@@ -29,7 +29,7 @@ func historyReducer(state: HistoryState, action: Action) -> HistoryState {
         newState.isExporting = false
         newState.exportFile = nil
 
-    case .none:
+    case .exportTapped, .none:
         break
     }
 

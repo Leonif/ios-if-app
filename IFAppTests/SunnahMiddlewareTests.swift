@@ -1,6 +1,7 @@
 import XCTest
 import Redux
 import UserNotifications
+import UIKit
 @testable import IFApp
 
 final class SunnahMiddlewareTests: XCTestCase {
@@ -24,7 +25,7 @@ final class SunnahMiddlewareTests: XCTestCase {
             return true
         }
     }
-    private struct Notifications: NotificationRepositoryProtocol {
+    private struct Notifications: NotificationSchedulerProtocol {
         let status: UNAuthorizationStatus
         func enableForegroundPresentation() {}
         func requestAuthorization() async -> Bool { false }
@@ -95,6 +96,27 @@ final class SunnahMiddlewareTests: XCTestCase {
         await fulfillment(of: [finished], timeout: 3)
         let delivered = await dates.values()
         XCTAssertEqual(delivered, [3])
+        withExtendedLifetime(middleware) {}
+    }
+
+    func testSettingsTapOpensTheSystemSettingsAndSchedulesNothing() async throws {
+        final class Box { var actions: [Action] = []; var thunks: [Thunk] = [] }
+        let box = Box()
+        let repository = Repository()
+        let middleware = SunnahMiddleware(repository: repository, notifications: Notifications(status: .authorized))
+        let url = try XCTUnwrap(URL(string: UIApplication.openSettingsURLString))
+        var enabled = AppState()
+        enabled.sunnahState.settings.weekly = true
+        middleware.handle(action: SunnahAction.systemSettingsTapped(url: url), state: enabled,
+                          dispatch: DispatchFunction(dispatchAction: { box.actions.append($0) },
+                                                     dispatchThunk: { box.thunks.append($0) }))
+        XCTAssertEqual(box.thunks.count, 1)
+        let link = try XCTUnwrap(box.thunks.first as? OpenExternalLinkThunk)
+        XCTAssertEqual(Mirror(reflecting: link).descendant("url") as? URL, url)
+        try await Task.sleep(nanoseconds: 200_000_000)
+        let counts = await repository.recorder.values()
+        XCTAssertTrue(counts.isEmpty)
+        XCTAssertTrue(box.actions.isEmpty)
         withExtendedLifetime(middleware) {}
     }
 }

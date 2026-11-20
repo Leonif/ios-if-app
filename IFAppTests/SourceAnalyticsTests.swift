@@ -9,7 +9,7 @@ import Redux
 
 final class SourceAnalyticsTests: XCTestCase {
 
-    private final class RepoSpy: AnalyticsRepositoryProtocol {
+    private final class TrackerSpy: AnalyticsTrackerProtocol {
         var events: [AnalyticsEvent] = []
         func log(_ event: AnalyticsEvent) { events.append(event) }
         func setUserProperty(_ value: String?, forName name: String) {}
@@ -33,42 +33,42 @@ final class SourceAnalyticsTests: XCTestCase {
     // MARK: - The funnel
 
     func testTheWholeFunnelIsCountableEndToEnd() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         send(AppLifecycleAction.sourcesOpened, to: middleware)
         send(AppLifecycleAction.sourceArticleOpened(articleID: 1), to: middleware)
-        send(AppLifecycleAction.sourceOriginalOpened(articleID: 1), to: middleware)
+        send(AppLifecycleAction.sourceOriginalOpened(articleID: 1, url: SourceArticle.all[1].url), to: middleware)
 
-        XCTAssertEqual(repo.events.map(\.name),
+        XCTAssertEqual(tracker.events.map(\.name),
                        ["sources_opened", "source_article_opened", "source_original_opened"])
-        XCTAssertEqual(repo.articles(of: "source_article_opened"), ["01"])
-        XCTAssertEqual(repo.articles(of: "source_original_opened"), ["01"])
+        XCTAssertEqual(tracker.articles(of: "source_article_opened"), ["01"])
+        XCTAssertEqual(tracker.articles(of: "source_original_opened"), ["01"])
     }
 
     func testEachArticleReportsItself() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         for id in 0..<4 {
             send(AppLifecycleAction.sourceArticleOpened(articleID: id), to: middleware)
         }
 
-        XCTAssertEqual(repo.articles(of: "source_article_opened"), ["00", "01", "02", "03"])
+        XCTAssertEqual(tracker.articles(of: "source_article_opened"), ["00", "01", "02", "03"])
     }
 
     // MARK: - Closing the reader
 
     func testClosingReportsWhetherTheEndWasReached() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         send(AppLifecycleAction.sourceArticleClosed(articleID: 2, reachedEnd: true),
              to: middleware)
         send(AppLifecycleAction.sourceArticleClosed(articleID: 3, reachedEnd: false),
              to: middleware)
 
-        let closed = repo.named("source_article_closed")
+        let closed = tracker.named("source_article_closed")
         XCTAssertEqual(closed.count, 2)
         XCTAssertEqual(closed.map { $0.parameters["article"] as? String }, ["02", "03"])
         XCTAssertEqual(closed.map { $0.parameters["reached_end"] as? String }, ["true", "false"])
@@ -100,14 +100,14 @@ final class SourceAnalyticsTests: XCTestCase {
     // MARK: - The other users of the external-link thunk
 
     func testOpeningAnExternalLinkOnItsOwnReportsNothing() {
-        let repo = RepoSpy()
-        let middleware = AnalyticsMiddleware(repo: repo)
+        let tracker = TrackerSpy()
+        let middleware = AnalyticsMiddleware(tracker: tracker)
 
         middleware.handle(
             thunk: OpenExternalLinkThunk(url: SiteLinks.privacyPolicy, links: LinksStub()),
             state: AppState()
         )
 
-        XCTAssertTrue(repo.events.isEmpty)
+        XCTAssertTrue(tracker.events.isEmpty)
     }
 }

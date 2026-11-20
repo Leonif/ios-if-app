@@ -2,22 +2,22 @@
 
 Why the repositories are the way they are. `UserDefaults` keys and file names below are persisted on users' devices: renaming one loses the stored value on every existing install. Read the section of a file before editing it; an edit that changes or cancels a point below updates the point in the same commit.
 
-## AnalyticsRepository.swift
+## AnalyticsTracker.swift
 
-- `AnalyticsRepository` — stateless gateway for analytics events. Events are never logged from a view: they come from `AnalyticsMiddleware`, the caller for everything that travels as an action, and from the one failure that does not — `history_load_failed` is found by the file layer and wired to this gateway in `AppDependencies`.
+- `AnalyticsTracker` — stateless gateway for analytics events. A tracker, not a repository: it neither stores nor reads, it only sends events out, which is why invariant 17 leaves it to the middleware. Events are never logged from a view: they come from `AnalyticsMiddleware`, the caller for everything that travels as an action, and, for now, from one failure that does not — `history_load_failed` is found by the file layer and wired to this gateway in `AppDependencies`. That path is the known debt of invariant 18 (analytics only from `AnalyticsMiddleware`), not a second legitimate caller.
 
-## AnalyticsRepositoryProtocol.swift
+## AnalyticsTrackerProtocol.swift
 
-- `AnalyticsRepositoryProtocol.setUserProperty(_:forName:)` — a persistent user property for segmentation; `nil` clears it.
+- `AnalyticsTrackerProtocol.setUserProperty(_:forName:)` — a persistent user property for segmentation; `nil` clears it.
 
-## DiagnosticsLogRepository.swift
+## DiagnosticsLogger.swift
 
-- `DiagnosticsLogRepository` — the developer-facing journal: what the app did, in order, written to a file inside the app container. A file rather than a stream because the two ends of diagnostics are not symmetric: on the simulator a Maestro run has to be readable with no UI and no human in the loop (`simctl get_app_container` and the file is there); on a real device there is no container to reach into, and the same file is the only thing that can be handed out. A journal that only streamed to Console would serve neither; the `os.Logger` mirror is a convenience on top, not the mechanism. Compiled out outside DEBUG and DEVELOPMENT: nothing here reaches an App Store build.
-- `DiagnosticsLogRepository.maxBytes` — rotated rather than truncated: the run that explains a failure is often the one before the one being looked at.
-- `DiagnosticsLogRepository.fileURL` — static so the debug screen can find the journal without injecting the repository: a view taking anything out of the container would break invariant 3, and the path is all it needs.
-- `DiagnosticsLogRepository.mirror` — `privacy: .public` is not decoration: `os.Logger` redacts interpolated values by default, and a journal of `<private>` is worse than none because it looks like it worked.
-- `DiagnosticsLogRepository.stamp` — timestamps are for machines and for reading side by side with Maestro output, so the locale is pinned. Invariant 5 (on-screen formatting) does not apply, but not because nothing reaches a screen — `DebugScreen` renders the tail of this file in a `Text`. It does not apply because the rule guards against two digit systems meeting on one screen, and `en_US_POSIX` always yields Latin digits: the guarantee `Locale.latinDigits` exists to give, in the same shape as `Clock.dayKeyFormatter`.
-- `DiagnosticsLogRepository.writeSessionHeader()` — every launch is marked, because the first question asked of a journal is always "is this from the run I just did".
+- `DiagnosticsLogger` — the developer-facing journal: what the app did, in order, written to a file inside the app container. A logger, not a repository: it only appends, nothing reads it back through the app, which is why invariant 17 leaves it to the middleware. A file rather than a stream because the two ends of diagnostics are not symmetric: on the simulator a Maestro run has to be readable with no UI and no human in the loop (`simctl get_app_container` and the file is there); on a real device there is no container to reach into, and the same file is the only thing that can be handed out. A journal that only streamed to Console would serve neither; the `os.Logger` mirror is a convenience on top, not the mechanism. Compiled out outside DEBUG and DEVELOPMENT: nothing here reaches an App Store build.
+- `DiagnosticsLogger.maxBytes` — rotated rather than truncated: the run that explains a failure is often the one before the one being looked at.
+- `DiagnosticsLogger.fileURL` — static so the debug screen can find the journal without injecting the logger: a view taking anything out of the container would break invariant 3, and the path is all it needs.
+- `DiagnosticsLogger.mirror` — `privacy: .public` is not decoration: `os.Logger` redacts interpolated values by default, and a journal of `<private>` is worse than none because it looks like it worked.
+- `DiagnosticsLogger.stamp` — timestamps are for machines and for reading side by side with Maestro output, so the locale is pinned. Invariant 5 (on-screen formatting) does not apply, but not because nothing reaches a screen — `DebugScreen` renders the tail of this file in a `Text`. It does not apply because the rule guards against two digit systems meeting on one screen, and `en_US_POSIX` always yields Latin digits: the guarantee `Locale.latinDigits` exists to give, in the same shape as `Clock.dayKeyFormatter`.
+- `DiagnosticsLogger.writeSessionHeader()` — every launch is marked, because the first question asked of a journal is always "is this from the run I just did".
 
 ## FastHistoryRepository.swift
 
@@ -66,17 +66,17 @@ Why the repositories are the way they are. `UserDefaults` keys and file names be
 - `HistoryExportRepository.write(csv:fileName:)` — temporary directory, not Documents: the file is a copy made for one share and the app is not its owner. The history already lives in `fast-history.json`, and a second copy in Documents would show up in the user's backups as a stale duplicate. Overwrites an earlier export of the same day; returns `nil` if the write failed.
 - `HistoryExportRepository.write(csv:fileName:)` — UTF-8 — the CSV is ASCII by construction (`HistoryExport`), so UTF-8 writes the same bytes and no BOM question arises.
 
-## NotificationRepository.swift
+## NotificationScheduler.swift
 
-- `NotificationRepository` — a thin wrapper over `NotificationManager` so thunks depend on a protocol, not a singleton.
+- `NotificationScheduler` — a thin wrapper over `NotificationManager` so thunks depend on a protocol, not a singleton. Named for its main job, not a repository by suffix, but still under invariant 17: it reads the permission and holds the scheduled requests, so only a thunk calls it.
 
-## NotificationRepositoryProtocol.swift
+## NotificationSchedulerProtocol.swift
 
-- `NotificationRepositoryProtocol.enableForegroundPresentation()` — makes scheduled pushes appear while the app is in the foreground; called once at launch, before any notification can be delivered.
-- `NotificationRepositoryProtocol.requestAuthorization()` — shows the system permission dialog and returns once the user has answered.
-- `NotificationRepositoryProtocol.removeLegacyDailyReminders()` — one-time cleanup of the legacy fixed daily reminders on existing installs.
-- `NotificationRepositoryProtocol.scheduleGoalNotification(after:)` — replaces any existing goal-reached push.
-- `NotificationRepositoryProtocol.scheduleEatingEndNotification(after:)` — replaces any existing eating-window-closed push.
+- `NotificationSchedulerProtocol.enableForegroundPresentation()` — makes scheduled pushes appear while the app is in the foreground; called once at launch, before any notification can be delivered.
+- `NotificationSchedulerProtocol.requestAuthorization()` — shows the system permission dialog and returns once the user has answered.
+- `NotificationSchedulerProtocol.removeLegacyDailyReminders()` — one-time cleanup of the legacy fixed daily reminders on existing installs.
+- `NotificationSchedulerProtocol.scheduleGoalNotification(after:)` — replaces any existing goal-reached push.
+- `NotificationSchedulerProtocol.scheduleEatingEndNotification(after:)` — replaces any existing eating-window-closed push.
 
 ## ProOfferRepository.swift
 

@@ -36,7 +36,8 @@ func mealReducer(state: MealState, action: Action) -> MealState {
     case .pickerConfirmed:
         newState.forgetRestorePoint()
 
-    case .none:
+    case .chipTapped, .scrubFeedbackRequested, .exactTimeChosen, .confirmTapped,
+         .windowClosedShown, .none:
         break
     }
 

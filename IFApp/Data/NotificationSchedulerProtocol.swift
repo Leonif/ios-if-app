@@ -1,12 +1,12 @@
 //
-//  NotificationRepositoryProtocol.swift
+//  NotificationSchedulerProtocol.swift
 //  IFApp
 //
 
 import Foundation
 import UserNotifications
 
-protocol NotificationRepositoryProtocol {
+protocol NotificationSchedulerProtocol {
     func enableForegroundPresentation()
     @discardableResult
     func requestAuthorization() async -> Bool

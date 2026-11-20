@@ -34,9 +34,11 @@ State names S1-S4 are the sheet's four cards from its handoff: S1 the ordinary p
 - `EndFastAction.refused(conflict:unavoidable:)` — carries the record itself so the reason can name it: a refusal that does not say what is in the way is the silent "no" this state exists to replace.
 - `EndFastAction.refusalWithdrawn` — "Pick another time": back to the picker with the previous choice intact.
 - `EndFastAction.closed` — the sheet closed without ending the fast: the scrim, or `Keep this fast`.
+- `EndFastAction` — `openTapped`, `chipTapped`, `stepTapped(minutes:)`, `confirmTapped` — intents: the taps on "End fast" and inside the sheet, with the tap's own payload and no clock. `EndFastMiddleware` turns each into its thunk, which reads the clock and sends the facts above. Analytics stays silent on them.
 
 ## EndFastReducer.swift
 
+- `endFastReducer(state:action:)` — intents are no-ops: the choice moves only on the fact the thunk sends, against the clock it read.
 - `endFastReducer(state:action:)` — `.refusalWithdrawn` keeps the choice on purpose: the person is sent back to change one thing, and a reset picker would make them re-enter the part that was fine.
 - `clamp(_:_:_:)` — clamped rather than rejected: a control that refuses to move is the silent "no" the refusal state exists to replace. The bounds are the fast's start plus a minute and the present moment, so a value outside them is not a choice the sheet can express at all.
 
